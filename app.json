@@ -9,7 +9,9 @@
     "splash": {
       "backgroundColor": "#1e293b"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "android": {
       "package": "com.nick.czechflashcards",
       "adaptiveIcon": {
@@ -18,8 +20,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "PUT-YOUR-EAS-PROJECT-ID-HERE"
+        "projectId": "d3627930-9fa8-45d8-9bb2-82f745df51b3"
       }
-    }
+    },
+    "owner": "chamleck"
   }
 }
