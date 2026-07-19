@@ -3,25 +3,32 @@ import { View, Text, StyleSheet } from "react-native";
 import { DeclensionTable as TableType, CASE_ORDER, CASE_LABELS } from "../types";
 import { theme } from "../utils/theme";
 
+// Стек-layout: кожен відмінок — окремий блок на всю ширину.
+// Зверху заголовок (номер · назва · контрольне питання),
+// під ним дві підписані колонки: однина / множина.
+// Так довгі форми (restauracích, pánovi/pánu) мають простір і не ламають рядок.
 export function DeclensionTable({ table }: { table: TableType }) {
   return (
     <View style={styles.wrap}>
-      <View style={[styles.row, styles.head]}>
-        <Text style={[styles.cell, styles.caseCol, styles.headText]}>відмінок</Text>
-        <Text style={[styles.cell, styles.headText]}>однина</Text>
-        <Text style={[styles.cell, styles.headText]}>множина</Text>
-      </View>
       {CASE_ORDER.map((c, i) => {
         const lbl = CASE_LABELS[c];
         return (
-          <View key={c} style={[styles.row, i % 2 === 0 && styles.rowAlt]}>
-            <View style={[styles.cell, styles.caseCol]}>
+          <View key={c} style={[styles.block, i > 0 && styles.blockDivider]}>
+            <View style={styles.head}>
               <Text style={styles.caseNum}>{lbl.number}</Text>
               <Text style={styles.caseName}>{lbl.uk}</Text>
-              <Text style={styles.caseQ}>{lbl.question}</Text>
+              <Text style={styles.caseQ}>· {lbl.question}</Text>
             </View>
-            <Text style={[styles.cell, styles.formText]}>{table[c].sg}</Text>
-            <Text style={[styles.cell, styles.formText]}>{table[c].pl}</Text>
+            <View style={styles.formsRow}>
+              <View style={styles.formCol}>
+                <Text style={styles.formLabel}>однина</Text>
+                <Text style={styles.formText}>{table[c].sg}</Text>
+              </View>
+              <View style={styles.formCol}>
+                <Text style={styles.formLabel}>множина</Text>
+                <Text style={styles.formText}>{table[c].pl}</Text>
+              </View>
+            </View>
           </View>
         );
       })}
@@ -35,24 +42,35 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: theme.colors.bgElevated,
   },
-  row: { flexDirection: "row", alignItems: "stretch" },
-  rowAlt: { backgroundColor: "rgba(255,255,255,0.03)" },
-  head: { backgroundColor: theme.colors.honey },
-  cell: {
-    flex: 1,
-    paddingVertical: theme.space(2.5),
-    paddingHorizontal: theme.space(2),
-    justifyContent: "center",
+  block: {
+    paddingVertical: theme.space(3),
+    paddingHorizontal: theme.space(3.5),
   },
-  caseCol: { flex: 1.3 },
-  headText: { color: "#3a1f00", fontWeight: "700", fontSize: 12, textAlign: "center" },
-  caseNum: { color: theme.colors.honey, fontWeight: "800", fontSize: 13 },
-  caseName: { color: theme.colors.text, fontSize: 12, fontWeight: "600" },
-  caseQ: { color: theme.colors.textFaint, fontSize: 10 },
+  blockDivider: {
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.06)",
+  },
+  head: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    flexWrap: "wrap",
+    marginBottom: theme.space(2),
+  },
+  caseNum: { color: theme.colors.honey, fontWeight: "800", fontSize: 14, marginRight: 6 },
+  caseName: { color: theme.colors.text, fontSize: 14, fontWeight: "700", marginRight: 6 },
+  caseQ: { color: theme.colors.textFaint, fontSize: 12 },
+  formsRow: { flexDirection: "row" },
+  formCol: { flex: 1, paddingRight: theme.space(2) },
+  formLabel: {
+    color: theme.colors.textFaint,
+    fontSize: 10,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
   formText: {
     color: theme.colors.text,
-    fontSize: 15,
-    textAlign: "center",
-    fontWeight: "500",
+    fontSize: 17,
+    fontWeight: "600",
   },
 });

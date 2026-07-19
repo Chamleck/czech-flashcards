@@ -68,3 +68,18 @@ export function buildQueue<T extends { id: string }>(
     (a, b) => (progress[a.id]?.dueAt ?? 0) - (progress[b.id]?.dueAt ?? 0)
   );
 }
+
+// Слово вважається "помилкою", якщо його хоч раз позначили "не знаю"
+// і відтоді ще не відповіли правильно (correctStreak скинуто в 0).
+export function isMistake(p: CardProgress | undefined): boolean {
+  return !!p && p.incorrectCount > 0 && p.correctStreak === 0;
+}
+
+// Множина id слів, які зараз у колоді "Повторити помилки".
+export function getMistakeIds(progress: Record<string, CardProgress>): Set<string> {
+  const ids = new Set<string>();
+  for (const id of Object.keys(progress)) {
+    if (isMistake(progress[id])) ids.add(id);
+  }
+  return ids;
+}

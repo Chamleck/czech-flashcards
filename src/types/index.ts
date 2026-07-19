@@ -60,6 +60,15 @@ export const PATTERN_LABELS: Record<DeclensionPattern, string> = {
   stavani: "stavení (сер., -í незмінний)",
 };
 
+// Тематичні категорії слів
+export type WordCategory =
+  | "people"
+  | "home"
+  | "food"
+  | "city"
+  | "transport"
+  | "nature";
+
 // Повна парадигма відмінювання: 7 відмінків x 2 числа
 export type DeclensionTable = Record<CzechCase, { sg: string; pl: string }>;
 
@@ -69,6 +78,7 @@ export interface NounEntry {
   cz: string; // чеською, називний однини (базова форма)
   gender: Gender;
   pattern: DeclensionPattern;
+  category: WordCategory;
   declension: DeclensionTable;
   exampleSentenceCz?: string;
   exampleSentenceUk?: string;
@@ -81,3 +91,13 @@ export interface CardProgress {
   lastSeenAt: number; // timestamp
   dueAt: number; // timestamp, для інтервального повторення
 }
+
+// Параметри навігації (React Navigation, native stack)
+export type RootStackParamList = {
+  Home: undefined;
+  WordCategories: undefined;
+  WordSelection: { category: WordCategory };
+  WordSession: { title: string; entryIds: string[] };
+  GrammarCategories: undefined;
+  GrammarTopic: { topicId: string };
+};

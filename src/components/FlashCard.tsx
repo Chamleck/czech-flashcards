@@ -26,7 +26,11 @@ export function FlashCard({ entry, revealed, onReveal }: Props) {
           <Text style={styles.revealBtnText}>Показати відповідь 👀</Text>
         </Pressable>
       ) : (
-        <ScrollView style={styles.answerScroll} contentContainerStyle={{ paddingBottom: 8 }}>
+        <ScrollView
+          style={styles.answerScroll}
+          contentContainerStyle={{ paddingBottom: 8 }}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={[styles.answerHead, { borderColor: gColor }]}>
             <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
             <Text style={[styles.answerWord, { color: gColor }]}>{entry.cz}</Text>
