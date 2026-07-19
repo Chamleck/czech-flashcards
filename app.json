@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Чеські картки",
+    "slug": "czech-flashcards",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "backgroundColor": "#1e293b"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "android": {
+      "package": "com.nick.czechflashcards",
+      "adaptiveIcon": {
+        "backgroundColor": "#1e293b"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "PUT-YOUR-EAS-PROJECT-ID-HERE"
+      }
+    }
+  }
+}
