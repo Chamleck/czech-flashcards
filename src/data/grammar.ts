@@ -33,15 +33,15 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "list",
         items: [
-          { term: "🧑 Чоловічий істот.", note: "muž, student, pán — закінчення часто на приголосний" },
-          { term: "🪑 Чоловічий неістот.", note: "hrad, stůl, stroj — теж на приголосний, але Asg = Nsg" },
-          { term: "🌸 Жіночий", note: "žena, růže, kost — часто на -a, -e або приголосний" },
-          { term: "☀️ Середній", note: "město, moře, kuře — часто на -o, -e, -í" },
+          { term: "🧑 Чоловічий істот.", note: "напр. student → studenti, pán → páni. Знахідний однини = родовий однини (бо істота): «vidím studenta»." },
+          { term: "📦 Чоловічий неістот.", note: "напр. hrad → hrady, stůl → stoly. Знахідний однини = називний однини (бо неістота): «vidím hrad»." },
+          { term: "🌷 Жіночий", note: "напр. žena → ženy, růže → růže, kost → kosti. Часто на -a, -e або приголосний." },
+          { term: "⚪ Середній", note: "напр. město → města, moře → moře, kuře → kuřata. Часто на -o, -e, -í; у множині часто -a." },
         ],
       },
       {
         type: "paragraph",
-        text: "Число буває однина (jednotné číslo) і множина (množné číslo). Кожен відмінок має окрему форму для однини та множини — тому повна парадигма іменника це 7 × 2 = 14 форм.",
+        text: "Число буває однина (jednotné číslo) і множина (množné číslo). Кожен відмінок має окрему форму для однини та множини — тому повна парадигма іменника це 7 × 2 = 14 форм. Наприклад: одна žena — дві ženy, jeden hrad — tři hrady.",
       },
       {
         type: "tip",

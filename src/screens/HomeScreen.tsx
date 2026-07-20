@@ -9,7 +9,7 @@ import { NOUNS } from "../data/nouns";
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 interface Tile {
-  key: "words" | "grammar" | "phrases" | "sentences";
+  key: "words" | "grammar" | "flashcards" | "phrases" | "sentences";
   emoji: string;
   title: string;
   subtitle: string;
@@ -19,8 +19,9 @@ interface Tile {
 
 const TILES: Tile[] = [
   { key: "words", emoji: "🔤", title: "Слова", subtitle: `${NOUNS.length} іменників з відмінюванням`, color: theme.colors.honey, ready: true },
+  { key: "flashcards", emoji: "🎴", title: "Флеш-картки", subtitle: "Обери правильну форму", color: theme.colors.mint, ready: true },
   { key: "grammar", emoji: "📚", title: "Граматика", subtitle: "Відмінки, роди та зразки", color: theme.colors.lilac, ready: true },
-  { key: "phrases", emoji: "💬", title: "Фрази", subtitle: "Скоро", color: theme.colors.mint, ready: false },
+  { key: "phrases", emoji: "💬", title: "Фрази", subtitle: "Скоро", color: "#8ed081", ready: false },
   { key: "sentences", emoji: "✍️", title: "Речення з пропусками", subtitle: "Скоро", color: theme.colors.coral, ready: false },
 ];
 
@@ -30,6 +31,7 @@ export function HomeScreen({ navigation }: Props) {
   function open(key: Tile["key"]) {
     if (key === "words") navigation.navigate("WordCategories");
     else if (key === "grammar") navigation.navigate("GrammarCategories");
+    else if (key === "flashcards") navigation.navigate("FlashcardsCategories");
   }
 
   return (

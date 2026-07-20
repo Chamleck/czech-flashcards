@@ -3,9 +3,10 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
-import { theme, GENDER_LABEL } from "../utils/theme";
+import { theme } from "../utils/theme";
 import { NOUNS } from "../data/nouns";
 import { CATEGORY_BY_KEY } from "../data/categories";
+import { GenderIcon } from "../components/GenderIcon";
 
 type Props = NativeStackScreenProps<RootStackParamList, "WordSelection">;
 
@@ -65,7 +66,7 @@ export function WordSelectionScreen({ route, navigation }: Props) {
                 <Text style={styles.wordUk}>{w.uk}</Text>
                 <Text style={[styles.wordCz, { color: gColor }]}>{w.cz}</Text>
               </View>
-              <Text style={styles.genderDot}>{GENDER_LABEL[w.gender].split(" ").pop()}</Text>
+              <GenderIcon gender={w.gender} size={20} />
             </Pressable>
           );
         })}
@@ -120,7 +121,6 @@ const styles = StyleSheet.create({
   checkmark: { color: "#1a1020", fontSize: 16, fontWeight: "900" },
   wordUk: { color: theme.colors.text, fontSize: 16, fontWeight: "600" },
   wordCz: { fontSize: 14, fontWeight: "700", marginTop: 1 },
-  genderDot: { fontSize: 16 },
   footer: {
     paddingHorizontal: theme.space(4),
     paddingTop: theme.space(3),

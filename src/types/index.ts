@@ -18,14 +18,14 @@ export const CASE_ORDER: CzechCase[] = [
   "instrumental",
 ];
 
-export const CASE_LABELS: Record<CzechCase, { number: string; uk: string; question: string }> = {
-  nominativ: { number: "1.", uk: "Називний", question: "Kdo? Co?" },
-  genitiv: { number: "2.", uk: "Родовий", question: "Koho? Čeho?" },
-  dativ: { number: "3.", uk: "Давальний", question: "Komu? Čemu?" },
-  akuzativ: { number: "4.", uk: "Знахідний", question: "Koho? Co?" },
-  vokativ: { number: "5.", uk: "Кличний", question: "Oslovení!" },
-  lokal: { number: "6.", uk: "Місцевий", question: "O kom? O čem?" },
-  instrumental: { number: "7.", uk: "Орудний", question: "Kým? Čím?" },
+export const CASE_LABELS: Record<CzechCase, { number: string; uk: string; cz: string; question: string }> = {
+  nominativ: { number: "1.", uk: "Називний", cz: "Nominativ", question: "Kdo? Co?" },
+  genitiv: { number: "2.", uk: "Родовий", cz: "Genitiv", question: "Koho? Čeho?" },
+  dativ: { number: "3.", uk: "Давальний", cz: "Dativ", question: "Komu? Čemu?" },
+  akuzativ: { number: "4.", uk: "Знахідний", cz: "Akuzativ", question: "Koho? Co?" },
+  vokativ: { number: "5.", uk: "Кличний", cz: "Vokativ", question: "Oslovení!" },
+  lokal: { number: "6.", uk: "Місцевий", cz: "Lokál", question: "O kom? O čem?" },
+  instrumental: { number: "7.", uk: "Орудний", cz: "Instrumentál", question: "Kým? Čím?" },
 };
 
 export type Gender = "masc_anim" | "masc_inan" | "fem" | "neut";
@@ -100,4 +100,6 @@ export type RootStackParamList = {
   WordSession: { title: string; entryIds: string[] };
   GrammarCategories: undefined;
   GrammarTopic: { topicId: string };
+  FlashcardsCategories: undefined;
+  FlashcardsQuiz: { categoryId: string; title: string };
 };

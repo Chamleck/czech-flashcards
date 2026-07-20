@@ -12,6 +12,8 @@ import { WordSelectionScreen } from "./src/screens/WordSelectionScreen";
 import { WordSessionScreen } from "./src/screens/WordSessionScreen";
 import { GrammarCategoriesScreen } from "./src/screens/GrammarCategoriesScreen";
 import { GrammarTopicScreen } from "./src/screens/GrammarTopicScreen";
+import { FlashcardsCategoriesScreen } from "./src/screens/FlashcardsCategoriesScreen";
+import { FlashcardsQuizScreen } from "./src/screens/FlashcardsQuizScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -49,6 +51,8 @@ export default function App() {
           <Stack.Screen name="WordSession" component={WordSessionScreen} options={{ title: "" }} />
           <Stack.Screen name="GrammarCategories" component={GrammarCategoriesScreen} options={{ title: "Граматика" }} />
           <Stack.Screen name="GrammarTopic" component={GrammarTopicScreen} options={{ title: "" }} />
+          <Stack.Screen name="FlashcardsCategories" component={FlashcardsCategoriesScreen} options={{ title: "Флеш-картки" }} />
+          <Stack.Screen name="FlashcardsQuiz" component={FlashcardsQuizScreen} options={{ title: "" }} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

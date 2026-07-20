@@ -25,8 +25,8 @@ export const theme = {
 };
 
 export const GENDER_LABEL = {
-  masc_anim: "рід чол. (істота) 🧑",
-  masc_inan: "рід чол. (неістота) 🪑",
-  fem: "рід жін. 🌸",
-  neut: "рід сер. ☀️",
+  masc_anim: "рід чол. (істота)",
+  masc_inan: "рід чол. (неістота)",
+  fem: "рід жін.",
+  neut: "рід сер.",
 } as const;

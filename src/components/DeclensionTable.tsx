@@ -17,6 +17,7 @@ export function DeclensionTable({ table }: { table: TableType }) {
             <View style={styles.head}>
               <Text style={styles.caseNum}>{lbl.number}</Text>
               <Text style={styles.caseName}>{lbl.uk}</Text>
+              <Text style={styles.caseCz}>({lbl.cz})</Text>
               <Text style={styles.caseQ}>· {lbl.question}</Text>
             </View>
             <View style={styles.formsRow}>
@@ -57,7 +58,8 @@ const styles = StyleSheet.create({
     marginBottom: theme.space(2),
   },
   caseNum: { color: theme.colors.honey, fontWeight: "800", fontSize: 14, marginRight: 6 },
-  caseName: { color: theme.colors.text, fontSize: 14, fontWeight: "700", marginRight: 6 },
+  caseName: { color: theme.colors.text, fontSize: 14, fontWeight: "700", marginRight: 5 },
+  caseCz: { color: theme.genderColor.masc_inan, fontSize: 12, fontWeight: "600", fontStyle: "italic", marginRight: 6 },
   caseQ: { color: theme.colors.textFaint, fontSize: 12 },
   formsRow: { flexDirection: "row" },
   formCol: { flex: 1, paddingRight: theme.space(2) },

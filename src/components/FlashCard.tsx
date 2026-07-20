@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { NounEntry } from "../types";
 import { theme, GENDER_LABEL } from "../utils/theme";
 import { DeclensionTable } from "./DeclensionTable";
+import { GenderIcon } from "./GenderIcon";
 
 interface Props {
   entry: NounEntry;
@@ -34,7 +35,11 @@ export function FlashCard({ entry, revealed, onReveal }: Props) {
           <View style={[styles.answerHead, { borderColor: gColor }]}>
             <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
             <Text style={[styles.answerWord, { color: gColor }]}>{entry.cz}</Text>
-            <Text style={[styles.genderTag, { color: gColor }]}>
+          </View>
+
+          <View style={styles.genderBadge}>
+            <GenderIcon gender={entry.gender} size={15} />
+            <Text style={[styles.genderBadgeText, { color: gColor }]}>
               {GENDER_LABEL[entry.gender]}
             </Text>
           </View>
@@ -78,7 +83,19 @@ const styles = StyleSheet.create({
   },
   answerLabel: { color: theme.colors.textDim, fontSize: 13 },
   answerWord: { fontSize: 28, fontWeight: "800", marginVertical: 2 },
-  genderTag: { fontSize: 13, fontWeight: "600" },
+  genderBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+    gap: 6,
+    backgroundColor: theme.colors.bg, // темніше за картку — візуально відокремлює
+    borderRadius: 999,
+    paddingVertical: theme.space(1.5),
+    paddingHorizontal: theme.space(3.5),
+    marginBottom: theme.space(4),
+  },
+  genderBadgeText: { fontSize: 13, fontWeight: "700" },
   example: {
     marginTop: theme.space(4),
     backgroundColor: theme.colors.bgElevated,

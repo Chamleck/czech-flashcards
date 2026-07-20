@@ -11,23 +11,23 @@ type Props = NativeStackScreenProps<RootStackParamList, "GrammarTopic">;
 // Згруповані зразки відмінювання для блоку "patterns"
 const PATTERN_GROUPS = [
   { g: "🧑 Чол. рід — істоти", items: [
-    { name: "pán", note: "твердий: студент, pán, syn — Nsg на приголосний, Gsg -a" },
-    { name: "muž", note: "м'який: učitel, muž, otec — Gsg -e, часто Npl -i/-é" },
+    { name: "pán", note: "твердий: студент, pán, syn — називний однини на приголосний, родовий однини на -a" },
+    { name: "muž", note: "м'який: učitel, muž, otec — родовий однини на -e, часто називний множини на -i/-é" },
   ]},
-  { g: "🪑 Чол. рід — неістоти", items: [
-    { name: "hrad", note: "твердий: stůl, dům, les — Gsg -u, Lsg -e/-u" },
-    { name: "stroj", note: "м'який: pokoj, čaj — Gsg -e, Npl -e" },
+  { g: "📦 Чол. рід — неістоти", items: [
+    { name: "hrad", note: "твердий: stůl, dům, les — родовий однини на -u, місцевий однини на -e/-u" },
+    { name: "stroj", note: "м'який: pokoj, čaj — родовий однини на -e, називний множини на -e" },
   ]},
-  { g: "🌸 Жін. рід", items: [
-    { name: "žena", note: "твердий на -a: káva, škola — Gsg -y, Isg -ou" },
-    { name: "růže", note: "м'який на -e: restaurace — Gsg -e, Npl -e" },
-    { name: "kost", note: "на приголосний (i-відміна): věc, noc — Isg -í" },
+  { g: "🌷 Жін. рід", items: [
+    { name: "žena", note: "твердий на -a: káva, škola — родовий однини на -y, орудний однини на -ou" },
+    { name: "růže", note: "м'який на -e: restaurace — родовий однини на -e, називний множини на -e" },
+    { name: "kost", note: "на приголосний (i-відміна): věc, noc — орудний однини на -í" },
   ]},
-  { g: "☀️ Сер. рід", items: [
-    { name: "město", note: "твердий на -o: auto, okno — Npl -a" },
-    { name: "moře", note: "м'який на -e: pole — Gsg -e, Npl -e" },
-    { name: "kuře", note: "малята (-ete): dítě-подібні — Gsg -ete, Npl -ata" },
-    { name: "stavení", note: "на -í: nádraží — незмінне в однині, Ipl -ími" },
+  { g: "⚪ Сер. рід", items: [
+    { name: "město", note: "твердий на -o: auto, okno — називний множини на -a" },
+    { name: "moře", note: "м'який на -e: pole — родовий однини на -e, називний множини на -e" },
+    { name: "kuře", note: "малята (тип -ete): dítě-подібні — родовий однини на -ete, називний множини на -ata" },
+    { name: "stavení", note: "на -í: nádraží — незмінне в однині, орудний множини на -ími" },
   ]},
 ];
 
@@ -40,7 +40,9 @@ function CasesBlock() {
           <View key={c} style={styles.caseRow}>
             <Text style={styles.caseNum}>{l.number}</Text>
             <View style={{ flex: 1 }}>
-              <Text style={styles.caseName}>{l.uk}</Text>
+              <Text style={styles.caseName}>
+                {l.uk} <Text style={styles.caseCz}>({l.cz})</Text>
+              </Text>
               <Text style={styles.caseQ}>{l.question}</Text>
             </View>
           </View>
@@ -155,6 +157,7 @@ const styles = StyleSheet.create({
   caseRow: { flexDirection: "row", alignItems: "center", padding: theme.space(2.5), gap: theme.space(3) },
   caseNum: { color: theme.colors.honey, fontSize: 20, fontWeight: "800", width: 28 },
   caseName: { color: theme.colors.text, fontSize: 15, fontWeight: "700" },
+  caseCz: { color: theme.genderColor.masc_inan, fontSize: 13, fontWeight: "600", fontStyle: "italic" },
   caseQ: { color: theme.colors.textFaint, fontSize: 13 },
   grpBox: {
     backgroundColor: theme.colors.bgCard,
