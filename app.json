@@ -6,11 +6,16 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "backgroundColor": "#1e293b"
-    },
     "assetBundlePatterns": [
       "**/*"
+    ],
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#211527"
+        }
+      ]
     ],
     "android": {
       "package": "com.nick.czechflashcards",
