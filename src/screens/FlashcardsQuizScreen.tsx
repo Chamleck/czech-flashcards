@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "re
 import { View, Text, StyleSheet, Pressable, Animated } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Audio } from "expo-av";
+import { getQuizSounds } from "../utils/soundCache";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
@@ -56,42 +57,25 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
     });
   }, [navigation, title, idx, session.length]);
 
-  // Завантаження звуків
+  // Звуки завантажуються й "прогріваються" ОДИН РАЗ за час роботи застосунку
+  // (див. soundCache.ts) — тут лише беремо вже готові об'єкти з кешу. Це усуває
+  // вікно тиші, яке раніше повторювалось у КОЖНОМУ новому раунді через те, що
+  // екран квізу перезавантажував звуки й audio mode при кожному вході.
   useEffect(() => {
     let mounted = true;
-    (async () => {
-      try {
-        await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
-        const c = await Audio.Sound.createAsync(require("../../assets/sounds/correct.wav"));
-        const w = await Audio.Sound.createAsync(require("../../assets/sounds/wrong.wav"));
-        if (mounted) {
-          correctSound.current = c.sound;
-          wrongSound.current = w.sound;
-          // "Прогрів" аудіосесії. На Android перший реальний виклик відтворення
-          // асинхронно запитує audio focus у системи й провалюється в тишину, поки
-          // фокус не видано (баг не залежить від швидкості кліку й повторюється
-          // не лише на першому питанні). Тому одразу програємо звук майже беззвучно —
-          // це захоплює audio focus заздалегідь, і всі реальні кліки вже звучать.
-          try {
-            await c.sound.setVolumeAsync(0);
-            await c.sound.playAsync();
-            await c.sound.stopAsync();
-            await c.sound.setVolumeAsync(1);
-          } catch {
-            // прогрів не вдався — не критично
-          }
-        } else {
-          c.sound.unloadAsync();
-          w.sound.unloadAsync();
-        }
-      } catch {
+    getQuizSounds()
+      .then(({ correct, wrong }) => {
+        if (!mounted) return;
+        correctSound.current = correct;
+        wrongSound.current = wrong;
+      })
+      .catch(() => {
         // звук не критичний — гра працює й без нього
-      }
-    })();
+      });
     return () => {
       mounted = false;
-      correctSound.current?.unloadAsync();
-      wrongSound.current?.unloadAsync();
+      // НЕ вивантажуємо звуки — вони живуть у кеші на весь час роботи застосунку,
+      // щоб наступний вхід у квіз не проходив через нове вікно тиші.
     };
   }, []);
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
@@ -14,6 +14,7 @@ import { GrammarCategoriesScreen } from "./src/screens/GrammarCategoriesScreen";
 import { GrammarTopicScreen } from "./src/screens/GrammarTopicScreen";
 import { FlashcardsCategoriesScreen } from "./src/screens/FlashcardsCategoriesScreen";
 import { FlashcardsQuizScreen } from "./src/screens/FlashcardsQuizScreen";
+import { getQuizSounds } from "./src/utils/soundCache";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -31,6 +32,15 @@ const navTheme = {
 };
 
 export default function App() {
+  useEffect(() => {
+    // Прогріваємо звуки квізу заздалегідь, ще на старті застосунку — поки користувач
+    // дійде до Home → Флеш-картки → квіз (мінімум пара переходів), кеш майже напевно
+    // вже готовий, і "вікно тиші" на перший тап у першому ж раунді стає малоймовірним.
+    getQuizSounds().catch(() => {
+      // звук не критичний — застосунок працює й без нього
+    });
+  }, []);
+
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
