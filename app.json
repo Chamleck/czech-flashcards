@@ -15,7 +15,8 @@
         {
           "backgroundColor": "#211527"
         }
-      ]
+      ],
+      "expo-audio"
     ],
     "android": {
       "package": "com.nick.czechflashcards",

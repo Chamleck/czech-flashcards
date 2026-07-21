@@ -1,8 +1,7 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { View, Text, StyleSheet, Pressable, Animated } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Audio } from "expo-av";
-import { getQuizSounds } from "../utils/soundCache";
+import { playCorrect, playWrong } from "../utils/soundCache";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
@@ -31,8 +30,6 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
   const [newRecord, setNewRecord] = useState(false);
 
   const shake = useRef(new Animated.Value(0)).current;
-  const correctSound = useRef<Audio.Sound | null>(null);
-  const wrongSound = useRef<Audio.Sound | null>(null);
   // Ваги помилок по comboId — тримаємо в ref, щоб оновлення між відповідями/сесіями
   // не спричиняли зайвих ре-рендерів. Персистяться в AsyncStorage.
   const mistakes = useRef<MistakeStore>({});
@@ -57,36 +54,6 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
     });
   }, [navigation, title, idx, session.length]);
 
-  // Звуки завантажуються й "прогріваються" ОДИН РАЗ за час роботи застосунку
-  // (див. soundCache.ts) — тут лише беремо вже готові об'єкти з кешу. Це усуває
-  // вікно тиші, яке раніше повторювалось у КОЖНОМУ новому раунді через те, що
-  // екран квізу перезавантажував звуки й audio mode при кожному вході.
-  useEffect(() => {
-    let mounted = true;
-    getQuizSounds()
-      .then(({ correct, wrong }) => {
-        if (!mounted) return;
-        correctSound.current = correct;
-        wrongSound.current = wrong;
-      })
-      .catch(() => {
-        // звук не критичний — гра працює й без нього
-      });
-    return () => {
-      mounted = false;
-      // НЕ вивантажуємо звуки — вони живуть у кеші на весь час роботи застосунку,
-      // щоб наступний вхід у квіз не проходив через нове вікно тиші.
-    };
-  }, []);
-
-  async function play(ref: React.MutableRefObject<Audio.Sound | null>) {
-    try {
-      await ref.current?.replayAsync();
-    } catch {
-      // ігноруємо
-    }
-  }
-
   function runShake() {
     shake.setValue(0);
     Animated.sequence([
@@ -106,7 +73,7 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
 
     if (option === current.correct) {
       const firstTry = selectedWrong === null;
-      play(correctSound);
+      playCorrect();
       setSolved(true);
       // Трекінг помилок по комбінації: перша спроба вірна → зараховуємо як правильну
       // (наближає затухання ваги); якщо перед цим був промах — комбінація вже позначена
@@ -130,7 +97,7 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
         setIdx((i) => i + 1);
       }, 750);
     } else {
-      play(wrongSound);
+      playWrong();
       runShake();
       // Помилка на цій комбінації → підвищуємо її вагу (BOOST) на майбутні сесії.
       mistakes.current = recordAnswer(mistakes.current, current.comboId, false);

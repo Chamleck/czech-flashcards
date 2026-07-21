@@ -14,8 +14,8 @@ import { GrammarCategoriesScreen } from "./src/screens/GrammarCategoriesScreen";
 import { GrammarTopicScreen } from "./src/screens/GrammarTopicScreen";
 import { FlashcardsCategoriesScreen } from "./src/screens/FlashcardsCategoriesScreen";
 import { FlashcardsQuizScreen } from "./src/screens/FlashcardsQuizScreen";
-// Імпорт лише заради побічного ефекту: soundCache.ts сам запускає прогрів звуків
-// одразу при завантаженні модуля (ще до першого рендеру App) — див. коментар там.
+// Імпорт лише заради побічного ефекту: soundCache.ts при завантаженні модуля
+// налаштовує audio mode і створює плеєри звуків квізу (ще до першого рендеру).
 import "./src/utils/soundCache";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
