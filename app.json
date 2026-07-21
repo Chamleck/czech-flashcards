@@ -13,11 +13,12 @@
       [
         "expo-splash-screen",
         {
+          "image": "./assets/splash.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
           "backgroundColor": "#211527"
         }
-      ],
-      "expo-audio",
-      "expo-asset"
+      ]
     ],
     "android": {
       "package": "com.nick.czechflashcards",
