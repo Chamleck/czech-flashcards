@@ -7,6 +7,12 @@ import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { generateSession, Question } from "../utils/flashcardEngine";
 import { loadFlashcardStats, saveFlashcardStats, mergeSession } from "../utils/flashcardStats";
+import {
+  loadMistakes,
+  saveMistakes,
+  recordAnswer,
+  MistakeStore,
+} from "../utils/flashcardWeights";
 
 type Props = NativeStackScreenProps<RootStackParamList, "FlashcardsQuiz">;
 
@@ -21,13 +27,21 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
   const [selectedWrong, setSelectedWrong] = useState<number | null>(null);
   const [solved, setSolved] = useState(false);
   const [stats, setStats] = useState({ answered: 0, correct: 0, streak: 0, best: 0 });
+  const [newRecord, setNewRecord] = useState(false);
 
   const shake = useRef(new Animated.Value(0)).current;
   const correctSound = useRef<Audio.Sound | null>(null);
   const wrongSound = useRef<Audio.Sound | null>(null);
+  // Ваги помилок по comboId — тримаємо в ref, щоб оновлення між відповідями/сесіями
+  // не спричиняли зайвих ре-рендерів. Персистяться в AsyncStorage.
+  const mistakes = useRef<MistakeStore>({});
 
   useEffect(() => {
-    setSession(generateSession(SESSION_LEN));
+    (async () => {
+      const m = await loadMistakes();
+      mistakes.current = m;
+      setSession(generateSession(SESSION_LEN, undefined, m));
+    })();
   }, []);
 
   useLayoutEffect(() => {
@@ -53,6 +67,19 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
         if (mounted) {
           correctSound.current = c.sound;
           wrongSound.current = w.sound;
+          // "Прогрів" аудіосесії. На Android перший реальний виклик відтворення
+          // асинхронно запитує audio focus у системи й провалюється в тишину, поки
+          // фокус не видано (баг не залежить від швидкості кліку й повторюється
+          // не лише на першому питанні). Тому одразу програємо звук майже беззвучно —
+          // це захоплює audio focus заздалегідь, і всі реальні кліки вже звучать.
+          try {
+            await c.sound.setVolumeAsync(0);
+            await c.sound.playAsync();
+            await c.sound.stopAsync();
+            await c.sound.setVolumeAsync(1);
+          } catch {
+            // прогрів не вдався — не критично
+          }
         } else {
           c.sound.unloadAsync();
           w.sound.unloadAsync();
@@ -97,6 +124,13 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
       const firstTry = selectedWrong === null;
       play(correctSound);
       setSolved(true);
+      // Трекінг помилок по комбінації: перша спроба вірна → зараховуємо як правильну
+      // (наближає затухання ваги); якщо перед цим був промах — комбінація вже позначена
+      // помилковою нижче, у гілці else, тож тут не перезараховуємо як правильну.
+      if (firstTry) {
+        mistakes.current = recordAnswer(mistakes.current, current.comboId, true);
+        saveMistakes(mistakes.current);
+      }
       setStats((s) => {
         const streak = firstTry ? s.streak + 1 : 0;
         return {
@@ -114,6 +148,9 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
     } else {
       play(wrongSound);
       runShake();
+      // Помилка на цій комбінації → підвищуємо її вагу (BOOST) на майбутні сесії.
+      mistakes.current = recordAnswer(mistakes.current, current.comboId, false);
+      saveMistakes(mistakes.current);
       setSelectedWrong(optionIdx);
       setStats((s) => ({ ...s, streak: 0 }));
     }
@@ -124,7 +161,13 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
     if (!finished) return;
     (async () => {
       const prev = await loadFlashcardStats();
-      await saveFlashcardStats(mergeSession(prev, stats.answered, stats.correct, stats.best));
+      const { stats: next, newRecord: broke } = mergeSession(prev, {
+        answered: stats.answered,
+        correct: stats.correct,
+        bestStreak: stats.best,
+      });
+      await saveFlashcardStats(next);
+      setNewRecord(broke);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);
@@ -148,19 +191,28 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
           <Text style={styles.doneText}>
             Точність: {pct}%{"\n"}Найкраща серія: {stats.best}
           </Text>
+          {newRecord && (
+            <Text style={styles.recordBanner}>🏆 Новий рекорд раунду!</Text>
+          )}
           <Pressable
             style={styles.againBtn}
             onPress={() => {
-              setSession(generateSession(SESSION_LEN));
+              setSession(generateSession(SESSION_LEN, undefined, mistakes.current));
               setIdx(0);
               setSelectedWrong(null);
               setSolved(false);
               setStats({ answered: 0, correct: 0, streak: 0, best: 0 });
+              setNewRecord(false);
             }}
           >
             <Text style={styles.againText}>Ще сесія 🔁</Text>
           </Pressable>
-          <Pressable style={styles.backBtn} onPress={() => navigation.goBack()}>
+          <Pressable
+            style={styles.backBtn}
+            onPress={() =>
+              navigation.navigate("FlashcardsCategories", { justFinishedRound: true })
+            }
+          >
             <Text style={styles.backText}>До категорій</Text>
           </Pressable>
         </View>
@@ -262,6 +314,13 @@ const styles = StyleSheet.create({
   doneTitle: { color: theme.colors.text, fontSize: 24, fontWeight: "800", marginTop: 8 },
   doneScore: { color: theme.colors.honey, fontSize: 40, fontWeight: "900", marginTop: theme.space(3) },
   doneText: { color: theme.colors.textDim, fontSize: 16, textAlign: "center", marginTop: theme.space(2), lineHeight: 24 },
+  recordBanner: {
+    color: theme.colors.honey,
+    fontSize: 18,
+    fontWeight: "900",
+    textAlign: "center",
+    marginTop: theme.space(4),
+  },
   againBtn: {
     marginTop: theme.space(6),
     backgroundColor: theme.colors.honey,

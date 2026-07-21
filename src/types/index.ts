@@ -100,6 +100,6 @@ export type RootStackParamList = {
   WordSession: { title: string; entryIds: string[] };
   GrammarCategories: undefined;
   GrammarTopic: { topicId: string };
-  FlashcardsCategories: undefined;
+  FlashcardsCategories: { justFinishedRound?: boolean } | undefined;
   FlashcardsQuiz: { categoryId: string; title: string };
 };

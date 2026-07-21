@@ -14,6 +14,7 @@
     ],
     "android": {
       "package": "com.nick.czechflashcards",
+      "backgroundColor": "#211527",
       "adaptiveIcon": {
         "backgroundColor": "#1e293b"
       }
