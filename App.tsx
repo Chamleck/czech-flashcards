@@ -45,7 +45,7 @@ export default function App() {
             headerTitleStyle: { color: theme.colors.text, fontWeight: "800" },
             headerShadowVisible: false,
             contentStyle: { backgroundColor: theme.colors.bg },
-            headerBackTitleVisible: false,
+            headerBackButtonDisplayMode: "minimal",
           }}
         >
           <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
