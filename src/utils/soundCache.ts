@@ -18,7 +18,13 @@ let loadingPromise: Promise<{ correct: Audio.Sound; wrong: Audio.Sound }> | null
 async function warmUp(sound: Audio.Sound): Promise<void> {
   try {
     await sound.setVolumeAsync(0);
-    await sound.playAsync();
+    // ВАЖЛИВО: прогріваємо саме тим методом, який реально викликає гра при кліку —
+    // replayAsync(), а не playAsync(). Це різні виклики в expo-av, і є відомі
+    // особливості Android/ExoPlayer, коли саме ПЕРШИЙ виклик replayAsync() на об'єкті
+    // поводиться інакше, ніж перший playAsync() (потребує повторної підготовки після
+    // stopAsync). Раніше прогрів "спалював" перший playAsync, а гра викликала
+    // replayAsync — тобто прогрівався не той метод, який реально грав під час кліку.
+    await sound.replayAsync();
     await new Promise((r) => setTimeout(r, 120));
     await sound.stopAsync();
     await sound.setPositionAsync(0);
@@ -40,8 +46,9 @@ export function getQuizSounds(): Promise<{ correct: Audio.Sound; wrong: Audio.So
       await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
       const c = await Audio.Sound.createAsync(require("../../assets/sounds/correct.wav"));
       const w = await Audio.Sound.createAsync(require("../../assets/sounds/wrong.wav"));
-      await warmUp(c.sound);
-      await warmUp(w.sound);
+      // Прогріваємо ОБИДВА звуки паралельно (не послідовно) — це вдвічі скорочує
+      // сумарний час до готовності, звужуючи вікно, у яке може влучити перший тап.
+      await Promise.all([warmUp(c.sound), warmUp(w.sound)]);
       correctSound = c.sound;
       wrongSound = w.sound;
       return { correct: c.sound, wrong: w.sound };
@@ -58,3 +65,11 @@ export function getQuizSounds(): Promise<{ correct: Audio.Sound; wrong: Audio.So
   }
   return loadingPromise;
 }
+
+// Запускаємо прогрів ОДРАЗУ при завантаженні цього модуля — тобто ще до першого
+// рендеру App і будь-якого useEffect. Модуль обчислюється під час резолву імпортів,
+// раніше за будь-який життєвий цикл компонента, тож це максимально скорочує вікно
+// між стартом застосунку й моментом, коли користувач встигне зробити перший тап.
+getQuizSounds().catch(() => {
+  // звук не критичний — застосунок працює й без нього
+});
