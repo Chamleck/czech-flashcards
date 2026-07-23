@@ -1,25 +1,19 @@
-import { createAudioPlayer, setAudioModeAsync, preload, type AudioPlayer } from "expo-audio";
+import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from "expo-audio";
 
 // Звуки квізу на expo-audio (замінив expo-av, який не збирався під RN 0.85 / SDK 56).
 //
 // mixWithOthers на Android не запитує audio focus — це прибирає причину, через яку
 // expo-av "губив" перший тап (асинхронний запит фокусу після холодного старту).
-//
-// ОКРЕМА причина тиші, знайдена пізніше й підтверджена офіційним issue розробників
-// (expo/expo #42900, лютий 2026): expo-audio НЕ має справжньої попередньої буферизації
-// звуку — вона починається лише по виклику play(), що дає помітну затримку саме для
-// коротких UI-звуків. Офіційний issue прямо каже: "expo-audio doesn't fit for sound
-// effects or UI sound interaction like clicks". Офіційне рішення — preload(source):
-// запускає буферизацію заздалегідь (у module scope, до рендеру), так що подальший
-// play() стартує "near-instantly".
-//
-// Прогрів (play+pause одразу після ініціалізації) лишаємо як ДОДАТКОВИЙ захист від
-// іншої, платформної причини: холодний старт аудіо-підсистеми Android (AudioFlinger/
-// HAL) для процесу, що ще ЖОДНОГО разу не програвав звук. Ці дві причини незалежні
-// одна від одної, тому обидва пом'якшення лишаємо разом, а не заміняємо одне іншим.
-// Це все ще не стовідсоткова гарантія (перевірено емпірично: J S-хитрощі з таймінгом
-// на expo-av чотири рази поспіль не змінювали поведінку) — якщо тиша на найпершому
-// тапі колись все ж проскочить, вважаємо це прийнятним рідкісним edge-case.
+// Але лишається окрема, вже платформна причина: холодний старт аудіо-підсистеми
+// Android (AudioFlinger/HAL) для процесу, що ще ЖОДНОГО разу не програвав звук,
+// сам по собі вимагає часу на "прокидання". Це не race condition навколо нашого
+// коду, а холодний старт нативного шару ОС — J S-хитрощами з таймінгом (перевірено
+// емпірично на expo-av: 4 різні спроби не змінили поведінку) її обійти не можна.
+// Единий визнаний у спільноті expo-audio workaround — реальний play()+pause() одразу
+// після ініціалізації, щоб "розбудити" аудіо-шар заздалегідь, поки користувач ще
+// навігує до квізу. Це не гарантія, а пом'якшення, і як компроміс ми на цьому
+// зупиняємось: якщо тиша на найпершому тапі колись все ж проскочить — вважаємо
+// це прийнятним рідкісним edge-case, не ганяємось за ним далі.
 
 let correctPlayer: AudioPlayer | null = null;
 let wrongPlayer: AudioPlayer | null = null;
@@ -32,14 +26,8 @@ async function init(): Promise<void> {
     // до дефолтного (Android знову асинхронно запитує audio focus).
     await setAudioModeAsync({ interruptionMode: "mixWithOthers", playsInSilentMode: true });
 
-    const correctSource = require("../../assets/sounds/correct.wav");
-    const wrongSource = require("../../assets/sounds/wrong.wav");
-
-    // Офіційний preload(): починає буферизацію ДО того, як гравець реально потрібен.
-    await Promise.all([preload(correctSource), preload(wrongSource)]);
-
-    correctPlayer = createAudioPlayer(correctSource);
-    wrongPlayer = createAudioPlayer(wrongSource);
+    correctPlayer = createAudioPlayer(require("../../assets/sounds/correct.wav"));
+    wrongPlayer = createAudioPlayer(require("../../assets/sounds/wrong.wav"));
 
     // Прогрів: реальний play() на ОБОХ плеєрах (не лише виставлення volume — сам
     // виклик play() і є тим, що "будить" аудіо-шар), одразу гасимо назад.
