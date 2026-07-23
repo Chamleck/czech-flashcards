@@ -1,0 +1,9 @@
+{
+  "platforms": ["android", "apple"],
+  "android": {
+    "modules": ["expo.modules.quizsounds.QuizSoundsModule"]
+  },
+  "apple": {
+    "modules": ["QuizSoundsModule"]
+  }
+}

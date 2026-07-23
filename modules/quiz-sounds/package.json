@@ -1,0 +1,7 @@
+{
+  "name": "quiz-sounds",
+  "version": "1.0.0",
+  "description": "Short quiz sound effects via Android SoundPool (local Expo module)",
+  "main": "index.ts",
+  "private": true
+}
