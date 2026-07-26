@@ -123,7 +123,7 @@ function makeQuestionForCombo(
     comboId: comboId(entry.id, targetCase, targetNumber),
     promptWord: entry.declension.nominativ.sg,
     promptUk: entry.uk,
-    taskText: `Оберіть форму: ${lbl.uk} (${lbl.cz}), ${NUMBER_LABEL[targetNumber]}`,
+    taskText: `Оберіть форму: ${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${NUMBER_LABEL[targetNumber]}`,
     correct,
     options: shuffle([correct, distractor]),
     distractorKind: kind,
