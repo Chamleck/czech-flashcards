@@ -21,10 +21,17 @@ import java.util.Collections
  * тобто на старті застосунку, і повідомляє про завершення через OnLoadCompleteListener.
  * У момент play() лишається тільки підмішати вже готовий PCM — роботи майже немає.
  *
- * Атрибути USAGE_ASSISTANCE_SONIFICATION + CONTENT_TYPE_SONIFICATION — офіційно
- * рекомендовані Android для звуків, що супроводжують дію користувача. Вони також не
- * запитують audio focus у системи, тож зникає й та причина затримки, з якою ми воювали
- * на expo-av.
+ * Атрибути USAGE_GAME + CONTENT_TYPE_SONIFICATION — реальна комбінація, яку
+ * використовують застосунки для ігрових/UI-звуків через SoundPool. ВАЖЛИВО: тут
+ * спочатку стояв USAGE_ASSISTANCE_SONIFICATION (за описом з документації), але це
+ * призвело до повної тиші — Android маппить різні usage-атрибути на РІЗНІ гучностні
+ * потоки (див. AudioAttributes.toLegacyStreamType), і ASSISTANCE_SONIFICATION,
+ * судячи з усього, веде не на медіа-гучність, а на системну/сповіщень, яка на
+ * пристрої могла бути окремо приглушена. USAGE_GAME веде саме на медіа-потік
+ * (STREAM_MUSIC) — ту гучність, яку користувачі зазвичай і роблять голосніше.
+ *
+ * Побічно ці атрибути також не запитують audio focus у системи, тож зникає й та
+ * причина затримки, з якою ми воювали на expo-av.
  */
 class QuizSoundsModule : Module() {
   private var soundPool: SoundPool? = null
@@ -43,7 +50,7 @@ class QuizSoundsModule : Module() {
       val context: Context = appContext.reactContext ?: return@OnCreate
 
       val attributes = AudioAttributes.Builder()
-        .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+        .setUsage(AudioAttributes.USAGE_GAME)
         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
         .build()
 
