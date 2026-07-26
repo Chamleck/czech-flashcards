@@ -1,7 +1,15 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CardProgress } from "../types";
 
-const KEY = "czech_flashcards_progress_v1";
+// Ключі сховища прогресу. Кожна частина мови має власну колоду
+// (і власну колоду "Повторити помилки"), тому ключі різні.
+const NOUN_KEY = "czech_flashcards_progress_v1"; // історичний ключ — іменники
+const VERB_KEY = "czech_verbs_progress_v1"; // дієслова
+
+// За замовчуванням працюємо з колодою іменників (зворотна сумісність).
+const KEY = NOUN_KEY;
+
+export const PROGRESS_KEYS = { nouns: NOUN_KEY, verbs: VERB_KEY };
 
 // Прості інтервали повторення (мс). Індекс = поточний streak правильних відповідей.
 const INTERVALS = [
@@ -14,21 +22,36 @@ const INTERVALS = [
   1000 * 60 * 60 * 24 * 21, // 6 — 3 тижні
 ];
 
-export async function loadProgress(): Promise<Record<string, CardProgress>> {
+// Базові варіанти з явним ключем сховища.
+export async function loadProgressFrom(
+  storageKey: string
+): Promise<Record<string, CardProgress>> {
   try {
-    const raw = await AsyncStorage.getItem(KEY);
+    const raw = await AsyncStorage.getItem(storageKey);
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
   }
 }
 
-export async function saveProgress(all: Record<string, CardProgress>): Promise<void> {
+export async function saveProgressTo(
+  storageKey: string,
+  all: Record<string, CardProgress>
+): Promise<void> {
   try {
-    await AsyncStorage.setItem(KEY, JSON.stringify(all));
+    await AsyncStorage.setItem(storageKey, JSON.stringify(all));
   } catch {
     // тихо ігноруємо — прогрес не критичний для роботи
   }
+}
+
+// Зворотно-сумісні обгортки для іменників (працюють зі старим ключем).
+export function loadProgress(): Promise<Record<string, CardProgress>> {
+  return loadProgressFrom(KEY);
+}
+
+export function saveProgress(all: Record<string, CardProgress>): Promise<void> {
+  return saveProgressTo(KEY, all);
 }
 
 export function updateCard(

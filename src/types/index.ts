@@ -93,14 +93,92 @@ export interface CardProgress {
   dueAt: number; // timestamp, для інтервального повторення
 }
 
+// ─────────────────────────── ДІЄСЛОВА ───────────────────────────
+
+// Особи дієвідміни (однина 1/2/3 + множина 1/2/3)
+export type VerbPerson = "ja" | "ty" | "on" | "my" | "vy" | "oni";
+
+export const PERSON_ORDER: VerbPerson[] = ["ja", "ty", "on", "my", "vy", "oni"];
+
+// Підписи осіб (займенник + українською), для таблиці дієвідміни
+export const PERSON_LABELS: Record<VerbPerson, { cz: string; uk: string }> = {
+  ja: { cz: "já", uk: "я" },
+  ty: { cz: "ty", uk: "ти" },
+  on: { cz: "on/ona/ono", uk: "він/вона/воно" },
+  my: { cz: "my", uk: "ми" },
+  vy: { cz: "vy", uk: "ви" },
+  oni: { cz: "oni/ony", uk: "вони" },
+};
+
+// Форми дієслова для однієї особи (усі 6 осіб)
+export type PersonForms = Record<VerbPerson, string>;
+
+// Вид дієслова
+export type VerbAspect = "imperfective" | "perfective";
+
+// Дієслівний клас (5 традиційних класів + нерегулярні/модальні)
+export type VerbClass = "I" | "II" | "III" | "IV" | "V" | "irregular";
+
+export const VERB_ASPECT_LABEL: Record<VerbAspect, string> = {
+  imperfective: "недоконаний вид",
+  perfective: "доконаний вид",
+};
+
+// Форми дієприкметника минулого часу (l-форма).
+// Рід узгоджується з підметом у ВСІХ особах, тому зберігаємо 5 унікальних форм.
+export interface PastParticiple {
+  m: string; // чол. рід однини: dělal
+  f: string; // жін. рід однини: dělala
+  n: string; // сер. рід однини: dělalo
+  manim_pl: string; // чол. істот. множини: dělali
+  other_pl: string; // решта множини: dělaly
+}
+
+export interface VerbEntry {
+  id: string;
+  uk: string; // українською (інфінітив-переклад)
+  cz: string; // чеський інфінітив (напр. "dělat")
+  aspect: VerbAspect;
+  verbClass: VerbClass;
+  reflexive?: "se" | "si"; // зворотне дієслово (dívat se)
+
+  // Текстова примітка про видову пару (без повної парадигми партнера)
+  aspectPairNote?: string;
+
+  // Теперішній час — ТІЛЬКИ для недоконаного виду (доконаний не має теперішнього).
+  present?: PersonForms;
+
+  // Майбутній час:
+  //  - недоконаний зазвичай: складена конструкція budu/budeš... + інфінітив
+  //    (тоді future НЕ задаємо, компонент будує його з інфінітива та BYT_FUTURE);
+  //  - доконаний: власна дієвідміна (за формою = "теперішня", але значення майбутнє);
+  //  - винятки (jít→půjdu, jet→pojedu): задаємо явні форми тут.
+  future?: PersonForms;
+
+  // Минулий час — 5 форм l-дієприкметника.
+  pastParticiple: PastParticiple;
+
+  exampleSentenceCz?: string;
+  exampleSentenceUk?: string;
+}
+
 // Параметри навігації (React Navigation, native stack)
 export type RootStackParamList = {
   Home: undefined;
+  // Проміжний екран вибору частини мови (Іменники / Дієслова / …)
+  WordsPartOfSpeech: undefined;
+  // Іменники
   WordCategories: undefined;
   WordSelection: { category: WordCategory };
   WordSession: { title: string; entryIds: string[] };
+  // Дієслова
+  VerbCategories: undefined;
+  VerbSelection: { verbClass: VerbClass };
+  VerbSession: { title: string; entryIds: string[] };
+  // Граматика
   GrammarCategories: undefined;
   GrammarTopic: { topicId: string };
+  // Флеш-картки (квіз)
   FlashcardsCategories: { justFinishedRound?: boolean } | undefined;
   FlashcardsQuiz: { categoryId: string; title: string };
 };

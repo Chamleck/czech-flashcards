@@ -7,9 +7,13 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { RootStackParamList } from "./src/types";
 import { theme } from "./src/utils/theme";
 import { HomeScreen } from "./src/screens/HomeScreen";
+import { WordsPartOfSpeechScreen } from "./src/screens/WordsPartOfSpeechScreen";
 import { WordCategoriesScreen } from "./src/screens/WordCategoriesScreen";
 import { WordSelectionScreen } from "./src/screens/WordSelectionScreen";
 import { WordSessionScreen } from "./src/screens/WordSessionScreen";
+import { VerbCategoriesScreen } from "./src/screens/VerbCategoriesScreen";
+import { VerbSelectionScreen } from "./src/screens/VerbSelectionScreen";
+import { VerbSessionScreen } from "./src/screens/VerbSessionScreen";
 import { GrammarCategoriesScreen } from "./src/screens/GrammarCategoriesScreen";
 import { GrammarTopicScreen } from "./src/screens/GrammarTopicScreen";
 import { FlashcardsCategoriesScreen } from "./src/screens/FlashcardsCategoriesScreen";
@@ -46,9 +50,13 @@ export default function App() {
           }}
         >
           <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="WordCategories" component={WordCategoriesScreen} options={{ title: "Слова" }} />
+          <Stack.Screen name="WordsPartOfSpeech" component={WordsPartOfSpeechScreen} options={{ title: "Слова" }} />
+          <Stack.Screen name="WordCategories" component={WordCategoriesScreen} options={{ title: "Іменники" }} />
           <Stack.Screen name="WordSelection" component={WordSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="WordSession" component={WordSessionScreen} options={{ title: "" }} />
+          <Stack.Screen name="VerbCategories" component={VerbCategoriesScreen} options={{ title: "Дієслова" }} />
+          <Stack.Screen name="VerbSelection" component={VerbSelectionScreen} options={{ title: "Вибір дієслів" }} />
+          <Stack.Screen name="VerbSession" component={VerbSessionScreen} options={{ title: "" }} />
           <Stack.Screen name="GrammarCategories" component={GrammarCategoriesScreen} options={{ title: "Граматика" }} />
           <Stack.Screen name="GrammarTopic" component={GrammarTopicScreen} options={{ title: "" }} />
           <Stack.Screen name="FlashcardsCategories" component={FlashcardsCategoriesScreen} options={{ title: "Флеш-картки" }} />

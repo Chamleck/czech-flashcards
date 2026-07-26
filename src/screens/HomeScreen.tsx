@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
-import { NOUNS } from "../data/nouns";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -18,7 +17,7 @@ interface Tile {
 }
 
 const TILES: Tile[] = [
-  { key: "words", emoji: "🔤", title: "Слова", subtitle: `${NOUNS.length} іменників з відмінюванням`, color: theme.colors.honey, ready: true },
+  { key: "words", emoji: "🔤", title: "Слова", subtitle: "Іменники, дієслова та більше", color: theme.colors.honey, ready: true },
   { key: "flashcards", emoji: "🎴", title: "Флеш-картки", subtitle: "Обери правильну форму", color: theme.colors.mint, ready: true },
   { key: "grammar", emoji: "📚", title: "Граматика", subtitle: "Відмінки, роди та зразки", color: theme.colors.lilac, ready: true },
   { key: "phrases", emoji: "💬", title: "Фрази", subtitle: "Скоро", color: "#8ed081", ready: false },
@@ -29,7 +28,7 @@ export function HomeScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
 
   function open(key: Tile["key"]) {
-    if (key === "words") navigation.navigate("WordCategories");
+    if (key === "words") navigation.navigate("WordsPartOfSpeech");
     else if (key === "grammar") navigation.navigate("GrammarCategories");
     else if (key === "flashcards") navigation.navigate("FlashcardsCategories");
   }
