@@ -8,6 +8,7 @@ import { theme } from "../utils/theme";
 import { VERBS } from "../data/verbs";
 import { VERB_CLASSES } from "../data/verbCategories";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
+import { plural } from "../utils/plural";
 
 type Props = NativeStackScreenProps<RootStackParamList, "VerbCategories">;
 
@@ -35,6 +36,13 @@ export function VerbCategoriesScreen({ navigation }: Props) {
     const ids = VERBS.filter((v) => mistakeIds.has(v.id)).map((v) => v.id);
     if (ids.length === 0) return;
     navigation.navigate("VerbSession", { title: "Повторити помилки", entryIds: ids });
+  }
+
+  // Тап по класу — одразу сесія зі всіма дієсловами класу.
+  function startClass(key: string, title: string) {
+    const ids = VERBS.filter((v) => v.verbClass === key).map((v) => v.id);
+    if (ids.length === 0) return;
+    navigation.navigate("VerbSession", { title, entryIds: ids });
   }
 
   return (
@@ -65,32 +73,29 @@ export function VerbCategoriesScreen({ navigation }: Props) {
       {VERB_CLASSES.map((c) => {
         const count = countInClass(c.key);
         return (
-          <Pressable
-            key={c.key}
-            style={[styles.catRow, { borderLeftColor: c.color }]}
-            onPress={() => navigation.navigate("VerbSelection", { verbClass: c.key })}
-          >
-            <View style={{ flex: 1 }}>
-              <Text style={styles.catTitle}>{c.title}</Text>
-              <Text style={styles.catHint}>{c.hint}</Text>
-              <Text style={styles.catSub}>{count} {plural(count, "дієслово", "дієслова", "дієслів")}</Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </Pressable>
+          <View key={c.key} style={[styles.catRow, { borderLeftColor: c.color }]}>
+            <Pressable style={styles.catMain} onPress={() => startClass(c.key, c.title)}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.catTitle}>{c.title}</Text>
+                <Text style={styles.catHint}>{c.hint}</Text>
+                <Text style={styles.catSub}>{count} {plural(count, "дієслово", "дієслова", "дієслів")}</Text>
+              </View>
+            </Pressable>
+            {/* Кастомний підбір дієслів */}
+            <Pressable
+              style={styles.editBtn}
+              hitSlop={8}
+              onPress={() => navigation.navigate("VerbSelection", { verbClass: c.key })}
+            >
+              <Text style={styles.editIcon}>✏️</Text>
+            </Pressable>
+          </View>
         );
       })}
     </ScrollView>
   );
 }
 
-// Українська множина: 1 / 2-4 / 5+
-function plural(n: number, one: string, few: string, many: string): string {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return one;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
-  return many;
-}
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: theme.colors.bg },
@@ -134,15 +139,28 @@ const styles = StyleSheet.create({
   catRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.space(3),
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.md,
     borderLeftWidth: 4,
-    padding: theme.space(4),
     marginBottom: theme.space(3),
+  },
+  catMain: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.space(3),
+    padding: theme.space(4),
   },
   catTitle: { color: theme.colors.text, fontSize: 16, fontWeight: "700" },
   catHint: { color: theme.colors.textFaint, fontSize: 12, marginTop: 1 },
   catSub: { color: theme.colors.textDim, fontSize: 13, marginTop: 3 },
-  chevron: { color: theme.colors.textFaint, fontSize: 28, fontWeight: "300" },
+  editBtn: {
+    paddingHorizontal: theme.space(4),
+    paddingVertical: theme.space(4),
+    alignSelf: "stretch",
+    justifyContent: "center",
+    borderLeftWidth: 1,
+    borderLeftColor: "rgba(255,255,255,0.06)",
+  },
+  editIcon: { fontSize: 18 },
 });

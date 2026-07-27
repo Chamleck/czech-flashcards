@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
+import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
+import { plural } from "../utils/plural";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -26,6 +29,24 @@ const TILES: Tile[] = [
 
 export function HomeScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
+  const [wordMistakes, setWordMistakes] = useState(0);
+
+  // Сумарні помилки по «Словах» (іменники + дієслова) для індикатора на плитці.
+  useFocusEffect(
+    useCallback(() => {
+      let alive = true;
+      Promise.all([
+        loadProgressFrom(PROGRESS_KEYS.nouns),
+        loadProgressFrom(PROGRESS_KEYS.verbs),
+      ]).then(([np, vp]: [Record<string, CardProgress>, Record<string, CardProgress>]) => {
+        if (!alive) return;
+        setWordMistakes(getMistakeIds(np).size + getMistakeIds(vp).size);
+      });
+      return () => {
+        alive = false;
+      };
+    }, [])
+  );
 
   function open(key: Tile["key"]) {
     if (key === "words") navigation.navigate("WordsPartOfSpeech");
@@ -42,18 +63,24 @@ export function HomeScreen({ navigation }: Props) {
       <Text style={styles.subtitle}>Вчимо чеську через картки</Text>
 
       <View style={styles.grid}>
-        {TILES.map((t) => (
-          <Pressable
-            key={t.key}
-            style={[styles.tile, { borderColor: t.color }, !t.ready && styles.tileDim]}
-            onPress={() => t.ready && open(t.key)}
-          >
-            <Text style={styles.tileEmoji}>{t.emoji}</Text>
-            <Text style={styles.tileTitle}>{t.title}</Text>
-            <Text style={styles.tileSub}>{t.subtitle}</Text>
-            {!t.ready && <Text style={styles.soon}>🔒</Text>}
-          </Pressable>
-        ))}
+        {TILES.map((t) => {
+          const showMistakes = t.key === "words" && wordMistakes > 0;
+          const subtitle = showMistakes
+            ? `🔁 ${wordMistakes} ${plural(wordMistakes, "слово", "слова", "слів")} на повторення`
+            : t.subtitle;
+          return (
+            <Pressable
+              key={t.key}
+              style={[styles.tile, { borderColor: t.color }, !t.ready && styles.tileDim]}
+              onPress={() => t.ready && open(t.key)}
+            >
+              <Text style={styles.tileEmoji}>{t.emoji}</Text>
+              <Text style={styles.tileTitle}>{t.title}</Text>
+              <Text style={[styles.tileSub, showMistakes && styles.tileSubAlert]}>{subtitle}</Text>
+              {!t.ready && <Text style={styles.soon}>🔒</Text>}
+            </Pressable>
+          );
+        })}
       </View>
 
       <View style={styles.note}>
@@ -84,6 +111,7 @@ const styles = StyleSheet.create({
   tileEmoji: { fontSize: 34 },
   tileTitle: { color: theme.colors.text, fontSize: 18, fontWeight: "800", marginTop: theme.space(2) },
   tileSub: { color: theme.colors.textDim, fontSize: 12, marginTop: 2 },
+  tileSubAlert: { color: theme.colors.coral, fontWeight: "700" },
   soon: { position: "absolute", top: theme.space(3), right: theme.space(3), fontSize: 16 },
   note: { marginTop: theme.space(6), backgroundColor: theme.colors.bgElevated, borderRadius: theme.radius.md, padding: theme.space(4) },
   noteText: { color: theme.colors.textDim, fontSize: 13, lineHeight: 20 },

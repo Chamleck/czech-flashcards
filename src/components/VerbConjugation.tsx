@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { VerbEntry, PersonForms, PERSON_ORDER, PERSON_LABELS } from "../types";
+import { VerbEntry, PERSON_ORDER, PERSON_LABELS } from "../types";
 import { theme } from "../utils/theme";
 import { BYT_FUTURE, PAST_AUX } from "../data/auxVerbs";
 
@@ -28,31 +28,45 @@ function TenseTable({
 }
 
 // Побудова рядків для теперішнього часу.
-function presentRows(forms: PersonForms) {
-  return PERSON_ORDER.map((p) => ({ cz: forms[p] }));
+// se/si йде одразу після дієслова — дієслово тут єдиний наголошений елемент,
+// тож клітика природно потрапляє на другу позицію: "učím se".
+function presentRows(v: VerbEntry) {
+  if (!v.present) return [];
+  const refl = v.reflexive ? ` ${v.reflexive}` : "";
+  return PERSON_ORDER.map((p) => ({ cz: `${v.present![p]}${refl}` }));
 }
 
 // Побудова рядків для майбутнього часу.
-//  - якщо у дієслова є власні форми future (доконані, jít→půjdu тощо) — беремо їх;
-//  - інакше складене: budu/budeš… + інфінітив (недоконані).
+//  - якщо є власні форми future (доконані, jít→půjdu тощо) — це одне фінітне
+//    дієслово, se/si додається одразу після нього: "vrátím se";
+//  - інакше складене недоконаних: budu/budeš… + інфінітив. Тут допоміжне
+//    "budu" — наголошений елемент, тож se/si стає одразу після НЬОГО,
+//    а не після інфінітива: "budu se učit", НЕ "budu učit se".
 function futureRows(v: VerbEntry) {
-  const inf = v.reflexive ? `${v.cz} ${v.reflexive}` : v.cz;
   return PERSON_ORDER.map((p) => {
-    if (v.future) return { cz: v.future[p] };
-    return { cz: `${BYT_FUTURE[p]} ${inf}` };
+    if (v.future) {
+      const refl = v.reflexive ? ` ${v.reflexive}` : "";
+      return { cz: `${v.future[p]}${refl}` };
+    }
+    const refl = v.reflexive ? `${v.reflexive} ` : "";
+    return { cz: `${BYT_FUTURE[p]} ${refl}${v.cz}` };
   });
 }
 
 // Побудова рядків для минулого часу: допоміжне (jsem/jsi/…) + l-дієприкметник.
-// Показуємо чоловічий рід за замовчуванням, а поряд — усі 5 форм дієприкметника окремим блоком.
+//  - ja/ty/on: однина (чоловічий рід — базовий варіант; усі роди окремим блоком);
+//  - my/vy/oni: множина (чол. істот. — базовий варіант);
+//  - порядок клітики: [дієприкметник] [допоміжне] se — "učil jsem se",
+//    НЕ "učil se jsem". Коли допоміжного немає (3-тя особа), se йде одразу
+//    після дієприкметника, який сам стає наголошеним елементом: "učil se".
 function pastRows(v: VerbEntry) {
   const refl = v.reflexive ? ` ${v.reflexive}` : "";
+  const pp = v.pastParticiple;
   return PERSON_ORDER.map((p) => {
     const aux = PAST_AUX[p];
-    const participle = v.pastParticiple.m; // базово чол. рід
-    const cz = aux
-      ? `${participle}${refl} ${aux}`
-      : `${participle}${refl}`;
+    const isPlural = p === "my" || p === "vy" || p === "oni";
+    const participle = isPlural ? pp.manim_pl : pp.m;
+    const cz = aux ? `${participle} ${aux}${refl}` : `${participle}${refl}`;
     return { cz };
   });
 }
@@ -69,7 +83,7 @@ export function VerbConjugation({ entry }: { entry: VerbEntry }) {
           <Text style={[styles.tenseTitle, { color: theme.colors.mint }]}>
             Теперішній час
           </Text>
-          <TenseTable forms={presentRows(entry.present)} accent={theme.colors.text} />
+          <TenseTable forms={presentRows(entry)} accent={theme.colors.text} />
         </View>
       )}
 

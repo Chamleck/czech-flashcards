@@ -8,6 +8,7 @@ import { theme } from "../utils/theme";
 import { NOUNS } from "../data/nouns";
 import { CATEGORIES } from "../data/categories";
 import { loadProgress, getMistakeIds } from "../utils/progress";
+import { plural } from "../utils/plural";
 
 type Props = NativeStackScreenProps<RootStackParamList, "WordCategories">;
 
@@ -38,6 +39,13 @@ export function WordCategoriesScreen({ navigation }: Props) {
     navigation.navigate("WordSession", { title: "Повторити помилки", entryIds: ids });
   }
 
+  // Тап по категорії — одразу сесія зі всіма словами категорії.
+  function startCategory(key: string, title: string) {
+    const ids = NOUNS.filter((n) => n.category === key).map((n) => n.id);
+    if (ids.length === 0) return;
+    navigation.navigate("WordSession", { title, entryIds: ids });
+  }
+
   return (
     <ScrollView
       style={styles.safe}
@@ -65,33 +73,31 @@ export function WordCategoriesScreen({ navigation }: Props) {
 
       {CATEGORIES.map((c) => {
         const count = countInCategory(c.key);
+        const title = `${c.emoji} ${c.title}`;
         return (
-          <Pressable
-            key={c.key}
-            style={[styles.catRow, { borderLeftColor: c.color }]}
-            onPress={() => navigation.navigate("WordSelection", { category: c.key })}
-          >
-            <Text style={styles.catEmoji}>{c.emoji}</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.catTitle}>{c.title}</Text>
-              <Text style={styles.catSub}>{count} {plural(count, "слово", "слова", "слів")}</Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </Pressable>
+          <View key={c.key} style={[styles.catRow, { borderLeftColor: c.color }]}>
+            <Pressable style={styles.catMain} onPress={() => startCategory(c.key, title)}>
+              <Text style={styles.catEmoji}>{c.emoji}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.catTitle}>{c.title}</Text>
+                <Text style={styles.catSub}>{count} {plural(count, "слово", "слова", "слів")}</Text>
+              </View>
+            </Pressable>
+            {/* Кастомний підбір слів */}
+            <Pressable
+              style={styles.editBtn}
+              hitSlop={8}
+              onPress={() => navigation.navigate("WordSelection", { category: c.key })}
+            >
+              <Text style={styles.editIcon}>✏️</Text>
+            </Pressable>
+          </View>
         );
       })}
     </ScrollView>
   );
 }
 
-// Українська множина: 1 слово / 2 слова / 5 слів
-function plural(n: number, one: string, few: string, many: string): string {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return one;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
-  return many;
-}
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: theme.colors.bg },
@@ -135,15 +141,28 @@ const styles = StyleSheet.create({
   catRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.space(3),
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.md,
     borderLeftWidth: 4,
-    padding: theme.space(4),
     marginBottom: theme.space(3),
+  },
+  catMain: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.space(3),
+    padding: theme.space(4),
   },
   catEmoji: { fontSize: 26 },
   catTitle: { color: theme.colors.text, fontSize: 16, fontWeight: "700" },
   catSub: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
-  chevron: { color: theme.colors.textFaint, fontSize: 28, fontWeight: "300" },
+  editBtn: {
+    paddingHorizontal: theme.space(4),
+    paddingVertical: theme.space(4),
+    alignSelf: "stretch",
+    justifyContent: "center",
+    borderLeftWidth: 1,
+    borderLeftColor: "rgba(255,255,255,0.06)",
+  },
+  editIcon: { fontSize: 18 },
 });
