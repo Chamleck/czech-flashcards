@@ -158,8 +158,13 @@ export interface VerbEntry {
   // Минулий час — 5 форм l-дієприкметника.
   pastParticiple: PastParticiple;
 
-  exampleSentenceCz?: string;
-  exampleSentenceUk?: string;
+  // Приклади речень окремо для кожного часу (одне базове речення, що
+  // змінює форму дієслова). Теперішній — тільки для недоконаних.
+  examples: {
+    present?: { cz: string; uk: string };
+    past: { cz: string; uk: string };
+    future: { cz: string; uk: string };
+  };
 }
 
 // Параметри навігації (React Navigation, native stack)

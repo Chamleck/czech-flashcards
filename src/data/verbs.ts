@@ -24,8 +24,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "nesu", ty: "neseš", on: "nese", my: "neseme", vy: "nesete", oni: "nesou" },
     pastParticiple: { m: "nesl", f: "nesla", n: "neslo", manim_pl: "nesli", other_pl: "nesly" },
     aspectPairNote: "доконаний партнер: přinést (принести)",
-    exampleSentenceCz: "Nesu tašku domů.",
-    exampleSentenceUk: "Я несу сумку додому.",
+    examples: {
+      present: { cz: "Nesu tašku domů.", uk: "Я несу сумку додому." },
+      past: { cz: "Nesl jsem tašku domů.", uk: "Я ніс сумку додому." },
+      future: { cz: "Budu nést tašku domů.", uk: "Я нестиму сумку додому." },
+    },
   },
   {
     id: "brat",
@@ -36,8 +39,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "beru", ty: "bereš", on: "bere", my: "bereme", vy: "berete", oni: "berou" },
     pastParticiple: { m: "bral", f: "brala", n: "bralo", manim_pl: "brali", other_pl: "braly" },
     aspectPairNote: "доконаний партнер: vzít (взяти)",
-    exampleSentenceCz: "Beru si kávu.",
-    exampleSentenceUk: "Я беру собі каву.",
+    examples: {
+      present: { cz: "Beru si kávu.", uk: "Я беру собі каву." },
+      past: { cz: "Bral jsem si kávu.", uk: "Я брав собі каву." },
+      future: { cz: "Budu si brát kávu.", uk: "Я братиму собі каву." },
+    },
   },
   {
     id: "psat",
@@ -48,8 +54,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "píšu", ty: "píšeš", on: "píše", my: "píšeme", vy: "píšete", oni: "píšou" },
     pastParticiple: { m: "psal", f: "psala", n: "psalo", manim_pl: "psali", other_pl: "psaly" },
     aspectPairNote: "доконаний партнер: napsat (написати); варіант 1 ос. píši (книжн.)",
-    exampleSentenceCz: "Píšu dopis.",
-    exampleSentenceUk: "Я пишу лист.",
+    examples: {
+      present: { cz: "Píšu dopis.", uk: "Я пишу лист." },
+      past: { cz: "Psal jsem dopis.", uk: "Я писав лист." },
+      future: { cz: "Budu psát dopis.", uk: "Я писатиму лист." },
+    },
   },
   {
     id: "cist",
@@ -60,8 +69,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "čtu", ty: "čteš", on: "čte", my: "čteme", vy: "čtete", oni: "čtou" },
     pastParticiple: { m: "četl", f: "četla", n: "četlo", manim_pl: "četli", other_pl: "četly" },
     aspectPairNote: "доконаний партнер: přečíst (прочитати)",
-    exampleSentenceCz: "Čtu zajímavou knihu.",
-    exampleSentenceUk: "Я читаю цікаву книгу.",
+    examples: {
+      present: { cz: "Čtu zajímavou knihu.", uk: "Я читаю цікаву книгу." },
+      past: { cz: "Četl jsem zajímavou knihu.", uk: "Я читав цікаву книгу." },
+      future: { cz: "Budu číst zajímavou knihu.", uk: "Я читатиму цікаву книгу." },
+    },
   },
   {
     id: "pect",
@@ -72,8 +84,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "peču", ty: "pečeš", on: "peče", my: "pečeme", vy: "pečete", oni: "pečou" },
     pastParticiple: { m: "pekl", f: "pekla", n: "peklo", manim_pl: "pekli", other_pl: "pekly" },
     aspectPairNote: "доконаний партнер: upéct (спекти); інфінітив також péci (книжн.)",
-    exampleSentenceCz: "Peču chleba.",
-    exampleSentenceUk: "Я печу хліб.",
+    examples: {
+      present: { cz: "Peču chleba.", uk: "Я печу хліб." },
+      past: { cz: "Pekl jsem chleba.", uk: "Я пік хліб." },
+      future: { cz: "Budu péct chleba.", uk: "Я пектиму хліб." },
+    },
   },
   {
     id: "pit",
@@ -84,8 +99,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "piju", ty: "piješ", on: "pije", my: "pijeme", vy: "pijete", oni: "pijou" },
     pastParticiple: { m: "pil", f: "pila", n: "pilo", manim_pl: "pili", other_pl: "pily" },
     aspectPairNote: "доконаний партнер: vypít (випити); варіант 1 ос. piji (книжн.)",
-    exampleSentenceCz: "Piju vodu.",
-    exampleSentenceUk: "Я п'ю воду.",
+    examples: {
+      present: { cz: "Piju vodu.", uk: "Я п'ю воду." },
+      past: { cz: "Pil jsem vodu.", uk: "Я пив воду." },
+      future: { cz: "Budu pít vodu.", uk: "Я питиму воду." },
+    },
   },
   {
     id: "myt",
@@ -96,8 +114,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "myju", ty: "myješ", on: "myje", my: "myjeme", vy: "myjete", oni: "myjou" },
     pastParticiple: { m: "myl", f: "myla", n: "mylo", manim_pl: "myli", other_pl: "myly" },
     aspectPairNote: "доконаний партнер: umýt (вимити); варіант 1 ос. myji (книжн.)",
-    exampleSentenceCz: "Myju nádobí.",
-    exampleSentenceUk: "Я мию посуд.",
+    examples: {
+      present: { cz: "Myju nádobí.", uk: "Я мию посуд." },
+      past: { cz: "Myl jsem nádobí.", uk: "Я мив посуд." },
+      future: { cz: "Budu mýt nádobí.", uk: "Я митиму посуд." },
+    },
   },
   {
     id: "vest",
@@ -108,8 +129,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "vedu", ty: "vedeš", on: "vede", my: "vedeme", vy: "vedete", oni: "vedou" },
     pastParticiple: { m: "vedl", f: "vedla", n: "vedlo", manim_pl: "vedli", other_pl: "vedly" },
     aspectPairNote: "доконаний партнер: dovést (довести)",
-    exampleSentenceCz: "Vedu dítě do školy.",
-    exampleSentenceUk: "Я веду дитину до школи.",
+    examples: {
+      present: { cz: "Vedu dítě do školy.", uk: "Я веду дитину до школи." },
+      past: { cz: "Vedl jsem dítě do školy.", uk: "Я вів дитину до школи." },
+      future: { cz: "Budu vést dítě do školy.", uk: "Я вестиму дитину до школи." },
+    },
   },
   {
     id: "rust",
@@ -120,8 +144,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "rostu", ty: "rosteš", on: "roste", my: "rosteme", vy: "rostete", oni: "rostou" },
     pastParticiple: { m: "rostl", f: "rostla", n: "rostlo", manim_pl: "rostli", other_pl: "rostly" },
     aspectPairNote: "доконаний партнер: vyrůst (вирости)",
-    exampleSentenceCz: "Strom rychle roste.",
-    exampleSentenceUk: "Дерево швидко росте.",
+    examples: {
+      present: { cz: "Strom rychle roste.", uk: "Дерево швидко росте." },
+      past: { cz: "Strom rychle rostl.", uk: "Дерево швидко росло." },
+      future: { cz: "Strom bude rychle růst.", uk: "Дерево швидко ростиме." },
+    },
   },
 
   // ═══════════════════ II КЛАС (-ne) ═══════════════════
@@ -134,8 +161,10 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "začnu", ty: "začneš", on: "začne", my: "začneme", vy: "začnete", oni: "začnou" },
     pastParticiple: { m: "začal", f: "začala", n: "začalo", manim_pl: "začali", other_pl: "začaly" },
     aspectPairNote: "недоконаний партнер: začínat (починати)",
-    exampleSentenceCz: "Začnu pracovat zítra.",
-    exampleSentenceUk: "Я почну працювати завтра.",
+    examples: {
+      past: { cz: "Začal jsem pracovat.", uk: "Я почав працювати." },
+      future: { cz: "Začnu pracovat zítra.", uk: "Я почну працювати завтра." },
+    },
   },
   {
     id: "zapomenout",
@@ -146,8 +175,10 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "zapomenu", ty: "zapomeneš", on: "zapomene", my: "zapomeneme", vy: "zapomenete", oni: "zapomenou" },
     pastParticiple: { m: "zapomněl", f: "zapomněla", n: "zapomnělo", manim_pl: "zapomněli", other_pl: "zapomněly" },
     aspectPairNote: "недоконаний партнер: zapomínat (забувати)",
-    exampleSentenceCz: "Zapomenu na to.",
-    exampleSentenceUk: "Я забуду про це.",
+    examples: {
+      past: { cz: "Zapomněl jsem na to.", uk: "Я забув про це." },
+      future: { cz: "Zapomenu na to.", uk: "Я забуду про це." },
+    },
   },
   {
     id: "vstat",
@@ -158,8 +189,10 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "vstanu", ty: "vstaneš", on: "vstane", my: "vstaneme", vy: "vstanete", oni: "vstanou" },
     pastParticiple: { m: "vstal", f: "vstala", n: "vstalo", manim_pl: "vstali", other_pl: "vstaly" },
     aspectPairNote: "недоконаний партнер: vstávat (вставати)",
-    exampleSentenceCz: "Vstanu v sedm hodin.",
-    exampleSentenceUk: "Я встану о сьомій.",
+    examples: {
+      past: { cz: "Vstal jsem v sedm hodin.", uk: "Я встав о сьомій." },
+      future: { cz: "Vstanu v sedm hodin.", uk: "Я встану о сьомій." },
+    },
   },
   {
     id: "obleknout-se",
@@ -171,8 +204,10 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "obléknu", ty: "oblékneš", on: "oblékne", my: "oblékneme", vy: "obléknete", oni: "obléknou" },
     pastParticiple: { m: "oblékl", f: "oblékla", n: "obléklo", manim_pl: "oblékli", other_pl: "oblékly" },
     aspectPairNote: "недоконаний партнер: oblékat se (одягатися)",
-    exampleSentenceCz: "Obléknu se teple.",
-    exampleSentenceUk: "Я одягнуся тепло.",
+    examples: {
+      past: { cz: "Oblékl jsem se teple.", uk: "Я одягнувся тепло." },
+      future: { cz: "Obléknu se teple.", uk: "Я одягнуся тепло." },
+    },
   },
   {
     id: "sednout-si",
@@ -184,8 +219,10 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "sednu", ty: "sedneš", on: "sedne", my: "sedneme", vy: "sednete", oni: "sednou" },
     pastParticiple: { m: "sedl", f: "sedla", n: "sedlo", manim_pl: "sedli", other_pl: "sedly" },
     aspectPairNote: "недоконаний партнер: sedat si (сідати)",
-    exampleSentenceCz: "Sednu si na židli.",
-    exampleSentenceUk: "Я сяду на стілець.",
+    examples: {
+      past: { cz: "Sedl jsem si na židli.", uk: "Я сів на стілець." },
+      future: { cz: "Sednu si na židli.", uk: "Я сяду на стілець." },
+    },
   },
   {
     id: "vzpomenout-si",
@@ -197,8 +234,10 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "vzpomenu", ty: "vzpomeneš", on: "vzpomene", my: "vzpomeneme", vy: "vzpomenete", oni: "vzpomenou" },
     pastParticiple: { m: "vzpomněl", f: "vzpomněla", n: "vzpomnělo", manim_pl: "vzpomněli", other_pl: "vzpomněly" },
     aspectPairNote: "недоконаний партнер: vzpomínat si (згадувати)",
-    exampleSentenceCz: "Vzpomenu si na jméno.",
-    exampleSentenceUk: "Я згадаю ім'я.",
+    examples: {
+      past: { cz: "Vzpomněl jsem si na jméno.", uk: "Я згадав ім'я." },
+      future: { cz: "Vzpomenu si na jméno.", uk: "Я згадаю ім'я." },
+    },
   },
   {
     id: "padnout",
@@ -209,8 +248,10 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "padnu", ty: "padneš", on: "padne", my: "padneme", vy: "padnete", oni: "padnou" },
     pastParticiple: { m: "padl", f: "padla", n: "padlo", manim_pl: "padli", other_pl: "padly" },
     aspectPairNote: "недоконаний партнер: padat (падати)",
-    exampleSentenceCz: "Padne první sníh.",
-    exampleSentenceUk: "Впаде перший сніг.",
+    examples: {
+      past: { cz: "Padl první sníh.", uk: "Впав перший сніг." },
+      future: { cz: "Padne první sníh.", uk: "Впаде перший сніг." },
+    },
   },
   {
     id: "tisknout",
@@ -221,8 +262,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "tisknu", ty: "tiskneš", on: "tiskne", my: "tiskneme", vy: "tisknete", oni: "tisknou" },
     pastParticiple: { m: "tiskl", f: "tiskla", n: "tisklo", manim_pl: "tiskli", other_pl: "tiskly" },
     aspectPairNote: "доконаний партнер: vytisknout (надрукувати)",
-    exampleSentenceCz: "Tisknu dokument.",
-    exampleSentenceUk: "Я друкую документ.",
+    examples: {
+      present: { cz: "Tisknu dokument.", uk: "Я друкую документ." },
+      past: { cz: "Tiskl jsem dokument.", uk: "Я друкував документ." },
+      future: { cz: "Budu tisknout dokument.", uk: "Я друкуватиму документ." },
+    },
   },
 
   // ═══════════════════ III КЛАС (-uje/-je) ═══════════════════
@@ -235,8 +279,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "kupuju", ty: "kupuješ", on: "kupuje", my: "kupujeme", vy: "kupujete", oni: "kupujou" },
     pastParticiple: { m: "kupoval", f: "kupovala", n: "kupovalo", manim_pl: "kupovali", other_pl: "kupovaly" },
     aspectPairNote: "доконаний партнер: koupit (купити); варіант 1 ос. kupuji (книжн.)",
-    exampleSentenceCz: "Kupuju chleba každý den.",
-    exampleSentenceUk: "Я купую хліб щодня.",
+    examples: {
+      present: { cz: "Kupuju chleba každý den.", uk: "Я купую хліб щодня." },
+      past: { cz: "Kupoval jsem chleba každý den.", uk: "Я купував хліб щодня." },
+      future: { cz: "Budu kupovat chleba každý den.", uk: "Я купуватиму хліб щодня." },
+    },
   },
   {
     id: "pracovat",
@@ -247,8 +294,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "pracuju", ty: "pracuješ", on: "pracuje", my: "pracujeme", vy: "pracujete", oni: "pracujou" },
     pastParticiple: { m: "pracoval", f: "pracovala", n: "pracovalo", manim_pl: "pracovali", other_pl: "pracovaly" },
     aspectPairNote: "варіант 1 ос. pracuji (книжн.)",
-    exampleSentenceCz: "Pracuju v nemocnici.",
-    exampleSentenceUk: "Я працюю в лікарні.",
+    examples: {
+      present: { cz: "Pracuju v nemocnici.", uk: "Я працюю в лікарні." },
+      past: { cz: "Pracoval jsem v nemocnici.", uk: "Я працював у лікарні." },
+      future: { cz: "Budu pracovat v nemocnici.", uk: "Я працюватиму в лікарні." },
+    },
   },
   {
     id: "studovat",
@@ -259,8 +309,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "studuju", ty: "studuješ", on: "studuje", my: "studujeme", vy: "studujete", oni: "studujou" },
     pastParticiple: { m: "studoval", f: "studovala", n: "studovalo", manim_pl: "studovali", other_pl: "studovaly" },
     aspectPairNote: "варіант 1 ос. studuji (книжн.)",
-    exampleSentenceCz: "Studuju na univerzitě.",
-    exampleSentenceUk: "Я вчуся в університеті.",
+    examples: {
+      present: { cz: "Studuju na univerzitě.", uk: "Я вчуся в університеті." },
+      past: { cz: "Studoval jsem na univerzitě.", uk: "Я вчився в університеті." },
+      future: { cz: "Budu studovat na univerzitě.", uk: "Я вчитимуся в університеті." },
+    },
   },
   {
     id: "divat-se",
@@ -272,8 +325,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "dívám", ty: "díváš", on: "dívá", my: "díváme", vy: "díváte", oni: "dívají" },
     pastParticiple: { m: "díval", f: "dívala", n: "dívalo", manim_pl: "dívali", other_pl: "dívaly" },
     aspectPairNote: "доконаний партнер: podívat se (подивитися). Увага: дієвідміна за зразком -á (dívám)",
-    exampleSentenceCz: "Dívám se na film.",
-    exampleSentenceUk: "Я дивлюся фільм.",
+    examples: {
+      present: { cz: "Dívám se na film.", uk: "Я дивлюся фільм." },
+      past: { cz: "Díval jsem se na film.", uk: "Я дивився фільм." },
+      future: { cz: "Budu se dívat na film.", uk: "Я дивитимуся фільм." },
+    },
   },
   {
     id: "jmenovat-se",
@@ -285,8 +341,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "jmenuju", ty: "jmenuješ", on: "jmenuje", my: "jmenujeme", vy: "jmenujete", oni: "jmenujou" },
     pastParticiple: { m: "jmenoval", f: "jmenovala", n: "jmenovalo", manim_pl: "jmenovali", other_pl: "jmenovaly" },
     aspectPairNote: "варіант 1 ос. jmenuji (книжн.)",
-    exampleSentenceCz: "Jmenuju se Petr.",
-    exampleSentenceUk: "Мене звати Петро.",
+    examples: {
+      present: { cz: "Jmenuju se Petr.", uk: "Мене звати Петро." },
+      past: { cz: "Jmenoval jsem se Petr.", uk: "Мене звали Петро." },
+      future: { cz: "Budu se jmenovat Petr.", uk: "Мене зватимуть Петро." },
+    },
   },
   {
     id: "kryt",
@@ -297,8 +356,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "kryju", ty: "kryješ", on: "kryje", my: "kryjeme", vy: "kryjete", oni: "kryjou" },
     pastParticiple: { m: "kryl", f: "kryla", n: "krylo", manim_pl: "kryli", other_pl: "kryly" },
     aspectPairNote: "доконаний партнер: zakrýt (закрити); варіант 1 ос. kryji (книжн.)",
-    exampleSentenceCz: "Střecha kryje dům.",
-    exampleSentenceUk: "Дах криє будинок.",
+    examples: {
+      present: { cz: "Střecha kryje dům.", uk: "Дах криє будинок." },
+      past: { cz: "Střecha kryla dům.", uk: "Дах крив будинок." },
+      future: { cz: "Střecha bude krýt dům.", uk: "Дах криє будинок." },
+    },
   },
   {
     id: "potrebovat",
@@ -309,8 +371,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "potřebuju", ty: "potřebuješ", on: "potřebuje", my: "potřebujeme", vy: "potřebujete", oni: "potřebujou" },
     pastParticiple: { m: "potřeboval", f: "potřebovala", n: "potřebovalo", manim_pl: "potřebovali", other_pl: "potřebovaly" },
     aspectPairNote: "варіант 1 ос. potřebuji (книжн.)",
-    exampleSentenceCz: "Potřebuju pomoc.",
-    exampleSentenceUk: "Мені потрібна допомога.",
+    examples: {
+      present: { cz: "Potřebuju pomoc.", uk: "Мені потрібна допомога." },
+      past: { cz: "Potřeboval jsem pomoc.", uk: "Мені була потрібна допомога." },
+      future: { cz: "Budu potřebovat pomoc.", uk: "Мені буде потрібна допомога." },
+    },
   },
   {
     id: "dekovat",
@@ -321,8 +386,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "děkuju", ty: "děkuješ", on: "děkuje", my: "děkujeme", vy: "děkujete", oni: "děkujou" },
     pastParticiple: { m: "děkoval", f: "děkovala", n: "děkovalo", manim_pl: "děkovali", other_pl: "děkovaly" },
     aspectPairNote: "доконаний партнер: poděkovat (подякувати); варіант 1 ос. děkuji (книжн.)",
-    exampleSentenceCz: "Děkuju za pomoc.",
-    exampleSentenceUk: "Дякую за допомогу.",
+    examples: {
+      present: { cz: "Děkuju za pomoc.", uk: "Я дякую за допомогу." },
+      past: { cz: "Děkoval jsem za pomoc.", uk: "Я дякував за допомогу." },
+      future: { cz: "Budu děkovat za pomoc.", uk: "Я дякуватиму за допомогу." },
+    },
   },
   {
     id: "milovat",
@@ -333,8 +401,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "miluju", ty: "miluješ", on: "miluje", my: "milujeme", vy: "milujete", oni: "milujou" },
     pastParticiple: { m: "miloval", f: "milovala", n: "milovalo", manim_pl: "milovali", other_pl: "milovaly" },
     aspectPairNote: "варіант 1 ос. miluji (книжн.)",
-    exampleSentenceCz: "Miluju tě.",
-    exampleSentenceUk: "Я тебе кохаю.",
+    examples: {
+      present: { cz: "Miluju tě.", uk: "Я тебе кохаю." },
+      past: { cz: "Miloval jsem tě.", uk: "Я тебе кохав." },
+      future: { cz: "Budu tě milovat.", uk: "Я тебе кохатиму." },
+    },
   },
   {
     id: "opakovat",
@@ -345,8 +416,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "opakuju", ty: "opakuješ", on: "opakuje", my: "opakujeme", vy: "opakujete", oni: "opakujou" },
     pastParticiple: { m: "opakoval", f: "opakovala", n: "opakovalo", manim_pl: "opakovali", other_pl: "opakovaly" },
     aspectPairNote: "доконаний партнер: zopakovat (повторити); варіант 1 ос. opakuji (книжн.)",
-    exampleSentenceCz: "Opakuju si slovíčka.",
-    exampleSentenceUk: "Я повторюю слова.",
+    examples: {
+      present: { cz: "Opakuju si slovíčka.", uk: "Я повторюю слова." },
+      past: { cz: "Opakoval jsem si slovíčka.", uk: "Я повторював слова." },
+      future: { cz: "Budu si opakovat slovíčka.", uk: "Я повторюватиму слова." },
+    },
   },
 
   // ═══════════════════ IV КЛАС (-í) ═══════════════════
@@ -359,8 +433,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "prosím", ty: "prosíš", on: "prosí", my: "prosíme", vy: "prosíte", oni: "prosí" },
     pastParticiple: { m: "prosil", f: "prosila", n: "prosilo", manim_pl: "prosili", other_pl: "prosily" },
     aspectPairNote: "доконаний партнер: poprosit (попросити)",
-    exampleSentenceCz: "Prosím o pomoc.",
-    exampleSentenceUk: "Прошу допомоги.",
+    examples: {
+      present: { cz: "Prosím o pomoc.", uk: "Я прошу допомоги." },
+      past: { cz: "Prosil jsem o pomoc.", uk: "Я просив допомоги." },
+      future: { cz: "Budu prosit o pomoc.", uk: "Я проситиму допомоги." },
+    },
   },
   {
     id: "mluvit",
@@ -371,8 +448,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "mluvím", ty: "mluvíš", on: "mluví", my: "mluvíme", vy: "mluvíte", oni: "mluví" },
     pastParticiple: { m: "mluvil", f: "mluvila", n: "mluvilo", manim_pl: "mluvili", other_pl: "mluvily" },
     aspectPairNote: "доконаний партнер: promluvit (заговорити)",
-    exampleSentenceCz: "Mluvím česky.",
-    exampleSentenceUk: "Я говорю чеською.",
+    examples: {
+      present: { cz: "Mluvím česky.", uk: "Я говорю чеською." },
+      past: { cz: "Mluvil jsem česky.", uk: "Я говорив чеською." },
+      future: { cz: "Budu mluvit česky.", uk: "Я говоритиму чеською." },
+    },
   },
   {
     id: "videt",
@@ -383,8 +463,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "vidím", ty: "vidíš", on: "vidí", my: "vidíme", vy: "vidíte", oni: "vidí" },
     pastParticiple: { m: "viděl", f: "viděla", n: "vidělo", manim_pl: "viděli", other_pl: "viděly" },
     aspectPairNote: "доконаний партнер: uvidět (побачити)",
-    exampleSentenceCz: "Vidím horu.",
-    exampleSentenceUk: "Я бачу гору.",
+    examples: {
+      present: { cz: "Vidím horu.", uk: "Я бачу гору." },
+      past: { cz: "Viděl jsem horu.", uk: "Я бачив гору." },
+      future: { cz: "Budu vidět horu.", uk: "Я бачитиму гору." },
+    },
   },
   {
     id: "spat",
@@ -395,8 +478,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "spím", ty: "spíš", on: "spí", my: "spíme", vy: "spíte", oni: "spí" },
     pastParticiple: { m: "spal", f: "spala", n: "spalo", manim_pl: "spali", other_pl: "spaly" },
     aspectPairNote: "доконаний партнер: vyspat se (виспатися)",
-    exampleSentenceCz: "Spím osm hodin.",
-    exampleSentenceUk: "Я сплю вісім годин.",
+    examples: {
+      present: { cz: "Spím osm hodin.", uk: "Я сплю вісім годин." },
+      past: { cz: "Spal jsem osm hodin.", uk: "Я спав вісім годин." },
+      future: { cz: "Budu spát osm hodin.", uk: "Я спатиму вісім годин." },
+    },
   },
   {
     id: "ucit-se",
@@ -408,8 +494,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "učím", ty: "učíš", on: "učí", my: "učíme", vy: "učíte", oni: "učí" },
     pastParticiple: { m: "učil", f: "učila", n: "učilo", manim_pl: "učili", other_pl: "učily" },
     aspectPairNote: "доконаний партнер: naučit se (навчитися)",
-    exampleSentenceCz: "Učím se česky.",
-    exampleSentenceUk: "Я вчу чеську.",
+    examples: {
+      present: { cz: "Učím se česky.", uk: "Я вчу чеську." },
+      past: { cz: "Učil jsem se česky.", uk: "Я вчив чеську." },
+      future: { cz: "Budu se učit česky.", uk: "Я вчитиму чеську." },
+    },
   },
   {
     id: "vratit-se",
@@ -421,8 +510,10 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "vrátím", ty: "vrátíš", on: "vrátí", my: "vrátíme", vy: "vrátíte", oni: "vrátí" },
     pastParticiple: { m: "vrátil", f: "vrátila", n: "vrátilo", manim_pl: "vrátili", other_pl: "vrátily" },
     aspectPairNote: "недоконаний партнер: vracet se (повертатися)",
-    exampleSentenceCz: "Vrátím se večer.",
-    exampleSentenceUk: "Я повернуся ввечері.",
+    examples: {
+      past: { cz: "Vrátil jsem se večer.", uk: "Я повернувся ввечері." },
+      future: { cz: "Vrátím se večer.", uk: "Я повернуся ввечері." },
+    },
   },
   {
     id: "koupit",
@@ -433,8 +524,10 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "koupím", ty: "koupíš", on: "koupí", my: "koupíme", vy: "koupíte", oni: "koupí" },
     pastParticiple: { m: "koupil", f: "koupila", n: "koupilo", manim_pl: "koupili", other_pl: "koupily" },
     aspectPairNote: "недоконаний партнер: kupovat (купувати)",
-    exampleSentenceCz: "Koupím si nové auto.",
-    exampleSentenceUk: "Я куплю нове авто.",
+    examples: {
+      past: { cz: "Koupil jsem si nové auto.", uk: "Я купив собі нове авто." },
+      future: { cz: "Koupím si nové auto.", uk: "Я куплю собі нове авто." },
+    },
   },
   {
     id: "myslet",
@@ -445,8 +538,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "myslím", ty: "myslíš", on: "myslí", my: "myslíme", vy: "myslíte", oni: "myslí" },
     pastParticiple: { m: "myslel", f: "myslela", n: "myslelo", manim_pl: "mysleli", other_pl: "myslely" },
     aspectPairNote: "інфінітив також myslit; доконаний: pomyslet (подумати)",
-    exampleSentenceCz: "Myslím na tebe.",
-    exampleSentenceUk: "Я думаю про тебе.",
+    examples: {
+      present: { cz: "Myslím na tebe.", uk: "Я думаю про тебе." },
+      past: { cz: "Myslel jsem na tebe.", uk: "Я думав про тебе." },
+      future: { cz: "Budu na tebe myslet.", uk: "Я думатиму про тебе." },
+    },
   },
   {
     id: "slyset",
@@ -457,8 +553,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "slyším", ty: "slyšíš", on: "slyší", my: "slyšíme", vy: "slyšíte", oni: "slyší" },
     pastParticiple: { m: "slyšel", f: "slyšela", n: "slyšelo", manim_pl: "slyšeli", other_pl: "slyšely" },
     aspectPairNote: "доконаний партнер: uslyšet (почути)",
-    exampleSentenceCz: "Slyším hudbu.",
-    exampleSentenceUk: "Я чую музику.",
+    examples: {
+      present: { cz: "Slyším hudbu.", uk: "Я чую музику." },
+      past: { cz: "Slyšel jsem hudbu.", uk: "Я чув музику." },
+      future: { cz: "Budu slyšet hudbu.", uk: "Я чутиму музику." },
+    },
   },
   {
     id: "sedet",
@@ -469,8 +568,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "sedím", ty: "sedíš", on: "sedí", my: "sedíme", vy: "sedíte", oni: "sedí" },
     pastParticiple: { m: "seděl", f: "seděla", n: "sedělo", manim_pl: "seděli", other_pl: "seděly" },
     aspectPairNote: "доконаний партнер: posedět (посидіти)",
-    exampleSentenceCz: "Sedím na židli.",
-    exampleSentenceUk: "Я сиджу на стільці.",
+    examples: {
+      present: { cz: "Sedím na židli.", uk: "Я сиджу на стільці." },
+      past: { cz: "Seděl jsem na židli.", uk: "Я сидів на стільці." },
+      future: { cz: "Budu sedět na židli.", uk: "Я сидітиму на стільці." },
+    },
   },
   {
     id: "lezet",
@@ -481,8 +583,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "ležím", ty: "ležíš", on: "leží", my: "ležíme", vy: "ležíte", oni: "leží" },
     pastParticiple: { m: "ležel", f: "ležela", n: "leželo", manim_pl: "leželi", other_pl: "ležely" },
     aspectPairNote: "доконаний партнер: poležet (полежати)",
-    exampleSentenceCz: "Kniha leží na stole.",
-    exampleSentenceUk: "Книга лежить на столі.",
+    examples: {
+      present: { cz: "Kniha leží na stole.", uk: "Книга лежить на столі." },
+      past: { cz: "Kniha ležela na stole.", uk: "Книга лежала на столі." },
+      future: { cz: "Kniha bude ležet na stole.", uk: "Книга лежатиме на столі." },
+    },
   },
   {
     id: "chodit",
@@ -493,8 +598,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "chodím", ty: "chodíš", on: "chodí", my: "chodíme", vy: "chodíte", oni: "chodí" },
     pastParticiple: { m: "chodil", f: "chodila", n: "chodilo", manim_pl: "chodili", other_pl: "chodily" },
     aspectPairNote: "багатократне дієслово руху (пор. jít — однократне)",
-    exampleSentenceCz: "Chodím do školy pěšky.",
-    exampleSentenceUk: "Я ходжу до школи пішки.",
+    examples: {
+      present: { cz: "Chodím do školy pěšky.", uk: "Я ходжу до школи пішки." },
+      past: { cz: "Chodil jsem do školy pěšky.", uk: "Я ходив до школи пішки." },
+      future: { cz: "Budu chodit do školy pěšky.", uk: "Я ходитиму до школи пішки." },
+    },
   },
   {
     id: "nosit",
@@ -505,8 +613,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "nosím", ty: "nosíš", on: "nosí", my: "nosíme", vy: "nosíte", oni: "nosí" },
     pastParticiple: { m: "nosil", f: "nosila", n: "nosilo", manim_pl: "nosili", other_pl: "nosily" },
     aspectPairNote: "багатократне дієслово (пор. nést — однократне)",
-    exampleSentenceCz: "Nosím brýle.",
-    exampleSentenceUk: "Я ношу окуляри.",
+    examples: {
+      present: { cz: "Nosím brýle.", uk: "Я ношу окуляри." },
+      past: { cz: "Nosil jsem brýle.", uk: "Я носив окуляри." },
+      future: { cz: "Budu nosit brýle.", uk: "Я носитиму окуляри." },
+    },
   },
   {
     id: "platit",
@@ -517,8 +628,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "platím", ty: "platíš", on: "platí", my: "platíme", vy: "platíte", oni: "platí" },
     pastParticiple: { m: "platil", f: "platila", n: "platilo", manim_pl: "platili", other_pl: "platily" },
     aspectPairNote: "доконаний партнер: zaplatit (заплатити)",
-    exampleSentenceCz: "Platím kartou.",
-    exampleSentenceUk: "Я плачу карткою.",
+    examples: {
+      present: { cz: "Platím kartou.", uk: "Я плачу карткою." },
+      past: { cz: "Platil jsem kartou.", uk: "Я платив карткою." },
+      future: { cz: "Budu platit kartou.", uk: "Я платитиму карткою." },
+    },
   },
 
   // ═══════════════════ V КЛАС (-á) ═══════════════════
@@ -531,8 +645,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "dělám", ty: "děláš", on: "dělá", my: "děláme", vy: "děláte", oni: "dělají" },
     pastParticiple: { m: "dělal", f: "dělala", n: "dělalo", manim_pl: "dělali", other_pl: "dělaly" },
     aspectPairNote: "доконаний партнер: udělat (зробити)",
-    exampleSentenceCz: "Dělám úkol.",
-    exampleSentenceUk: "Я роблю завдання.",
+    examples: {
+      present: { cz: "Dělám úkol.", uk: "Я роблю завдання." },
+      past: { cz: "Dělal jsem úkol.", uk: "Я робив завдання." },
+      future: { cz: "Budu dělat úkol.", uk: "Я робитиму завдання." },
+    },
   },
   {
     id: "udelat",
@@ -543,8 +660,10 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "udělám", ty: "uděláš", on: "udělá", my: "uděláme", vy: "uděláte", oni: "udělají" },
     pastParticiple: { m: "udělal", f: "udělala", n: "udělalo", manim_pl: "udělali", other_pl: "udělaly" },
     aspectPairNote: "недоконаний партнер: dělat (робити)",
-    exampleSentenceCz: "Udělám to zítra.",
-    exampleSentenceUk: "Я зроблю це завтра.",
+    examples: {
+      past: { cz: "Udělal jsem to.", uk: "Я зробив це." },
+      future: { cz: "Udělám to zítra.", uk: "Я зроблю це завтра." },
+    },
   },
   {
     id: "cekat",
@@ -555,8 +674,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "čekám", ty: "čekáš", on: "čeká", my: "čekáme", vy: "čekáte", oni: "čekají" },
     pastParticiple: { m: "čekal", f: "čekala", n: "čekalo", manim_pl: "čekali", other_pl: "čekaly" },
     aspectPairNote: "доконаний партнер: počkat (почекати)",
-    exampleSentenceCz: "Čekám na autobus.",
-    exampleSentenceUk: "Я чекаю на автобус.",
+    examples: {
+      present: { cz: "Čekám na autobus.", uk: "Я чекаю на автобус." },
+      past: { cz: "Čekal jsem na autobus.", uk: "Я чекав на автобус." },
+      future: { cz: "Budu čekat na autobus.", uk: "Я чекатиму на автобус." },
+    },
   },
   {
     id: "hrat",
@@ -567,8 +689,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "hraju", ty: "hraješ", on: "hraje", my: "hrajeme", vy: "hrajete", oni: "hrajou" },
     pastParticiple: { m: "hrál", f: "hrála", n: "hrálo", manim_pl: "hráli", other_pl: "hrály" },
     aspectPairNote: "доконаний партнер: zahrát (зіграти); дієвідміна за зразком -je (hraju), варіант 1 ос. hraji (книжн.)",
-    exampleSentenceCz: "Hraju fotbal.",
-    exampleSentenceUk: "Я граю у футбол.",
+    examples: {
+      present: { cz: "Hraju fotbal.", uk: "Я граю у футбол." },
+      past: { cz: "Hrál jsem fotbal.", uk: "Я грав у футбол." },
+      future: { cz: "Budu hrát fotbal.", uk: "Я гратиму у футбол." },
+    },
   },
   {
     id: "ptat-se",
@@ -580,8 +705,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "ptám", ty: "ptáš", on: "ptá", my: "ptáme", vy: "ptáte", oni: "ptají" },
     pastParticiple: { m: "ptal", f: "ptala", n: "ptalo", manim_pl: "ptali", other_pl: "ptaly" },
     aspectPairNote: "доконаний партнер: zeptat se (запитати)",
-    exampleSentenceCz: "Ptám se na cestu.",
-    exampleSentenceUk: "Я питаю дорогу.",
+    examples: {
+      present: { cz: "Ptám se na cestu.", uk: "Я питаю дорогу." },
+      past: { cz: "Ptal jsem se na cestu.", uk: "Я питав дорогу." },
+      future: { cz: "Budu se ptát na cestu.", uk: "Я питатиму дорогу." },
+    },
   },
   {
     id: "snidat",
@@ -592,8 +720,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "snídám", ty: "snídáš", on: "snídá", my: "snídáme", vy: "snídáte", oni: "snídají" },
     pastParticiple: { m: "snídal", f: "snídala", n: "snídalo", manim_pl: "snídali", other_pl: "snídaly" },
     aspectPairNote: "доконаний партнер: nasnídat se (поснідати)",
-    exampleSentenceCz: "Snídám v osm.",
-    exampleSentenceUk: "Я снідаю о восьмій.",
+    examples: {
+      present: { cz: "Snídám v osm.", uk: "Я снідаю о восьмій." },
+      past: { cz: "Snídal jsem v osm.", uk: "Я снідав о восьмій." },
+      future: { cz: "Budu snídat v osm.", uk: "Я снідатиму о восьмій." },
+    },
   },
   {
     id: "volat",
@@ -604,8 +735,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "volám", ty: "voláš", on: "volá", my: "voláme", vy: "voláte", oni: "volají" },
     pastParticiple: { m: "volal", f: "volala", n: "volalo", manim_pl: "volali", other_pl: "volaly" },
     aspectPairNote: "доконаний партнер: zavolat (подзвонити)",
-    exampleSentenceCz: "Volám mámě.",
-    exampleSentenceUk: "Я дзвоню мамі.",
+    examples: {
+      present: { cz: "Volám mámě.", uk: "Я дзвоню мамі." },
+      past: { cz: "Volal jsem mámě.", uk: "Я дзвонив мамі." },
+      future: { cz: "Budu volat mámě.", uk: "Я дзвонитиму мамі." },
+    },
   },
   {
     id: "zavolat",
@@ -616,8 +750,10 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "zavolám", ty: "zavoláš", on: "zavolá", my: "zavoláme", vy: "zavoláte", oni: "zavolají" },
     pastParticiple: { m: "zavolal", f: "zavolala", n: "zavolalo", manim_pl: "zavolali", other_pl: "zavolaly" },
     aspectPairNote: "недоконаний партнер: volat (дзвонити)",
-    exampleSentenceCz: "Zavolám ti zítra.",
-    exampleSentenceUk: "Я подзвоню тобі завтра.",
+    examples: {
+      past: { cz: "Zavolal jsem ti.", uk: "Я подзвонив тобі." },
+      future: { cz: "Zavolám ti zítra.", uk: "Я подзвоню тобі завтра." },
+    },
   },
   {
     id: "poslouchat",
@@ -628,8 +764,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "poslouchám", ty: "posloucháš", on: "poslouchá", my: "posloucháme", vy: "posloucháte", oni: "poslouchají" },
     pastParticiple: { m: "poslouchal", f: "poslouchala", n: "poslouchalo", manim_pl: "poslouchali", other_pl: "poslouchaly" },
     aspectPairNote: "доконаний партнер: poslechnout si (послухати)",
-    exampleSentenceCz: "Poslouchám hudbu.",
-    exampleSentenceUk: "Я слухаю музику.",
+    examples: {
+      present: { cz: "Poslouchám hudbu.", uk: "Я слухаю музику." },
+      past: { cz: "Poslouchal jsem hudbu.", uk: "Я слухав музику." },
+      future: { cz: "Budu poslouchat hudbu.", uk: "Я слухатиму музику." },
+    },
   },
   {
     id: "vstavat",
@@ -640,8 +779,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "vstávám", ty: "vstáváš", on: "vstává", my: "vstáváme", vy: "vstáváte", oni: "vstávají" },
     pastParticiple: { m: "vstával", f: "vstávala", n: "vstávalo", manim_pl: "vstávali", other_pl: "vstávaly" },
     aspectPairNote: "доконаний партнер: vstát (встати)",
-    exampleSentenceCz: "Vstávám brzy ráno.",
-    exampleSentenceUk: "Я встаю рано вранці.",
+    examples: {
+      present: { cz: "Vstávám brzy ráno.", uk: "Я встаю рано вранці." },
+      past: { cz: "Vstával jsem brzy ráno.", uk: "Я вставав рано вранці." },
+      future: { cz: "Budu vstávat brzy ráno.", uk: "Я вставатиму рано вранці." },
+    },
   },
   {
     id: "znat",
@@ -652,8 +794,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "znám", ty: "znáš", on: "zná", my: "známe", vy: "znáte", oni: "znají" },
     pastParticiple: { m: "znal", f: "znala", n: "znalo", manim_pl: "znali", other_pl: "znaly" },
     aspectPairNote: "знати особу/місце (пор. vědět — знати факт, umět — вміти)",
-    exampleSentenceCz: "Znám toho člověka.",
-    exampleSentenceUk: "Я знаю цю людину.",
+    examples: {
+      present: { cz: "Znám toho člověka.", uk: "Я знаю цю людину." },
+      past: { cz: "Znal jsem toho člověka.", uk: "Я знав цю людину." },
+      future: { cz: "Budu znát toho člověka.", uk: "Я знатиму цю людину." },
+    },
   },
   {
     id: "zpivat",
@@ -664,8 +809,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "zpívám", ty: "zpíváš", on: "zpívá", my: "zpíváme", vy: "zpíváte", oni: "zpívají" },
     pastParticiple: { m: "zpíval", f: "zpívala", n: "zpívalo", manim_pl: "zpívali", other_pl: "zpívaly" },
     aspectPairNote: "доконаний партнер: zazpívat (заспівати)",
-    exampleSentenceCz: "Zpívám písničku.",
-    exampleSentenceUk: "Я співаю пісню.",
+    examples: {
+      present: { cz: "Zpívám písničku.", uk: "Я співаю пісню." },
+      past: { cz: "Zpíval jsem písničku.", uk: "Я співав пісню." },
+      future: { cz: "Budu zpívat písničku.", uk: "Я співатиму пісню." },
+    },
   },
 
   // ═══════════════════ НЕПРАВИЛЬНІ / МОДАЛЬНІ ═══════════════════
@@ -679,8 +827,11 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "budu", ty: "budeš", on: "bude", my: "budeme", vy: "budete", oni: "budou" },
     pastParticiple: { m: "byl", f: "byla", n: "bylo", manim_pl: "byli", other_pl: "byly" },
     aspectPairNote: "нерегулярне; майбутній час власний (budu…), а не складений",
-    exampleSentenceCz: "Jsem doma.",
-    exampleSentenceUk: "Я вдома.",
+    examples: {
+      present: { cz: "Jsem doma.", uk: "Я вдома." },
+      past: { cz: "Byl jsem doma.", uk: "Я був удома." },
+      future: { cz: "Budu doma.", uk: "Я буду вдома." },
+    },
   },
   {
     id: "mit",
@@ -691,8 +842,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "mám", ty: "máš", on: "má", my: "máme", vy: "máte", oni: "mají" },
     pastParticiple: { m: "měl", f: "měla", n: "mělo", manim_pl: "měli", other_pl: "měly" },
     aspectPairNote: "нерегулярне; майбутній складений: budu mít…",
-    exampleSentenceCz: "Mám nové auto.",
-    exampleSentenceUk: "У мене нове авто.",
+    examples: {
+      present: { cz: "Mám nové auto.", uk: "У мене нове авто." },
+      past: { cz: "Měl jsem nové auto.", uk: "У мене було нове авто." },
+      future: { cz: "Budu mít nové auto.", uk: "У мене буде нове авто." },
+    },
   },
   {
     id: "chtit",
@@ -703,8 +857,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "chci", ty: "chceš", on: "chce", my: "chceme", vy: "chcete", oni: "chtějí" },
     pastParticiple: { m: "chtěl", f: "chtěla", n: "chtělo", manim_pl: "chtěli", other_pl: "chtěly" },
     aspectPairNote: "нерегулярне; майбутній складений: budu chtít…",
-    exampleSentenceCz: "Chci jíst.",
-    exampleSentenceUk: "Я хочу їсти.",
+    examples: {
+      present: { cz: "Chci jíst.", uk: "Я хочу їсти." },
+      past: { cz: "Chtěl jsem jíst.", uk: "Я хотів їсти." },
+      future: { cz: "Budu chtít jíst.", uk: "Я хотітиму їсти." },
+    },
   },
   {
     id: "jit",
@@ -716,8 +873,11 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "půjdu", ty: "půjdeš", on: "půjde", my: "půjdeme", vy: "půjdete", oni: "půjdou" },
     pastParticiple: { m: "šel", f: "šla", n: "šlo", manim_pl: "šli", other_pl: "šly" },
     aspectPairNote: "нерегулярне; майбутній час власний (půjdu…), а не складений",
-    exampleSentenceCz: "Jdu domů.",
-    exampleSentenceUk: "Я йду додому.",
+    examples: {
+      present: { cz: "Jdu domů.", uk: "Я йду додому." },
+      past: { cz: "Šel jsem domů.", uk: "Я йшов додому." },
+      future: { cz: "Půjdu domů.", uk: "Я піду додому." },
+    },
   },
   {
     id: "jet",
@@ -729,8 +889,11 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "pojedu", ty: "pojedeš", on: "pojede", my: "pojedeme", vy: "pojedete", oni: "pojedou" },
     pastParticiple: { m: "jel", f: "jela", n: "jelo", manim_pl: "jeli", other_pl: "jely" },
     aspectPairNote: "нерегулярне; майбутній час власний (pojedu…), а не складений",
-    exampleSentenceCz: "Jedu do Prahy.",
-    exampleSentenceUk: "Я їду до Праги.",
+    examples: {
+      present: { cz: "Jedu do Prahy.", uk: "Я їду до Праги." },
+      past: { cz: "Jel jsem do Prahy.", uk: "Я їхав до Праги." },
+      future: { cz: "Pojedu do Prahy.", uk: "Я поїду до Праги." },
+    },
   },
   {
     id: "vedet",
@@ -741,8 +904,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "vím", ty: "víš", on: "ví", my: "víme", vy: "víte", oni: "vědí" },
     pastParticiple: { m: "věděl", f: "věděla", n: "vědělo", manim_pl: "věděli", other_pl: "věděly" },
     aspectPairNote: "нерегулярне (3 ос. мн. vědí!); знати факт (пор. znát — бути знайомим). Майбутній складений: budu vědět…",
-    exampleSentenceCz: "Vím, kde bydlíš.",
-    exampleSentenceUk: "Я знаю, де ти живеш.",
+    examples: {
+      present: { cz: "Vím, kde bydlíš.", uk: "Я знаю, де ти живеш." },
+      past: { cz: "Věděl jsem, kde bydlíš.", uk: "Я знав, де ти живеш." },
+      future: { cz: "Budu vědět, kde bydlíš.", uk: "Я знатиму, де ти живеш." },
+    },
   },
   {
     id: "jist",
@@ -753,8 +919,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "jím", ty: "jíš", on: "jí", my: "jíme", vy: "jíte", oni: "jedí" },
     pastParticiple: { m: "jedl", f: "jedla", n: "jedlo", manim_pl: "jedli", other_pl: "jedly" },
     aspectPairNote: "нерегулярне (3 ос. мн. jedí!); доконаний: sníst (з'їсти). Майбутній складений: budu jíst…",
-    exampleSentenceCz: "Jím oběd.",
-    exampleSentenceUk: "Я їм обід.",
+    examples: {
+      present: { cz: "Jím oběd.", uk: "Я їм обід." },
+      past: { cz: "Jedl jsem oběd.", uk: "Я їв обід." },
+      future: { cz: "Budu jíst oběd.", uk: "Я їстиму обід." },
+    },
   },
   {
     id: "moci",
@@ -765,8 +934,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "mohu", ty: "můžeš", on: "může", my: "můžeme", vy: "můžete", oni: "mohou" },
     pastParticiple: { m: "mohl", f: "mohla", n: "mohlo", manim_pl: "mohli", other_pl: "mohly" },
     aspectPairNote: "модальне; розм. форми můžu/můžou; інфінітив також moct. Майбутній складений: budu moci…",
-    exampleSentenceCz: "Můžu ti pomoct.",
-    exampleSentenceUk: "Я можу тобі допомогти.",
+    examples: {
+      present: { cz: "Můžu ti pomoct.", uk: "Я можу тобі допомогти." },
+      past: { cz: "Mohl jsem ti pomoct.", uk: "Я міг тобі допомогти." },
+      future: { cz: "Budu ti moci pomoct.", uk: "Я зможу тобі допомогти." },
+    },
   },
   {
     id: "muset",
@@ -777,8 +949,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "musím", ty: "musíš", on: "musí", my: "musíme", vy: "musíte", oni: "musí" },
     pastParticiple: { m: "musel", f: "musela", n: "muselo", manim_pl: "museli", other_pl: "musely" },
     aspectPairNote: "модальне (за формою IV клас, але традиційно серед нерегулярних/модальних); інфінітив також musit",
-    exampleSentenceCz: "Musím jít.",
-    exampleSentenceUk: "Я мушу йти.",
+    examples: {
+      present: { cz: "Musím jít.", uk: "Я мушу йти." },
+      past: { cz: "Musel jsem jít.", uk: "Я мусив йти." },
+      future: { cz: "Budu muset jít.", uk: "Я муситиму йти." },
+    },
   },
   {
     id: "umet",
@@ -789,8 +964,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "umím", ty: "umíš", on: "umí", my: "umíme", vy: "umíte", oni: "umí" },
     pastParticiple: { m: "uměl", f: "uměla", n: "umělo", manim_pl: "uměli", other_pl: "uměly" },
     aspectPairNote: "модальне; вміти робити щось (пор. znát, vědět)",
-    exampleSentenceCz: "Umím plavat.",
-    exampleSentenceUk: "Я вмію плавати.",
+    examples: {
+      present: { cz: "Umím plavat.", uk: "Я вмію плавати." },
+      past: { cz: "Uměl jsem plavat.", uk: "Я вмів плавати." },
+      future: { cz: "Budu umět plavat.", uk: "Я вмітиму плавати." },
+    },
   },
   {
     id: "smet",
@@ -801,8 +979,11 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "smím", ty: "smíš", on: "smí", my: "smíme", vy: "smíte", oni: "smí" },
     pastParticiple: { m: "směl", f: "směla", n: "smělo", manim_pl: "směli", other_pl: "směly" },
     aspectPairNote: "модальне; мати дозвіл (3 ос. мн. також smějí)",
-    exampleSentenceCz: "Smím vstoupit?",
-    exampleSentenceUk: "Можна увійти?",
+    examples: {
+      present: { cz: "Smím vstoupit?", uk: "Мені можна увійти?" },
+      past: { cz: "Směl jsem vstoupit.", uk: "Мені було можна увійти." },
+      future: { cz: "Budu smět vstoupit.", uk: "Мені буде можна увійти." },
+    },
   },
   {
     id: "vzit",
@@ -813,8 +994,10 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "vezmu", ty: "vezmeš", on: "vezme", my: "vezmeme", vy: "vezmete", oni: "vezmou" },
     pastParticiple: { m: "vzal", f: "vzala", n: "vzalo", manim_pl: "vzali", other_pl: "vzaly" },
     aspectPairNote: "нерегулярне доконане; недоконаний партнер: brát (брати)",
-    exampleSentenceCz: "Vezmu si deštník.",
-    exampleSentenceUk: "Я візьму парасольку.",
+    examples: {
+      past: { cz: "Vzal jsem si deštník.", uk: "Я взяв парасольку." },
+      future: { cz: "Vezmu si deštník.", uk: "Я візьму парасольку." },
+    },
   },
   {
     id: "stat-se",
@@ -826,8 +1009,10 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "stanu", ty: "staneš", on: "stane", my: "staneme", vy: "stanete", oni: "stanou" },
     pastParticiple: { m: "stal", f: "stala", n: "stalo", manim_pl: "stali", other_pl: "staly" },
     aspectPairNote: "нерегулярне доконане; недоконаний партнер: stávat se (ставатися)",
-    exampleSentenceCz: "Co se stalo?",
-    exampleSentenceUk: "Що сталося?",
+    examples: {
+      past: { cz: "Co se stalo?", uk: "Що сталося?" },
+      future: { cz: "Co se stane?", uk: "Що станеться?" },
+    },
   },
   {
     id: "bat-se",
@@ -839,7 +1024,10 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "bojím", ty: "bojíš", on: "bojí", my: "bojíme", vy: "bojíte", oni: "bojí" },
     pastParticiple: { m: "bál", f: "bála", n: "bálo", manim_pl: "báli", other_pl: "bály" },
     aspectPairNote: "нерегулярне; майбутній складений: budu se bát…",
-    exampleSentenceCz: "Bojím se tmy.",
-    exampleSentenceUk: "Я боюся темряви.",
+    examples: {
+      present: { cz: "Bojím se tmy.", uk: "Я боюся темряви." },
+      past: { cz: "Bál jsem se tmy.", uk: "Я боявся темряви." },
+      future: { cz: "Budu se bát tmy.", uk: "Я боятимуся темряви." },
+    },
   },
 ];

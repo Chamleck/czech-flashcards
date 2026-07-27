@@ -29,7 +29,11 @@ export function VerbCard({ entry, revealed, onReveal }: Props) {
           <Text style={styles.revealBtnText}>Показати відповідь 👀</Text>
         </Pressable>
       ) : (
-        <ScrollView style={styles.answerScroll} contentContainerStyle={{ paddingBottom: 8 }}>
+        <ScrollView
+          style={styles.answerScroll}
+          contentContainerStyle={{ paddingBottom: 8 }}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={[styles.answerHead, { borderColor: accent }]}>
             <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
             <Text style={[styles.answerWord, { color: accent }]}>{infinitive}</Text>
@@ -44,13 +48,6 @@ export function VerbCard({ entry, revealed, onReveal }: Props) {
           {entry.aspectPairNote && (
             <View style={styles.pairNote}>
               <Text style={styles.pairNoteText}>💡 {entry.aspectPairNote}</Text>
-            </View>
-          )}
-
-          {entry.exampleSentenceCz && (
-            <View style={styles.example}>
-              <Text style={styles.exampleCz}>💬 {entry.exampleSentenceCz}</Text>
-              <Text style={styles.exampleUk}>{entry.exampleSentenceUk}</Text>
             </View>
           )}
         </ScrollView>
@@ -94,12 +91,4 @@ const styles = StyleSheet.create({
     padding: theme.space(3),
   },
   pairNoteText: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19 },
-  example: {
-    marginTop: theme.space(3),
-    backgroundColor: theme.colors.bgElevated,
-    borderRadius: theme.radius.md,
-    padding: theme.space(3.5),
-  },
-  exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600" },
-  exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
 });
