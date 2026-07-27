@@ -7,6 +7,7 @@ import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { FLASHCARD_CATEGORIES } from "../data/flashcardCategories";
 import { loadFlashcardStats, FlashcardStats } from "../utils/flashcardStats";
+import { consumeRoundFinished } from "../utils/quizRoundFlag";
 
 type Props = NativeStackScreenProps<RootStackParamList, "FlashcardsCategories">;
 
@@ -16,13 +17,13 @@ function pctOf(correct: number, answered: number): number | null {
   return answered > 0 ? Math.round((correct / answered) * 100) : null;
 }
 
-export function FlashcardsCategoriesScreen({ route, navigation }: Props) {
+export function FlashcardsCategoriesScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [stats, setStats] = useState<FlashcardStats | null>(null);
   // Після щойно зіграного раунду відкриваємо вкладку "Цей раунд", інакше — "Загалом".
-  const [segment, setSegment] = useState<Segment>(
-    route.params?.justFinishedRound ? "round" : "total"
-  );
+  // Прапорець зчитуємо один раз при монтуванні (він одразу скидається).
+  const [justFinished] = useState(() => consumeRoundFinished());
+  const [segment, setSegment] = useState<Segment>(justFinished ? "round" : "total");
 
   useFocusEffect(
     useCallback(() => {
@@ -30,16 +31,10 @@ export function FlashcardsCategoriesScreen({ route, navigation }: Props) {
       loadFlashcardStats().then((s) => {
         if (alive) setStats(s);
       });
-      // Якщо повернулися одразу після зіграного раунду — показуємо "Цей раунд".
-      if (route.params?.justFinishedRound) {
-        setSegment("round");
-        // прибираємо прапорець, щоб наступний звичайний захід відкривав "Загалом"
-        navigation.setParams({ justFinishedRound: undefined });
-      }
       return () => {
         alive = false;
       };
-    }, [route.params?.justFinishedRound, navigation])
+    }, [])
   );
 
   const hasAnyData = !!stats && stats.totalAnswered > 0;

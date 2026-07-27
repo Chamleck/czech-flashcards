@@ -184,6 +184,6 @@ export type RootStackParamList = {
   GrammarCategories: undefined;
   GrammarTopic: { topicId: string };
   // Флеш-картки (квіз)
-  FlashcardsCategories: { justFinishedRound?: boolean } | undefined;
+  FlashcardsCategories: undefined;
   FlashcardsQuiz: { categoryId: string; title: string };
 };

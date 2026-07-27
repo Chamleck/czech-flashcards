@@ -8,6 +8,7 @@ import { theme } from "../utils/theme";
 import { generateSession, Question } from "../utils/flashcardEngine";
 import { generateVerbSession, VerbQuestion } from "../utils/verbFlashcardEngine";
 import { loadFlashcardStats, saveFlashcardStats, mergeSession } from "../utils/flashcardStats";
+import { markRoundFinished } from "../utils/quizRoundFlag";
 import {
   loadMistakes,
   saveMistakes,
@@ -174,9 +175,10 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
           </Pressable>
           <Pressable
             style={styles.backBtn}
-            onPress={() =>
-              navigation.navigate("FlashcardsCategories", { justFinishedRound: true })
-            }
+            onPress={() => {
+              markRoundFinished();
+              navigation.goBack();
+            }}
           >
             <Text style={styles.backText}>До категорій</Text>
           </Pressable>
