@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { VerbEntry, PERSON_ORDER, PERSON_LABELS } from "../types";
 import { theme } from "../utils/theme";
-import { BYT_FUTURE, PAST_AUX } from "../data/auxVerbs";
+import { presentForm, futureForm, pastForm } from "../utils/verbForms";
 
 type Tense = "present" | "past" | "future";
 
@@ -23,39 +23,28 @@ function TenseTable({ forms, accent }: { forms: { cz: string }[]; accent: string
   );
 }
 
-// Теперішній час: se/si одразу після дієслова ("učím se").
+// Рядки таблиці для теперішнього часу (6 стандартних осіб).
 function presentRows(v: VerbEntry) {
-  if (!v.present) return [];
-  const refl = v.reflexive ? ` ${v.reflexive}` : "";
-  return PERSON_ORDER.map((p) => ({ cz: `${v.present![p]}${refl}` }));
+  return PERSON_ORDER.map((p) => ({ cz: presentForm(v, p) ?? "" }));
 }
 
-// Майбутній час:
-//  - власні форми (доконані, jít→půjdu): se/si одразу після дієслова ("vrátím se");
-//  - складене недоконаних: "budu se učit" (se після budu, не після інфінітива).
+// Рядки для майбутнього часу.
 function futureRows(v: VerbEntry) {
-  return PERSON_ORDER.map((p) => {
-    if (v.future) {
-      const refl = v.reflexive ? ` ${v.reflexive}` : "";
-      return { cz: `${v.future[p]}${refl}` };
-    }
-    const refl = v.reflexive ? `${v.reflexive} ` : "";
-    return { cz: `${BYT_FUTURE[p]} ${refl}${v.cz}` };
-  });
+  return PERSON_ORDER.map((p) => ({ cz: futureForm(v, p) }));
 }
 
-// Минулий час: [дієприкметник] [допоміжне] se ("učil jsem se").
-// my/vy/oni — форма множини дієприкметника.
+// Рядки для минулого часу — у таблиці показуємо базово чол. рід для он/они
+// (повний розклад за родом — окремим блоком нижче).
 function pastRows(v: VerbEntry) {
-  const refl = v.reflexive ? ` ${v.reflexive}` : "";
-  const pp = v.pastParticiple;
-  return PERSON_ORDER.map((p) => {
-    const aux = PAST_AUX[p];
-    const isPlural = p === "my" || p === "vy" || p === "oni";
-    const participle = isPlural ? pp.manim_pl : pp.m;
-    const cz = aux ? `${participle} ${aux}${refl}` : `${participle}${refl}`;
-    return { cz };
-  });
+  const map: Record<string, "ja" | "ty" | "on" | "my" | "vy" | "oni_manim"> = {
+    ja: "ja",
+    ty: "ty",
+    on: "on",
+    my: "my",
+    vy: "vy",
+    oni: "oni_manim",
+  };
+  return PERSON_ORDER.map((p) => ({ cz: pastForm(v, map[p]) }));
 }
 
 const TENSE_META: Record<Tense, { label: string; color: string }> = {

@@ -1,0 +1,211 @@
+import { VerbEntry, VerbPerson, PERSON_ORDER, PERSON_LABELS } from "../types";
+import { VERBS } from "../data/verbs";
+import { MistakeStore, weightFor, comboId } from "./flashcardWeights";
+import {
+  presentForm,
+  futureForm,
+  pastForm,
+  PastSubject,
+  PAST_SUBJECT_ORDER,
+  PAST_SUBJECT_LABELS,
+} from "./verbForms";
+
+// Питання квізу дієслів. Той самий контракт полів, що й у Question іменників,
+// щоб екран квізу (FlashcardsQuizScreen) працював без змін.
+export interface VerbQuestion {
+  entry: VerbEntry;
+  tense: "present" | "past" | "future";
+  personKey: string; // особа/підмет (VerbPerson або PastSubject)
+  comboId: string;
+  promptWord: string; // інфінітив (cz), напр. "dělat" / "učit se"
+  promptUk: string; // українською
+  taskText: string; // "Минулий час — ona (вона)"
+  correct: string;
+  options: string[]; // [правильна, дистрактор] — перемішані
+}
+
+const TENSE_LABEL: Record<VerbQuestion["tense"], string> = {
+  present: "Теперішній час",
+  past: "Минулий час",
+  future: "Майбутній час",
+};
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Візуальне згортання довготи голосної — той самий принцип, що й у іменників:
+// форми, що різняться лише і/í, u/ů тощо, на екрані виглядають однаково.
+function collapseVowelLength(s: string): string {
+  return s
+    .replace(/á/g, "a")
+    .replace(/í/g, "i")
+    .replace(/é/g, "e")
+    .replace(/ó/g, "o")
+    .replace(/ú/g, "u")
+    .replace(/ů/g, "u")
+    .replace(/ý/g, "y")
+    .toLowerCase();
+}
+
+function isUsableDistractor(correct: string, d: string | null | undefined): d is string {
+  return !!d && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
+}
+
+// Інфінітив для показу (зі зворотною часткою, якщо є).
+function infinitiveOf(v: VerbEntry): string {
+  return v.reflexive ? `${v.cz} ${v.reflexive}` : v.cz;
+}
+
+// Усі форми дієслова в певному часі — для підбору дистракторів (інша особа того ж часу).
+function allFormsInTense(v: VerbEntry, tense: VerbQuestion["tense"]): string[] {
+  if (tense === "present") {
+    if (!v.present) return [];
+    return PERSON_ORDER.map((p) => presentForm(v, p)!).filter(Boolean);
+  }
+  if (tense === "future") {
+    return PERSON_ORDER.map((p) => futureForm(v, p));
+  }
+  return PAST_SUBJECT_ORDER.map((s) => pastForm(v, s));
+}
+
+// Усі форми дієслова у всіх доступних часах — остаточний fallback для дистрактора.
+function allFormsAllTenses(v: VerbEntry): string[] {
+  const tenses: VerbQuestion["tense"][] = v.present ? ["present", "past", "future"] : ["past", "future"];
+  return tenses.flatMap((t) => allFormsInTense(v, t));
+}
+
+// Дистрактор = РЕАЛЬНА форма того ж дієслова, відмінна від правильної
+// (і візуально, не лише як рядок). Спершу інша особа того ж часу,
+// потім — будь-яка форма з інших часів.
+function buildDistractor(v: VerbEntry, tense: VerbQuestion["tense"], correct: string): string | null {
+  const sameTense = shuffle(allFormsInTense(v, tense));
+  for (const f of sameTense) {
+    if (isUsableDistractor(correct, f)) return f;
+  }
+  const allForms = shuffle(allFormsAllTenses(v));
+  for (const f of allForms) {
+    if (isUsableDistractor(correct, f)) return f;
+  }
+  return null;
+}
+
+// Атомарна комбінація питання.
+interface Combo {
+  entry: VerbEntry;
+  tense: VerbQuestion["tense"];
+  personKey: string; // VerbPerson (present/future) або PastSubject (past)
+  correct: string;
+  id: string;
+}
+
+// Побудова однієї комбінації → форма + перевірка існування дистрактора.
+function makeCombo(
+  v: VerbEntry,
+  tense: VerbQuestion["tense"],
+  personKey: string,
+  correct: string
+): Combo | null {
+  if (!correct) return null;
+  if (!buildDistractor(v, tense, correct)) return null; // немає придатного дистрактора — пропускаємо
+  return { entry: v, tense, personKey, correct, id: comboId(v.id, tense, personKey) };
+}
+
+// Усі валідні комбінації пулу.
+function enumerateCombos(pool: VerbEntry[]): Combo[] {
+  const combos: Combo[] = [];
+  for (const v of pool) {
+    // present — лише недоконані
+    if (v.present) {
+      for (const p of PERSON_ORDER) {
+        const c = makeCombo(v, "present", p, presentForm(v, p) ?? "");
+        if (c) combos.push(c);
+      }
+    }
+    // future — усі
+    for (const p of PERSON_ORDER) {
+      const c = makeCombo(v, "future", p, futureForm(v, p));
+      if (c) combos.push(c);
+    }
+    // past — 9 підметів (з розбивкою за родом/числом)
+    for (const s of PAST_SUBJECT_ORDER) {
+      const c = makeCombo(v, "past", s, pastForm(v, s));
+      if (c) combos.push(c);
+    }
+  }
+  return combos;
+}
+
+// Текст завдання: "[Час] — [займенник cz] ([займенник uk])".
+function taskTextFor(tense: VerbQuestion["tense"], personKey: string): string {
+  if (tense === "past") {
+    const l = PAST_SUBJECT_LABELS[personKey as PastSubject];
+    return `${TENSE_LABEL[tense]} — ${l.cz} (${l.uk})`;
+  }
+  const l = PERSON_LABELS[personKey as VerbPerson];
+  return `${TENSE_LABEL[tense]} — ${l.cz} (${l.uk})`;
+}
+
+function makeQuestion(combo: Combo): VerbQuestion | null {
+  const distractor = buildDistractor(combo.entry, combo.tense, combo.correct);
+  if (!distractor) return null;
+  return {
+    entry: combo.entry,
+    tense: combo.tense,
+    personKey: combo.personKey,
+    comboId: combo.id,
+    promptWord: infinitiveOf(combo.entry),
+    promptUk: combo.entry.uk,
+    taskText: taskTextFor(combo.tense, combo.personKey),
+    correct: combo.correct,
+    options: shuffle([combo.correct, distractor]),
+  };
+}
+
+// Зважений випадковий вибір: ймовірність ∝ вазі (помилкові комбінації важчі).
+function weightedPick<T>(items: T[], weightOf: (t: T) => number): T {
+  let total = 0;
+  for (const it of items) total += weightOf(it);
+  let r = Math.random() * total;
+  for (const it of items) {
+    r -= weightOf(it);
+    if (r < 0) return it;
+  }
+  return items[items.length - 1];
+}
+
+// Сесія квізу дієслів. Та сама механіка, що й у іменників:
+// зважений вибір за comboId (помилки важчі), без повтору комбінації в межах сесії,
+// одне слово не йде поспіль.
+export function generateVerbSession(
+  count: number,
+  pool: VerbEntry[] = VERBS,
+  mistakes: MistakeStore = {}
+): VerbQuestion[] {
+  const combos = enumerateCombos(pool);
+  const questions: VerbQuestion[] = [];
+  const used = new Set<string>();
+  let lastId = "";
+  let guard = 0;
+
+  while (questions.length < count && guard < count * 40) {
+    guard++;
+    let candidates = combos.filter((c) => !used.has(c.id) && c.entry.id !== lastId);
+    if (candidates.length === 0) candidates = combos.filter((c) => !used.has(c.id));
+    if (candidates.length === 0) break;
+
+    const chosen = weightedPick(candidates, (c) => weightFor(mistakes, c.id));
+    used.add(chosen.id);
+    const q = makeQuestion(chosen);
+    if (!q) continue;
+
+    questions.push(q);
+    lastId = chosen.entry.id;
+  }
+  return questions;
+}

@@ -24,9 +24,9 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
     id: "verbs",
     emoji: "🏃",
     title: "Дієслова",
-    subtitle: "Часи (скоро)",
+    subtitle: "Часи: теперішній, минулий, майбутній",
     color: theme.colors.mint,
-    ready: false,
+    ready: true,
   },
   {
     id: "pronouns",

@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { generateSession, Question } from "../utils/flashcardEngine";
+import { generateVerbSession, VerbQuestion } from "../utils/verbFlashcardEngine";
 import { loadFlashcardStats, saveFlashcardStats, mergeSession } from "../utils/flashcardStats";
 import {
   loadMistakes,
@@ -18,11 +19,24 @@ type Props = NativeStackScreenProps<RootStackParamList, "FlashcardsQuiz">;
 
 const SESSION_LEN = 12;
 
+// Обидва движки повертають питання зі спільним контрактом полів,
+// які читає екран (promptWord/promptUk/taskText/correct/options/comboId).
+type QuizQuestion = Pick<
+  Question,
+  "promptWord" | "promptUk" | "taskText" | "correct" | "options" | "comboId"
+>;
+
+// Диспетчер: генерує сесію відповідно до категорії.
+function buildSession(categoryId: string, mistakes: MistakeStore): QuizQuestion[] {
+  if (categoryId === "verbs") return generateVerbSession(SESSION_LEN, undefined, mistakes);
+  return generateSession(SESSION_LEN, undefined, mistakes);
+}
+
 export function FlashcardsQuizScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const { title } = route.params;
+  const { title, categoryId } = route.params;
 
-  const [session, setSession] = useState<Question[]>([]);
+  const [session, setSession] = useState<QuizQuestion[]>([]);
   const [idx, setIdx] = useState(0);
   const [selectedWrong, setSelectedWrong] = useState<number | null>(null);
   const [solved, setSolved] = useState(false);
@@ -38,9 +52,9 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
     (async () => {
       const m = await loadMistakes();
       mistakes.current = m;
-      setSession(generateSession(SESSION_LEN, undefined, m));
+      setSession(buildSession(categoryId, m));
     })();
-  }, []);
+  }, [categoryId]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -148,7 +162,7 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
           <Pressable
             style={styles.againBtn}
             onPress={() => {
-              setSession(generateSession(SESSION_LEN, undefined, mistakes.current));
+              setSession(buildSession(categoryId, mistakes.current));
               setIdx(0);
               setSelectedWrong(null);
               setSolved(false);
