@@ -5,17 +5,21 @@ import {
   presentForm,
   futureForm,
   pastForm,
+  imperativeForm,
   PastSubject,
   PAST_SUBJECT_ORDER,
   PAST_SUBJECT_LABELS,
+  ImperativePerson,
+  IMPERATIVE_ORDER,
+  IMPERATIVE_LABELS,
 } from "./verbForms";
 
 // Питання квізу дієслів. Той самий контракт полів, що й у Question іменників,
 // щоб екран квізу (FlashcardsQuizScreen) працював без змін.
 export interface VerbQuestion {
   entry: VerbEntry;
-  tense: "present" | "past" | "future";
-  personKey: string; // особа/підмет (VerbPerson або PastSubject)
+  tense: "present" | "past" | "future" | "imperative";
+  personKey: string; // особа/підмет (VerbPerson | PastSubject | ImperativePerson)
   comboId: string;
   promptWord: string; // інфінітив (cz), напр. "dělat" / "učit se"
   promptUk: string; // українською
@@ -28,6 +32,7 @@ const TENSE_LABEL: Record<VerbQuestion["tense"], string> = {
   present: "Теперішній час",
   past: "Минулий час",
   future: "Майбутній час",
+  imperative: "Наказовий спосіб",
 };
 
 function shuffle<T>(arr: T[]): T[] {
@@ -71,12 +76,17 @@ function allFormsInTense(v: VerbEntry, tense: VerbQuestion["tense"]): string[] {
   if (tense === "future") {
     return PERSON_ORDER.map((p) => futureForm(v, p));
   }
+  if (tense === "imperative") {
+    if (!v.imperative) return [];
+    return IMPERATIVE_ORDER.map((p) => imperativeForm(v, p)!).filter(Boolean);
+  }
   return PAST_SUBJECT_ORDER.map((s) => pastForm(v, s));
 }
 
 // Усі форми дієслова у всіх доступних часах — остаточний fallback для дистрактора.
 function allFormsAllTenses(v: VerbEntry): string[] {
   const tenses: VerbQuestion["tense"][] = v.present ? ["present", "past", "future"] : ["past", "future"];
+  if (v.imperative) tenses.push("imperative");
   return tenses.flatMap((t) => allFormsInTense(v, t));
 }
 
@@ -137,14 +147,25 @@ function enumerateCombos(pool: VerbEntry[]): Combo[] {
       const c = makeCombo(v, "past", s, pastForm(v, s));
       if (c) combos.push(c);
     }
+    // imperative — 3 форми (ty/vy/my), лише якщо дієслово має наказовий спосіб
+    if (v.imperative) {
+      for (const p of IMPERATIVE_ORDER) {
+        const c = makeCombo(v, "imperative", p, imperativeForm(v, p) ?? "");
+        if (c) combos.push(c);
+      }
+    }
   }
   return combos;
 }
 
-// Текст завдання: "[Час] — [займенник cz] ([займенник uk])".
+// Текст завдання: "[Час/спосіб] — [займенник cz] ([займенник uk])".
 function taskTextFor(tense: VerbQuestion["tense"], personKey: string): string {
   if (tense === "past") {
     const l = PAST_SUBJECT_LABELS[personKey as PastSubject];
+    return `${TENSE_LABEL[tense]} — ${l.cz} (${l.uk})`;
+  }
+  if (tense === "imperative") {
+    const l = IMPERATIVE_LABELS[personKey as ImperativePerson];
     return `${TENSE_LABEL[tense]} — ${l.cz} (${l.uk})`;
   }
   const l = PERSON_LABELS[personKey as VerbPerson];

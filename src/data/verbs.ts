@@ -23,11 +23,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "I",
     present: { ja: "nesu", ty: "neseš", on: "nese", my: "neseme", vy: "nesete", oni: "nesou" },
     pastParticiple: { m: "nesl", f: "nesla", n: "neslo", manim_pl: "nesli", other_pl: "nesly" },
+    imperative: { ty: "nes", vy: "neste", my: "nesme" },
     aspectPairNote: "доконаний партнер: přinést (принести)",
     examples: {
       present: { cz: "Nesu tašku domů.", uk: "Я несу сумку додому." },
       past: { cz: "Nesl jsem tašku domů.", uk: "Я ніс сумку додому." },
       future: { cz: "Budu nést tašku domů.", uk: "Я нестиму сумку додому." },
+      imperative: { cz: "Nes tašku domů!", uk: "Неси сумку додому!" },
     },
   },
   {
@@ -38,11 +40,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "I",
     present: { ja: "beru", ty: "bereš", on: "bere", my: "bereme", vy: "berete", oni: "berou" },
     pastParticiple: { m: "bral", f: "brala", n: "bralo", manim_pl: "brali", other_pl: "braly" },
+    imperative: { ty: "ber", vy: "berte", my: "berme" },
     aspectPairNote: "доконаний партнер: vzít (взяти)",
     examples: {
       present: { cz: "Beru si kávu.", uk: "Я беру собі каву." },
       past: { cz: "Bral jsem si kávu.", uk: "Я брав собі каву." },
       future: { cz: "Budu si brát kávu.", uk: "Я братиму собі каву." },
+      imperative: { cz: "Ber si kávu!", uk: "Бери собі каву!" },
     },
   },
   {
@@ -53,11 +57,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "I",
     present: { ja: "píšu", ty: "píšeš", on: "píše", my: "píšeme", vy: "píšete", oni: "píšou" },
     pastParticiple: { m: "psal", f: "psala", n: "psalo", manim_pl: "psali", other_pl: "psaly" },
+    imperative: { ty: "piš", vy: "pište", my: "pišme" },
     aspectPairNote: "доконаний партнер: napsat (написати); варіант 1 ос. píši (книжн.)",
     examples: {
       present: { cz: "Píšu dopis.", uk: "Я пишу лист." },
       past: { cz: "Psal jsem dopis.", uk: "Я писав лист." },
       future: { cz: "Budu psát dopis.", uk: "Я писатиму лист." },
+      imperative: { cz: "Piš dopis!", uk: "Пиши лист!" },
     },
   },
   {
@@ -68,11 +74,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "I",
     present: { ja: "čtu", ty: "čteš", on: "čte", my: "čteme", vy: "čtete", oni: "čtou" },
     pastParticiple: { m: "četl", f: "četla", n: "četlo", manim_pl: "četli", other_pl: "četly" },
+    imperative: { ty: "čti", vy: "čtěte", my: "čtěme" },
     aspectPairNote: "доконаний партнер: přečíst (прочитати)",
     examples: {
       present: { cz: "Čtu zajímavou knihu.", uk: "Я читаю цікаву книгу." },
       past: { cz: "Četl jsem zajímavou knihu.", uk: "Я читав цікаву книгу." },
       future: { cz: "Budu číst zajímavou knihu.", uk: "Я читатиму цікаву книгу." },
+      imperative: { cz: "Čti tu knihu!", uk: "Читай ту книгу!" },
     },
   },
   {
@@ -83,11 +91,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "I",
     present: { ja: "peču", ty: "pečeš", on: "peče", my: "pečeme", vy: "pečete", oni: "pečou" },
     pastParticiple: { m: "pekl", f: "pekla", n: "peklo", manim_pl: "pekli", other_pl: "pekly" },
+    imperative: { ty: "peč", vy: "pečte", my: "pečme" },
     aspectPairNote: "доконаний партнер: upéct (спекти); інфінітив також péci (книжн.)",
     examples: {
       present: { cz: "Peču chleba.", uk: "Я печу хліб." },
       past: { cz: "Pekl jsem chleba.", uk: "Я пік хліб." },
       future: { cz: "Budu péct chleba.", uk: "Я пектиму хліб." },
+      imperative: { cz: "Peč chleba!", uk: "Печи хліб!" },
     },
   },
   {
@@ -98,11 +108,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "III",
     present: { ja: "piju", ty: "piješ", on: "pije", my: "pijeme", vy: "pijete", oni: "pijou" },
     pastParticiple: { m: "pil", f: "pila", n: "pilo", manim_pl: "pili", other_pl: "pily" },
+    imperative: { ty: "pij", vy: "pijte", my: "pijme" },
     aspectPairNote: "доконаний партнер: vypít (випити); варіант 1 ос. piji (книжн.)",
     examples: {
       present: { cz: "Piju vodu.", uk: "Я п'ю воду." },
       past: { cz: "Pil jsem vodu.", uk: "Я пив воду." },
       future: { cz: "Budu pít vodu.", uk: "Я питиму воду." },
+      imperative: { cz: "Pij vodu!", uk: "Пий воду!" },
     },
   },
   {
@@ -113,11 +125,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "III",
     present: { ja: "myju", ty: "myješ", on: "myje", my: "myjeme", vy: "myjete", oni: "myjou" },
     pastParticiple: { m: "myl", f: "myla", n: "mylo", manim_pl: "myli", other_pl: "myly" },
+    imperative: { ty: "myj", vy: "myjte", my: "myjme" },
     aspectPairNote: "доконаний партнер: umýt (вимити); варіант 1 ос. myji (книжн.)",
     examples: {
       present: { cz: "Myju nádobí.", uk: "Я мию посуд." },
       past: { cz: "Myl jsem nádobí.", uk: "Я мив посуд." },
       future: { cz: "Budu mýt nádobí.", uk: "Я митиму посуд." },
+      imperative: { cz: "Myj nádobí!", uk: "Мий посуд!" },
     },
   },
   {
@@ -128,11 +142,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "I",
     present: { ja: "vedu", ty: "vedeš", on: "vede", my: "vedeme", vy: "vedete", oni: "vedou" },
     pastParticiple: { m: "vedl", f: "vedla", n: "vedlo", manim_pl: "vedli", other_pl: "vedly" },
+    imperative: { ty: "veď", vy: "veďte", my: "veďme" },
     aspectPairNote: "доконаний партнер: dovést (довести)",
     examples: {
       present: { cz: "Vedu dítě do školy.", uk: "Я веду дитину до школи." },
       past: { cz: "Vedl jsem dítě do školy.", uk: "Я вів дитину до школи." },
       future: { cz: "Budu vést dítě do školy.", uk: "Я вестиму дитину до школи." },
+      imperative: { cz: "Veď dítě do školy!", uk: "Веди дитину до школи!" },
     },
   },
   {
@@ -160,10 +176,12 @@ export const VERBS: VerbEntry[] = [
     verbClass: "II",
     future: { ja: "začnu", ty: "začneš", on: "začne", my: "začneme", vy: "začnete", oni: "začnou" },
     pastParticiple: { m: "začal", f: "začala", n: "začalo", manim_pl: "začali", other_pl: "začaly" },
+    imperative: { ty: "začni", vy: "začněte", my: "začněme" },
     aspectPairNote: "недоконаний партнер: začínat (починати)",
     examples: {
       past: { cz: "Začal jsem pracovat.", uk: "Я почав працювати." },
       future: { cz: "Začnu pracovat zítra.", uk: "Я почну працювати завтра." },
+      imperative: { cz: "Začni pracovat!", uk: "Почни працювати!" },
     },
   },
   {
@@ -174,10 +192,12 @@ export const VERBS: VerbEntry[] = [
     verbClass: "II",
     future: { ja: "zapomenu", ty: "zapomeneš", on: "zapomene", my: "zapomeneme", vy: "zapomenete", oni: "zapomenou" },
     pastParticiple: { m: "zapomněl", f: "zapomněla", n: "zapomnělo", manim_pl: "zapomněli", other_pl: "zapomněly" },
+    imperative: { ty: "zapomeň", vy: "zapomeňte", my: "zapomeňme" },
     aspectPairNote: "недоконаний партнер: zapomínat (забувати)",
     examples: {
       past: { cz: "Zapomněl jsem na to.", uk: "Я забув про це." },
       future: { cz: "Zapomenu na to.", uk: "Я забуду про це." },
+      imperative: { cz: "Zapomeň na to!", uk: "Забудь про це!" },
     },
   },
   {
@@ -188,10 +208,12 @@ export const VERBS: VerbEntry[] = [
     verbClass: "II",
     future: { ja: "vstanu", ty: "vstaneš", on: "vstane", my: "vstaneme", vy: "vstanete", oni: "vstanou" },
     pastParticiple: { m: "vstal", f: "vstala", n: "vstalo", manim_pl: "vstali", other_pl: "vstaly" },
+    imperative: { ty: "vstaň", vy: "vstaňte", my: "vstaňme" },
     aspectPairNote: "недоконаний партнер: vstávat (вставати)",
     examples: {
       past: { cz: "Vstal jsem v sedm hodin.", uk: "Я встав о сьомій." },
       future: { cz: "Vstanu v sedm hodin.", uk: "Я встану о сьомій." },
+      imperative: { cz: "Vstaň brzy!", uk: "Встань рано!" },
     },
   },
   {
@@ -203,10 +225,12 @@ export const VERBS: VerbEntry[] = [
     reflexive: "se",
     future: { ja: "obléknu", ty: "oblékneš", on: "oblékne", my: "oblékneme", vy: "obléknete", oni: "obléknou" },
     pastParticiple: { m: "oblékl", f: "oblékla", n: "obléklo", manim_pl: "oblékli", other_pl: "oblékly" },
+    imperative: { ty: "oblékni se", vy: "oblékněte se", my: "oblékněme se" },
     aspectPairNote: "недоконаний партнер: oblékat se (одягатися)",
     examples: {
       past: { cz: "Oblékl jsem se teple.", uk: "Я одягнувся тепло." },
       future: { cz: "Obléknu se teple.", uk: "Я одягнуся тепло." },
+      imperative: { cz: "Oblékni se teple!", uk: "Одягнися тепло!" },
     },
   },
   {
@@ -218,10 +242,12 @@ export const VERBS: VerbEntry[] = [
     reflexive: "si",
     future: { ja: "sednu", ty: "sedneš", on: "sedne", my: "sedneme", vy: "sednete", oni: "sednou" },
     pastParticiple: { m: "sedl", f: "sedla", n: "sedlo", manim_pl: "sedli", other_pl: "sedly" },
+    imperative: { ty: "sedni si", vy: "sedněte si", my: "sedněme si" },
     aspectPairNote: "недоконаний партнер: sedat si (сідати)",
     examples: {
       past: { cz: "Sedl jsem si na židli.", uk: "Я сів на стілець." },
       future: { cz: "Sednu si na židli.", uk: "Я сяду на стілець." },
+      imperative: { cz: "Sedni si na židli!", uk: "Сідай на стілець!" },
     },
   },
   {
@@ -233,10 +259,12 @@ export const VERBS: VerbEntry[] = [
     reflexive: "si",
     future: { ja: "vzpomenu", ty: "vzpomeneš", on: "vzpomene", my: "vzpomeneme", vy: "vzpomenete", oni: "vzpomenou" },
     pastParticiple: { m: "vzpomněl", f: "vzpomněla", n: "vzpomnělo", manim_pl: "vzpomněli", other_pl: "vzpomněly" },
+    imperative: { ty: "vzpomeň si", vy: "vzpomeňte si", my: "vzpomeňme si" },
     aspectPairNote: "недоконаний партнер: vzpomínat si (згадувати)",
     examples: {
       past: { cz: "Vzpomněl jsem si na jméno.", uk: "Я згадав ім'я." },
       future: { cz: "Vzpomenu si na jméno.", uk: "Я згадаю ім'я." },
+      imperative: { cz: "Vzpomeň si na jméno!", uk: "Згадай ім'я!" },
     },
   },
   {
@@ -247,10 +275,12 @@ export const VERBS: VerbEntry[] = [
     verbClass: "II",
     future: { ja: "padnu", ty: "padneš", on: "padne", my: "padneme", vy: "padnete", oni: "padnou" },
     pastParticiple: { m: "padl", f: "padla", n: "padlo", manim_pl: "padli", other_pl: "padly" },
+    imperative: { ty: "padni", vy: "padněte", my: "padněme" },
     aspectPairNote: "недоконаний партнер: padat (падати)",
     examples: {
       past: { cz: "Padl první sníh.", uk: "Впав перший сніг." },
       future: { cz: "Padne první sníh.", uk: "Впаде перший сніг." },
+      imperative: { cz: "Nepadni!", uk: "Не впади!" },
     },
   },
   {
@@ -261,11 +291,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "II",
     present: { ja: "tisknu", ty: "tiskneš", on: "tiskne", my: "tiskneme", vy: "tisknete", oni: "tisknou" },
     pastParticiple: { m: "tiskl", f: "tiskla", n: "tisklo", manim_pl: "tiskli", other_pl: "tiskly" },
+    imperative: { ty: "tiskni", vy: "tiskněte", my: "tiskněme" },
     aspectPairNote: "доконаний партнер: vytisknout (надрукувати)",
     examples: {
       present: { cz: "Tisknu dokument.", uk: "Я друкую документ." },
       past: { cz: "Tiskl jsem dokument.", uk: "Я друкував документ." },
       future: { cz: "Budu tisknout dokument.", uk: "Я друкуватиму документ." },
+      imperative: { cz: "Tiskni dokument!", uk: "Друкуй документ!" },
     },
   },
 
@@ -278,11 +310,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "III",
     present: { ja: "kupuju", ty: "kupuješ", on: "kupuje", my: "kupujeme", vy: "kupujete", oni: "kupujou" },
     pastParticiple: { m: "kupoval", f: "kupovala", n: "kupovalo", manim_pl: "kupovali", other_pl: "kupovaly" },
+    imperative: { ty: "kupuj", vy: "kupujte", my: "kupujme" },
     aspectPairNote: "доконаний партнер: koupit (купити); варіант 1 ос. kupuji (книжн.)",
     examples: {
       present: { cz: "Kupuju chleba každý den.", uk: "Я купую хліб щодня." },
       past: { cz: "Kupoval jsem chleba každý den.", uk: "Я купував хліб щодня." },
       future: { cz: "Budu kupovat chleba každý den.", uk: "Я купуватиму хліб щодня." },
+      imperative: { cz: "Kupuj chleba každý den!", uk: "Купуй хліб щодня!" },
     },
   },
   {
@@ -293,11 +327,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "III",
     present: { ja: "pracuju", ty: "pracuješ", on: "pracuje", my: "pracujeme", vy: "pracujete", oni: "pracujou" },
     pastParticiple: { m: "pracoval", f: "pracovala", n: "pracovalo", manim_pl: "pracovali", other_pl: "pracovaly" },
+    imperative: { ty: "pracuj", vy: "pracujte", my: "pracujme" },
     aspectPairNote: "варіант 1 ос. pracuji (книжн.)",
     examples: {
       present: { cz: "Pracuju v nemocnici.", uk: "Я працюю в лікарні." },
       past: { cz: "Pracoval jsem v nemocnici.", uk: "Я працював у лікарні." },
       future: { cz: "Budu pracovat v nemocnici.", uk: "Я працюватиму в лікарні." },
+      imperative: { cz: "Pracuj pečlivě!", uk: "Працюй старанно!" },
     },
   },
   {
@@ -308,11 +344,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "III",
     present: { ja: "studuju", ty: "studuješ", on: "studuje", my: "studujeme", vy: "studujete", oni: "studujou" },
     pastParticiple: { m: "studoval", f: "studovala", n: "studovalo", manim_pl: "studovali", other_pl: "studovaly" },
+    imperative: { ty: "studuj", vy: "studujte", my: "studujme" },
     aspectPairNote: "варіант 1 ос. studuji (книжн.)",
     examples: {
       present: { cz: "Studuju na univerzitě.", uk: "Я вчуся в університеті." },
       past: { cz: "Studoval jsem na univerzitě.", uk: "Я вчився в університеті." },
       future: { cz: "Budu studovat na univerzitě.", uk: "Я вчитимуся в університеті." },
+      imperative: { cz: "Studuj každý den!", uk: "Вчися щодня!" },
     },
   },
   {
@@ -324,11 +362,13 @@ export const VERBS: VerbEntry[] = [
     reflexive: "se",
     present: { ja: "dívám", ty: "díváš", on: "dívá", my: "díváme", vy: "díváte", oni: "dívají" },
     pastParticiple: { m: "díval", f: "dívala", n: "dívalo", manim_pl: "dívali", other_pl: "dívaly" },
+    imperative: { ty: "dívej se", vy: "dívejte se", my: "dívejme se" },
     aspectPairNote: "доконаний партнер: podívat se (подивитися). Увага: дієвідміна за зразком -á (dívám)",
     examples: {
       present: { cz: "Dívám se na film.", uk: "Я дивлюся фільм." },
       past: { cz: "Díval jsem se na film.", uk: "Я дивився фільм." },
       future: { cz: "Budu se dívat na film.", uk: "Я дивитимуся фільм." },
+      imperative: { cz: "Dívej se na film!", uk: "Дивись фільм!" },
     },
   },
   {
@@ -340,11 +380,13 @@ export const VERBS: VerbEntry[] = [
     reflexive: "se",
     present: { ja: "jmenuju", ty: "jmenuješ", on: "jmenuje", my: "jmenujeme", vy: "jmenujete", oni: "jmenujou" },
     pastParticiple: { m: "jmenoval", f: "jmenovala", n: "jmenovalo", manim_pl: "jmenovali", other_pl: "jmenovaly" },
+    imperative: { ty: "jmenuj se", vy: "jmenujte se", my: "jmenujme se" },
     aspectPairNote: "варіант 1 ос. jmenuji (книжн.)",
     examples: {
       present: { cz: "Jmenuju se Petr.", uk: "Мене звати Петро." },
       past: { cz: "Jmenoval jsem se Petr.", uk: "Мене звали Петро." },
       future: { cz: "Budu se jmenovat Petr.", uk: "Мене зватимуть Петро." },
+      imperative: { cz: "Jmenuj se, prosím!", uk: "Назвися, будь ласка!" },
     },
   },
   {
@@ -355,11 +397,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "III",
     present: { ja: "kryju", ty: "kryješ", on: "kryje", my: "kryjeme", vy: "kryjete", oni: "kryjou" },
     pastParticiple: { m: "kryl", f: "kryla", n: "krylo", manim_pl: "kryli", other_pl: "kryly" },
+    imperative: { ty: "kryj", vy: "kryjte", my: "kryjme" },
     aspectPairNote: "доконаний партнер: zakrýt (закрити); варіант 1 ос. kryji (книжн.)",
     examples: {
       present: { cz: "Střecha kryje dům.", uk: "Дах криє будинок." },
       past: { cz: "Střecha kryla dům.", uk: "Дах крив будинок." },
       future: { cz: "Střecha bude krýt dům.", uk: "Дах криє будинок." },
+      imperative: { cz: "Kryj se!", uk: "Прикрийся!" },
     },
   },
   {
@@ -370,11 +414,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "III",
     present: { ja: "potřebuju", ty: "potřebuješ", on: "potřebuje", my: "potřebujeme", vy: "potřebujete", oni: "potřebujou" },
     pastParticiple: { m: "potřeboval", f: "potřebovala", n: "potřebovalo", manim_pl: "potřebovali", other_pl: "potřebovaly" },
+    imperative: { ty: "potřebuj", vy: "potřebujte", my: "potřebujme" },
     aspectPairNote: "варіант 1 ос. potřebuji (книжн.)",
     examples: {
       present: { cz: "Potřebuju pomoc.", uk: "Мені потрібна допомога." },
       past: { cz: "Potřeboval jsem pomoc.", uk: "Мені була потрібна допомога." },
       future: { cz: "Budu potřebovat pomoc.", uk: "Мені буде потрібна допомога." },
+      imperative: { cz: "Nepotřebuj nic víc!", uk: "Не потребуй нічого більше!" },
     },
   },
   {
@@ -385,11 +431,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "III",
     present: { ja: "děkuju", ty: "děkuješ", on: "děkuje", my: "děkujeme", vy: "děkujete", oni: "děkujou" },
     pastParticiple: { m: "děkoval", f: "děkovala", n: "děkovalo", manim_pl: "děkovali", other_pl: "děkovaly" },
+    imperative: { ty: "děkuj", vy: "děkujte", my: "děkujme" },
     aspectPairNote: "доконаний партнер: poděkovat (подякувати); варіант 1 ос. děkuji (книжн.)",
     examples: {
       present: { cz: "Děkuju za pomoc.", uk: "Я дякую за допомогу." },
       past: { cz: "Děkoval jsem za pomoc.", uk: "Я дякував за допомогу." },
       future: { cz: "Budu děkovat za pomoc.", uk: "Я дякуватиму за допомогу." },
+      imperative: { cz: "Děkuj za pomoc!", uk: "Дякуй за допомогу!" },
     },
   },
   {
@@ -400,11 +448,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "III",
     present: { ja: "miluju", ty: "miluješ", on: "miluje", my: "milujeme", vy: "milujete", oni: "milujou" },
     pastParticiple: { m: "miloval", f: "milovala", n: "milovalo", manim_pl: "milovali", other_pl: "milovaly" },
+    imperative: { ty: "miluj", vy: "milujte", my: "milujme" },
     aspectPairNote: "варіант 1 ос. miluji (книжн.)",
     examples: {
       present: { cz: "Miluju tě.", uk: "Я тебе кохаю." },
       past: { cz: "Miloval jsem tě.", uk: "Я тебе кохав." },
       future: { cz: "Budu tě milovat.", uk: "Я тебе кохатиму." },
+      imperative: { cz: "Miluj svůj život!", uk: "Люби своє життя!" },
     },
   },
   {
@@ -415,11 +465,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "III",
     present: { ja: "opakuju", ty: "opakuješ", on: "opakuje", my: "opakujeme", vy: "opakujete", oni: "opakujou" },
     pastParticiple: { m: "opakoval", f: "opakovala", n: "opakovalo", manim_pl: "opakovali", other_pl: "opakovaly" },
+    imperative: { ty: "opakuj", vy: "opakujte", my: "opakujme" },
     aspectPairNote: "доконаний партнер: zopakovat (повторити); варіант 1 ос. opakuji (книжн.)",
     examples: {
       present: { cz: "Opakuju si slovíčka.", uk: "Я повторюю слова." },
       past: { cz: "Opakoval jsem si slovíčka.", uk: "Я повторював слова." },
       future: { cz: "Budu si opakovat slovíčka.", uk: "Я повторюватиму слова." },
+      imperative: { cz: "Opakuj si slovíčka!", uk: "Повторюй слова!" },
     },
   },
 
@@ -432,11 +484,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "IV",
     present: { ja: "prosím", ty: "prosíš", on: "prosí", my: "prosíme", vy: "prosíte", oni: "prosí" },
     pastParticiple: { m: "prosil", f: "prosila", n: "prosilo", manim_pl: "prosili", other_pl: "prosily" },
+    imperative: { ty: "pros", vy: "proste", my: "prosme" },
     aspectPairNote: "доконаний партнер: poprosit (попросити)",
     examples: {
       present: { cz: "Prosím o pomoc.", uk: "Я прошу допомоги." },
       past: { cz: "Prosil jsem o pomoc.", uk: "Я просив допомоги." },
       future: { cz: "Budu prosit o pomoc.", uk: "Я проситиму допомоги." },
+      imperative: { cz: "Pros o pomoc!", uk: "Проси допомоги!" },
     },
   },
   {
@@ -447,11 +501,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "IV",
     present: { ja: "mluvím", ty: "mluvíš", on: "mluví", my: "mluvíme", vy: "mluvíte", oni: "mluví" },
     pastParticiple: { m: "mluvil", f: "mluvila", n: "mluvilo", manim_pl: "mluvili", other_pl: "mluvily" },
+    imperative: { ty: "mluv", vy: "mluvte", my: "mluvme" },
     aspectPairNote: "доконаний партнер: promluvit (заговорити)",
     examples: {
       present: { cz: "Mluvím česky.", uk: "Я говорю чеською." },
       past: { cz: "Mluvil jsem česky.", uk: "Я говорив чеською." },
       future: { cz: "Budu mluvit česky.", uk: "Я говоритиму чеською." },
+      imperative: { cz: "Mluv česky!", uk: "Говори чеською!" },
     },
   },
   {
@@ -462,11 +518,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "IV",
     present: { ja: "vidím", ty: "vidíš", on: "vidí", my: "vidíme", vy: "vidíte", oni: "vidí" },
     pastParticiple: { m: "viděl", f: "viděla", n: "vidělo", manim_pl: "viděli", other_pl: "viděly" },
+    imperative: { ty: "viz", vy: "vizte", my: "vizme" },
     aspectPairNote: "доконаний партнер: uvidět (побачити)",
     examples: {
       present: { cz: "Vidím horu.", uk: "Я бачу гору." },
       past: { cz: "Viděl jsem horu.", uk: "Я бачив гору." },
       future: { cz: "Budu vidět horu.", uk: "Я бачитиму гору." },
+      imperative: { cz: "Viz kapitolu 6!", uk: "Дивись розділ 6!" },
     },
   },
   {
@@ -477,11 +535,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "IV",
     present: { ja: "spím", ty: "spíš", on: "spí", my: "spíme", vy: "spíte", oni: "spí" },
     pastParticiple: { m: "spal", f: "spala", n: "spalo", manim_pl: "spali", other_pl: "spaly" },
+    imperative: { ty: "spi", vy: "spěte", my: "spěme" },
     aspectPairNote: "доконаний партнер: vyspat se (виспатися)",
     examples: {
       present: { cz: "Spím osm hodin.", uk: "Я сплю вісім годин." },
       past: { cz: "Spal jsem osm hodin.", uk: "Я спав вісім годин." },
       future: { cz: "Budu spát osm hodin.", uk: "Я спатиму вісім годин." },
+      imperative: { cz: "Spi dobře!", uk: "Спи добре!" },
     },
   },
   {
@@ -493,11 +553,13 @@ export const VERBS: VerbEntry[] = [
     reflexive: "se",
     present: { ja: "učím", ty: "učíš", on: "učí", my: "učíme", vy: "učíte", oni: "učí" },
     pastParticiple: { m: "učil", f: "učila", n: "učilo", manim_pl: "učili", other_pl: "učily" },
+    imperative: { ty: "uč se", vy: "učte se", my: "učme se" },
     aspectPairNote: "доконаний партнер: naučit se (навчитися)",
     examples: {
       present: { cz: "Učím se česky.", uk: "Я вчу чеську." },
       past: { cz: "Učil jsem se česky.", uk: "Я вчив чеську." },
       future: { cz: "Budu se učit česky.", uk: "Я вчитиму чеську." },
+      imperative: { cz: "Uč se česky!", uk: "Вчи чеську!" },
     },
   },
   {
@@ -509,10 +571,12 @@ export const VERBS: VerbEntry[] = [
     reflexive: "se",
     future: { ja: "vrátím", ty: "vrátíš", on: "vrátí", my: "vrátíme", vy: "vrátíte", oni: "vrátí" },
     pastParticiple: { m: "vrátil", f: "vrátila", n: "vrátilo", manim_pl: "vrátili", other_pl: "vrátily" },
+    imperative: { ty: "vrať se", vy: "vraťte se", my: "vraťme se" },
     aspectPairNote: "недоконаний партнер: vracet se (повертатися)",
     examples: {
       past: { cz: "Vrátil jsem se večer.", uk: "Я повернувся ввечері." },
       future: { cz: "Vrátím se večer.", uk: "Я повернуся ввечері." },
+      imperative: { cz: "Vrať se večer!", uk: "Повертайся ввечері!" },
     },
   },
   {
@@ -523,10 +587,12 @@ export const VERBS: VerbEntry[] = [
     verbClass: "IV",
     future: { ja: "koupím", ty: "koupíš", on: "koupí", my: "koupíme", vy: "koupíte", oni: "koupí" },
     pastParticiple: { m: "koupil", f: "koupila", n: "koupilo", manim_pl: "koupili", other_pl: "koupily" },
+    imperative: { ty: "kup", vy: "kupte", my: "kupme" },
     aspectPairNote: "недоконаний партнер: kupovat (купувати)",
     examples: {
       past: { cz: "Koupil jsem si nové auto.", uk: "Я купив собі нове авто." },
       future: { cz: "Koupím si nové auto.", uk: "Я куплю собі нове авто." },
+      imperative: { cz: "Kup si nové auto!", uk: "Купи собі нове авто!" },
     },
   },
   {
@@ -537,11 +603,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "IV",
     present: { ja: "myslím", ty: "myslíš", on: "myslí", my: "myslíme", vy: "myslíte", oni: "myslí" },
     pastParticiple: { m: "myslel", f: "myslela", n: "myslelo", manim_pl: "mysleli", other_pl: "myslely" },
+    imperative: { ty: "mysli", vy: "myslete", my: "mysleme" },
     aspectPairNote: "інфінітив також myslit; доконаний: pomyslet (подумати)",
     examples: {
       present: { cz: "Myslím na tebe.", uk: "Я думаю про тебе." },
       past: { cz: "Myslel jsem na tebe.", uk: "Я думав про тебе." },
       future: { cz: "Budu na tebe myslet.", uk: "Я думатиму про тебе." },
+      imperative: { cz: "Mysli na to!", uk: "Думай про це!" },
     },
   },
   {
@@ -552,11 +620,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "IV",
     present: { ja: "slyším", ty: "slyšíš", on: "slyší", my: "slyšíme", vy: "slyšíte", oni: "slyší" },
     pastParticiple: { m: "slyšel", f: "slyšela", n: "slyšelo", manim_pl: "slyšeli", other_pl: "slyšely" },
+    imperative: { ty: "slyš", vy: "slyšte", my: "slyšme" },
     aspectPairNote: "доконаний партнер: uslyšet (почути)",
     examples: {
       present: { cz: "Slyším hudbu.", uk: "Я чую музику." },
       past: { cz: "Slyšel jsem hudbu.", uk: "Я чув музику." },
       future: { cz: "Budu slyšet hudbu.", uk: "Я чутиму музику." },
+      imperative: { cz: "Slyš, co říkám!", uk: "Слухай, що я кажу!" },
     },
   },
   {
@@ -567,11 +637,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "IV",
     present: { ja: "sedím", ty: "sedíš", on: "sedí", my: "sedíme", vy: "sedíte", oni: "sedí" },
     pastParticiple: { m: "seděl", f: "seděla", n: "sedělo", manim_pl: "seděli", other_pl: "seděly" },
+    imperative: { ty: "seď", vy: "seďte", my: "seďme" },
     aspectPairNote: "доконаний партнер: posedět (посидіти)",
     examples: {
       present: { cz: "Sedím na židli.", uk: "Я сиджу на стільці." },
       past: { cz: "Seděl jsem na židli.", uk: "Я сидів на стільці." },
       future: { cz: "Budu sedět na židli.", uk: "Я сидітиму на стільці." },
+      imperative: { cz: "Seď rovně!", uk: "Сиди прямо!" },
     },
   },
   {
@@ -582,11 +654,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "IV",
     present: { ja: "ležím", ty: "ležíš", on: "leží", my: "ležíme", vy: "ležíte", oni: "leží" },
     pastParticiple: { m: "ležel", f: "ležela", n: "leželo", manim_pl: "leželi", other_pl: "ležely" },
+    imperative: { ty: "lež", vy: "ležte", my: "ležme" },
     aspectPairNote: "доконаний партнер: poležet (полежати)",
     examples: {
       present: { cz: "Kniha leží na stole.", uk: "Книга лежить на столі." },
       past: { cz: "Kniha ležela na stole.", uk: "Книга лежала на столі." },
       future: { cz: "Kniha bude ležet na stole.", uk: "Книга лежатиме на столі." },
+      imperative: { cz: "Lež klidně!", uk: "Лежи спокійно!" },
     },
   },
   {
@@ -597,11 +671,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "IV",
     present: { ja: "chodím", ty: "chodíš", on: "chodí", my: "chodíme", vy: "chodíte", oni: "chodí" },
     pastParticiple: { m: "chodil", f: "chodila", n: "chodilo", manim_pl: "chodili", other_pl: "chodily" },
+    imperative: { ty: "choď", vy: "choďte", my: "choďme" },
     aspectPairNote: "багатократне дієслово руху (пор. jít — однократне)",
     examples: {
       present: { cz: "Chodím do školy pěšky.", uk: "Я ходжу до школи пішки." },
       past: { cz: "Chodil jsem do školy pěšky.", uk: "Я ходив до школи пішки." },
       future: { cz: "Budu chodit do školy pěšky.", uk: "Я ходитиму до школи пішки." },
+      imperative: { cz: "Choď do školy pěšky!", uk: "Ходи до школи пішки!" },
     },
   },
   {
@@ -612,11 +688,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "IV",
     present: { ja: "nosím", ty: "nosíš", on: "nosí", my: "nosíme", vy: "nosíte", oni: "nosí" },
     pastParticiple: { m: "nosil", f: "nosila", n: "nosilo", manim_pl: "nosili", other_pl: "nosily" },
+    imperative: { ty: "nos", vy: "noste", my: "nosme" },
     aspectPairNote: "багатократне дієслово (пор. nést — однократне)",
     examples: {
       present: { cz: "Nosím brýle.", uk: "Я ношу окуляри." },
       past: { cz: "Nosil jsem brýle.", uk: "Я носив окуляри." },
       future: { cz: "Budu nosit brýle.", uk: "Я носитиму окуляри." },
+      imperative: { cz: "Nos brýle!", uk: "Носи окуляри!" },
     },
   },
   {
@@ -627,11 +705,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "IV",
     present: { ja: "platím", ty: "platíš", on: "platí", my: "platíme", vy: "platíte", oni: "platí" },
     pastParticiple: { m: "platil", f: "platila", n: "platilo", manim_pl: "platili", other_pl: "platily" },
+    imperative: { ty: "plať", vy: "plaťte", my: "plaťme" },
     aspectPairNote: "доконаний партнер: zaplatit (заплатити)",
     examples: {
       present: { cz: "Platím kartou.", uk: "Я плачу карткою." },
       past: { cz: "Platil jsem kartou.", uk: "Я платив карткою." },
       future: { cz: "Budu platit kartou.", uk: "Я платитиму карткою." },
+      imperative: { cz: "Plať kartou!", uk: "Плати карткою!" },
     },
   },
 
@@ -644,11 +724,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "V",
     present: { ja: "dělám", ty: "děláš", on: "dělá", my: "děláme", vy: "děláte", oni: "dělají" },
     pastParticiple: { m: "dělal", f: "dělala", n: "dělalo", manim_pl: "dělali", other_pl: "dělaly" },
+    imperative: { ty: "dělej", vy: "dělejte", my: "dělejme" },
     aspectPairNote: "доконаний партнер: udělat (зробити)",
     examples: {
       present: { cz: "Dělám úkol.", uk: "Я роблю завдання." },
       past: { cz: "Dělal jsem úkol.", uk: "Я робив завдання." },
       future: { cz: "Budu dělat úkol.", uk: "Я робитиму завдання." },
+      imperative: { cz: "Dělej úkol!", uk: "Роби завдання!" },
     },
   },
   {
@@ -659,10 +741,12 @@ export const VERBS: VerbEntry[] = [
     verbClass: "V",
     future: { ja: "udělám", ty: "uděláš", on: "udělá", my: "uděláme", vy: "uděláte", oni: "udělají" },
     pastParticiple: { m: "udělal", f: "udělala", n: "udělalo", manim_pl: "udělali", other_pl: "udělaly" },
+    imperative: { ty: "udělej", vy: "udělejte", my: "udělejme" },
     aspectPairNote: "недоконаний партнер: dělat (робити)",
     examples: {
       past: { cz: "Udělal jsem to.", uk: "Я зробив це." },
       future: { cz: "Udělám to zítra.", uk: "Я зроблю це завтра." },
+      imperative: { cz: "Udělej to hned!", uk: "Зроби це негайно!" },
     },
   },
   {
@@ -673,11 +757,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "V",
     present: { ja: "čekám", ty: "čekáš", on: "čeká", my: "čekáme", vy: "čekáte", oni: "čekají" },
     pastParticiple: { m: "čekal", f: "čekala", n: "čekalo", manim_pl: "čekali", other_pl: "čekaly" },
+    imperative: { ty: "čekej", vy: "čekejte", my: "čekejme" },
     aspectPairNote: "доконаний партнер: počkat (почекати)",
     examples: {
       present: { cz: "Čekám na autobus.", uk: "Я чекаю на автобус." },
       past: { cz: "Čekal jsem na autobus.", uk: "Я чекав на автобус." },
       future: { cz: "Budu čekat na autobus.", uk: "Я чекатиму на автобус." },
+      imperative: { cz: "Čekej na autobus!", uk: "Чекай на автобус!" },
     },
   },
   {
@@ -688,11 +774,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "III",
     present: { ja: "hraju", ty: "hraješ", on: "hraje", my: "hrajeme", vy: "hrajete", oni: "hrajou" },
     pastParticiple: { m: "hrál", f: "hrála", n: "hrálo", manim_pl: "hráli", other_pl: "hrály" },
+    imperative: { ty: "hraj", vy: "hrajte", my: "hrajme" },
     aspectPairNote: "доконаний партнер: zahrát (зіграти); дієвідміна за зразком -je (hraju), варіант 1 ос. hraji (книжн.)",
     examples: {
       present: { cz: "Hraju fotbal.", uk: "Я граю у футбол." },
       past: { cz: "Hrál jsem fotbal.", uk: "Я грав у футбол." },
       future: { cz: "Budu hrát fotbal.", uk: "Я гратиму у футбол." },
+      imperative: { cz: "Hraj fotbal!", uk: "Грай у футбол!" },
     },
   },
   {
@@ -704,11 +792,13 @@ export const VERBS: VerbEntry[] = [
     reflexive: "se",
     present: { ja: "ptám", ty: "ptáš", on: "ptá", my: "ptáme", vy: "ptáte", oni: "ptají" },
     pastParticiple: { m: "ptal", f: "ptala", n: "ptalo", manim_pl: "ptali", other_pl: "ptaly" },
+    imperative: { ty: "ptej se", vy: "ptejte se", my: "ptejme se" },
     aspectPairNote: "доконаний партнер: zeptat se (запитати)",
     examples: {
       present: { cz: "Ptám se na cestu.", uk: "Я питаю дорогу." },
       past: { cz: "Ptal jsem se na cestu.", uk: "Я питав дорогу." },
       future: { cz: "Budu se ptát na cestu.", uk: "Я питатиму дорогу." },
+      imperative: { cz: "Ptej se na cestu!", uk: "Питай дорогу!" },
     },
   },
   {
@@ -719,11 +809,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "V",
     present: { ja: "snídám", ty: "snídáš", on: "snídá", my: "snídáme", vy: "snídáte", oni: "snídají" },
     pastParticiple: { m: "snídal", f: "snídala", n: "snídalo", manim_pl: "snídali", other_pl: "snídaly" },
+    imperative: { ty: "snídej", vy: "snídejte", my: "snídejme" },
     aspectPairNote: "доконаний партнер: nasnídat se (поснідати)",
     examples: {
       present: { cz: "Snídám v osm.", uk: "Я снідаю о восьмій." },
       past: { cz: "Snídal jsem v osm.", uk: "Я снідав о восьмій." },
       future: { cz: "Budu snídat v osm.", uk: "Я снідатиму о восьмій." },
+      imperative: { cz: "Snídej v osm!", uk: "Снідай о восьмій!" },
     },
   },
   {
@@ -734,11 +826,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "V",
     present: { ja: "volám", ty: "voláš", on: "volá", my: "voláme", vy: "voláte", oni: "volají" },
     pastParticiple: { m: "volal", f: "volala", n: "volalo", manim_pl: "volali", other_pl: "volaly" },
+    imperative: { ty: "volej", vy: "volejte", my: "volejme" },
     aspectPairNote: "доконаний партнер: zavolat (подзвонити)",
     examples: {
       present: { cz: "Volám mámě.", uk: "Я дзвоню мамі." },
       past: { cz: "Volal jsem mámě.", uk: "Я дзвонив мамі." },
       future: { cz: "Budu volat mámě.", uk: "Я дзвонитиму мамі." },
+      imperative: { cz: "Volej mámě!", uk: "Дзвони мамі!" },
     },
   },
   {
@@ -749,10 +843,12 @@ export const VERBS: VerbEntry[] = [
     verbClass: "V",
     future: { ja: "zavolám", ty: "zavoláš", on: "zavolá", my: "zavoláme", vy: "zavoláte", oni: "zavolají" },
     pastParticiple: { m: "zavolal", f: "zavolala", n: "zavolalo", manim_pl: "zavolali", other_pl: "zavolaly" },
+    imperative: { ty: "zavolej", vy: "zavolejte", my: "zavolejme" },
     aspectPairNote: "недоконаний партнер: volat (дзвонити)",
     examples: {
       past: { cz: "Zavolal jsem ti.", uk: "Я подзвонив тобі." },
       future: { cz: "Zavolám ti zítra.", uk: "Я подзвоню тобі завтра." },
+      imperative: { cz: "Zavolej mi zítra!", uk: "Подзвони мені завтра!" },
     },
   },
   {
@@ -763,11 +859,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "V",
     present: { ja: "poslouchám", ty: "posloucháš", on: "poslouchá", my: "posloucháme", vy: "posloucháte", oni: "poslouchají" },
     pastParticiple: { m: "poslouchal", f: "poslouchala", n: "poslouchalo", manim_pl: "poslouchali", other_pl: "poslouchaly" },
+    imperative: { ty: "poslouchej", vy: "poslouchejte", my: "poslouchejme" },
     aspectPairNote: "доконаний партнер: poslechnout si (послухати)",
     examples: {
       present: { cz: "Poslouchám hudbu.", uk: "Я слухаю музику." },
       past: { cz: "Poslouchal jsem hudbu.", uk: "Я слухав музику." },
       future: { cz: "Budu poslouchat hudbu.", uk: "Я слухатиму музику." },
+      imperative: { cz: "Poslouchej hudbu!", uk: "Слухай музику!" },
     },
   },
   {
@@ -778,11 +876,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "V",
     present: { ja: "vstávám", ty: "vstáváš", on: "vstává", my: "vstáváme", vy: "vstáváte", oni: "vstávají" },
     pastParticiple: { m: "vstával", f: "vstávala", n: "vstávalo", manim_pl: "vstávali", other_pl: "vstávaly" },
+    imperative: { ty: "vstávej", vy: "vstávejte", my: "vstávejme" },
     aspectPairNote: "доконаний партнер: vstát (встати)",
     examples: {
       present: { cz: "Vstávám brzy ráno.", uk: "Я встаю рано вранці." },
       past: { cz: "Vstával jsem brzy ráno.", uk: "Я вставав рано вранці." },
       future: { cz: "Budu vstávat brzy ráno.", uk: "Я вставатиму рано вранці." },
+      imperative: { cz: "Vstávej brzy ráno!", uk: "Вставай рано вранці!" },
     },
   },
   {
@@ -793,11 +893,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "V",
     present: { ja: "znám", ty: "znáš", on: "zná", my: "známe", vy: "znáte", oni: "znají" },
     pastParticiple: { m: "znal", f: "znala", n: "znalo", manim_pl: "znali", other_pl: "znaly" },
+    imperative: { ty: "znej", vy: "znejte", my: "znejme" },
     aspectPairNote: "знати особу/місце (пор. vědět — знати факт, umět — вміти)",
     examples: {
       present: { cz: "Znám toho člověka.", uk: "Я знаю цю людину." },
       past: { cz: "Znal jsem toho člověka.", uk: "Я знав цю людину." },
       future: { cz: "Budu znát toho člověka.", uk: "Я знатиму цю людину." },
+      imperative: { cz: "Znej svá práva!", uk: "Знай свої права!" },
     },
   },
   {
@@ -808,11 +910,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "V",
     present: { ja: "zpívám", ty: "zpíváš", on: "zpívá", my: "zpíváme", vy: "zpíváte", oni: "zpívají" },
     pastParticiple: { m: "zpíval", f: "zpívala", n: "zpívalo", manim_pl: "zpívali", other_pl: "zpívaly" },
+    imperative: { ty: "zpívej", vy: "zpívejte", my: "zpívejme" },
     aspectPairNote: "доконаний партнер: zazpívat (заспівати)",
     examples: {
       present: { cz: "Zpívám písničku.", uk: "Я співаю пісню." },
       past: { cz: "Zpíval jsem písničku.", uk: "Я співав пісню." },
       future: { cz: "Budu zpívat písničku.", uk: "Я співатиму пісню." },
+      imperative: { cz: "Zpívej písničku!", uk: "Співай пісню!" },
     },
   },
 
@@ -826,11 +930,13 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "jsem", ty: "jsi", on: "je", my: "jsme", vy: "jste", oni: "jsou" },
     future: { ja: "budu", ty: "budeš", on: "bude", my: "budeme", vy: "budete", oni: "budou" },
     pastParticiple: { m: "byl", f: "byla", n: "bylo", manim_pl: "byli", other_pl: "byly" },
+    imperative: { ty: "buď", vy: "buďte", my: "buďme" },
     aspectPairNote: "нерегулярне; майбутній час власний (budu…), а не складений",
     examples: {
       present: { cz: "Jsem doma.", uk: "Я вдома." },
       past: { cz: "Byl jsem doma.", uk: "Я був удома." },
       future: { cz: "Budu doma.", uk: "Я буду вдома." },
+      imperative: { cz: "Buď doma v osm!", uk: "Будь удома о восьмій!" },
     },
   },
   {
@@ -841,11 +947,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "irregular",
     present: { ja: "mám", ty: "máš", on: "má", my: "máme", vy: "máte", oni: "mají" },
     pastParticiple: { m: "měl", f: "měla", n: "mělo", manim_pl: "měli", other_pl: "měly" },
+    imperative: { ty: "měj", vy: "mějte", my: "mějme" },
     aspectPairNote: "нерегулярне; майбутній складений: budu mít…",
     examples: {
       present: { cz: "Mám nové auto.", uk: "У мене нове авто." },
       past: { cz: "Měl jsem nové auto.", uk: "У мене було нове авто." },
       future: { cz: "Budu mít nové auto.", uk: "У мене буде нове авто." },
+      imperative: { cz: "Měj se hezky!", uk: "Тримайся!" },
     },
   },
   {
@@ -856,11 +964,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "irregular",
     present: { ja: "chci", ty: "chceš", on: "chce", my: "chceme", vy: "chcete", oni: "chtějí" },
     pastParticiple: { m: "chtěl", f: "chtěla", n: "chtělo", manim_pl: "chtěli", other_pl: "chtěly" },
+    imperative: { ty: "chtěj", vy: "chtějte", my: "chtějme" },
     aspectPairNote: "нерегулярне; майбутній складений: budu chtít…",
     examples: {
       present: { cz: "Chci jíst.", uk: "Я хочу їсти." },
       past: { cz: "Chtěl jsem jíst.", uk: "Я хотів їсти." },
       future: { cz: "Budu chtít jíst.", uk: "Я хотітиму їсти." },
+      imperative: { cz: "Chtěj víc od života!", uk: "Хоти більше від життя!" },
     },
   },
   {
@@ -872,11 +982,13 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "jdu", ty: "jdeš", on: "jde", my: "jdeme", vy: "jdete", oni: "jdou" },
     future: { ja: "půjdu", ty: "půjdeš", on: "půjde", my: "půjdeme", vy: "půjdete", oni: "půjdou" },
     pastParticiple: { m: "šel", f: "šla", n: "šlo", manim_pl: "šli", other_pl: "šly" },
+    imperative: { ty: "jdi", vy: "jděte", my: "jděme" },
     aspectPairNote: "нерегулярне; майбутній час власний (půjdu…), а не складений",
     examples: {
       present: { cz: "Jdu domů.", uk: "Я йду додому." },
       past: { cz: "Šel jsem domů.", uk: "Я йшов додому." },
       future: { cz: "Půjdu domů.", uk: "Я піду додому." },
+      imperative: { cz: "Jdi domů!", uk: "Йди додому!" },
     },
   },
   {
@@ -888,11 +1000,13 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "jedu", ty: "jedeš", on: "jede", my: "jedeme", vy: "jedete", oni: "jedou" },
     future: { ja: "pojedu", ty: "pojedeš", on: "pojede", my: "pojedeme", vy: "pojedete", oni: "pojedou" },
     pastParticiple: { m: "jel", f: "jela", n: "jelo", manim_pl: "jeli", other_pl: "jely" },
+    imperative: { ty: "jeď", vy: "jeďte", my: "jeďme" },
     aspectPairNote: "нерегулярне; майбутній час власний (pojedu…), а не складений",
     examples: {
       present: { cz: "Jedu do Prahy.", uk: "Я їду до Праги." },
       past: { cz: "Jel jsem do Prahy.", uk: "Я їхав до Праги." },
       future: { cz: "Pojedu do Prahy.", uk: "Я поїду до Праги." },
+      imperative: { cz: "Jeď do Prahy!", uk: "Їдь до Праги!" },
     },
   },
   {
@@ -903,11 +1017,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "irregular",
     present: { ja: "vím", ty: "víš", on: "ví", my: "víme", vy: "víte", oni: "vědí" },
     pastParticiple: { m: "věděl", f: "věděla", n: "vědělo", manim_pl: "věděli", other_pl: "věděly" },
+    imperative: { ty: "věz", vy: "vězte", my: "vězme" },
     aspectPairNote: "нерегулярне (3 ос. мн. vědí!); знати факт (пор. znát — бути знайомим). Майбутній складений: budu vědět…",
     examples: {
       present: { cz: "Vím, kde bydlíš.", uk: "Я знаю, де ти живеш." },
       past: { cz: "Věděl jsem, kde bydlíš.", uk: "Я знав, де ти живеш." },
       future: { cz: "Budu vědět, kde bydlíš.", uk: "Я знатиму, де ти живеш." },
+      imperative: { cz: "Věz, že máš pravdu!", uk: "Знай, що ти маєш рацію!" },
     },
   },
   {
@@ -918,11 +1034,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "irregular",
     present: { ja: "jím", ty: "jíš", on: "jí", my: "jíme", vy: "jíte", oni: "jedí" },
     pastParticiple: { m: "jedl", f: "jedla", n: "jedlo", manim_pl: "jedli", other_pl: "jedly" },
+    imperative: { ty: "jez", vy: "jezte", my: "jezme" },
     aspectPairNote: "нерегулярне (3 ос. мн. jedí!); доконаний: sníst (з'їсти). Майбутній складений: budu jíst…",
     examples: {
       present: { cz: "Jím oběd.", uk: "Я їм обід." },
       past: { cz: "Jedl jsem oběd.", uk: "Я їв обід." },
       future: { cz: "Budu jíst oběd.", uk: "Я їстиму обід." },
+      imperative: { cz: "Jez pomalu!", uk: "Їж повільно!" },
     },
   },
   {
@@ -963,11 +1081,13 @@ export const VERBS: VerbEntry[] = [
     verbClass: "irregular",
     present: { ja: "umím", ty: "umíš", on: "umí", my: "umíme", vy: "umíte", oni: "umí" },
     pastParticiple: { m: "uměl", f: "uměla", n: "umělo", manim_pl: "uměli", other_pl: "uměly" },
+    imperative: { ty: "uměj", vy: "umějte", my: "umějme" },
     aspectPairNote: "модальне; вміти робити щось (пор. znát, vědět)",
     examples: {
       present: { cz: "Umím plavat.", uk: "Я вмію плавати." },
       past: { cz: "Uměl jsem plavat.", uk: "Я вмів плавати." },
       future: { cz: "Budu umět plavat.", uk: "Я вмітиму плавати." },
+      imperative: { cz: "Uměj mluvit s každým!", uk: "Умій говорити з кожним!" },
     },
   },
   {
@@ -993,10 +1113,12 @@ export const VERBS: VerbEntry[] = [
     verbClass: "irregular",
     future: { ja: "vezmu", ty: "vezmeš", on: "vezme", my: "vezmeme", vy: "vezmete", oni: "vezmou" },
     pastParticiple: { m: "vzal", f: "vzala", n: "vzalo", manim_pl: "vzali", other_pl: "vzaly" },
+    imperative: { ty: "vezmi", vy: "vezměte", my: "vezměme" },
     aspectPairNote: "нерегулярне доконане; недоконаний партнер: brát (брати)",
     examples: {
       past: { cz: "Vzal jsem si deštník.", uk: "Я взяв парасольку." },
       future: { cz: "Vezmu si deštník.", uk: "Я візьму парасольку." },
+      imperative: { cz: "Vezmi si deštník!", uk: "Візьми парасольку!" },
     },
   },
   {
@@ -1008,10 +1130,12 @@ export const VERBS: VerbEntry[] = [
     reflexive: "se",
     future: { ja: "stanu", ty: "staneš", on: "stane", my: "staneme", vy: "stanete", oni: "stanou" },
     pastParticiple: { m: "stal", f: "stala", n: "stalo", manim_pl: "stali", other_pl: "staly" },
+    imperative: { ty: "staň se", vy: "staňte se", my: "staňme se" },
     aspectPairNote: "нерегулярне доконане; недоконаний партнер: stávat se (ставатися)",
     examples: {
       past: { cz: "Co se stalo?", uk: "Що сталося?" },
       future: { cz: "Co se stane?", uk: "Що станеться?" },
+      imperative: { cz: "Staň se lepším!", uk: "Стань кращим!" },
     },
   },
   {
@@ -1023,11 +1147,13 @@ export const VERBS: VerbEntry[] = [
     reflexive: "se",
     present: { ja: "bojím", ty: "bojíš", on: "bojí", my: "bojíme", vy: "bojíte", oni: "bojí" },
     pastParticiple: { m: "bál", f: "bála", n: "bálo", manim_pl: "báli", other_pl: "bály" },
+    imperative: { ty: "boj se", vy: "bojte se", my: "bojme se" },
     aspectPairNote: "нерегулярне; майбутній складений: budu se bát…",
     examples: {
       present: { cz: "Bojím se tmy.", uk: "Я боюся темряви." },
       past: { cz: "Bál jsem se tmy.", uk: "Я боявся темряви." },
       future: { cz: "Budu se bát tmy.", uk: "Я боятимуся темряви." },
+      imperative: { cz: "Neboj se!", uk: "Не бійся!" },
     },
   },
 ];

@@ -158,12 +158,18 @@ export interface VerbEntry {
   // Минулий час — 5 форм l-дієприкметника.
   pastParticiple: PastParticiple;
 
+  // Наказовий спосіб (rozkazovací způsob) — лише 3 форми: ty/vy/my.
+  // Опційне: модальні (moci/muset/smět) та деякі дієслова (růst) його не мають.
+  imperative?: { ty: string; vy: string; my: string };
+
   // Приклади речень окремо для кожного часу (одне базове речення, що
-  // змінює форму дієслова). Теперішній — тільки для недоконаних.
+  // змінює форму дієслова). Теперішній — тільки для недоконаних,
+  // imperative — лише для дієслів із наказовим способом.
   examples: {
     present?: { cz: string; uk: string };
     past: { cz: string; uk: string };
     future: { cz: string; uk: string };
+    imperative?: { cz: string; uk: string };
   };
 }
 

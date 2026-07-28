@@ -2,19 +2,34 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { VerbEntry, PERSON_ORDER, PERSON_LABELS } from "../types";
 import { theme } from "../utils/theme";
-import { presentForm, futureForm, pastForm } from "../utils/verbForms";
+import {
+  presentForm,
+  futureForm,
+  pastForm,
+  imperativeForm,
+  IMPERATIVE_ORDER,
+  IMPERATIVE_LABELS,
+} from "../utils/verbForms";
 
-type Tense = "present" | "past" | "future";
+type Mode = "present" | "past" | "future" | "imperative";
 
-// Таблиця однієї часової форми: особа → форма дієслова.
-function TenseTable({ forms, accent }: { forms: { cz: string }[]; accent: string }) {
+// Таблиця з довільними підписами рядків (особа/підмет → форма).
+function FormTable({
+  labels,
+  forms,
+  accent,
+}: {
+  labels: { cz: string; uk: string }[];
+  forms: { cz: string }[];
+  accent: string;
+}) {
   return (
     <View style={styles.table}>
-      {PERSON_ORDER.map((p, i) => (
-        <View key={p} style={[styles.row, i % 2 === 0 && styles.rowAlt]}>
+      {labels.map((lbl, i) => (
+        <View key={i} style={[styles.row, i % 2 === 0 && styles.rowAlt]}>
           <View style={styles.personCell}>
-            <Text style={styles.personCz}>{PERSON_LABELS[p].cz}</Text>
-            <Text style={styles.personUk}>{PERSON_LABELS[p].uk}</Text>
+            <Text style={styles.personCz}>{lbl.cz}</Text>
+            <Text style={styles.personUk}>{lbl.uk}</Text>
           </View>
           <Text style={[styles.formText, { color: accent }]}>{forms[i].cz}</Text>
         </View>
@@ -47,29 +62,58 @@ function pastRows(v: VerbEntry) {
   return PERSON_ORDER.map((p) => ({ cz: pastForm(v, map[p]) }));
 }
 
-const TENSE_META: Record<Tense, { label: string; color: string }> = {
+// Рядки для наказового способу (3 форми: ty/vy/my).
+function imperativeRows(v: VerbEntry) {
+  return IMPERATIVE_ORDER.map((p) => ({ cz: imperativeForm(v, p) ?? "" }));
+}
+
+const MODE_META: Record<Mode, { label: string; color: string }> = {
   present: { label: "Теперішній", color: theme.colors.mint },
   past: { label: "Минулий", color: theme.colors.honey },
   future: { label: "Майбутній", color: theme.colors.lilac },
+  imperative: { label: "Наказовий", color: theme.colors.coral },
 };
+
+// Стандартні підписи 6 осіб (для теп./мин./майб.).
+const PERSON_ROW_LABELS = PERSON_ORDER.map((p) => PERSON_LABELS[p]);
+// Підписи 3 осіб наказового способу.
+const IMPERATIVE_ROW_LABELS = IMPERATIVE_ORDER.map((p) => IMPERATIVE_LABELS[p]);
 
 export function VerbConjugation({ entry }: { entry: VerbEntry }) {
   const isPerfective = entry.aspect === "perfective";
+  const hasImperative = !!entry.imperative;
 
-  // Доступні таби: доконаний вид не має теперішнього.
-  const tabs: Tense[] = isPerfective ? ["past", "future"] : ["present", "past", "future"];
+  // Доступні таби: доконаний вид не має теперішнього; наказовий — лише якщо є.
+  const modes: Mode[] = [
+    ...(isPerfective ? (["past", "future"] as Mode[]) : (["present", "past", "future"] as Mode[])),
+    ...(hasImperative ? (["imperative"] as Mode[]) : []),
+  ];
   // Стартовий таб: у доконаного — "past", інакше "present".
-  const [tense, setTense] = useState<Tense>(isPerfective ? "past" : "present");
+  const [mode, setMode] = useState<Mode>(isPerfective ? "past" : "present");
 
   const pp = entry.pastParticiple;
-  const meta = TENSE_META[tense];
+  const meta = MODE_META[mode];
 
   const rows =
-    tense === "present" ? presentRows(entry) : tense === "past" ? pastRows(entry) : futureRows(entry);
+    mode === "present"
+      ? presentRows(entry)
+      : mode === "past"
+      ? pastRows(entry)
+      : mode === "future"
+      ? futureRows(entry)
+      : imperativeRows(entry);
 
-  // Приклад для поточного часу.
+  const rowLabels = mode === "imperative" ? IMPERATIVE_ROW_LABELS : PERSON_ROW_LABELS;
+
+  // Приклад для поточного режиму.
   const example =
-    tense === "present" ? entry.examples.present : tense === "past" ? entry.examples.past : entry.examples.future;
+    mode === "present"
+      ? entry.examples.present
+      : mode === "past"
+      ? entry.examples.past
+      : mode === "future"
+      ? entry.examples.future
+      : entry.examples.imperative;
 
   return (
     <View>
@@ -83,16 +127,16 @@ export function VerbConjugation({ entry }: { entry: VerbEntry }) {
         </View>
       )}
 
-      {/* Перемикач часів */}
+      {/* Перемикач режимів (flexWrap — переносить на 2 ряди, коли табів 4) */}
       <View style={styles.segment}>
-        {tabs.map((t) => {
-          const active = t === tense;
-          const m = TENSE_META[t];
+        {modes.map((t) => {
+          const active = t === mode;
+          const m = MODE_META[t];
           return (
             <Pressable
               key={t}
               style={[styles.segBtn, active && { backgroundColor: m.color }]}
-              onPress={() => setTense(t)}
+              onPress={() => setMode(t)}
             >
               <Text style={[styles.segText, active && styles.segTextActive]}>{m.label}</Text>
             </Pressable>
@@ -100,12 +144,22 @@ export function VerbConjugation({ entry }: { entry: VerbEntry }) {
         })}
       </View>
 
-      {/* Таблиця дієвідміни поточного часу */}
+      {/* Банер наказового способу — лише під табом "Наказовий" */}
+      {mode === "imperative" && (
+        <View style={styles.imperativeNote}>
+          <Text style={styles.imperativeNoteText}>
+            ℹ️ Наказовий спосіб має лише 3 форми: ty (ти), vy (ви) і my (закличне «зробімо»).
+            Для «він/вона» використовують конструкцію «ať to udělá» (нехай зробить).
+          </Text>
+        </View>
+      )}
+
+      {/* Таблиця форм поточного режиму */}
       <View style={styles.section}>
-        <TenseTable forms={rows} accent={theme.colors.text} />
+        <FormTable labels={rowLabels} forms={rows} accent={theme.colors.text} />
 
         {/* Форми дієприкметника за родом — лише під табом "Минулий" */}
-        {tense === "past" && (
+        {mode === "past" && (
           <View style={styles.participleBox}>
             <Text style={styles.participleLabel}>Дієприкметник за родом:</Text>
             <Text style={styles.participleForms}>
@@ -121,7 +175,7 @@ export function VerbConjugation({ entry }: { entry: VerbEntry }) {
         )}
       </View>
 
-      {/* Приклад речення для поточного часу */}
+      {/* Приклад речення для поточного режиму */}
       {example && (
         <View style={[styles.example, { borderLeftColor: meta.color }]}>
           <Text style={styles.exampleCz}>💬 {example.cz}</Text>
@@ -136,19 +190,30 @@ const styles = StyleSheet.create({
   section: { marginBottom: theme.space(3) },
   segment: {
     flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 3,
     backgroundColor: theme.colors.bgElevated,
     borderRadius: theme.radius.md,
     padding: 3,
     marginBottom: theme.space(3),
   },
   segBtn: {
-    flex: 1,
+    flexGrow: 1,
+    flexBasis: "30%",
+    minWidth: 90,
     paddingVertical: theme.space(2),
     borderRadius: theme.radius.sm,
     alignItems: "center",
   },
   segText: { color: theme.colors.textDim, fontSize: 13, fontWeight: "700" },
   segTextActive: { color: "#1a1020" },
+  imperativeNote: {
+    backgroundColor: theme.colors.bgElevated,
+    borderRadius: theme.radius.md,
+    padding: theme.space(3),
+    marginBottom: theme.space(3),
+  },
+  imperativeNoteText: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19 },
   table: {
     borderRadius: theme.radius.md,
     overflow: "hidden",

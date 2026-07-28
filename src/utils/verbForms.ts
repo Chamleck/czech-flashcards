@@ -108,3 +108,23 @@ export function pastForm(v: VerbEntry, s: PastSubject): string {
 
 // Зручний доступ до 6 стандартних осіб для теп./майб. таблиць.
 export { PERSON_ORDER };
+
+// ── Наказовий спосіб ──
+// Лише 3 форми (ty/vy/my). Дані вже містять готові форми зі зворотною
+// часткою в правильному місці (напр. "oblékni se", "uč se"), тож просто
+// повертаємо їх як є.
+export type ImperativePerson = "ty" | "vy" | "my";
+
+export const IMPERATIVE_ORDER: ImperativePerson[] = ["ty", "vy", "my"];
+
+export const IMPERATIVE_LABELS: Record<ImperativePerson, { cz: string; uk: string }> = {
+  ty: { cz: "ty", uk: "ти" },
+  vy: { cz: "vy", uk: "ви" },
+  my: { cz: "my", uk: "ми (закличне)" },
+};
+
+// Форма наказового способу для особи (null, якщо дієслово його не має).
+export function imperativeForm(v: VerbEntry, p: ImperativePerson): string | null {
+  if (!v.imperative) return null;
+  return v.imperative[p];
+}
