@@ -12,6 +12,7 @@ import {
 } from "../types";
 import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
+import { NOUNS } from "../data/nouns";
 import { MistakeStore, weightFor, comboId } from "./flashcardWeights";
 
 // Питання квізу прикметників/займенників. Той самий контракт полів, що й у
@@ -118,6 +119,15 @@ function adjectivePartnerForm(
   return firstForm(a.declension[g][c][n]);
 }
 
+// Іменник-якір для фрази: випадковий іменник потрібного роду з бази Фази 1.
+// Уся парадигма вже вивірена; беремо форму цієї ж клітинки (відмінок×число).
+function nounCarrierForm(g: Gender, c: CzechCase, n: GrammaticalNumber): string {
+  const pool = NOUNS.filter((noun) => noun.gender === g);
+  if (pool.length === 0) return "";
+  const noun = pool[Math.floor(Math.random() * pool.length)];
+  return firstForm(noun.declension[c][n]);
+}
+
 // Партнер для тестованого прикметника — випадковий займенник (у т.ч. незмінний),
 // показаний ПЕРЕД пропуском: "jeho ___".
 // Партнер для тестованого займенника — випадковий прикметник, показаний ПІСЛЯ
@@ -128,12 +138,13 @@ function buildContextPhrase(
   c: CzechCase,
   n: GrammaticalNumber
 ): string {
+  const noun = nounCarrierForm(g, c, n);
   if (tested.kind === "adjective") {
     const p = PRONOUNS[Math.floor(Math.random() * PRONOUNS.length)];
-    return `${pronounPartnerForm(p, g, c, n)} ___`;
+    return `${pronounPartnerForm(p, g, c, n)} ___ ${noun}`;
   }
   const a = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
-  return `___ ${adjectivePartnerForm(a, g, c, n)}`;
+  return `___ ${adjectivePartnerForm(a, g, c, n)} ${noun}`;
 }
 
 // Усі реальні форми тестованого слова (для дистракторів), крім "—".
@@ -206,7 +217,7 @@ function enumerateCombos(pool: Tested[]): Combo[] {
 
 function taskTextFor(kind: Tested["kind"], g: Gender, c: CzechCase, n: GrammaticalNumber): string {
   const l = CASE_LABELS[c];
-  return `Оберіть ${KIND_LABEL[kind]}: ${GENDER_SHORT[g]}, ${l.uk} (${l.cz}), ${NUMBER_LABEL[n]}`;
+  return `Оберіть ${KIND_LABEL[kind]}: ${GENDER_SHORT[g]}, ${l.uk} (${l.cz}) — ${l.question}, ${NUMBER_LABEL[n]}`;
 }
 
 function makeQuestion(combo: Combo): DeclQuestion | null {
