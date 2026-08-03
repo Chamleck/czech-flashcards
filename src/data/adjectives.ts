@@ -4,7 +4,7 @@ import { AdjectiveEntry } from "../types";
 // Повна парадигма: 4 роди × 7 відмінків × 2 числа (56 форм на слово).
 // Дані згенеровано детерміновано з основи та зразка; для 8 слів із чергуванням
 // приголосного (velcí, staří, drazí…) чол.істот. Npl/Vpl взято з м'якої основи.
-// Варіантні форми немає — прикметники не мають нормативних дублетів.
+// Приклади — предикативні, з фіксованим носієм на кожен рід у межах категорії.
 
 export const ADJECTIVES: AdjectiveEntry[] = [
   {
@@ -52,8 +52,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "velkým", pl: "velkými" },
       },
     },
-    exampleSentenceCz: "Ten dům je velký.",
-    exampleSentenceUk: "Той будинок великий.",
+    examples: {
+      masc_anim: { cz: "Muž je velký.", uk: "Чоловік великий." },
+      masc_inan: { cz: "Dům je velký.", uk: "Будинок великий." },
+      fem: { cz: "Věž je velká.", uk: "Вежа велика." },
+      neut: { cz: "Okno je velké.", uk: "Вікно велике." },
+    },
   },
   {
     id: "maly",
@@ -100,8 +104,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "malým", pl: "malými" },
       },
     },
-    exampleSentenceCz: "Mám malý byt.",
-    exampleSentenceUk: "У мене маленька квартира.",
+    examples: {
+      masc_anim: { cz: "Muž je malý.", uk: "Чоловік малий." },
+      masc_inan: { cz: "Dům je malý.", uk: "Будинок малий." },
+      fem: { cz: "Věž je malá.", uk: "Вежа мала." },
+      neut: { cz: "Okno je malé.", uk: "Вікно мале." },
+    },
   },
   {
     id: "vysoky",
@@ -148,8 +156,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "vysokým", pl: "vysokými" },
       },
     },
-    exampleSentenceCz: "Je to vysoký strom.",
-    exampleSentenceUk: "Це високе дерево.",
+    examples: {
+      masc_anim: { cz: "Muž je vysoký.", uk: "Чоловік високий." },
+      masc_inan: { cz: "Dům je vysoký.", uk: "Будинок високий." },
+      fem: { cz: "Věž je vysoká.", uk: "Вежа висока." },
+      neut: { cz: "Okno je vysoké.", uk: "Вікно високе." },
+    },
   },
   {
     id: "nizky",
@@ -196,8 +208,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "nízkým", pl: "nízkými" },
       },
     },
-    exampleSentenceCz: "Stůl je nízký.",
-    exampleSentenceUk: "Стіл низький.",
+    examples: {
+      masc_anim: { cz: "Muž je nízký.", uk: "Чоловік низький." },
+      masc_inan: { cz: "Dům je nízký.", uk: "Будинок низький." },
+      fem: { cz: "Věž je nízká.", uk: "Вежа низька." },
+      neut: { cz: "Okno je nízké.", uk: "Вікно низьке." },
+    },
   },
   {
     id: "stary",
@@ -244,8 +260,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "starým", pl: "starými" },
       },
     },
-    exampleSentenceCz: "To je starý hrad.",
-    exampleSentenceUk: "Це старий замок.",
+    examples: {
+      masc_anim: { cz: "Muž je starý.", uk: "Чоловік старий." },
+      masc_inan: { cz: "Film je starý.", uk: "Фільм старий." },
+      fem: { cz: "Kniha je stará.", uk: "Книга стара." },
+      neut: { cz: "Auto je staré.", uk: "Авто старе." },
+    },
   },
   {
     id: "novy",
@@ -292,8 +312,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "novým", pl: "novými" },
       },
     },
-    exampleSentenceCz: "Koupil jsem nový telefon.",
-    exampleSentenceUk: "Я купив новий телефон.",
+    examples: {
+      masc_anim: { cz: "Muž je nový.", uk: "Чоловік новий." },
+      masc_inan: { cz: "Film je nový.", uk: "Фільм новий." },
+      fem: { cz: "Kniha je nová.", uk: "Книга нова." },
+      neut: { cz: "Auto je nové.", uk: "Авто нове." },
+    },
   },
   {
     id: "mlady",
@@ -340,8 +364,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "mladým", pl: "mladými" },
       },
     },
-    exampleSentenceCz: "Je to mladý muž.",
-    exampleSentenceUk: "Це молодий чоловік.",
+    examples: {
+      masc_anim: { cz: "Muž je mladý.", uk: "Чоловік молодий." },
+      masc_inan: { cz: "Měsíc je mladý.", uk: "Місяць молодий." },
+      fem: { cz: "Žena je mladá.", uk: "Жінка молода." },
+      neut: { cz: "Tele je mladé.", uk: "Теля молоде." },
+    },
   },
   {
     id: "dobry",
@@ -388,8 +416,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "dobrým", pl: "dobrými" },
       },
     },
-    exampleSentenceCz: "Je to dobrý člověk.",
-    exampleSentenceUk: "Це добра людина.",
+    examples: {
+      masc_anim: { cz: "Muž je dobrý.", uk: "Чоловік добрий." },
+      masc_inan: { cz: "Film je dobrý.", uk: "Фільм добрий." },
+      fem: { cz: "Kniha je dobrá.", uk: "Книга добра." },
+      neut: { cz: "Auto je dobré.", uk: "Авто добре." },
+    },
   },
   {
     id: "spatny",
@@ -436,8 +468,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "špatným", pl: "špatnými" },
       },
     },
-    exampleSentenceCz: "Mám špatný den.",
-    exampleSentenceUk: "У мене поганий день.",
+    examples: {
+      masc_anim: { cz: "Muž je špatný.", uk: "Чоловік поганий." },
+      masc_inan: { cz: "Film je špatný.", uk: "Фільм поганий." },
+      fem: { cz: "Kniha je špatná.", uk: "Книга погана." },
+      neut: { cz: "Auto je špatné.", uk: "Авто погане." },
+    },
   },
   {
     id: "hezky",
@@ -484,8 +520,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "hezkým", pl: "hezkými" },
       },
     },
-    exampleSentenceCz: "To je hezký obrázek.",
-    exampleSentenceUk: "Це гарна картинка.",
+    examples: {
+      masc_anim: { cz: "Muž je hezký.", uk: "Чоловік гарний." },
+      masc_inan: { cz: "Film je hezký.", uk: "Фільм гарний." },
+      fem: { cz: "Kniha je hezká.", uk: "Книга гарна." },
+      neut: { cz: "Auto je hezké.", uk: "Авто гарне." },
+    },
   },
   {
     id: "drahy",
@@ -532,8 +572,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "drahým", pl: "drahými" },
       },
     },
-    exampleSentenceCz: "To auto je drahé.",
-    exampleSentenceUk: "Це авто дороге.",
+    examples: {
+      masc_anim: { cz: "Kůň je drahý.", uk: "Кінь дорогий." },
+      masc_inan: { cz: "Oběd je drahý.", uk: "Обід дорогий." },
+      fem: { cz: "Káva je drahá.", uk: "Кава дорога." },
+      neut: { cz: "Pivo je drahé.", uk: "Пиво дороге." },
+    },
   },
   {
     id: "levny",
@@ -580,8 +624,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "levným", pl: "levnými" },
       },
     },
-    exampleSentenceCz: "Je to levný oběd.",
-    exampleSentenceUk: "Це дешевий обід.",
+    examples: {
+      masc_anim: { cz: "Kůň je levný.", uk: "Кінь дешевий." },
+      masc_inan: { cz: "Oběd je levný.", uk: "Обід дешевий." },
+      fem: { cz: "Káva je levná.", uk: "Кава дешева." },
+      neut: { cz: "Pivo je levné.", uk: "Пиво дешеве." },
+    },
   },
   {
     id: "rychly",
@@ -628,8 +676,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "rychlým", pl: "rychlými" },
       },
     },
-    exampleSentenceCz: "Mám rychlé auto.",
-    exampleSentenceUk: "У мене швидка машина.",
+    examples: {
+      masc_anim: { cz: "Kůň je rychlý.", uk: "Кінь швидкий." },
+      masc_inan: { cz: "Vlak je rychlý.", uk: "Потяг швидкий." },
+      fem: { cz: "Raketa je rychlá.", uk: "Ракета швидка." },
+      neut: { cz: "Auto je rychlé.", uk: "Авто швидке." },
+    },
   },
   {
     id: "teply",
@@ -676,8 +728,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "teplým", pl: "teplými" },
       },
     },
-    exampleSentenceCz: "Dnes je teplý den.",
-    exampleSentenceUk: "Сьогодні теплий день.",
+    examples: {
+      masc_anim: { cz: "Kůň je teplý.", uk: "Кінь теплий." },
+      masc_inan: { cz: "Oběd je teplý.", uk: "Обід теплий." },
+      fem: { cz: "Káva je teplá.", uk: "Кава тепла." },
+      neut: { cz: "Pivo je teplé.", uk: "Пиво тепле." },
+    },
   },
   {
     id: "studeny",
@@ -724,8 +780,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "studeným", pl: "studenými" },
       },
     },
-    exampleSentenceCz: "Piju studenou vodu.",
-    exampleSentenceUk: "Я п'ю холодну воду.",
+    examples: {
+      masc_anim: { cz: "Kůň je studený.", uk: "Кінь холодний." },
+      masc_inan: { cz: "Oběd je studený.", uk: "Обід холодний." },
+      fem: { cz: "Káva je studená.", uk: "Кава холодна." },
+      neut: { cz: "Pivo je studené.", uk: "Пиво холодне." },
+    },
   },
   {
     id: "cerny",
@@ -772,8 +832,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "černým", pl: "černými" },
       },
     },
-    exampleSentenceCz: "Mám černý kabát.",
-    exampleSentenceUk: "У мене чорне пальто.",
+    examples: {
+      masc_anim: { cz: "Pták je černý.", uk: "Птах чорний." },
+      masc_inan: { cz: "Svetr je černý.", uk: "Светр чорний." },
+      fem: { cz: "Růže je černá.", uk: "Троянда чорна." },
+      neut: { cz: "Auto je černé.", uk: "Авто чорне." },
+    },
   },
   {
     id: "bily",
@@ -820,8 +884,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "bílým", pl: "bílými" },
       },
     },
-    exampleSentenceCz: "Je to bílý sníh.",
-    exampleSentenceUk: "Це білий сніг.",
+    examples: {
+      masc_anim: { cz: "Pták je bílý.", uk: "Птах білий." },
+      masc_inan: { cz: "Svetr je bílý.", uk: "Светр білий." },
+      fem: { cz: "Růže je bílá.", uk: "Троянда біла." },
+      neut: { cz: "Auto je bílé.", uk: "Авто біле." },
+    },
   },
   {
     id: "cerveny",
@@ -868,8 +936,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "červeným", pl: "červenými" },
       },
     },
-    exampleSentenceCz: "Koupila červené růže.",
-    exampleSentenceUk: "Вона купила червоні троянди.",
+    examples: {
+      masc_anim: { cz: "Pták je červený.", uk: "Птах червоний." },
+      masc_inan: { cz: "Svetr je červený.", uk: "Светр червоний." },
+      fem: { cz: "Růže je červená.", uk: "Троянда червона." },
+      neut: { cz: "Auto je červené.", uk: "Авто червоне." },
+    },
   },
   {
     id: "modry",
@@ -916,8 +988,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "modrým", pl: "modrými" },
       },
     },
-    exampleSentenceCz: "Nebe je modré.",
-    exampleSentenceUk: "Небо синє.",
+    examples: {
+      masc_anim: { cz: "Pták je modrý.", uk: "Птах синій." },
+      masc_inan: { cz: "Svetr je modrý.", uk: "Светр синій." },
+      fem: { cz: "Růže je modrá.", uk: "Троянда синя." },
+      neut: { cz: "Auto je modré.", uk: "Авто синє." },
+    },
   },
   {
     id: "zeleny",
@@ -964,8 +1040,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "zeleným", pl: "zelenými" },
       },
     },
-    exampleSentenceCz: "Tráva je zelená.",
-    exampleSentenceUk: "Трава зелена.",
+    examples: {
+      masc_anim: { cz: "Pták je zelený.", uk: "Птах зелений." },
+      masc_inan: { cz: "Svetr je zelený.", uk: "Светр зелений." },
+      fem: { cz: "Růže je zelená.", uk: "Троянда зелена." },
+      neut: { cz: "Auto je zelené.", uk: "Авто зелене." },
+    },
   },
   {
     id: "zluty",
@@ -1012,8 +1092,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "žlutým", pl: "žlutými" },
       },
     },
-    exampleSentenceCz: "Slunce je žluté.",
-    exampleSentenceUk: "Сонце жовте.",
+    examples: {
+      masc_anim: { cz: "Pták je žlutý.", uk: "Птах жовтий." },
+      masc_inan: { cz: "Svetr je žlutý.", uk: "Светр жовтий." },
+      fem: { cz: "Růže je žlutá.", uk: "Троянда жовта." },
+      neut: { cz: "Auto je žluté.", uk: "Авто жовте." },
+    },
   },
   {
     id: "jarni",
@@ -1060,8 +1144,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "jarním", pl: "jarními" },
       },
     },
-    exampleSentenceCz: "Je krásný jarní den.",
-    exampleSentenceUk: "Гарний весняний день.",
+    examples: {
+      masc_anim: { cz: "Pták je jarní.", uk: "Птах весняний." },
+      masc_inan: { cz: "Déšť je jarní.", uk: "Дощ весняний." },
+      fem: { cz: "Bouře je jarní.", uk: "Буря весняна." },
+      neut: { cz: "Slunce je jarní.", uk: "Сонце весняне." },
+    },
   },
   {
     id: "cizi",
@@ -1108,8 +1196,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "cizím", pl: "cizími" },
       },
     },
-    exampleSentenceCz: "To je cizí kufr.",
-    exampleSentenceUk: "Це чужа валіза.",
+    examples: {
+      masc_anim: { cz: "Muž je cizí.", uk: "Чоловік чужий." },
+      masc_inan: { cz: "Dům je cizí.", uk: "Будинок чужий." },
+      fem: { cz: "Země je cizí.", uk: "Країна чужа." },
+      neut: { cz: "Město je cizí.", uk: "Місто чуже." },
+    },
   },
   {
     id: "posledni",
@@ -1156,8 +1248,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "posledním", pl: "posledními" },
       },
     },
-    exampleSentenceCz: "Je to poslední vlak.",
-    exampleSentenceUk: "Це останній потяг.",
+    examples: {
+      masc_anim: { cz: "Muž je poslední.", uk: "Чоловік останній." },
+      masc_inan: { cz: "Vlak je poslední.", uk: "Потяг останній." },
+      fem: { cz: "Stránka je poslední.", uk: "Сторінка остання." },
+      neut: { cz: "Slovo je poslední.", uk: "Слово останнє." },
+    },
   },
   {
     id: "domaci",
@@ -1204,7 +1300,11 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "domácím", pl: "domácími" },
       },
     },
-    exampleSentenceCz: "Mám domácí úkol.",
-    exampleSentenceUk: "У мене домашнє завдання.",
+    examples: {
+      masc_anim: { cz: "Mazlíček je domácí.", uk: "Улюбленець домашній." },
+      masc_inan: { cz: "Počítač je domácí.", uk: "Комп'ютер домашній." },
+      fem: { cz: "Práce je domácí.", uk: "Робота домашня." },
+      neut: { cz: "Kino je domácí.", uk: "Кіно домашнє." },
+    },
   },
 ];

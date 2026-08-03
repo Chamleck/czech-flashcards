@@ -74,6 +74,8 @@ function Block({ block }: { block: GrammarBlock }) {
   switch (block.type) {
     case "paragraph":
       return <Text style={styles.p}>{block.text}</Text>;
+    case "heading":
+      return <Text style={styles.h2}>{block.text}</Text>;
     case "tip":
       return (
         <View style={styles.tip}>
@@ -132,6 +134,13 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: theme.colors.bg },
   content: { padding: theme.space(4) },
   p: { color: theme.colors.textDim, fontSize: 15, lineHeight: 22, marginBottom: theme.space(3) },
+  h2: {
+    color: theme.colors.honey,
+    fontSize: 17,
+    fontWeight: "800",
+    marginTop: theme.space(2),
+    marginBottom: theme.space(2),
+  },
   tip: {
     backgroundColor: theme.colors.bgElevated,
     borderRadius: theme.radius.md,

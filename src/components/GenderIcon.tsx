@@ -12,7 +12,18 @@ const ICON: Record<Gender, typeof User> = {
   neut: Circle, // сер. рід — нейтральна форма
 };
 
-export function GenderIcon({ gender, size = 18 }: { gender: Gender; size?: number }) {
+export function GenderIcon({
+  gender,
+  size = 18,
+  activeDark = false,
+}: {
+  gender: Gender;
+  size?: number;
+  activeDark?: boolean;
+}) {
   const Cmp = ICON[gender];
-  return <Cmp size={size} color={theme.genderColor[gender]} strokeWidth={2.4} />;
+  // На активному табі фон залито кольором роду — фарбуємо іконку в темний,
+  // щоб вона не зливалася з фоном (інакше однаковий колір → іконка зникає).
+  const color = activeDark ? "#1a1020" : theme.genderColor[gender];
+  return <Cmp size={size} color={color} strokeWidth={2.4} />;
 }

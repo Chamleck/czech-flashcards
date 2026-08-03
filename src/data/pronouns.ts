@@ -55,8 +55,12 @@ export const PRONOUNS: PronounEntry[] = [
         instrumental: { sg: "mým", pl: "mými" },
       },
     },
-    exampleSentenceCz: "To je můj dům.",
-    exampleSentenceUk: "Це мій будинок.",
+    examples: {
+      masc_anim: { cz: "To je můj bratr.", uk: "Це мій брат." },
+      masc_inan: { cz: "To je můj dům.", uk: "Це мій будинок." },
+      fem: { cz: "To je má sestra.", uk: "Це моя сестра." },
+      neut: { cz: "To je mé auto.", uk: "Це моє авто." },
+    },
   },
   {
     id: "tvuj",
@@ -103,8 +107,12 @@ export const PRONOUNS: PronounEntry[] = [
         instrumental: { sg: "tvým", pl: "tvými" },
       },
     },
-    exampleSentenceCz: "Kde je tvůj bratr?",
-    exampleSentenceUk: "Де твій брат?",
+    examples: {
+      masc_anim: { cz: "To je tvůj bratr.", uk: "Це твій брат." },
+      masc_inan: { cz: "To je tvůj dům.", uk: "Це твій будинок." },
+      fem: { cz: "To je tvá sestra.", uk: "Це твоя сестра." },
+      neut: { cz: "To je tvé auto.", uk: "Це твоє авто." },
+    },
   },
   {
     id: "svuj",
@@ -151,8 +159,12 @@ export const PRONOUNS: PronounEntry[] = [
         instrumental: { sg: "svým", pl: "svými" },
       },
     },
-    exampleSentenceCz: "Mám rád svůj pokoj.",
-    exampleSentenceUk: "Я люблю свою кімнату.",
+    examples: {
+      masc_anim: { cz: "Mám rád svého bratra.", uk: "Я люблю свого брата." },
+      masc_inan: { cz: "Mám svůj dům.", uk: "Я маю свій будинок." },
+      fem: { cz: "Mám svou sestru.", uk: "Я маю свою сестру." },
+      neut: { cz: "Mám své auto.", uk: "Я маю своє авто." },
+    },
   },
   {
     id: "nas",
@@ -199,8 +211,12 @@ export const PRONOUNS: PronounEntry[] = [
         instrumental: { sg: "naším", pl: "našimi" },
       },
     },
-    exampleSentenceCz: "To je náš učitel.",
-    exampleSentenceUk: "Це наш учитель.",
+    examples: {
+      masc_anim: { cz: "To je náš bratr.", uk: "Це наш брат." },
+      masc_inan: { cz: "To je náš dům.", uk: "Це наш будинок." },
+      fem: { cz: "To je naše sestra.", uk: "Це наша сестра." },
+      neut: { cz: "To je naše auto.", uk: "Це наше авто." },
+    },
   },
   {
     id: "vas",
@@ -247,8 +263,12 @@ export const PRONOUNS: PronounEntry[] = [
         instrumental: { sg: "vaším", pl: "vašimi" },
       },
     },
-    exampleSentenceCz: "Je to váš kufr?",
-    exampleSentenceUk: "Це ваша валіза?",
+    examples: {
+      masc_anim: { cz: "To je váš bratr.", uk: "Це ваш брат." },
+      masc_inan: { cz: "To je váš dům.", uk: "Це ваш будинок." },
+      fem: { cz: "To je vaše sestra.", uk: "Це ваша сестра." },
+      neut: { cz: "To je vaše auto.", uk: "Це ваше авто." },
+    },
   },
   {
     id: "jeji",
@@ -295,8 +315,12 @@ export const PRONOUNS: PronounEntry[] = [
         instrumental: { sg: "jejím", pl: "jejími" },
       },
     },
-    exampleSentenceCz: "To je její kniha.",
-    exampleSentenceUk: "Це її книга.",
+    examples: {
+      masc_anim: { cz: "To je její bratr.", uk: "Це її брат." },
+      masc_inan: { cz: "To je její dům.", uk: "Це її будинок." },
+      fem: { cz: "To je její sestra.", uk: "Це її сестра." },
+      neut: { cz: "To je její auto.", uk: "Це її авто." },
+    },
   },
   {
     id: "jeho",
@@ -306,7 +330,7 @@ export const PRONOUNS: PronounEntry[] = [
     declinable: false,
     invariantForm: "jeho",
     exampleSentenceCz: "To je jeho auto.",
-    exampleSentenceUk: "Це його машина.",
+    exampleSentenceUk: "Це його авто.",
   },
   {
     id: "jejich",
@@ -363,7 +387,11 @@ export const PRONOUNS: PronounEntry[] = [
         instrumental: { sg: "tím", pl: "těmi" },
       },
     },
-    exampleSentenceCz: "Ten pán je učitel.",
-    exampleSentenceUk: "Той пан — учитель.",
+    examples: {
+      masc_anim: { cz: "Ten bratr je tam.", uk: "Той брат там." },
+      masc_inan: { cz: "Ten dům je tam.", uk: "Той будинок там." },
+      fem: { cz: "Ta sestra je tam.", uk: "Та сестра там." },
+      neut: { cz: "To auto je tam.", uk: "Те авто там." },
+    },
   },
 ];

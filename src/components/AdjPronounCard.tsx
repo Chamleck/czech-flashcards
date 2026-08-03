@@ -77,18 +77,18 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
             </View>
           ) : (
             <>
-              {/* Таби роду */}
-              <View style={styles.tabs}>
+              {/* Таби роду — контейнер як у дієсловах (segment) */}
+              <View style={styles.segment}>
                 {GENDER_ORDER.map((g) => {
                   const on = g === gender;
                   return (
                     <Pressable
                       key={g}
-                      style={[styles.tab, on && { backgroundColor: theme.genderColor[g] }]}
+                      style={[styles.segBtn, on && { backgroundColor: theme.genderColor[g] }]}
                       onPress={() => setGender(g)}
                     >
-                      <GenderIcon gender={g} size={14} />
-                      <Text style={[styles.tabText, on && styles.tabTextOn]}>
+                      <GenderIcon gender={g} size={14} activeDark={on} />
+                      <Text style={[styles.segText, on && styles.segTextActive]}>
                         {GENDER_SHORT[g]}
                       </Text>
                     </Pressable>
@@ -100,12 +100,23 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
             </>
           )}
 
-          {entry.exampleSentenceCz && (
-            <View style={styles.example}>
-              <Text style={styles.exampleCz}>💬 {entry.exampleSentenceCz}</Text>
-              <Text style={styles.exampleUk}>{entry.exampleSentenceUk}</Text>
-            </View>
-          )}
+          {/* Приклад: для незмінних — один; для решти — за обраним родом */}
+          {indeclinable
+            ? (entry as any).exampleSentenceCz && (
+                <View style={styles.example}>
+                  <Text style={styles.exampleCz}>💬 {(entry as any).exampleSentenceCz}</Text>
+                  <Text style={styles.exampleUk}>{(entry as any).exampleSentenceUk}</Text>
+                </View>
+              )
+            : (() => {
+                const ex = (entry as any).examples[gender];
+                return (
+                  <View style={[styles.example, { borderLeftColor: theme.genderColor[gender] }]}>
+                    <Text style={styles.exampleCz}>💬 {ex.cz}</Text>
+                    <Text style={styles.exampleUk}>{ex.uk}</Text>
+                  </View>
+                );
+              })()}
         </ScrollView>
       )}
     </View>
@@ -138,23 +149,28 @@ const styles = StyleSheet.create({
   answerLabel: { color: theme.colors.textDim, fontSize: 13 },
   answerWord: { fontSize: 28, fontWeight: "800", marginVertical: 2 },
   patternText: { color: theme.colors.textFaint, fontSize: 12, fontWeight: "600" },
-  tabs: {
+  segment: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: theme.space(2),
+    gap: 3,
+    backgroundColor: theme.colors.bgElevated,
+    borderRadius: theme.radius.md,
+    padding: 3,
     marginBottom: theme.space(3),
   },
-  tab: {
+  segBtn: {
+    flexGrow: 1,
+    flexBasis: "22%",
+    minWidth: 76,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: 5,
-    backgroundColor: theme.colors.bgElevated,
-    borderRadius: 999,
     paddingVertical: theme.space(2),
-    paddingHorizontal: theme.space(3),
+    borderRadius: theme.radius.sm,
   },
-  tabText: { color: theme.colors.textDim, fontSize: 12, fontWeight: "700" },
-  tabTextOn: { color: "#1a1020" },
+  segText: { color: theme.colors.textDim, fontSize: 12, fontWeight: "700" },
+  segTextActive: { color: "#1a1020" },
   invariantBox: {
     backgroundColor: theme.colors.bgElevated,
     borderRadius: theme.radius.md,

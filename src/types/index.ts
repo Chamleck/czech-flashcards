@@ -99,6 +99,9 @@ export interface CardProgress {
 // рід × (7 відмінків × 2 числа). Перевикористовує форму DeclensionTable.
 export type FullDeclension = Record<Gender, DeclensionTable>;
 
+// Приклад речення для кожного роду (змінюється разом із табом роду в картці).
+export type GenderExamples = Record<Gender, { cz: string; uk: string }>;
+
 // Порядок родів для перемикача-табів у картці розкриття.
 export const GENDER_ORDER: Gender[] = ["masc_anim", "masc_inan", "fem", "neut"];
 
@@ -124,8 +127,8 @@ export interface AdjectiveEntry {
   // true → у чол. істот. Npl/Vpl чергується приголосний (velký→velcí, starý→staří)
   hasConsonantAlternation: boolean;
   declension: FullDeclension;
-  exampleSentenceCz?: string;
-  exampleSentenceUk?: string;
+  // Приклади для кожного роду — показуються під відповідним табом.
+  examples: GenderExamples;
 }
 
 // ── Займенники (присвійні + вказівні) ──
@@ -136,8 +139,6 @@ interface PronounBase {
   uk: string;
   cz: string; // базова форма (напр. můj, ten)
   subtype: PronounSubtype;
-  exampleSentenceCz?: string;
-  exampleSentenceUk?: string;
 }
 
 // Відмінюваний займенник: můj/tvůj/svůj (як mladý), náš/váš (vzor náš),
@@ -146,12 +147,16 @@ export interface DeclinablePronoun extends PronounBase {
   declinable: true;
   vzorLabel: string; // короткий підпис зразка для картки/граматики
   declension: FullDeclension;
+  examples: GenderExamples; // приклад на кожен рід (як у прикметників)
 }
 
-// Незмінний займенник: jeho, jejich — одна форма на всі відмінки.
+// Незмінний займенник: jeho, jejich — одна форма на всі відмінки,
+// тому й приклад один (табів роду немає).
 export interface IndeclinablePronoun extends PronounBase {
   declinable: false;
   invariantForm: string;
+  exampleSentenceCz?: string;
+  exampleSentenceUk?: string;
 }
 
 export type PronounEntry = DeclinablePronoun | IndeclinablePronoun;
