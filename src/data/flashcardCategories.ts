@@ -29,11 +29,11 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
     ready: true,
   },
   {
-    id: "pronouns",
-    emoji: "👤",
-    title: "Займенники",
-    subtitle: "Однина / множина (скоро)",
+    id: "adj-pron",
+    emoji: "🎨",
+    title: "Прикметники та займенники",
+    subtitle: "Узгодження за родом, відмінком і числом",
     color: theme.colors.lilac,
-    ready: false,
+    ready: true,
   },
 ];

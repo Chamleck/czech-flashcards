@@ -7,6 +7,7 @@ import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { generateSession, Question } from "../utils/flashcardEngine";
 import { generateVerbSession, VerbQuestion } from "../utils/verbFlashcardEngine";
+import { generateDeclensionSession, DeclQuestion } from "../utils/declensionFlashcardEngine";
 import { loadFlashcardStats, saveFlashcardStats, mergeSession } from "../utils/flashcardStats";
 import { markRoundFinished } from "../utils/quizRoundFlag";
 import {
@@ -22,14 +23,17 @@ const SESSION_LEN = 12;
 
 // Обидва движки повертають питання зі спільним контрактом полів,
 // які читає екран (promptWord/promptUk/taskText/correct/options/comboId).
+// contextPhrase — необов'язкове поле (лише квиз прикметників/займенників):
+// фраза з партнером і пропуском. Іменники/дієслова його не задають.
 type QuizQuestion = Pick<
   Question,
   "promptWord" | "promptUk" | "taskText" | "correct" | "options" | "comboId"
->;
+> & { contextPhrase?: string };
 
 // Диспетчер: генерує сесію відповідно до категорії.
 function buildSession(categoryId: string, mistakes: MistakeStore): QuizQuestion[] {
   if (categoryId === "verbs") return generateVerbSession(SESSION_LEN, undefined, mistakes);
+  if (categoryId === "adj-pron") return generateDeclensionSession(SESSION_LEN, undefined, mistakes);
   return generateSession(SESSION_LEN, undefined, mistakes);
 }
 
@@ -195,6 +199,11 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
           <Text style={styles.promptLabel}>слово 🇨🇿</Text>
           <Text style={styles.promptWord}>{current.promptWord}</Text>
           <Text style={styles.promptUk}>{current.promptUk}</Text>
+          {current.contextPhrase && (
+            <View style={styles.phraseBox}>
+              <Text style={styles.phraseText}>{current.contextPhrase}</Text>
+            </View>
+          )}
           <View style={styles.taskBox}>
             <Text style={styles.taskText}>{current.taskText}</Text>
           </View>
@@ -251,6 +260,21 @@ const styles = StyleSheet.create({
   promptLabel: { color: theme.colors.textDim, fontSize: 13 },
   promptWord: { color: theme.colors.text, fontSize: 34, fontWeight: "900", marginTop: 4 },
   promptUk: { color: theme.colors.textDim, fontSize: 16, marginTop: 2 },
+  phraseBox: {
+    marginTop: theme.space(3),
+    backgroundColor: theme.colors.bgElevated,
+    borderRadius: theme.radius.md,
+    paddingVertical: theme.space(2.5),
+    paddingHorizontal: theme.space(4),
+    alignSelf: "center",
+  },
+  phraseText: {
+    color: theme.colors.text,
+    fontSize: 20,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+    textAlign: "center",
+  },
   taskBox: {
     marginTop: theme.space(4),
     backgroundColor: theme.colors.bg,
