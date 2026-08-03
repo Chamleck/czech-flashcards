@@ -13,6 +13,14 @@ import { GenderIcon } from "./GenderIcon";
 
 export type DeclEntry = AdjectiveEntry | PronounEntry;
 
+type Degree = "positive" | "comparative" | "superlative";
+const DEGREE_ORDER: Degree[] = ["positive", "comparative", "superlative"];
+const DEGREE_SHORT: Record<Degree, string> = {
+  positive: "Звичайний",
+  comparative: "Вищий",
+  superlative: "Найвищий",
+};
+
 interface Props {
   entry: DeclEntry;
   revealed: boolean;
@@ -24,8 +32,15 @@ function isIndeclinable(e: DeclEntry): boolean {
   return "declinable" in e && e.declinable === false;
 }
 
+// Ступені порівняння має лише градуйований прикметник (не займенник, не відносний).
+function degreesOf(e: DeclEntry): AdjectiveEntry["degrees"] | undefined {
+  return "degrees" in e ? e.degrees : undefined;
+}
+
 // Підпис зразка під заголовком картки.
-function patternLabel(e: DeclEntry): string {
+function patternLabel(e: DeclEntry, degree: Degree): string {
+  // Ступені порівняння відмінюються за зразком jarní незалежно від базового.
+  if (degree !== "positive") return "ступінь порівняння · відмінюється як jarní";
   if ("pattern" in e) {
     const base = e.pattern === "tvrdy" ? "твердий зразок (mladý)" : "м'який зразок (jarní)";
     return e.hasConsonantAlternation ? `${base} · чергування у чол. іст. мн.` : base;
@@ -36,14 +51,22 @@ function patternLabel(e: DeclEntry): string {
 
 export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
   const [gender, setGender] = useState<Gender>("masc_anim");
+  const [degree, setDegree] = useState<Degree>("positive");
   const accent = theme.colors.lilac;
 
-  // Скидаємо обраний рід при зміні слова.
+  // Скидаємо обраний рід і ступінь при зміні слова.
   useEffect(() => {
     setGender("masc_anim");
+    setDegree("positive");
   }, [entry.id]);
 
   const indeclinable = isIndeclinable(entry);
+  const degrees = degreesOf(entry);
+
+  // Активна парадигма й підпис слова залежно від обраного ступеня.
+  const currentDecl =
+    degree === "positive" || !degrees ? (entry as any).declension : degrees[degree].declension;
+  const currentCz = degree === "positive" || !degrees ? entry.cz : degrees[degree].cz;
 
   return (
     <View style={styles.card}>
@@ -64,8 +87,8 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
         >
           <View style={[styles.answerHead, { borderColor: accent }]}>
             <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
-            <Text style={[styles.answerWord, { color: accent }]}>{entry.cz}</Text>
-            <Text style={styles.patternText}>{patternLabel(entry)}</Text>
+            <Text style={[styles.answerWord, { color: accent }]}>{currentCz}</Text>
+            <Text style={styles.patternText}>{patternLabel(entry, degree)}</Text>
           </View>
 
           {indeclinable ? (
@@ -77,6 +100,26 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
             </View>
           ) : (
             <>
+              {/* Вісь ступеня порівняння — лише для градуйованих прикметників */}
+              {degrees && (
+                <View style={styles.segment}>
+                  {DEGREE_ORDER.map((d) => {
+                    const on = d === degree;
+                    return (
+                      <Pressable
+                        key={d}
+                        style={[styles.segBtn, on && { backgroundColor: theme.colors.honey }]}
+                        onPress={() => setDegree(d)}
+                      >
+                        <Text style={[styles.segText, on && styles.segTextActive]}>
+                          {DEGREE_SHORT[d]}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              )}
+
               {/* Таби роду — контейнер як у дієсловах (segment) */}
               <View style={styles.segment}>
                 {GENDER_ORDER.map((g) => {
@@ -96,11 +139,12 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
                 })}
               </View>
 
-              <DeclensionTable table={(entry as any).declension[gender]} />
+              <DeclensionTable table={currentDecl[gender]} />
             </>
           )}
 
-          {/* Приклад: для незмінних — один; для решти — за обраним родом */}
+          {/* Приклад показуємо лише для звичайного ступеня та незмінних.
+              Для вищого/найвищого прикладу немає — таблиця вже показує суть. */}
           {indeclinable
             ? (entry as any).exampleSentenceCz && (
                 <View style={styles.example}>
@@ -108,7 +152,8 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
                   <Text style={styles.exampleUk}>{(entry as any).exampleSentenceUk}</Text>
                 </View>
               )
-            : (() => {
+            : degree === "positive" &&
+              (() => {
                 const ex = (entry as any).examples[gender];
                 return (
                   <View style={[styles.example, { borderLeftColor: theme.genderColor[gender] }]}>

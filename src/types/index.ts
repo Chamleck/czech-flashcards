@@ -129,6 +129,13 @@ export interface AdjectiveEntry {
   declension: FullDeclension;
   // Приклади для кожного роду — показуються під відповідним табом.
   examples: GenderExamples;
+  // Ступені порівняння (вищий/найвищий) — лише в градуйованих прикметників.
+  // Відносні (jarní, cizí, poslední, domácí) ступенів не мають → поле відсутнє.
+  // Обидва ступені відмінюються за зразком jarní (м'який).
+  degrees?: {
+    comparative: { cz: string; uk: string; declension: FullDeclension };
+    superlative: { cz: string; uk: string; declension: FullDeclension };
+  };
 }
 
 // ── Займенники (присвійні + вказівні) ──
