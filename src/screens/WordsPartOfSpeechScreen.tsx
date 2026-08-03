@@ -7,6 +7,8 @@ import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { NOUNS } from "../data/nouns";
 import { VERBS } from "../data/verbs";
+import { ADJECTIVES } from "../data/adjectives";
+import { PRONOUNS } from "../data/pronouns";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { plural } from "../utils/plural";
 
@@ -24,27 +26,40 @@ interface POSTile {
 const TILES: POSTile[] = [
   { key: "nouns", emoji: "🔤", title: "Іменники", subtitle: `${NOUNS.length} слів з відмінюванням`, color: theme.colors.honey, ready: true },
   { key: "verbs", emoji: "🏃", title: "Дієслова", subtitle: `${VERBS.length} слів з дієвідміною`, color: theme.colors.mint, ready: true },
-  { key: "adjectives", emoji: "🎨", title: "Прикметники", subtitle: "Скоро", color: theme.colors.lilac, ready: false },
-  { key: "pronouns", emoji: "👉", title: "Займенники", subtitle: "Скоро", color: theme.colors.coral, ready: false },
+  { key: "adjectives", emoji: "🎨", title: "Прикметники", subtitle: `${ADJECTIVES.length} слів з відмінюванням`, color: theme.colors.lilac, ready: true },
+  { key: "pronouns", emoji: "👉", title: "Займенники", subtitle: `${PRONOUNS.length} присвійних і вказівних`, color: theme.colors.coral, ready: true },
 ];
 
 export function WordsPartOfSpeechScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [nounMistakes, setNounMistakes] = useState(0);
   const [verbMistakes, setVerbMistakes] = useState(0);
+  const [adjMistakes, setAdjMistakes] = useState(0);
+  const [pronMistakes, setPronMistakes] = useState(0);
 
-  // Рахуємо помилки по обох колодах при кожному фокусі екрана.
+  // Рахуємо помилки по всіх колодах при кожному фокусі екрана.
   useFocusEffect(
     useCallback(() => {
       let alive = true;
       Promise.all([
         loadProgressFrom(PROGRESS_KEYS.nouns),
         loadProgressFrom(PROGRESS_KEYS.verbs),
-      ]).then(([np, vp]: [Record<string, CardProgress>, Record<string, CardProgress>]) => {
-        if (!alive) return;
-        setNounMistakes(getMistakeIds(np).size);
-        setVerbMistakes(getMistakeIds(vp).size);
-      });
+        loadProgressFrom(PROGRESS_KEYS.adjectives),
+        loadProgressFrom(PROGRESS_KEYS.pronouns),
+      ]).then(
+        ([np, vp, ap, pp]: [
+          Record<string, CardProgress>,
+          Record<string, CardProgress>,
+          Record<string, CardProgress>,
+          Record<string, CardProgress>
+        ]) => {
+          if (!alive) return;
+          setNounMistakes(getMistakeIds(np).size);
+          setVerbMistakes(getMistakeIds(vp).size);
+          setAdjMistakes(getMistakeIds(ap).size);
+          setPronMistakes(getMistakeIds(pp).size);
+        }
+      );
       return () => {
         alive = false;
       };
@@ -54,11 +69,15 @@ export function WordsPartOfSpeechScreen({ navigation }: Props) {
   function open(key: POSTile["key"]) {
     if (key === "nouns") navigation.navigate("WordCategories");
     else if (key === "verbs") navigation.navigate("VerbCategories");
+    else if (key === "adjectives") navigation.navigate("AdjectiveCategories");
+    else if (key === "pronouns") navigation.navigate("PronounGroups");
   }
 
   function mistakesFor(key: POSTile["key"]): number {
     if (key === "nouns") return nounMistakes;
     if (key === "verbs") return verbMistakes;
+    if (key === "adjectives") return adjMistakes;
+    if (key === "pronouns") return pronMistakes;
     return 0;
   }
 

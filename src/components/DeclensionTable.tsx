@@ -12,8 +12,10 @@ export function DeclensionTable({ table }: { table: TableType }) {
     <View style={styles.wrap}>
       {CASE_ORDER.map((c, i) => {
         const lbl = CASE_LABELS[c];
+        // Займенники не мають вокатива (обидві форми "—") — приглушуємо рядок.
+        const empty = table[c].sg === "—" && table[c].pl === "—";
         return (
-          <View key={c} style={[styles.block, i > 0 && styles.blockDivider]}>
+          <View key={c} style={[styles.block, i > 0 && styles.blockDivider, empty && styles.blockEmpty]}>
             <View style={styles.head}>
               <Text style={styles.caseNum}>{lbl.number}</Text>
               <Text style={styles.caseName}>{lbl.uk}</Text>
@@ -23,11 +25,11 @@ export function DeclensionTable({ table }: { table: TableType }) {
             <View style={styles.formsRow}>
               <View style={styles.formCol}>
                 <Text style={styles.formLabel}>однина</Text>
-                <Text style={styles.formText}>{table[c].sg}</Text>
+                <Text style={[styles.formText, empty && styles.formEmpty]}>{table[c].sg}</Text>
               </View>
               <View style={styles.formCol}>
                 <Text style={styles.formLabel}>множина</Text>
-                <Text style={styles.formText}>{table[c].pl}</Text>
+                <Text style={[styles.formText, empty && styles.formEmpty]}>{table[c].pl}</Text>
               </View>
             </View>
           </View>
@@ -51,6 +53,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "rgba(255,255,255,0.06)",
   },
+  blockEmpty: { opacity: 0.4 },
+  formEmpty: { color: theme.colors.textFaint },
   head: {
     flexDirection: "row",
     alignItems: "baseline",

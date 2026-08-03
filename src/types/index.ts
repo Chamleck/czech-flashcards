@@ -93,6 +93,69 @@ export interface CardProgress {
   dueAt: number; // timestamp, для інтервального повторення
 }
 
+// ────────────────────── ПРИКМЕТНИКИ / ЗАЙМЕННИКИ ──────────────────────
+
+// Повна парадигма для слів, що узгоджуються в роді (прикметники, займенники):
+// рід × (7 відмінків × 2 числа). Перевикористовує форму DeclensionTable.
+export type FullDeclension = Record<Gender, DeclensionTable>;
+
+// Порядок родів для перемикача-табів у картці розкриття.
+export const GENDER_ORDER: Gender[] = ["masc_anim", "masc_inan", "fem", "neut"];
+
+// Короткі підписи родів для табів (повні — у GENDER_LABEL з theme).
+export const GENDER_SHORT: Record<Gender, string> = {
+  masc_anim: "чол. іст.",
+  masc_inan: "чол. неіст.",
+  fem: "жін.",
+  neut: "сер.",
+};
+
+// ── Прикметники ──
+export type AdjectivePattern = "tvrdy" | "mekky"; // mladý / jarní
+
+export type AdjectiveCategory = "size" | "quality" | "measure" | "colors" | "soft";
+
+export interface AdjectiveEntry {
+  id: string;
+  uk: string;
+  cz: string; // називний чол. роду однини (базова форма, напр. mladý)
+  pattern: AdjectivePattern;
+  category: AdjectiveCategory;
+  // true → у чол. істот. Npl/Vpl чергується приголосний (velký→velcí, starý→staří)
+  hasConsonantAlternation: boolean;
+  declension: FullDeclension;
+  exampleSentenceCz?: string;
+  exampleSentenceUk?: string;
+}
+
+// ── Займенники (присвійні + вказівні) ──
+export type PronounSubtype = "possessive" | "demonstrative";
+
+interface PronounBase {
+  id: string;
+  uk: string;
+  cz: string; // базова форма (напр. můj, ten)
+  subtype: PronounSubtype;
+  exampleSentenceCz?: string;
+  exampleSentenceUk?: string;
+}
+
+// Відмінюваний займенник: můj/tvůj/svůj (як mladý), náš/váš (vzor náš),
+// ten (vzor ten), її (як jarní).
+export interface DeclinablePronoun extends PronounBase {
+  declinable: true;
+  vzorLabel: string; // короткий підпис зразка для картки/граматики
+  declension: FullDeclension;
+}
+
+// Незмінний займенник: jeho, jejich — одна форма на всі відмінки.
+export interface IndeclinablePronoun extends PronounBase {
+  declinable: false;
+  invariantForm: string;
+}
+
+export type PronounEntry = DeclinablePronoun | IndeclinablePronoun;
+
 // ─────────────────────────── ДІЄСЛОВА ───────────────────────────
 
 // Особи дієвідміни (однина 1/2/3 + множина 1/2/3)
@@ -186,6 +249,14 @@ export type RootStackParamList = {
   VerbCategories: undefined;
   VerbSelection: { verbClass: VerbClass };
   VerbSession: { title: string; entryIds: string[] };
+  // Прикметники
+  AdjectiveCategories: undefined;
+  AdjectiveSelection: { category: AdjectiveCategory };
+  // Займенники (присвійні + вказівні; особові — окрема фаза)
+  PronounGroups: undefined;
+  PronounSelection: undefined;
+  // Спільна сесія прикметників/займенників (картка з табами роду)
+  DeclSession: { title: string; kind: "adjective" | "pronoun"; entryIds: string[] };
   // Граматика
   GrammarCategories: undefined;
   GrammarTopic: { topicId: string };
