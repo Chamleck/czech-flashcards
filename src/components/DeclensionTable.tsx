@@ -3,10 +3,12 @@ import { View, Text, StyleSheet } from "react-native";
 import { DeclensionTable as TableType, CASE_ORDER, CASE_LABELS } from "../types";
 import { theme } from "../utils/theme";
 
-// Стек-layout: кожен відмінок — окремий блок на всю ширину.
-// Зверху заголовок (номер · назва · контрольне питання),
-// під ним дві підписані колонки: однина / множина.
-// Так довгі форми (restauracích, pánovi/pánu) мають простір і не ламають рядок.
+// Кожен відмінок — блок із ДВОМА рядками, що поділяють ту саму сітку колонок
+// 48%/48% (formCol/formColPl): заголовок (номер·назва·зразок | контрольне питання)
+// і форми (однина | множина). Через спільні стилі колонок обидва рядки завжди
+// вирівняні по одній вертикальній лінії — контрольне питання стоїть точно
+// над значенням множини, незалежно від довжини назви відмінка перед ним.
+// Довгий текст переноситься всередині своєї колонки, не зсуваючи сусідню.
 export function DeclensionTable({ table }: { table: TableType }) {
   return (
     <View style={styles.wrap}>
@@ -17,10 +19,16 @@ export function DeclensionTable({ table }: { table: TableType }) {
         return (
           <View key={c} style={[styles.block, i > 0 && styles.blockDivider, empty && styles.blockEmpty]}>
             <View style={styles.head}>
-              <Text style={styles.caseNum}>{lbl.number}</Text>
-              <Text style={styles.caseName}>{lbl.uk}</Text>
-              <Text style={styles.caseCz}>({lbl.cz})</Text>
-              <Text style={styles.caseQ}>· {lbl.question}</Text>
+              <View style={styles.formCol}>
+                <Text>
+                  <Text style={styles.caseNum}>{lbl.number}</Text>
+                  <Text style={styles.caseName}> {lbl.uk}</Text>
+                  <Text style={styles.caseCz}> ({lbl.cz})</Text>
+                </Text>
+              </View>
+              <View style={styles.formColPl}>
+                <Text style={styles.caseQ}>{lbl.question}</Text>
+              </View>
             </View>
             <View style={styles.formsRow}>
               <View style={styles.formCol}>
@@ -57,13 +65,12 @@ const styles = StyleSheet.create({
   formEmpty: { color: theme.colors.textFaint },
   head: {
     flexDirection: "row",
-    alignItems: "baseline",
-    flexWrap: "wrap",
+    alignItems: "flex-start",
     marginBottom: theme.space(2),
   },
-  caseNum: { color: theme.colors.honey, fontWeight: "800", fontSize: 14, marginRight: 6 },
-  caseName: { color: theme.colors.text, fontSize: 14, fontWeight: "700", marginRight: 5 },
-  caseCz: { color: theme.genderColor.masc_inan, fontSize: 12, fontWeight: "600", fontStyle: "italic", marginRight: 6 },
+  caseNum: { color: theme.colors.honey, fontWeight: "800", fontSize: 14 },
+  caseName: { color: theme.colors.text, fontSize: 14, fontWeight: "700" },
+  caseCz: { color: theme.genderColor.masc_inan, fontSize: 12, fontWeight: "600", fontStyle: "italic" },
   caseQ: { color: theme.colors.textFaint, fontSize: 12 },
   formsRow: { flexDirection: "row" },
   // Перший стовпець (однина) — ФІКСОВАНИЙ відсоток (не flex і не px): довга
