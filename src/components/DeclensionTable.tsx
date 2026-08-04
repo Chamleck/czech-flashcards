@@ -27,7 +27,7 @@ export function DeclensionTable({ table }: { table: TableType }) {
                 <Text style={styles.formLabel}>однина</Text>
                 <Text style={[styles.formText, empty && styles.formEmpty]}>{table[c].sg}</Text>
               </View>
-              <View style={styles.formCol}>
+              <View style={styles.formColPl}>
                 <Text style={styles.formLabel}>множина</Text>
                 <Text style={[styles.formText, empty && styles.formEmpty]}>{table[c].pl}</Text>
               </View>
@@ -66,7 +66,14 @@ const styles = StyleSheet.create({
   caseCz: { color: theme.genderColor.masc_inan, fontSize: 12, fontWeight: "600", fontStyle: "italic", marginRight: 6 },
   caseQ: { color: theme.colors.textFaint, fontSize: 12 },
   formsRow: { flexDirection: "row" },
-  formCol: { flex: 1, paddingRight: theme.space(2) },
+  // Перший стовпець (однина) — ФІКСОВАНИЙ відсоток (не flex і не px): довга
+  // форма (напр. "studentovi / studentu") переноситься всередині нього й НЕ
+  // розпихає сусідній стовпець в один конкретний рядок. Відсоток (а не px)
+  // масштабується під ширину екрана — на вузьких пристроях обидва стовпці
+  // звужуються пропорційно, замість того щоб перший з'їдав сталу кількість dp
+  // за рахунок другого. Стовпець множини завжди стартує з однакової позиції.
+  formCol: { width: "48%", paddingRight: theme.space(2) },
+  formColPl: { width: "48%", paddingRight: 0 },
   formLabel: {
     color: theme.colors.textFaint,
     fontSize: 10,

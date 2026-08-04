@@ -37,7 +37,6 @@ export interface DeclQuestion {
 const QUIZ_CASES: CzechCase[] = CASE_ORDER.filter((c) => c !== "vokativ");
 
 const NUMBER_LABEL: Record<GrammaticalNumber, string> = { sg: "однина", pl: "множина" };
-const KIND_LABEL = { adjective: "прикметник", pronoun: "займенник" } as const;
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -78,16 +77,36 @@ interface Tested {
   cz: string;
   uk: string;
   decl: FullDeclension;
+  degree?: "comparative" | "superlative"; // для підпису завдання (ступінь порівняння)
 }
 
 function buildTestedPool(): Tested[] {
-  const adj: Tested[] = ADJECTIVES.map((a) => ({
-    id: a.id,
-    kind: "adjective",
-    cz: a.cz,
-    uk: a.uk,
-    decl: a.declension,
-  }));
+  // Прикметники: звичайний ступінь + (для градуйованих) вищий і найвищий —
+  // кожен окремим тестованим записом з унікальним id (окремий трекінг помилок).
+  const adj: Tested[] = ADJECTIVES.flatMap((a) => {
+    const out: Tested[] = [
+      { id: a.id, kind: "adjective", cz: a.cz, uk: a.uk, decl: a.declension },
+    ];
+    if (a.degrees) {
+      out.push({
+        id: `${a.id}__comp`,
+        kind: "adjective",
+        cz: a.degrees.comparative.cz,
+        uk: a.degrees.comparative.uk,
+        decl: a.degrees.comparative.declension,
+        degree: "comparative",
+      });
+      out.push({
+        id: `${a.id}__super`,
+        kind: "adjective",
+        cz: a.degrees.superlative.cz,
+        uk: a.degrees.superlative.uk,
+        decl: a.degrees.superlative.declension,
+        degree: "superlative",
+      });
+    }
+    return out;
+  });
   // Займенники: лише відмінювані. jeho/jejich не тестуємо (одна форма — нема вибору).
   const pron: Tested[] = PRONOUNS.filter((p) => p.declinable).map((p) => ({
     id: p.id,
@@ -215,9 +234,17 @@ function enumerateCombos(pool: Tested[]): Combo[] {
   return combos;
 }
 
-function taskTextFor(kind: Tested["kind"], g: Gender, c: CzechCase, n: GrammaticalNumber): string {
+function taskTextFor(tested: Tested, g: Gender, c: CzechCase, n: GrammaticalNumber): string {
   const l = CASE_LABELS[c];
-  return `Оберіть ${KIND_LABEL[kind]}: ${GENDER_SHORT[g]}, ${l.uk} (${l.cz}) — ${l.question}, ${NUMBER_LABEL[n]}`;
+  const kindLabel =
+    tested.kind === "pronoun"
+      ? "займенник"
+      : tested.degree === "comparative"
+        ? "прикметник (вищий ст.)"
+        : tested.degree === "superlative"
+          ? "прикметник (найвищий ст.)"
+          : "прикметник";
+  return `Оберіть ${kindLabel}: ${GENDER_SHORT[g]}, ${l.uk} (${l.cz}) — ${l.question}, ${NUMBER_LABEL[n]}`;
 }
 
 function makeQuestion(combo: Combo): DeclQuestion | null {
@@ -232,7 +259,7 @@ function makeQuestion(combo: Combo): DeclQuestion | null {
     comboId: combo.id,
     promptWord: tested.cz,
     promptUk: tested.uk,
-    taskText: taskTextFor(tested.kind, gender, targetCase, targetNumber),
+    taskText: taskTextFor(tested, gender, targetCase, targetNumber),
     contextPhrase: buildContextPhrase(tested, gender, targetCase, targetNumber),
     correct,
     options: shuffle([correct, distractor]),

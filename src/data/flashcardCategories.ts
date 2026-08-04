@@ -32,7 +32,7 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
     id: "adj-pron",
     emoji: "🎨",
     title: "Прикметники та займенники",
-    subtitle: "Узгодження за родом, відмінком і числом",
+    subtitle: "Рід, відмінок, число та ступінь порівняння",
     color: theme.colors.lilac,
     ready: true,
   },
