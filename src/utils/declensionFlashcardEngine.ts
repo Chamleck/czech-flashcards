@@ -78,6 +78,11 @@ interface Tested {
   uk: string;
   decl: FullDeclension;
   degree?: "comparative" | "superlative"; // для підпису завдання (ступінь порівняння)
+  // Для записів-ступенів — базове слово (напр. vysoký/високий), яке показуємо
+  // як підказку. Учень має сам утворити й відмінити ступінь, а не бачити його
+  // готовим у промпті. У звичайного ступеня й займенників відсутнє.
+  baseCz?: string;
+  baseUk?: string;
 }
 
 function buildTestedPool(): Tested[] {
@@ -95,6 +100,8 @@ function buildTestedPool(): Tested[] {
         uk: a.degrees.comparative.uk,
         decl: a.degrees.comparative.declension,
         degree: "comparative",
+        baseCz: a.cz,
+        baseUk: a.uk,
       });
       out.push({
         id: `${a.id}__super`,
@@ -103,6 +110,8 @@ function buildTestedPool(): Tested[] {
         uk: a.degrees.superlative.uk,
         decl: a.degrees.superlative.declension,
         degree: "superlative",
+        baseCz: a.cz,
+        baseUk: a.uk,
       });
     }
     return out;
@@ -257,8 +266,9 @@ function makeQuestion(combo: Combo): DeclQuestion | null {
     targetCase,
     targetNumber,
     comboId: combo.id,
-    promptWord: tested.cz,
-    promptUk: tested.uk,
+    // Для ступенів показуємо базове слово (vysoký), а не готову форму ступеня.
+    promptWord: tested.baseCz ?? tested.cz,
+    promptUk: tested.baseUk ?? tested.uk,
     taskText: taskTextFor(tested, gender, targetCase, targetNumber),
     contextPhrase: buildContextPhrase(tested, gender, targetCase, targetNumber),
     correct,
