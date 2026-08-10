@@ -4,41 +4,62 @@ import { DeclensionTable as TableType, CASE_ORDER, CASE_LABELS } from "../types"
 import { theme } from "../utils/theme";
 
 // Кожен відмінок — блок із ДВОМА рядками, що поділяють ту саму сітку колонок
-// 48%/48% (formCol/formColPl): заголовок (номер·назва·зразок | контрольне питання)
-// і форми (однина | множина). Через спільні стилі колонок обидва рядки завжди
+// 58%/42% (formCol/formColPl): заголовок (номер·назва·зразок | контрольне питання)
+// і форми (ліва | права колонка). Через спільні стилі колонок обидва рядки завжди
 // вирівняні по одній вертикальній лінії — контрольне питання стоїть точно
-// над значенням множини, незалежно від довжини назви відмінка перед ним.
+// над значенням правої колонки, незалежно від довжини назви відмінка перед ним.
 // Довгий текст переноситься всередині своєї колонки, не зсуваючи сусідню.
-export function DeclensionTable({ table }: { table: TableType }) {
+//
+// За замовчуванням колонки — «однина» / «множина» (іменники, прикметники,
+// присвійні/вказівні займенники). Особові займенники передають власні
+// columnLabels (короткий/довгий або без прийм./після прийм.), а my/vy —
+// singleColumn (одна форма на відмінок, права колонка не потрібна).
+interface Props {
+  table: TableType;
+  columnLabels?: { sg: string; pl: string };
+  singleColumn?: boolean;
+}
+
+export function DeclensionTable({ table, columnLabels, singleColumn = false }: Props) {
+  const leftLabel = columnLabels?.sg ?? "однина";
+  const rightLabel = columnLabels?.pl ?? "множина";
+
   return (
     <View style={styles.wrap}>
       {CASE_ORDER.map((c, i) => {
         const lbl = CASE_LABELS[c];
-        // Займенники не мають вокатива (обидві форми "—") — приглушуємо рядок.
-        const empty = table[c].sg === "—" && table[c].pl === "—";
+        const sg = table[c].sg;
+        const pl = table[c].pl;
+        // Рядок повністю порожній (обидві форми "—") — приглушуємо весь блок
+        // (напр. вокатив у займенників). Окрема клітинка "—" приглушується сама.
+        const rowEmpty = sg === "—" && (singleColumn || pl === "—");
         return (
-          <View key={c} style={[styles.block, i > 0 && styles.blockDivider, empty && styles.blockEmpty]}>
+          <View key={c} style={[styles.block, i > 0 && styles.blockDivider, rowEmpty && styles.blockEmpty]}>
             <View style={styles.head}>
-              <View style={styles.formCol}>
+              <View style={singleColumn ? styles.formColFull : styles.formCol}>
                 <Text>
                   <Text style={styles.caseNum}>{lbl.number}</Text>
                   <Text style={styles.caseName}> {lbl.uk}</Text>
                   <Text style={styles.caseCz}> ({lbl.cz})</Text>
                 </Text>
               </View>
-              <View style={styles.formColPl}>
-                <Text style={styles.caseQ}>{lbl.question}</Text>
-              </View>
+              {!singleColumn && (
+                <View style={styles.formColPl}>
+                  <Text style={styles.caseQ}>{lbl.question}</Text>
+                </View>
+              )}
             </View>
             <View style={styles.formsRow}>
-              <View style={styles.formCol}>
-                <Text style={styles.formLabel}>однина</Text>
-                <Text style={[styles.formText, empty && styles.formEmpty]}>{table[c].sg}</Text>
+              <View style={singleColumn ? styles.formColFull : styles.formCol}>
+                <Text style={styles.formLabel}>{leftLabel}</Text>
+                <Text style={[styles.formText, sg === "—" && styles.formEmpty]}>{sg}</Text>
               </View>
-              <View style={styles.formColPl}>
-                <Text style={styles.formLabel}>множина</Text>
-                <Text style={[styles.formText, empty && styles.formEmpty]}>{table[c].pl}</Text>
-              </View>
+              {!singleColumn && (
+                <View style={styles.formColPl}>
+                  <Text style={styles.formLabel}>{rightLabel}</Text>
+                  <Text style={[styles.formText, pl === "—" && styles.formEmpty]}>{pl}</Text>
+                </View>
+              )}
             </View>
           </View>
         );
@@ -73,22 +94,14 @@ const styles = StyleSheet.create({
   caseCz: { color: theme.genderColor.masc_inan, fontSize: 12, fontWeight: "600", fontStyle: "italic" },
   caseQ: { color: theme.colors.textFaint, fontSize: 12 },
   formsRow: { flexDirection: "row" },
-  // Перший стовпець (однина) — ФІКСОВАНИЙ відсоток (не flex і не px): довга
-  // форма (напр. "studentovi / studentu") переноситься всередині нього й НЕ
-  // розпихає сусідній стовпець в один конкретний рядок. Відсоток (а не px)
-  // масштабується під ширину екрана — на вузьких пристроях обидва стовпці
-  // звужуються пропорційно, замість того щоб перший з'їдав сталу кількість dp
-  // за рахунок другого. Стовпець множини завжди стартує з однакової позиції.
-  // Асиметричне співвідношення 58/42 (не 50/50): ліва колонка структурно
-  // ширша, бо несе довшу назву відмінка ("7. Орудний (Instrumentál)"),
-  // тоді як праворуч у заголовку лише коротке питання ("Kým? Čím?"). Числа
-  // підібрані під РЕАЛЬНИЙ найдовший вміст (виміряно): 58% вистачає, щоб
-  // найдовший заголовок влазив у рядок, 42% — щоб найдовше значення множини
-  // ("studenti / studentové") теж вмістилось. Відсоток (а не px) масштабується
-  // під ширину екрана; на дуже вузьких екранах найдовший заголовок перенесеться
-  // всередині своєї колонки — сусідня колонка при цьому не зсувається.
+  // Асиметричне співвідношення 58/42 (див. коментар про фіксований %). Ліва
+  // колонка ширша, бо несе довшу назву відмінка; права — коротке питання/форму.
+  // Відсоток (не px) масштабується під ширину екрана; довгий текст переноситься
+  // всередині колонки, не зсуваючи сусідню.
   formCol: { width: "58%", paddingRight: theme.space(2) },
   formColPl: { width: "42%", paddingRight: 0 },
+  // Одноколоночний режим (my / vy — одна форма на відмінок).
+  formColFull: { width: "100%", paddingRight: 0 },
   formLabel: {
     color: theme.colors.textFaint,
     fontSize: 10,

@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { PRONOUNS } from "../data/pronouns";
+import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { plural } from "../utils/plural";
 
@@ -44,6 +45,15 @@ export function PronounGroupsScreen({ navigation }: Props) {
     });
   }
 
+  function startPersonal() {
+    const ids = PERSONAL_PRONOUNS.map((p) => p.id);
+    navigation.navigate("DeclSession", {
+      title: "🙋 Особові",
+      kind: "personal",
+      entryIds: ids,
+    });
+  }
+
   return (
     <ScrollView
       style={styles.safe}
@@ -68,17 +78,25 @@ export function PronounGroupsScreen({ navigation }: Props) {
 
       <Text style={styles.sectionLabel}>Групи</Text>
 
-      {/* Особові — окрема фаза, поки заблоковано */}
-      <View style={[styles.catRow, styles.catRowDim, { borderLeftColor: theme.colors.textFaint }]}>
-        <View style={styles.catMain}>
+      {/* Особові — активна група */}
+      <View style={[styles.catRow, { borderLeftColor: theme.colors.mint }]}>
+        <Pressable style={styles.catMain} onPress={startPersonal}>
           <Text style={styles.catEmoji}>🙋</Text>
           <View style={{ flex: 1 }}>
             <Text style={styles.catTitle}>Особові</Text>
-            <Text style={styles.catHint}>já, ty, on, ona — довгі/короткі форми</Text>
-            <Text style={styles.catSub}>Скоро</Text>
+            <Text style={styles.catHint}>já, ty, on, ona, my, vy, oni, se — довгі/короткі форми</Text>
+            <Text style={styles.catSub}>
+              {PERSONAL_PRONOUNS.length} {plural(PERSONAL_PRONOUNS.length, "слово", "слова", "слів")}
+            </Text>
           </View>
-        </View>
-        <Text style={styles.lock}>🔒</Text>
+        </Pressable>
+        <Pressable
+          style={styles.editBtn}
+          hitSlop={8}
+          onPress={() => navigation.navigate("PersonalPronounSelection")}
+        >
+          <Text style={styles.editIcon}>✏️</Text>
+        </Pressable>
       </View>
 
       {/* Присвійні та вказівні — активна група */}

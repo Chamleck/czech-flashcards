@@ -10,6 +10,7 @@ import {
 import { theme } from "../utils/theme";
 import { DeclensionTable } from "./DeclensionTable";
 import { GenderIcon } from "./GenderIcon";
+import { SegmentTabs } from "./SegmentTabs";
 
 export type DeclEntry = AdjectiveEntry | PronounEntry;
 
@@ -102,42 +103,26 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
             <>
               {/* Вісь ступеня порівняння — лише для градуйованих прикметників */}
               {degrees && (
-                <View style={styles.segment}>
-                  {DEGREE_ORDER.map((d) => {
-                    const on = d === degree;
-                    return (
-                      <Pressable
-                        key={d}
-                        style={[styles.segBtn, on && { backgroundColor: theme.colors.honey }]}
-                        onPress={() => setDegree(d)}
-                      >
-                        <Text style={[styles.segText, on && styles.segTextActive]}>
-                          {DEGREE_SHORT[d]}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
+                <SegmentTabs
+                  options={DEGREE_ORDER}
+                  active={degree}
+                  onSelect={setDegree}
+                  colorFor={() => theme.colors.honey}
+                  labelFor={(d) => DEGREE_SHORT[d]}
+                  minWidth={90}
+                  flexBasis="30%"
+                />
               )}
 
-              {/* Таби роду — контейнер як у дієсловах (segment) */}
-              <View style={styles.segment}>
-                {GENDER_ORDER.map((g) => {
-                  const on = g === gender;
-                  return (
-                    <Pressable
-                      key={g}
-                      style={[styles.segBtn, on && { backgroundColor: theme.genderColor[g] }]}
-                      onPress={() => setGender(g)}
-                    >
-                      <GenderIcon gender={g} size={14} activeDark={on} />
-                      <Text style={[styles.segText, on && styles.segTextActive]}>
-                        {GENDER_SHORT[g]}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
+              {/* Таби роду */}
+              <SegmentTabs
+                options={GENDER_ORDER}
+                active={gender}
+                onSelect={setGender}
+                colorFor={(g) => theme.genderColor[g]}
+                labelFor={(g) => GENDER_SHORT[g]}
+                iconFor={(g, on) => <GenderIcon gender={g} size={14} activeDark={on} />}
+              />
 
               <DeclensionTable table={currentDecl[gender]} />
             </>
@@ -194,28 +179,6 @@ const styles = StyleSheet.create({
   answerLabel: { color: theme.colors.textDim, fontSize: 13 },
   answerWord: { fontSize: 28, fontWeight: "800", marginVertical: 2 },
   patternText: { color: theme.colors.textFaint, fontSize: 12, fontWeight: "600" },
-  segment: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 3,
-    backgroundColor: theme.colors.bgElevated,
-    borderRadius: theme.radius.md,
-    padding: 3,
-    marginBottom: theme.space(3),
-  },
-  segBtn: {
-    flexGrow: 1,
-    flexBasis: "22%",
-    minWidth: 76,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 5,
-    paddingVertical: theme.space(2),
-    borderRadius: theme.radius.sm,
-  },
-  segText: { color: theme.colors.textDim, fontSize: 12, fontWeight: "700" },
-  segTextActive: { color: "#1a1020" },
   invariantBox: {
     backgroundColor: theme.colors.bgElevated,
     borderRadius: theme.radius.md,

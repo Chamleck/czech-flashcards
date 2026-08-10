@@ -5,8 +5,10 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { AdjPronounCard, DeclEntry } from "../components/AdjPronounCard";
+import { PersonalPronounCard } from "../components/PersonalPronounCard";
 import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
+import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import {
   loadProgressFrom,
   saveProgressTo,
@@ -21,8 +23,15 @@ export function DeclSessionScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { title, kind, entryIds } = route.params;
 
-  const storageKey = kind === "adjective" ? PROGRESS_KEYS.adjectives : PROGRESS_KEYS.pronouns;
-  const dataset: DeclEntry[] = kind === "adjective" ? ADJECTIVES : PRONOUNS;
+  const isPersonal = kind === "personal";
+  const storageKey =
+    kind === "adjective"
+      ? PROGRESS_KEYS.adjectives
+      : kind === "personal"
+      ? PROGRESS_KEYS.personal
+      : PROGRESS_KEYS.pronouns;
+  const dataset: { id: string }[] =
+    kind === "adjective" ? ADJECTIVES : kind === "personal" ? PERSONAL_PRONOUNS : PRONOUNS;
 
   const entries = useMemo(
     () => dataset.filter((e) => entryIds.includes(e.id)),
@@ -42,7 +51,7 @@ export function DeclSessionScreen({ route, navigation }: Props) {
     });
   }, [storageKey]);
 
-  const queue = useMemo<DeclEntry[]>(
+  const queue = useMemo<{ id: string }[]>(
     () => (loaded ? buildQueue(entries, progress) : []),
     // фіксуємо чергу лише при завантаженні, щоб картки не перестрибували
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -116,7 +125,19 @@ export function DeclSessionScreen({ route, navigation }: Props) {
   return (
     <View style={styles.safe}>
       <View style={styles.cardArea}>
-        <AdjPronounCard entry={current} revealed={revealed} onReveal={() => setRevealed(true)} />
+        {isPersonal ? (
+          <PersonalPronounCard
+            entry={current as (typeof PERSONAL_PRONOUNS)[number]}
+            revealed={revealed}
+            onReveal={() => setRevealed(true)}
+          />
+        ) : (
+          <AdjPronounCard
+            entry={current as DeclEntry}
+            revealed={revealed}
+            onReveal={() => setRevealed(true)}
+          />
+        )}
       </View>
 
       {revealed && (

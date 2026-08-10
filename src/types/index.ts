@@ -168,6 +168,49 @@ export interface IndeclinablePronoun extends PronounBase {
 
 export type PronounEntry = DeclinablePronoun | IndeclinablePronoun;
 
+// ── Особові займенники (já, ty, on, my, vy, oni, se) ──
+// Особові НЕ вкладаються у FullDeclension: парадигма нерегулярна, а замість
+// пари «однина/множина» кожна клітинка несе пару ВАРІАНТНИХ форм. Зміст пари
+// залежить від слова, тому колонки підписуються індивідуально (columns):
+//   • já / ty / se — «короткий» (приклонка: mě, mi, tě, se…) vs
+//     «довгий / після прийменника» (наголошений: mne, mně, tebe, sebe…);
+//   • on / ona / oni — «без прийменника» (j-форма: jeho, jemu, jí…) vs
+//     «після прийменника» (n-форма: něho, němu, ní…).
+// Клітинка, де відповідної форми немає, позначається "—".
+//
+// Примітка: маркер reflexive: "se"|"si" у VerbEntry — це лише позначка зворотності
+// дієслова, НЕ парадигма. Тут же (займенник se/sebe) зберігаємо повне відмінювання
+// зворотного займенника. Перетину даних немає — це різні сутності.
+export type PronounDuo = { a: string; b: string };
+export type PersonalDeclension = Record<CzechCase, PronounDuo>;
+export type PronounColumnLabels = { a: string; b: string };
+
+interface PersonalPronounBase {
+  id: string;
+  uk: string;
+  cz: string; // словникова форма (já, ty, on, my, vy, oni, se)
+  columns: PronounColumnLabels;
+}
+
+// Без роду: já, ty, my, vy, se — одна парадигма, без табів.
+// my / vy не мають варіантних форм: колонка b скрізь "—" (таблиця показує 1 стовпець).
+export interface PlainPersonalPronoun extends PersonalPronounBase {
+  gendered: false;
+  declension: PersonalDeclension;
+  exampleCz: string;
+  exampleUk: string;
+}
+
+// За родом: on/ona/ono (3-тя одн.), oni/ony/ona (3-тя мн.) — таби роду.
+// У множині за родом різниться лише називний; решта форм спільні.
+export interface GenderedPersonalPronoun extends PersonalPronounBase {
+  gendered: true;
+  declension: Record<Gender, PersonalDeclension>;
+  examples: GenderExamples;
+}
+
+export type PersonalPronounEntry = PlainPersonalPronoun | GenderedPersonalPronoun;
+
 // ─────────────────────────── ДІЄСЛОВА ───────────────────────────
 
 // Особи дієвідміни (однина 1/2/3 + множина 1/2/3)
@@ -264,11 +307,13 @@ export type RootStackParamList = {
   // Прикметники
   AdjectiveCategories: undefined;
   AdjectiveSelection: { category: AdjectiveCategory };
-  // Займенники (присвійні + вказівні; особові — окрема фаза)
+  // Займенники
   PronounGroups: undefined;
-  PronounSelection: undefined;
-  // Спільна сесія прикметників/займенників (картка з табами роду)
-  DeclSession: { title: string; kind: "adjective" | "pronoun"; entryIds: string[] };
+  PronounSelection: undefined; // присвійні + вказівні
+  PersonalPronounSelection: undefined; // особові
+  // Спільна сесія прикметників/займенників (картка з табами роду).
+  // kind "personal" → особові займенники (окрема картка PersonalPronounCard).
+  DeclSession: { title: string; kind: "adjective" | "pronoun" | "personal"; entryIds: string[] };
   // Граматика
   GrammarCategories: undefined;
   GrammarTopic: { topicId: string };

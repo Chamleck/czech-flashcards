@@ -6,12 +6,19 @@ import { CardProgress } from "../types";
 const NOUN_KEY = "czech_flashcards_progress_v1"; // історичний ключ — іменники
 const VERB_KEY = "czech_verbs_progress_v1"; // дієслова
 const ADJ_KEY = "czech_adjectives_progress_v1"; // прикметники
-const PRON_KEY = "czech_pronouns_progress_v1"; // займенники
+const PRON_KEY = "czech_pronouns_progress_v1"; // присвійні + вказівні
+const PERSONAL_KEY = "czech_personal_pronouns_progress_v1"; // особові
 
 // За замовчуванням працюємо з колодою іменників (зворотна сумісність).
 const KEY = NOUN_KEY;
 
-export const PROGRESS_KEYS = { nouns: NOUN_KEY, verbs: VERB_KEY, adjectives: ADJ_KEY, pronouns: PRON_KEY };
+export const PROGRESS_KEYS = {
+  nouns: NOUN_KEY,
+  verbs: VERB_KEY,
+  adjectives: ADJ_KEY,
+  pronouns: PRON_KEY,
+  personal: PERSONAL_KEY,
+};
 
 // Прості інтервали повторення (мс). Індекс = поточний streak правильних відповідей.
 const INTERVALS = [
