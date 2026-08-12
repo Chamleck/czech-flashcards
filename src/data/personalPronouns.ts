@@ -9,7 +9,7 @@ import { PersonalPronounEntry, PersonalDeclension, Gender } from "../types";
 // "—" = форма відсутня (напр. немає короткої, або клітинка невживана).
 // Вокатив в особових відсутній → скрізь "—".
 
-const COLS_SL = { a: "короткий", b: "довгий · після прийм." };
+const COLS_SL = { a: "короткий", b: "довгий" };
 const COLS_NP = { a: "без прийм.", b: "після прийм." };
 const COLS_ONE = { a: "форма", b: "—" };
 
