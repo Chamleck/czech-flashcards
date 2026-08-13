@@ -396,9 +396,9 @@ function ppOtherForms(getForm: (c: CzechCase, r: Reg) => string, exceptCase: Cze
   return out;
 }
 
-function ppTaskText(g: Gender | null, c: CzechCase, reg: Reg, person: 1 | 2 | 3): string {
+function ppTaskText(g: Gender | null, c: CzechCase, reg: Reg, is3rdPerson: boolean): string {
   const l = CASE_LABELS[c];
-  const regLbl = person === 3 ? REG_LABEL_3[reg] : REG_LABEL_12[reg];
+  const regLbl = is3rdPerson ? REG_LABEL_3[reg] : REG_LABEL_12[reg];
   const genPart = g ? `${GENDER_SHORT[g]}, ` : "";
   return `Оберіть займенник: ${genPart}${l.uk} (${l.cz}) — ${l.question}, ${regLbl}`;
 }
@@ -464,7 +464,7 @@ function enumeratePersonalCombos(): UnitCombo[] {
             correct: sf.form,
             forms: ppOtherForms(getForm, c),
             avoid: [getForm(c, 0), getForm(c, 1)],
-            taskText: ppTaskText(null, c, sf.reg, person),
+            taskText: ppTaskText(null, c, sf.reg, false),
             contextFactory: () => fillFrame(sf.frame, sf.form),
             promptWord: entry.cz,
             promptUk: entry.uk,
@@ -493,7 +493,7 @@ function enumeratePersonalCombos(): UnitCombo[] {
             correct: form,
             forms: ppOtherForms(getForm, c),
             avoid: [getForm(c, 0), getForm(c, 1)],
-            taskText: ppTaskText(null, c, r, person),
+            taskText: ppTaskText(null, c, r, false),
             contextFactory: () => fillFrame(frame, form),
             promptWord: entry.cz,
             promptUk: entry.uk,
@@ -523,7 +523,7 @@ function enumeratePersonalCombos(): UnitCombo[] {
               correct: form,
               forms: ppOtherForms(getForm, c),
               avoid: [getForm(c, 0), getForm(c, 1)],
-              taskText: ppTaskText(g, c, r, person),
+              taskText: ppTaskText(g, c, r, true),
               contextFactory: () => fillFrame(cf.s1, form, buildAntecedent(g, "sg")),
               promptWord: entry.cz,
               promptUk: entry.uk,
@@ -551,7 +551,7 @@ function enumeratePersonalCombos(): UnitCombo[] {
             correct: form,
             forms: ppOtherForms(getForm, c),
             avoid: [getForm(c, 0), getForm(c, 1)],
-            taskText: ppTaskText(null, c, r, person),
+            taskText: ppTaskText(null, c, r, true),
             // рід лише декорує антецедент (непрямі форми множини спільні для всіх родів)
             contextFactory: () => {
               const ag = shuffle(["masc_anim", "masc_inan", "fem", "neut"] as Gender[])[0];
