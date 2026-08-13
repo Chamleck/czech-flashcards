@@ -9,12 +9,14 @@ import { VERBS } from "../data/verbs";
 import { VERB_CLASSES } from "../data/verbCategories";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { plural } from "../utils/plural";
+import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 
 type Props = NativeStackScreenProps<RootStackParamList, "VerbCategories">;
 
 export function VerbCategoriesScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [mistakeIds, setMistakeIds] = useState<Set<string>>(new Set());
+  const [mode, setMode] = useState<BrowseMode>("train");
 
   // Оновлюємо колоду помилок дієслів щоразу при поверненні на екран.
   useFocusEffect(
@@ -38,11 +40,15 @@ export function VerbCategoriesScreen({ navigation }: Props) {
     navigation.navigate("VerbSession", { title: "Повторити помилки", entryIds: ids });
   }
 
-  // Тап по класу — одразу сесія зі всіма дієсловами класу.
-  function startClass(key: string, title: string) {
+  // Тап по класу: тренування — сесія; перегляд — список дієслів класу.
+  function onClass(key: string, title: string) {
     const ids = VERBS.filter((v) => v.verbClass === key).map((v) => v.id);
     if (ids.length === 0) return;
-    navigation.navigate("VerbSession", { title, entryIds: ids });
+    if (mode === "browse") {
+      navigation.navigate("BrowseList", { kind: "verbs", entryIds: ids, title });
+    } else {
+      navigation.navigate("VerbSession", { title, entryIds: ids });
+    }
   }
 
   return (
@@ -50,23 +56,27 @@ export function VerbCategoriesScreen({ navigation }: Props) {
       style={styles.safe}
       contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + theme.space(6) }]}
     >
-      {/* Колода помилок */}
-      <Pressable
-        style={[styles.mistakeCard, mistakeCount === 0 && styles.mistakeCardEmpty]}
-        onPress={startMistakes}
-        disabled={mistakeCount === 0}
-      >
-        <Text style={styles.mistakeEmoji}>🔁</Text>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.mistakeTitle}>Повторити помилки</Text>
-          <Text style={styles.mistakeSub}>
-            {mistakeCount === 0
-              ? "Поки що немає дієслів на повторення"
-              : `${mistakeCount} ${plural(mistakeCount, "дієслово", "дієслова", "дієслів")} чекає`}
-          </Text>
-        </View>
-        {mistakeCount > 0 && <Text style={styles.mistakeBadge}>{mistakeCount}</Text>}
-      </Pressable>
+      <ModeToggle mode={mode} onChange={setMode} />
+
+      {/* Колода помилок — лише в режимі тренування */}
+      {mode === "train" && (
+        <Pressable
+          style={[styles.mistakeCard, mistakeCount === 0 && styles.mistakeCardEmpty]}
+          onPress={startMistakes}
+          disabled={mistakeCount === 0}
+        >
+          <Text style={styles.mistakeEmoji}>🔁</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.mistakeTitle}>Повторити помилки</Text>
+            <Text style={styles.mistakeSub}>
+              {mistakeCount === 0
+                ? "Поки що немає дієслів на повторення"
+                : `${mistakeCount} ${plural(mistakeCount, "дієслово", "дієслова", "дієслів")} чекає`}
+            </Text>
+          </View>
+          {mistakeCount > 0 && <Text style={styles.mistakeBadge}>{mistakeCount}</Text>}
+        </Pressable>
+      )}
 
       <Text style={styles.sectionLabel}>Класи дієвідміни</Text>
 
@@ -74,21 +84,23 @@ export function VerbCategoriesScreen({ navigation }: Props) {
         const count = countInClass(c.key);
         return (
           <View key={c.key} style={[styles.catRow, { borderLeftColor: c.color }]}>
-            <Pressable style={styles.catMain} onPress={() => startClass(c.key, c.title)}>
+            <Pressable style={styles.catMain} onPress={() => onClass(c.key, c.title)}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.catTitle}>{c.title}</Text>
                 <Text style={styles.catHint}>{c.hint}</Text>
                 <Text style={styles.catSub}>{count} {plural(count, "дієслово", "дієслова", "дієслів")}</Text>
               </View>
             </Pressable>
-            {/* Кастомний підбір дієслів */}
-            <Pressable
-              style={styles.editBtn}
-              hitSlop={8}
-              onPress={() => navigation.navigate("VerbSelection", { verbClass: c.key })}
-            >
-              <Text style={styles.editIcon}>✏️</Text>
-            </Pressable>
+            {/* Кастомний підбір — лише в тренуванні */}
+            {mode === "train" && (
+              <Pressable
+                style={styles.editBtn}
+                hitSlop={8}
+                onPress={() => navigation.navigate("VerbSelection", { verbClass: c.key })}
+              >
+                <Text style={styles.editIcon}>✏️</Text>
+              </Pressable>
+            )}
           </View>
         );
       })}

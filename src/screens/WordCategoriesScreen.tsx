@@ -9,12 +9,14 @@ import { NOUNS } from "../data/nouns";
 import { CATEGORIES } from "../data/categories";
 import { loadProgress, getMistakeIds } from "../utils/progress";
 import { plural } from "../utils/plural";
+import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 
 type Props = NativeStackScreenProps<RootStackParamList, "WordCategories">;
 
 export function WordCategoriesScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [mistakeIds, setMistakeIds] = useState<Set<string>>(new Set());
+  const [mode, setMode] = useState<BrowseMode>("train");
 
   // Оновлюємо колоду помилок щоразу, коли екран знову у фокусі
   // (напр. після завершення сесії, де щось позначили "не знаю").
@@ -39,11 +41,15 @@ export function WordCategoriesScreen({ navigation }: Props) {
     navigation.navigate("WordSession", { title: "Повторити помилки", entryIds: ids });
   }
 
-  // Тап по категорії — одразу сесія зі всіма словами категорії.
-  function startCategory(key: string, title: string) {
+  // Тап по категорії: тренування — сесія зі всіма словами; перегляд — список слів.
+  function onCategory(key: string, title: string) {
     const ids = NOUNS.filter((n) => n.category === key).map((n) => n.id);
     if (ids.length === 0) return;
-    navigation.navigate("WordSession", { title, entryIds: ids });
+    if (mode === "browse") {
+      navigation.navigate("BrowseList", { kind: "nouns", entryIds: ids, title });
+    } else {
+      navigation.navigate("WordSession", { title, entryIds: ids });
+    }
   }
 
   return (
@@ -51,23 +57,27 @@ export function WordCategoriesScreen({ navigation }: Props) {
       style={styles.safe}
       contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + theme.space(6) }]}
     >
-      {/* Колода помилок */}
-      <Pressable
-        style={[styles.mistakeCard, mistakeCount === 0 && styles.mistakeCardEmpty]}
-        onPress={startMistakes}
-        disabled={mistakeCount === 0}
-      >
-        <Text style={styles.mistakeEmoji}>🔁</Text>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.mistakeTitle}>Повторити помилки</Text>
-          <Text style={styles.mistakeSub}>
-            {mistakeCount === 0
-              ? "Поки що немає слів на повторення"
-              : `${mistakeCount} ${plural(mistakeCount, "слово", "слова", "слів")} чекає`}
-          </Text>
-        </View>
-        {mistakeCount > 0 && <Text style={styles.mistakeBadge}>{mistakeCount}</Text>}
-      </Pressable>
+      <ModeToggle mode={mode} onChange={setMode} />
+
+      {/* Колода помилок — лише в режимі тренування */}
+      {mode === "train" && (
+        <Pressable
+          style={[styles.mistakeCard, mistakeCount === 0 && styles.mistakeCardEmpty]}
+          onPress={startMistakes}
+          disabled={mistakeCount === 0}
+        >
+          <Text style={styles.mistakeEmoji}>🔁</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.mistakeTitle}>Повторити помилки</Text>
+            <Text style={styles.mistakeSub}>
+              {mistakeCount === 0
+                ? "Поки що немає слів на повторення"
+                : `${mistakeCount} ${plural(mistakeCount, "слово", "слова", "слів")} чекає`}
+            </Text>
+          </View>
+          {mistakeCount > 0 && <Text style={styles.mistakeBadge}>{mistakeCount}</Text>}
+        </Pressable>
+      )}
 
       <Text style={styles.sectionLabel}>Категорії</Text>
 
@@ -76,21 +86,23 @@ export function WordCategoriesScreen({ navigation }: Props) {
         const title = `${c.emoji} ${c.title}`;
         return (
           <View key={c.key} style={[styles.catRow, { borderLeftColor: c.color }]}>
-            <Pressable style={styles.catMain} onPress={() => startCategory(c.key, title)}>
+            <Pressable style={styles.catMain} onPress={() => onCategory(c.key, title)}>
               <Text style={styles.catEmoji}>{c.emoji}</Text>
               <View style={{ flex: 1 }}>
                 <Text style={styles.catTitle}>{c.title}</Text>
                 <Text style={styles.catSub}>{count} {plural(count, "слово", "слова", "слів")}</Text>
               </View>
             </Pressable>
-            {/* Кастомний підбір слів */}
-            <Pressable
-              style={styles.editBtn}
-              hitSlop={8}
-              onPress={() => navigation.navigate("WordSelection", { category: c.key })}
-            >
-              <Text style={styles.editIcon}>✏️</Text>
-            </Pressable>
+            {/* Кастомний підбір слів — лише в тренуванні (у перегляді завжди повний список) */}
+            {mode === "train" && (
+              <Pressable
+                style={styles.editBtn}
+                hitSlop={8}
+                onPress={() => navigation.navigate("WordSelection", { category: c.key })}
+              >
+                <Text style={styles.editIcon}>✏️</Text>
+              </Pressable>
+            )}
           </View>
         );
       })}

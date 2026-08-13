@@ -1,0 +1,33 @@
+import React from "react";
+import { theme } from "../utils/theme";
+import { SegmentTabs } from "./SegmentTabs";
+
+// Перемикач режиму на екранах категорій: Тренування ↔ Перегляд.
+// "browse" веде тап по категорії в режим перегляду (список без чекбоксів → картки
+// зі свайпом) замість запуску тренувальної сесії. Один компонент на всі частини мови.
+export type BrowseMode = "train" | "browse";
+
+const LABELS: Record<BrowseMode, string> = {
+  train: "🎯 Тренування",
+  browse: "📖 Перегляд",
+};
+
+export function ModeToggle({
+  mode,
+  onChange,
+}: {
+  mode: BrowseMode;
+  onChange: (m: BrowseMode) => void;
+}) {
+  return (
+    <SegmentTabs
+      options={["train", "browse"] as const}
+      active={mode}
+      onSelect={onChange}
+      colorFor={() => theme.colors.lilac}
+      labelFor={(m) => LABELS[m]}
+      minWidth={130}
+      flexBasis="48%"
+    />
+  );
+}

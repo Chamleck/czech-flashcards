@@ -20,6 +20,8 @@ import { PronounGroupsScreen } from "./src/screens/PronounGroupsScreen";
 import { PronounSelectionScreen } from "./src/screens/PronounSelectionScreen";
 import { PersonalPronounSelectionScreen } from "./src/screens/PersonalPronounSelectionScreen";
 import { DeclSessionScreen } from "./src/screens/DeclSessionScreen";
+import { BrowseListScreen } from "./src/screens/BrowseListScreen";
+import { BrowseCardScreen } from "./src/screens/BrowseCardScreen";
 import { GrammarCategoriesScreen } from "./src/screens/GrammarCategoriesScreen";
 import { GrammarTopicScreen } from "./src/screens/GrammarTopicScreen";
 import { FlashcardsCategoriesScreen } from "./src/screens/FlashcardsCategoriesScreen";
@@ -69,6 +71,8 @@ export default function App() {
           <Stack.Screen name="PronounSelection" component={PronounSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="PersonalPronounSelection" component={PersonalPronounSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="DeclSession" component={DeclSessionScreen} options={{ title: "" }} />
+          <Stack.Screen name="BrowseList" component={BrowseListScreen} options={{ title: "" }} />
+          <Stack.Screen name="BrowseCard" component={BrowseCardScreen} options={{ title: "" }} />
           <Stack.Screen name="GrammarCategories" component={GrammarCategoriesScreen} options={{ title: "Граматика" }} />
           <Stack.Screen name="GrammarTopic" component={GrammarTopicScreen} options={{ title: "" }} />
           <Stack.Screen name="FlashcardsCategories" component={FlashcardsCategoriesScreen} options={{ title: "Флеш-картки" }} />

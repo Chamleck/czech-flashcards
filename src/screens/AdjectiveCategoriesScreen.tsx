@@ -9,12 +9,14 @@ import { ADJECTIVES } from "../data/adjectives";
 import { ADJ_CATEGORIES } from "../data/adjectiveCategories";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { plural } from "../utils/plural";
+import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AdjectiveCategories">;
 
 export function AdjectiveCategoriesScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [mistakeIds, setMistakeIds] = useState<Set<string>>(new Set());
+  const [mode, setMode] = useState<BrowseMode>("train");
 
   useFocusEffect(
     useCallback(() => {
@@ -37,10 +39,14 @@ export function AdjectiveCategoriesScreen({ navigation }: Props) {
     navigation.navigate("DeclSession", { title: "Повторити помилки", kind: "adjective", entryIds: ids });
   }
 
-  function startCategory(key: string, title: string) {
+  function onCategory(key: string, title: string) {
     const ids = ADJECTIVES.filter((a) => a.category === key).map((a) => a.id);
     if (ids.length === 0) return;
-    navigation.navigate("DeclSession", { title, kind: "adjective", entryIds: ids });
+    if (mode === "browse") {
+      navigation.navigate("BrowseList", { kind: "adjectives", entryIds: ids, title });
+    } else {
+      navigation.navigate("DeclSession", { title, kind: "adjective", entryIds: ids });
+    }
   }
 
   return (
@@ -48,22 +54,26 @@ export function AdjectiveCategoriesScreen({ navigation }: Props) {
       style={styles.safe}
       contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + theme.space(6) }]}
     >
-      <Pressable
-        style={[styles.mistakeCard, mistakeCount === 0 && styles.mistakeCardEmpty]}
-        onPress={startMistakes}
-        disabled={mistakeCount === 0}
-      >
-        <Text style={styles.mistakeEmoji}>🔁</Text>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.mistakeTitle}>Повторити помилки</Text>
-          <Text style={styles.mistakeSub}>
-            {mistakeCount === 0
-              ? "Поки що немає слів на повторення"
-              : `${mistakeCount} ${plural(mistakeCount, "слово", "слова", "слів")} чекає`}
-          </Text>
-        </View>
-        {mistakeCount > 0 && <Text style={styles.mistakeBadge}>{mistakeCount}</Text>}
-      </Pressable>
+      <ModeToggle mode={mode} onChange={setMode} />
+
+      {mode === "train" && (
+        <Pressable
+          style={[styles.mistakeCard, mistakeCount === 0 && styles.mistakeCardEmpty]}
+          onPress={startMistakes}
+          disabled={mistakeCount === 0}
+        >
+          <Text style={styles.mistakeEmoji}>🔁</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.mistakeTitle}>Повторити помилки</Text>
+            <Text style={styles.mistakeSub}>
+              {mistakeCount === 0
+                ? "Поки що немає слів на повторення"
+                : `${mistakeCount} ${plural(mistakeCount, "слово", "слова", "слів")} чекає`}
+            </Text>
+          </View>
+          {mistakeCount > 0 && <Text style={styles.mistakeBadge}>{mistakeCount}</Text>}
+        </Pressable>
+      )}
 
       <Text style={styles.sectionLabel}>Категорії</Text>
 
@@ -72,7 +82,7 @@ export function AdjectiveCategoriesScreen({ navigation }: Props) {
         const title = `${c.emoji} ${c.title}`;
         return (
           <View key={c.key} style={[styles.catRow, { borderLeftColor: c.color }]}>
-            <Pressable style={styles.catMain} onPress={() => startCategory(c.key, title)}>
+            <Pressable style={styles.catMain} onPress={() => onCategory(c.key, title)}>
               <Text style={styles.catEmoji}>{c.emoji}</Text>
               <View style={{ flex: 1 }}>
                 <Text style={styles.catTitle}>{c.title}</Text>
@@ -80,13 +90,15 @@ export function AdjectiveCategoriesScreen({ navigation }: Props) {
                 <Text style={styles.catSub}>{count} {plural(count, "слово", "слова", "слів")}</Text>
               </View>
             </Pressable>
-            <Pressable
-              style={styles.editBtn}
-              hitSlop={8}
-              onPress={() => navigation.navigate("AdjectiveSelection", { category: c.key })}
-            >
-              <Text style={styles.editIcon}>✏️</Text>
-            </Pressable>
+            {mode === "train" && (
+              <Pressable
+                style={styles.editBtn}
+                hitSlop={8}
+                onPress={() => navigation.navigate("AdjectiveSelection", { category: c.key })}
+              >
+                <Text style={styles.editIcon}>✏️</Text>
+              </Pressable>
+            )}
           </View>
         );
       })}

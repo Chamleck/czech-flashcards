@@ -76,7 +76,7 @@ export function AdjectiveSelectionScreen({ route, navigation }: Props) {
           onPress={start}
           disabled={selected.size === 0}
         >
-          <Text style={styles.startText}>
+          <Text style={[styles.startText, selected.size === 0 && styles.startTextDisabled]}>
             {selected.size === 0 ? "Оберіть слова" : `Почати (${selected.size}) ▶️`}
           </Text>
         </Pressable>
@@ -134,4 +134,5 @@ const styles = StyleSheet.create({
   },
   startBtnDisabled: { backgroundColor: theme.colors.bgElevated },
   startText: { color: "#3a1f00", fontWeight: "800", fontSize: 16 },
+  startTextDisabled: { color: theme.colors.textFaint },
 });

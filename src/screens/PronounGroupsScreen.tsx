@@ -9,12 +9,14 @@ import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { plural } from "../utils/plural";
+import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 
 type Props = NativeStackScreenProps<RootStackParamList, "PronounGroups">;
 
 export function PronounGroupsScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [mistakeIds, setMistakeIds] = useState<Set<string>>(new Set());
+  const [mode, setMode] = useState<BrowseMode>("train");
 
   useFocusEffect(
     useCallback(() => {
@@ -36,22 +38,19 @@ export function PronounGroupsScreen({ navigation }: Props) {
     navigation.navigate("DeclSession", { title: "Повторити помилки", kind: "pronoun", entryIds: ids });
   }
 
-  function startAll() {
+  // Тап по групі: тренування — сесія; перегляд — список слів групи.
+  function openAll() {
     const ids = PRONOUNS.map((p) => p.id);
-    navigation.navigate("DeclSession", {
-      title: "👉 Присвійні та вказівні",
-      kind: "pronoun",
-      entryIds: ids,
-    });
+    const title = "👉 Присвійні та вказівні";
+    if (mode === "browse") navigation.navigate("BrowseList", { kind: "pronouns", entryIds: ids, title });
+    else navigation.navigate("DeclSession", { title, kind: "pronoun", entryIds: ids });
   }
 
-  function startPersonal() {
+  function openPersonal() {
     const ids = PERSONAL_PRONOUNS.map((p) => p.id);
-    navigation.navigate("DeclSession", {
-      title: "🙋 Особові",
-      kind: "personal",
-      entryIds: ids,
-    });
+    const title = "🙋 Особові";
+    if (mode === "browse") navigation.navigate("BrowseList", { kind: "personal", entryIds: ids, title });
+    else navigation.navigate("DeclSession", { title, kind: "personal", entryIds: ids });
   }
 
   return (
@@ -59,28 +58,32 @@ export function PronounGroupsScreen({ navigation }: Props) {
       style={styles.safe}
       contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + theme.space(6) }]}
     >
-      <Pressable
-        style={[styles.mistakeCard, mistakeCount === 0 && styles.mistakeCardEmpty]}
-        onPress={startMistakes}
-        disabled={mistakeCount === 0}
-      >
-        <Text style={styles.mistakeEmoji}>🔁</Text>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.mistakeTitle}>Повторити помилки</Text>
-          <Text style={styles.mistakeSub}>
-            {mistakeCount === 0
-              ? "Поки що немає слів на повторення"
-              : `${mistakeCount} ${plural(mistakeCount, "слово", "слова", "слів")} чекає`}
-          </Text>
-        </View>
-        {mistakeCount > 0 && <Text style={styles.mistakeBadge}>{mistakeCount}</Text>}
-      </Pressable>
+      <ModeToggle mode={mode} onChange={setMode} />
+
+      {mode === "train" && (
+        <Pressable
+          style={[styles.mistakeCard, mistakeCount === 0 && styles.mistakeCardEmpty]}
+          onPress={startMistakes}
+          disabled={mistakeCount === 0}
+        >
+          <Text style={styles.mistakeEmoji}>🔁</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.mistakeTitle}>Повторити помилки</Text>
+            <Text style={styles.mistakeSub}>
+              {mistakeCount === 0
+                ? "Поки що немає слів на повторення"
+                : `${mistakeCount} ${plural(mistakeCount, "слово", "слова", "слів")} чекає`}
+            </Text>
+          </View>
+          {mistakeCount > 0 && <Text style={styles.mistakeBadge}>{mistakeCount}</Text>}
+        </Pressable>
+      )}
 
       <Text style={styles.sectionLabel}>Групи</Text>
 
       {/* Особові — активна група */}
       <View style={[styles.catRow, { borderLeftColor: theme.colors.mint }]}>
-        <Pressable style={styles.catMain} onPress={startPersonal}>
+        <Pressable style={styles.catMain} onPress={openPersonal}>
           <Text style={styles.catEmoji}>🙋</Text>
           <View style={{ flex: 1 }}>
             <Text style={styles.catTitle}>Особові</Text>
@@ -90,18 +93,20 @@ export function PronounGroupsScreen({ navigation }: Props) {
             </Text>
           </View>
         </Pressable>
-        <Pressable
-          style={styles.editBtn}
-          hitSlop={8}
-          onPress={() => navigation.navigate("PersonalPronounSelection")}
-        >
-          <Text style={styles.editIcon}>✏️</Text>
-        </Pressable>
+        {mode === "train" && (
+          <Pressable
+            style={styles.editBtn}
+            hitSlop={8}
+            onPress={() => navigation.navigate("PersonalPronounSelection")}
+          >
+            <Text style={styles.editIcon}>✏️</Text>
+          </Pressable>
+        )}
       </View>
 
       {/* Присвійні та вказівні — активна група */}
       <View style={[styles.catRow, { borderLeftColor: theme.colors.lilac }]}>
-        <Pressable style={styles.catMain} onPress={startAll}>
+        <Pressable style={styles.catMain} onPress={openAll}>
           <Text style={styles.catEmoji}>👉</Text>
           <View style={{ flex: 1 }}>
             <Text style={styles.catTitle}>Присвійні та вказівні</Text>
@@ -109,13 +114,15 @@ export function PronounGroupsScreen({ navigation }: Props) {
             <Text style={styles.catSub}>{PRONOUNS.length} {plural(PRONOUNS.length, "слово", "слова", "слів")}</Text>
           </View>
         </Pressable>
-        <Pressable
-          style={styles.editBtn}
-          hitSlop={8}
-          onPress={() => navigation.navigate("PronounSelection")}
-        >
-          <Text style={styles.editIcon}>✏️</Text>
-        </Pressable>
+        {mode === "train" && (
+          <Pressable
+            style={styles.editBtn}
+            hitSlop={8}
+            onPress={() => navigation.navigate("PronounSelection")}
+          >
+            <Text style={styles.editIcon}>✏️</Text>
+          </Pressable>
+        )}
       </View>
     </ScrollView>
   );

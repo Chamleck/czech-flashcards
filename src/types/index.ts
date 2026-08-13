@@ -292,6 +292,9 @@ export interface VerbEntry {
 }
 
 // Параметри навігації (React Navigation, native stack)
+// Частина мови для режиму перегляду. Визначає джерело даних і компонент картки.
+export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "personal";
+
 export type RootStackParamList = {
   Home: undefined;
   // Проміжний екран вибору частини мови (Іменники / Дієслова / …)
@@ -314,6 +317,11 @@ export type RootStackParamList = {
   // Спільна сесія прикметників/займенників (картка з табами роду).
   // kind "personal" → особові займенники (окрема картка PersonalPronounCard).
   DeclSession: { title: string; kind: "adjective" | "pronoun" | "personal"; entryIds: string[] };
+  // Режим ПЕРЕГЛЯДУ слів (не тренування): список без чекбоксів → картка з горизонтальним
+  // свайпом між сусідніми словами. Спільний для всіх частин мови через BrowseKind:
+  // kind визначає і джерело даних, і компонент картки (як у DeclSession за "kind").
+  BrowseList: { kind: BrowseKind; entryIds: string[]; title: string };
+  BrowseCard: { kind: BrowseKind; entryIds: string[]; initialIndex: number; title: string };
   // Граматика
   GrammarCategories: undefined;
   GrammarTopic: { topicId: string };
