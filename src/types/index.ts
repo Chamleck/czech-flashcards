@@ -297,6 +297,8 @@ export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "person
 
 export type RootStackParamList = {
   Home: undefined;
+  // ТИМЧАСОВИЙ маршрут — прибрати разом з TTSPrototypeScreen після рішення щодо озвучення.
+  TTSPrototype: undefined;
   // Проміжний екран вибору частини мови (Іменники / Дієслова / …)
   WordsPartOfSpeech: undefined;
   // Іменники

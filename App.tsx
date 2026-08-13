@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { RootStackParamList } from "./src/types";
 import { theme } from "./src/utils/theme";
 import { HomeScreen } from "./src/screens/HomeScreen";
+import { TTSPrototypeScreen } from "./src/screens/TTSPrototypeScreen";
 import { WordsPartOfSpeechScreen } from "./src/screens/WordsPartOfSpeechScreen";
 import { WordCategoriesScreen } from "./src/screens/WordCategoriesScreen";
 import { WordSelectionScreen } from "./src/screens/WordSelectionScreen";
@@ -58,6 +59,7 @@ export default function App() {
           }}
         >
           <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="TTSPrototype" component={TTSPrototypeScreen} options={{ title: "🔊 Тест голосу" }} />
           <Stack.Screen name="WordsPartOfSpeech" component={WordsPartOfSpeechScreen} options={{ title: "Слова" }} />
           <Stack.Screen name="WordCategories" component={WordCategoriesScreen} options={{ title: "Іменники" }} />
           <Stack.Screen name="WordSelection" component={WordSelectionScreen} options={{ title: "Вибір слів" }} />

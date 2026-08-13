@@ -89,6 +89,11 @@ export function HomeScreen({ navigation }: Props) {
           дати та цілі речення.
         </Text>
       </View>
+
+      {/* ТИМЧАСОВО: вхід у прототип перевірки голосу. Прибрати після рішення. */}
+      <Pressable style={styles.ttsTestLink} onPress={() => navigation.navigate("TTSPrototype")}>
+        <Text style={styles.ttsTestLinkText}>🔊 Тест голосу (тимчасово)</Text>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -115,4 +120,6 @@ const styles = StyleSheet.create({
   soon: { position: "absolute", top: theme.space(3), right: theme.space(3), fontSize: 16 },
   note: { marginTop: theme.space(6), backgroundColor: theme.colors.bgElevated, borderRadius: theme.radius.md, padding: theme.space(4) },
   noteText: { color: theme.colors.textDim, fontSize: 13, lineHeight: 20 },
+  ttsTestLink: { marginTop: theme.space(4), alignItems: "center", padding: theme.space(2) },
+  ttsTestLinkText: { color: theme.colors.textFaint, fontSize: 13, fontWeight: "600" },
 });
