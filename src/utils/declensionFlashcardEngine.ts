@@ -16,7 +16,7 @@ import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { NOUNS } from "../data/nouns";
-import { MistakeStore, weightFor, comboId } from "./flashcardWeights";
+import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
 
 // Питання квізу прикметників/займенників. Той самий контракт полів, що й у
 // іменників/дієслів (щоб екран працював без змін), + необов'язкове contextPhrase:
@@ -587,45 +587,22 @@ function adjPronUnits(pool: Tested[]): UnitCombo[] {
   }));
 }
 
-function weightedPick<T>(items: T[], weightOf: (t: T) => number): T {
-  let total = 0;
-  for (const it of items) total += weightOf(it);
-  let r = Math.random() * total;
-  for (const it of items) {
-    r -= weightOf(it);
-    if (r < 0) return it;
-  }
-  return items[items.length - 1];
-}
-
-// Сесія: та сама механіка, що в іменників/дієслів — зважений вибір за comboId
-// (помилки важчі), без повтору комбінації в межах сесії, одне слово не поспіль.
+// Сесія: вибір комбінацій — спільний selectRoundCombos (ваги + зарезервовані
+// слоти помилок + «не те саме слово поспіль»).
 export function generateDeclensionSession(
   count: number,
   pool: Tested[] = buildTestedPool(),
   mistakes: MistakeStore = {}
 ): DeclQuestion[] {
-  // Один пул: прикметники + присвійні/вказівні + особові (усе крутиться разом,
-  // як природно й уживається в чеській). Ваги/раунд/«не поспіль» — спільні.
+  // Один пул: прикметники + присвійні/вказівні + особові (усе крутиться разом).
+  // Вибір (ваги + зарезервовані слоти помилок + «не те саме слово поспіль») —
+  // спільний selectRoundCombos.
   const combos: UnitCombo[] = [...adjPronUnits(pool), ...enumeratePersonalCombos()];
+  const chosen = selectRoundCombos(combos, mistakes, count, (c) => c.wordId);
   const questions: DeclQuestion[] = [];
-  const used = new Set<string>();
-  let lastWord = "";
-  let guard = 0;
-
-  while (questions.length < count && guard < count * 40) {
-    guard++;
-    let candidates = combos.filter((c) => !used.has(c.id) && c.wordId !== lastWord);
-    if (candidates.length === 0) candidates = combos.filter((c) => !used.has(c.id));
-    if (candidates.length === 0) break;
-
-    const chosen = weightedPick(candidates, (c) => weightFor(mistakes, c.id));
-    used.add(chosen.id);
-    const q = chosen.make();
-    if (!q) continue;
-
-    questions.push(q);
-    lastWord = chosen.wordId;
+  for (const c of chosen) {
+    const q = c.make();
+    if (q) questions.push(q);
   }
   return questions;
 }

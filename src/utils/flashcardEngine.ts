@@ -6,7 +6,7 @@ import {
   GrammaticalNumber,
 } from "../types";
 import { NOUNS } from "../data/nouns";
-import { MistakeStore, weightFor, comboId } from "./flashcardWeights";
+import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
 
 export interface Question {
   entry: NounEntry;
@@ -153,52 +153,22 @@ function enumerateCombos(pool: NounEntry[]): Combo[] {
   return combos;
 }
 
-// Зважений випадковий вибір одного елемента: ймовірність ∝ вазі.
-function weightedPick<T>(items: T[], weightOf: (t: T) => number): T {
-  let total = 0;
-  for (const it of items) total += weightOf(it);
-  let r = Math.random() * total;
-  for (const it of items) {
-    r -= weightOf(it);
-    if (r < 0) return it;
-  }
-  return items[items.length - 1];
-}
-
-// Сесія: count питань, обраних ЗВАЖЕНИМ випадковим вибором за comboId.
-// Помилкові комбінації мають підвищену вагу (BOOST) → випадають частіше, але не гарантовано.
-// Обмеження: та сама комбінація не повторюється в межах сесії; одне слово не йде поспіль;
-// тип дистрактора чергується (ротація number/case).
+// Сесія: count питань. Вибір комбінацій (ваги помилок + зарезервовані слоти під
+// помилки + «не те саме слово поспіль») — спільний selectRoundCombos. Тип питання
+// (число/відмінок) чергується за позицією.
 export function generateSession(
   count: number,
   pool: NounEntry[] = NOUNS,
   mistakes: MistakeStore = {}
 ): Question[] {
   const combos = enumerateCombos(pool);
+  const chosen = selectRoundCombos(combos, mistakes, count, (c) => c.entry.id);
   const questions: Question[] = [];
-  const used = new Set<string>();
-  let lastId = "";
-  let i = 0;
-  let guard = 0;
-
-  while (questions.length < count && guard < count * 40) {
-    guard++;
-
-    // кандидати: ще не використані комбінації, не того ж слова, що попереднє
-    let candidates = combos.filter((c) => !used.has(c.id) && c.entry.id !== lastId);
-    // якщо через обмеження "не те саме слово підряд" застрягли — послаблюємо його
-    if (candidates.length === 0) candidates = combos.filter((c) => !used.has(c.id));
-    if (candidates.length === 0) break; // валідних комбінацій менше, ніж потрібно питань
-
-    const chosen = weightedPick(candidates, (c) => weightFor(mistakes, c.id));
+  chosen.forEach((c, i) => {
+    // тип питання чергується за позицією (число / відмінок)
     const kind: "number" | "case" = i % 2 === 0 ? "number" : "case";
-    const q = makeQuestionForCombo(chosen.entry, chosen.targetCase, chosen.targetNumber, kind);
-    used.add(chosen.id);
-    if (!q) continue;
-
-    questions.push(q);
-    lastId = chosen.entry.id;
-    i++;
-  }
+    const q = makeQuestionForCombo(c.entry, c.targetCase, c.targetNumber, kind);
+    if (q) questions.push(q);
+  });
   return questions;
 }

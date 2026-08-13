@@ -55,7 +55,7 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
 
   useEffect(() => {
     (async () => {
-      const m = await loadMistakes();
+      const m = await loadMistakes(categoryId);
       mistakes.current = m;
       setSession(buildSession(categoryId, m));
     })();
@@ -99,7 +99,7 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
       // помилковою нижче, у гілці else, тож тут не перезараховуємо як правильну.
       if (firstTry) {
         mistakes.current = recordAnswer(mistakes.current, current.comboId, true);
-        saveMistakes(mistakes.current);
+        saveMistakes(categoryId, mistakes.current);
       }
       setStats((s) => {
         const streak = firstTry ? s.streak + 1 : 0;
@@ -120,7 +120,7 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
       runShake();
       // Помилка на цій комбінації → підвищуємо її вагу (BOOST) на майбутні сесії.
       mistakes.current = recordAnswer(mistakes.current, current.comboId, false);
-      saveMistakes(mistakes.current);
+      saveMistakes(categoryId, mistakes.current);
       setSelectedWrong(optionIdx);
       setStats((s) => ({ ...s, streak: 0 }));
     }

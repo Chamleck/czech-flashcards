@@ -1,6 +1,6 @@
 import { VerbEntry, VerbPerson, PERSON_ORDER, PERSON_LABELS } from "../types";
 import { VERBS } from "../data/verbs";
-import { MistakeStore, weightFor, comboId } from "./flashcardWeights";
+import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
 import {
   presentForm,
   futureForm,
@@ -188,45 +188,19 @@ function makeQuestion(combo: Combo): VerbQuestion | null {
   };
 }
 
-// Зважений випадковий вибір: ймовірність ∝ вазі (помилкові комбінації важчі).
-function weightedPick<T>(items: T[], weightOf: (t: T) => number): T {
-  let total = 0;
-  for (const it of items) total += weightOf(it);
-  let r = Math.random() * total;
-  for (const it of items) {
-    r -= weightOf(it);
-    if (r < 0) return it;
-  }
-  return items[items.length - 1];
-}
-
-// Сесія квізу дієслів. Та сама механіка, що й у іменників:
-// зважений вибір за comboId (помилки важчі), без повтору комбінації в межах сесії,
-// одне слово не йде поспіль.
+// Сесія квізу дієслів. Вибір комбінацій (ваги + зарезервовані слоти помилок +
+// «не те саме слово поспіль») — спільний selectRoundCombos.
 export function generateVerbSession(
   count: number,
   pool: VerbEntry[] = VERBS,
   mistakes: MistakeStore = {}
 ): VerbQuestion[] {
   const combos = enumerateCombos(pool);
+  const chosen = selectRoundCombos(combos, mistakes, count, (c) => c.entry.id);
   const questions: VerbQuestion[] = [];
-  const used = new Set<string>();
-  let lastId = "";
-  let guard = 0;
-
-  while (questions.length < count && guard < count * 40) {
-    guard++;
-    let candidates = combos.filter((c) => !used.has(c.id) && c.entry.id !== lastId);
-    if (candidates.length === 0) candidates = combos.filter((c) => !used.has(c.id));
-    if (candidates.length === 0) break;
-
-    const chosen = weightedPick(candidates, (c) => weightFor(mistakes, c.id));
-    used.add(chosen.id);
-    const q = makeQuestion(chosen);
-    if (!q) continue;
-
-    questions.push(q);
-    lastId = chosen.entry.id;
+  for (const c of chosen) {
+    const q = makeQuestion(c);
+    if (q) questions.push(q);
   }
   return questions;
 }
