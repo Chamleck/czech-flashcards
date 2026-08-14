@@ -12,7 +12,6 @@ import { DeclensionTable } from "./DeclensionTable";
 import { GenderIcon } from "./GenderIcon";
 import { SegmentTabs } from "./SegmentTabs";
 import { Speakable } from "./Speakable";
-import { ShimmerOnMount } from "./ShimmerOnMount";
 
 export type DeclEntry = AdjectiveEntry | PronounEntry;
 
@@ -88,7 +87,7 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
           contentContainerStyle={{ paddingBottom: 8 }}
           showsVerticalScrollIndicator={false}
         >
-          <ShimmerOnMount>
+          <>
             <View style={[styles.answerHead, { borderColor: accent }]}>
               <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
               <Speakable
@@ -172,7 +171,7 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
                     </View>
                   );
                 })()}
-          </ShimmerOnMount>
+          </>
         </ScrollView>
       )}
     </View>

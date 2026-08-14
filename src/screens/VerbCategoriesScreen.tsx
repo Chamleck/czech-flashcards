@@ -16,7 +16,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "VerbCategories">;
 export function VerbCategoriesScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [mistakeIds, setMistakeIds] = useState<Set<string>>(new Set());
-  const [mode, setMode] = useState<BrowseMode>("train");
+  const [mode, setMode] = useState<BrowseMode>("browse");
 
   // Оновлюємо колоду помилок дієслів щоразу при поверненні на екран.
   useFocusEffect(

@@ -1,5 +1,5 @@
-import React from "react";
-import { Text, StyleProp, TextStyle, StyleSheet } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { Animated, StyleProp, TextStyle, StyleSheet, Easing } from "react-native";
 import { theme } from "../utils/theme";
 import { speak, useSpeakingId } from "../utils/useSpeech";
 
@@ -9,29 +9,55 @@ interface Props {
   style?: StyleProp<TextStyle>;
 }
 
-// Тапабельний озвучуваний текст. Постійна ознака "можна почути" — пунктирне
-// підкреслення (НЕ колір: колір на картках уже означає рід/відмінок/ступінь —
-// напр. заголовне слово фарбується за родом, форми в таблиці нейтральні, і т.д.
-// Забрати цей сенс заради "колір = посилання" означало б зіпсувати наявну
-// граматичну кольорову мову застосунку). Під час самого відтворення текст
-// тимчасово підсвічується акцентним кольором — це не конфліктує, бо діє лише
-// кілька секунд, поки звучить, а не постійно.
+// Тапабельний озвучуваний текст.
+//
+// Ознака "можна почути" — пунктирне підкреслення (постійна) + одночасний м'який
+// "спалах" усіх озвучуваних слів у момент відкриття картки (як мерехтіння
+// інтерактивного предмета в іграх: ненав'язливо показує, з чим можна взаємодіяти).
+// Спалах не по черзі, а одразу на всіх словах разом.
+//
+// Підсвітка ПІД ЧАС програвання — напівпрозора ФОНОВА плашка, а не зміна кольору
+// тексту: колір тексту в застосунку вже означає рід/відмінок/ступінь (напр.
+// дієприкметник чол. роду має м'ятний колір — той самий, що був би підсвіткою),
+// тож зміна кольору була б невидимою на частині слів. Фон видно на будь-якому
+// кольорі тексту й він не займає жодного кольору з граматичної палітри.
 export function Speakable({ id, text, style }: Props) {
   const speakingId = useSpeakingId();
   const active = speakingId === id;
 
+  // Спалах при появі (один раз): 0 → 1 → 0.
+  const flash = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const anim = Animated.sequence([
+      Animated.timing(flash, { toValue: 1, duration: 260, delay: 200, easing: Easing.out(Easing.quad), useNativeDriver: false }),
+      Animated.timing(flash, { toValue: 0, duration: 420, easing: Easing.in(Easing.quad), useNativeDriver: false }),
+    ]);
+    anim.start();
+    return () => anim.stop();
+  }, [flash]);
+
+  // Фон: під час програвання — стала плашка; поза тим — короткий спалах при появі.
+  // (useNativeDriver: false, бо анімуємо backgroundColor.)
+  const flashBg = flash.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["rgba(255,255,255,0)", "rgba(255,255,255,0.16)"],
+  });
+
   return (
-    <Text
-      style={[style, styles.speakable, active && styles.active]}
+    <Animated.Text
+      style={[
+        style,
+        styles.speakable,
+        { backgroundColor: active ? theme.colors.speakActiveBg : flashBg },
+      ]}
       onPress={() => speak(text, id)}
       suppressHighlighting
     >
       {text}
-    </Text>
+    </Animated.Text>
   );
 }
 
 const styles = StyleSheet.create({
   speakable: { textDecorationLine: "underline", textDecorationStyle: "dotted" },
-  active: { color: theme.colors.mint },
 });

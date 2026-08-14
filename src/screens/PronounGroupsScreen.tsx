@@ -16,7 +16,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "PronounGroups">;
 export function PronounGroupsScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [mistakeIds, setMistakeIds] = useState<Set<string>>(new Set());
-  const [mode, setMode] = useState<BrowseMode>("train");
+  const [mode, setMode] = useState<BrowseMode>("browse");
 
   useFocusEffect(
     useCallback(() => {

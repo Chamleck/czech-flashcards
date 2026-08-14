@@ -16,7 +16,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "WordCategories">;
 export function WordCategoriesScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [mistakeIds, setMistakeIds] = useState<Set<string>>(new Set());
-  const [mode, setMode] = useState<BrowseMode>("train");
+  const [mode, setMode] = useState<BrowseMode>("browse");
 
   // Оновлюємо колоду помилок щоразу, коли екран знову у фокусі
   // (напр. після завершення сесії, де щось позначили "не знаю").

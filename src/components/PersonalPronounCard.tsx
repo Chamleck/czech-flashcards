@@ -14,7 +14,6 @@ import { DeclensionTable } from "./DeclensionTable";
 import { GenderIcon } from "./GenderIcon";
 import { SegmentTabs } from "./SegmentTabs";
 import { Speakable } from "./Speakable";
-import { ShimmerOnMount } from "./ShimmerOnMount";
 
 interface Props {
   entry: PersonalPronounEntry;
@@ -63,7 +62,7 @@ export function PersonalPronounCard({ entry, revealed, onReveal }: Props) {
           contentContainerStyle={{ paddingBottom: 8 }}
           showsVerticalScrollIndicator={false}
         >
-          <ShimmerOnMount>
+          <>
             <View style={[styles.answerHead, { borderColor: accent }]}>
               <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
               <Speakable
@@ -106,7 +105,7 @@ export function PersonalPronounCard({ entry, revealed, onReveal }: Props) {
                 <Text style={styles.exampleUk}>{example.uk}</Text>
               </View>
             )}
-          </ShimmerOnMount>
+          </>
         </ScrollView>
       )}
     </View>

@@ -21,7 +21,7 @@ export function ModeToggle({
 }) {
   return (
     <SegmentTabs
-      options={["train", "browse"] as const}
+      options={["browse", "train"] as const}
       active={mode}
       onSelect={onChange}
       colorFor={() => theme.colors.lilac}

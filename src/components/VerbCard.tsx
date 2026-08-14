@@ -5,7 +5,6 @@ import { theme } from "../utils/theme";
 import { VERB_CLASS_BY_KEY } from "../data/verbCategories";
 import { VerbConjugation } from "./VerbConjugation";
 import { Speakable } from "./Speakable";
-import { ShimmerOnMount } from "./ShimmerOnMount";
 
 interface Props {
   entry: VerbEntry;
@@ -36,7 +35,7 @@ export function VerbCard({ entry, revealed, onReveal }: Props) {
           contentContainerStyle={{ paddingBottom: 8 }}
           showsVerticalScrollIndicator={false}
         >
-          <ShimmerOnMount>
+          <>
             <View style={[styles.answerHead, { borderColor: accent }]}>
               <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
               <Speakable
@@ -57,7 +56,7 @@ export function VerbCard({ entry, revealed, onReveal }: Props) {
                 <Text style={styles.pairNoteText}>💡 {entry.aspectPairNote}</Text>
               </View>
             )}
-          </ShimmerOnMount>
+          </>
         </ScrollView>
       )}
     </View>

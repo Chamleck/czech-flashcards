@@ -4,7 +4,6 @@ import { NounEntry } from "../types";
 import { theme, GENDER_LABEL } from "../utils/theme";
 import { DeclensionTable } from "./DeclensionTable";
 import { Speakable } from "./Speakable";
-import { ShimmerOnMount } from "./ShimmerOnMount";
 
 interface Props {
   entry: NounEntry;
@@ -29,7 +28,7 @@ export function FlashCard({ entry, revealed, onReveal }: Props) {
         </Pressable>
       ) : (
         <ScrollView style={styles.answerScroll} contentContainerStyle={{ paddingBottom: 8 }}>
-          <ShimmerOnMount>
+          <>
             <View style={[styles.answerHead, { borderColor: gColor }]}>
               <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
               <Speakable
@@ -57,7 +56,7 @@ export function FlashCard({ entry, revealed, onReveal }: Props) {
                 <Text style={styles.exampleUk}>{entry.exampleSentenceUk}</Text>
               </View>
             )}
-          </ShimmerOnMount>
+          </>
         </ScrollView>
       )}
     </View>
