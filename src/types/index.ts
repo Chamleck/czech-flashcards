@@ -68,7 +68,9 @@ export type WordCategory =
   | "city"
   | "transport"
   | "nature"
-  | "animals";
+  | "animals"
+  | "days"
+  | "months";
 
 // Повна парадигма відмінювання: 7 відмінків x 2 числа
 export type DeclensionTable = Record<CzechCase, { sg: string; pl: string }>;

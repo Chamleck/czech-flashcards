@@ -17,6 +17,8 @@ export const CATEGORIES: CategoryMeta[] = [
   { key: "transport", emoji: "🚗", title: "Транспорт", color: "#5a9fd4" },
   { key: "nature", emoji: "🌿", title: "Природа", color: "#8ed081" },
   { key: "animals", emoji: "🐾", title: "Тварини", color: "#e0a458" },
+  { key: "days", emoji: "📅", title: "Дні тижня", color: "#7fb8e0" },
+  { key: "months", emoji: "🗓️", title: "Місяці", color: "#c98ed0" },
 ];
 
 export const CATEGORY_BY_KEY: Record<WordCategory, CategoryMeta> = CATEGORIES.reduce(
