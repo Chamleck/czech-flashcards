@@ -45,14 +45,14 @@ export function FlashCard({ entry, revealed, onReveal }: Props) {
 
             {entry.exampleSentenceCz && (
               <View style={styles.example}>
-                <Text style={styles.exampleCz}>
-                  💬{" "}
+                <View style={styles.exampleRow}>
+                  <Text style={styles.exampleCz}>💬 </Text>
                   <Speakable
                     id={`${entry.id}:example`}
                     text={entry.exampleSentenceCz}
                     style={styles.exampleCz}
                   />
-                </Text>
+                </View>
                 <Text style={styles.exampleUk}>{entry.exampleSentenceUk}</Text>
               </View>
             )}
@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.space(3.5),
   },
+  exampleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline" },
   exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600" },
   exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
 });

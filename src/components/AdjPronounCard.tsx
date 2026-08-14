@@ -143,14 +143,14 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
             {indeclinable
               ? (entry as any).exampleSentenceCz && (
                   <View style={styles.example}>
-                    <Text style={styles.exampleCz}>
-                      💬{" "}
+                    <View style={styles.exampleRow}>
+                      <Text style={styles.exampleCz}>💬 </Text>
                       <Speakable
                         id={`${entry.id}:example`}
                         text={(entry as any).exampleSentenceCz}
                         style={styles.exampleCz}
                       />
-                    </Text>
+                    </View>
                     <Text style={styles.exampleUk}>{(entry as any).exampleSentenceUk}</Text>
                   </View>
                 )
@@ -159,14 +159,14 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
                   const ex = (entry as any).examples[gender];
                   return (
                     <View style={[styles.example, { borderLeftColor: theme.genderColor[gender] }]}>
-                      <Text style={styles.exampleCz}>
-                        💬{" "}
+                      <View style={styles.exampleRow}>
+                        <Text style={styles.exampleCz}>💬 </Text>
                         <Speakable
                           id={`${entry.id}:${gender}:example`}
                           text={ex.cz}
                           style={styles.exampleCz}
                         />
-                      </Text>
+                      </View>
                       <Text style={styles.exampleUk}>{ex.uk}</Text>
                     </View>
                   );
@@ -224,6 +224,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.space(3.5),
   },
+  exampleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline" },
   exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600" },
   exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
 });

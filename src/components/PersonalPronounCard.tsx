@@ -99,9 +99,10 @@ export function PersonalPronounCard({ entry, revealed, onReveal }: Props) {
                   { borderLeftColor: entry.gendered ? theme.genderColor[gender] : accent },
                 ]}
               >
-                <Text style={styles.exampleCz}>
-                  💬 <Speakable id={exampleId} text={example.cz} style={styles.exampleCz} />
-                </Text>
+                <View style={styles.exampleRow}>
+                  <Text style={styles.exampleCz}>💬 </Text>
+                  <Speakable id={exampleId} text={example.cz} style={styles.exampleCz} />
+                </View>
                 <Text style={styles.exampleUk}>{example.uk}</Text>
               </View>
             )}
@@ -145,6 +146,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.space(3.5),
   },
+  exampleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline" },
   exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600" },
   exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
 });

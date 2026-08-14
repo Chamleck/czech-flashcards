@@ -179,18 +179,29 @@ export function VerbConjugation({ entry }: { entry: VerbEntry }) {
         {mode === "past" && (
           <View style={styles.participleBox}>
             <Text style={styles.participleLabel}>Дієприкметник за родом:</Text>
-            <Text style={styles.participleForms}>
-              <Speakable id={`${entry.id}:pp:m`} text={pp.m} style={styles.pMasc} /> (чол.) ·{" "}
-              <Speakable id={`${entry.id}:pp:f`} text={pp.f} style={styles.pFem} /> (жін.) ·{" "}
-              <Speakable id={`${entry.id}:pp:n`} text={pp.n} style={styles.pNeut} /> (сер.)
-            </Text>
-            <Text style={styles.participleForms}>
-              мн.:{" "}
-              <Speakable id={`${entry.id}:pp:manim_pl`} text={pp.manim_pl} style={styles.pMasc} />{" "}
-              (чол. істот.) ·{" "}
-              <Speakable id={`${entry.id}:pp:other_pl`} text={pp.other_pl} style={styles.pFem} />{" "}
-              (решта)
-            </Text>
+            <View style={styles.participleRow}>
+              <Speakable id={`${entry.id}:pp:m`} text={pp.m} style={[styles.participleForms, styles.pMasc]} />
+              <Text style={styles.participleForms}> (чол.) · </Text>
+              <Speakable id={`${entry.id}:pp:f`} text={pp.f} style={[styles.participleForms, styles.pFem]} />
+              <Text style={styles.participleForms}> (жін.) · </Text>
+              <Speakable id={`${entry.id}:pp:n`} text={pp.n} style={[styles.participleForms, styles.pNeut]} />
+              <Text style={styles.participleForms}> (сер.)</Text>
+            </View>
+            <View style={styles.participleRow}>
+              <Text style={styles.participleForms}>мн.: </Text>
+              <Speakable
+                id={`${entry.id}:pp:manim_pl`}
+                text={pp.manim_pl}
+                style={[styles.participleForms, styles.pMasc]}
+              />
+              <Text style={styles.participleForms}> (чол. істот.) · </Text>
+              <Speakable
+                id={`${entry.id}:pp:other_pl`}
+                text={pp.other_pl}
+                style={[styles.participleForms, styles.pFem]}
+              />
+              <Text style={styles.participleForms}> (решта)</Text>
+            </View>
           </View>
         )}
       </View>
@@ -198,9 +209,10 @@ export function VerbConjugation({ entry }: { entry: VerbEntry }) {
       {/* Приклад речення для поточного режиму */}
       {example && (
         <View style={[styles.example, { borderLeftColor: meta.color }]}>
-          <Text style={styles.exampleCz}>
-            💬 <Speakable id={`${entry.id}:${mode}:example`} text={example.cz} style={styles.exampleCz} />
-          </Text>
+          <View style={styles.exampleRow}>
+            <Text style={styles.exampleCz}>💬 </Text>
+            <Speakable id={`${entry.id}:${mode}:example`} text={example.cz} style={styles.exampleCz} />
+          </View>
           <Text style={styles.exampleUk}>{example.uk}</Text>
         </View>
       )}
@@ -262,6 +274,7 @@ const styles = StyleSheet.create({
   perfNoteText: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19 },
   participleBox: { marginTop: theme.space(2), paddingHorizontal: theme.space(1) },
   participleLabel: { color: theme.colors.textDim, fontSize: 12, fontWeight: "700", marginBottom: 2 },
+  participleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline" },
   participleForms: { color: theme.colors.text, fontSize: 13, lineHeight: 20 },
   pMasc: { color: theme.colors.mint, fontWeight: "700" },
   pFem: { color: "#ff8fb1", fontWeight: "700" },
@@ -273,6 +286,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.space(3.5),
   },
+  exampleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline" },
   exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600" },
   exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
 });
