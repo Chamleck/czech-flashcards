@@ -18,6 +18,7 @@ import { FlashCard } from "../components/FlashCard";
 import { VerbCard } from "../components/VerbCard";
 import { AdjPronounCard } from "../components/AdjPronounCard";
 import { PersonalPronounCard } from "../components/PersonalPronounCard";
+import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
 
 type Props = NativeStackScreenProps<RootStackParamList, "BrowseCard">;
 
@@ -43,6 +44,7 @@ function CardFor({ kind, entry }: { kind: BrowseKind; entry: any }) {
 export function BrowseCardScreen({ route, navigation }: Props) {
   const { kind, entryIds, initialIndex, title } = route.params;
   const { width } = useWindowDimensions();
+  useStopSpeechOnUnmount(); // вихід з екрана — не тягнемо звук
 
   const entries = useMemo(
     () => browseEntries(browseSource(kind), entryIds),
@@ -71,7 +73,10 @@ export function BrowseCardScreen({ route, navigation }: Props) {
 
   function onMomentumEnd(e: NativeSyntheticEvent<NativeScrollEvent>) {
     const i = Math.round(e.nativeEvent.contentOffset.x / width);
-    if (i !== idx) setIdx(i);
+    if (i !== idx) {
+      stopSpeech(); // свайпнули на іншу картку — звук попередньої не тягнемо
+      setIdx(i);
+    }
   }
 
   function renderItem({ item }: ListRenderItemInfo<{ id: string }>) {

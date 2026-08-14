@@ -7,12 +7,14 @@ import { theme } from "../utils/theme";
 import { FlashCard } from "../components/FlashCard";
 import { NOUNS } from "../data/nouns";
 import { loadProgress, saveProgress, updateCard, buildQueue } from "../utils/progress";
+import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
 
 type Props = NativeStackScreenProps<RootStackParamList, "WordSession">;
 
 export function WordSessionScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { title, entryIds } = route.params;
+  useStopSpeechOnUnmount(); // не тягнемо звук за екран при виході
 
   // Обрані слова цієї сесії (у порядку, як у базі)
   const entries = useMemo(
@@ -66,6 +68,7 @@ export function WordSessionScreen({ route, navigation }: Props) {
 
   async function answer(knewIt: boolean) {
     if (!current) return;
+    stopSpeech(); // не тягнемо озвучення попереднього слова на наступну картку
     const updated = {
       ...progress,
       [current.id]: updateCard(progress[current.id], current.id, knewIt),

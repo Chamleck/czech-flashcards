@@ -11,6 +11,8 @@ import { theme } from "../utils/theme";
 import { DeclensionTable } from "./DeclensionTable";
 import { GenderIcon } from "./GenderIcon";
 import { SegmentTabs } from "./SegmentTabs";
+import { Speakable } from "./Speakable";
+import { ShimmerOnMount } from "./ShimmerOnMount";
 
 export type DeclEntry = AdjectiveEntry | PronounEntry;
 
@@ -86,67 +88,91 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
           contentContainerStyle={{ paddingBottom: 8 }}
           showsVerticalScrollIndicator={false}
         >
-          <View style={[styles.answerHead, { borderColor: accent }]}>
-            <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
-            <Text style={[styles.answerWord, { color: accent }]}>{currentCz}</Text>
-            <Text style={styles.patternText}>{patternLabel(entry, degree)}</Text>
-          </View>
-
-          {indeclinable ? (
-            <View style={styles.invariantBox}>
-              <Text style={styles.invariantForm}>{(entry as any).invariantForm}</Text>
-              <Text style={styles.invariantNote}>
-                Незмінний займенник — однакова форма в усіх відмінках, родах і числах.
-              </Text>
-            </View>
-          ) : (
-            <>
-              {/* Вісь ступеня порівняння — лише для градуйованих прикметників */}
-              {degrees && (
-                <SegmentTabs
-                  options={DEGREE_ORDER}
-                  active={degree}
-                  onSelect={setDegree}
-                  colorFor={() => theme.colors.honey}
-                  labelFor={(d) => DEGREE_SHORT[d]}
-                  minWidth={90}
-                  flexBasis="30%"
-                />
-              )}
-
-              {/* Таби роду */}
-              <SegmentTabs
-                options={GENDER_ORDER}
-                active={gender}
-                onSelect={setGender}
-                colorFor={(g) => theme.genderColor[g]}
-                labelFor={(g) => GENDER_SHORT[g]}
-                iconFor={(g, on) => <GenderIcon gender={g} size={14} activeDark={on} />}
+          <ShimmerOnMount>
+            <View style={[styles.answerHead, { borderColor: accent }]}>
+              <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
+              <Speakable
+                id={`${entry.id}:${degree}:headline`}
+                text={currentCz}
+                style={[styles.answerWord, { color: accent }]}
               />
+              <Text style={styles.patternText}>{patternLabel(entry, degree)}</Text>
+            </View>
 
-              <DeclensionTable table={currentDecl[gender]} />
-            </>
-          )}
+            {indeclinable ? (
+              <View style={styles.invariantBox}>
+                <Speakable
+                  id={`${entry.id}:invariant`}
+                  text={(entry as any).invariantForm}
+                  style={styles.invariantForm}
+                />
+                <Text style={styles.invariantNote}>
+                  Незмінний займенник — однакова форма в усіх відмінках, родах і числах.
+                </Text>
+              </View>
+            ) : (
+              <>
+                {/* Вісь ступеня порівняння — лише для градуйованих прикметників */}
+                {degrees && (
+                  <SegmentTabs
+                    options={DEGREE_ORDER}
+                    active={degree}
+                    onSelect={setDegree}
+                    colorFor={() => theme.colors.honey}
+                    labelFor={(d) => DEGREE_SHORT[d]}
+                    minWidth={90}
+                    flexBasis="30%"
+                  />
+                )}
 
-          {/* Приклад показуємо лише для звичайного ступеня та незмінних.
-              Для вищого/найвищого прикладу немає — таблиця вже показує суть. */}
-          {indeclinable
-            ? (entry as any).exampleSentenceCz && (
-                <View style={styles.example}>
-                  <Text style={styles.exampleCz}>💬 {(entry as any).exampleSentenceCz}</Text>
-                  <Text style={styles.exampleUk}>{(entry as any).exampleSentenceUk}</Text>
-                </View>
-              )
-            : degree === "positive" &&
-              (() => {
-                const ex = (entry as any).examples[gender];
-                return (
-                  <View style={[styles.example, { borderLeftColor: theme.genderColor[gender] }]}>
-                    <Text style={styles.exampleCz}>💬 {ex.cz}</Text>
-                    <Text style={styles.exampleUk}>{ex.uk}</Text>
+                {/* Таби роду */}
+                <SegmentTabs
+                  options={GENDER_ORDER}
+                  active={gender}
+                  onSelect={setGender}
+                  colorFor={(g) => theme.genderColor[g]}
+                  labelFor={(g) => GENDER_SHORT[g]}
+                  iconFor={(g, on) => <GenderIcon gender={g} size={14} activeDark={on} />}
+                />
+
+                <DeclensionTable table={currentDecl[gender]} speakId={`${entry.id}:${degree}:${gender}`} />
+              </>
+            )}
+
+            {/* Приклад показуємо лише для звичайного ступеня та незмінних.
+                Для вищого/найвищого прикладу немає — таблиця вже показує суть. */}
+            {indeclinable
+              ? (entry as any).exampleSentenceCz && (
+                  <View style={styles.example}>
+                    <Text style={styles.exampleCz}>
+                      💬{" "}
+                      <Speakable
+                        id={`${entry.id}:example`}
+                        text={(entry as any).exampleSentenceCz}
+                        style={styles.exampleCz}
+                      />
+                    </Text>
+                    <Text style={styles.exampleUk}>{(entry as any).exampleSentenceUk}</Text>
                   </View>
-                );
-              })()}
+                )
+              : degree === "positive" &&
+                (() => {
+                  const ex = (entry as any).examples[gender];
+                  return (
+                    <View style={[styles.example, { borderLeftColor: theme.genderColor[gender] }]}>
+                      <Text style={styles.exampleCz}>
+                        💬{" "}
+                        <Speakable
+                          id={`${entry.id}:${gender}:example`}
+                          text={ex.cz}
+                          style={styles.exampleCz}
+                        />
+                      </Text>
+                      <Text style={styles.exampleUk}>{ex.uk}</Text>
+                    </View>
+                  );
+                })()}
+          </ShimmerOnMount>
         </ScrollView>
       )}
     </View>

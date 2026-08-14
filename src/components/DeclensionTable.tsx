@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { DeclensionTable as TableType, CASE_ORDER, CASE_LABELS } from "../types";
 import { theme } from "../utils/theme";
+import { Speakable } from "./Speakable";
 
 // Кожен відмінок — блок із ДВОМА рядками, що поділяють ту саму сітку колонок
 // 58%/42% (formCol/formColPl): заголовок (номер·назва·зразок | контрольне питання)
@@ -14,13 +15,18 @@ import { theme } from "../utils/theme";
 // присвійні/вказівні займенники). Особові займенники передають власні
 // columnLabels (короткий/довгий або без прийм./після прийм.), а my/vy —
 // singleColumn (одна форма на відмінок, права колонка не потрібна).
+//
+// speakId (опційно): якщо переданий, кожна форма стає озвучуваною (Speakable) з
+// id `${speakId}:{case}:sg|pl`. Дублети ("pánovi / pánu") озвучуються цілком —
+// Speakable сам прибирає "/" для TTS, показ лишається без змін.
 interface Props {
   table: TableType;
   columnLabels?: { sg: string; pl: string };
   singleColumn?: boolean;
+  speakId?: string;
 }
 
-export function DeclensionTable({ table, columnLabels, singleColumn = false }: Props) {
+export function DeclensionTable({ table, columnLabels, singleColumn = false, speakId }: Props) {
   const leftLabel = columnLabels?.sg ?? "однина";
   const rightLabel = columnLabels?.pl ?? "множина";
 
@@ -52,12 +58,20 @@ export function DeclensionTable({ table, columnLabels, singleColumn = false }: P
             <View style={styles.formsRow}>
               <View style={singleColumn ? styles.formColFull : styles.formCol}>
                 <Text style={styles.formLabel}>{leftLabel}</Text>
-                <Text style={[styles.formText, sg === "—" && styles.formEmpty]}>{sg}</Text>
+                {sg === "—" || !speakId ? (
+                  <Text style={[styles.formText, sg === "—" && styles.formEmpty]}>{sg}</Text>
+                ) : (
+                  <Speakable id={`${speakId}:${c}:sg`} text={sg} style={styles.formText} />
+                )}
               </View>
               {!singleColumn && (
                 <View style={styles.formColPl}>
                   <Text style={styles.formLabel}>{rightLabel}</Text>
-                  <Text style={[styles.formText, pl === "—" && styles.formEmpty]}>{pl}</Text>
+                  {pl === "—" || !speakId ? (
+                    <Text style={[styles.formText, pl === "—" && styles.formEmpty]}>{pl}</Text>
+                  ) : (
+                    <Speakable id={`${speakId}:${c}:pl`} text={pl} style={styles.formText} />
+                  )}
                 </View>
               )}
             </View>

@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { NounEntry } from "../types";
 import { theme, GENDER_LABEL } from "../utils/theme";
 import { DeclensionTable } from "./DeclensionTable";
-import { GenderIcon } from "./GenderIcon";
+import { Speakable } from "./Speakable";
+import { ShimmerOnMount } from "./ShimmerOnMount";
 
 interface Props {
   entry: NounEntry;
@@ -27,31 +28,36 @@ export function FlashCard({ entry, revealed, onReveal }: Props) {
           <Text style={styles.revealBtnText}>Показати відповідь 👀</Text>
         </Pressable>
       ) : (
-        <ScrollView
-          style={styles.answerScroll}
-          contentContainerStyle={{ paddingBottom: 8 }}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={[styles.answerHead, { borderColor: gColor }]}>
-            <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
-            <Text style={[styles.answerWord, { color: gColor }]}>{entry.cz}</Text>
-          </View>
-
-          <View style={styles.genderBadge}>
-            <GenderIcon gender={entry.gender} size={15} />
-            <Text style={[styles.genderBadgeText, { color: gColor }]}>
-              {GENDER_LABEL[entry.gender]}
-            </Text>
-          </View>
-
-          <DeclensionTable table={entry.declension} />
-
-          {entry.exampleSentenceCz && (
-            <View style={styles.example}>
-              <Text style={styles.exampleCz}>💬 {entry.exampleSentenceCz}</Text>
-              <Text style={styles.exampleUk}>{entry.exampleSentenceUk}</Text>
+        <ScrollView style={styles.answerScroll} contentContainerStyle={{ paddingBottom: 8 }}>
+          <ShimmerOnMount>
+            <View style={[styles.answerHead, { borderColor: gColor }]}>
+              <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
+              <Speakable
+                id={`${entry.id}:headline`}
+                text={entry.cz}
+                style={[styles.answerWord, { color: gColor }]}
+              />
+              <Text style={[styles.genderTag, { color: gColor }]}>
+                {GENDER_LABEL[entry.gender]}
+              </Text>
             </View>
-          )}
+
+            <DeclensionTable table={entry.declension} speakId={entry.id} />
+
+            {entry.exampleSentenceCz && (
+              <View style={styles.example}>
+                <Text style={styles.exampleCz}>
+                  💬{" "}
+                  <Speakable
+                    id={`${entry.id}:example`}
+                    text={entry.exampleSentenceCz}
+                    style={styles.exampleCz}
+                  />
+                </Text>
+                <Text style={styles.exampleUk}>{entry.exampleSentenceUk}</Text>
+              </View>
+            )}
+          </ShimmerOnMount>
         </ScrollView>
       )}
     </View>
@@ -83,19 +89,7 @@ const styles = StyleSheet.create({
   },
   answerLabel: { color: theme.colors.textDim, fontSize: 13 },
   answerWord: { fontSize: 28, fontWeight: "800", marginVertical: 2 },
-  genderBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "center",
-    gap: 6,
-    backgroundColor: theme.colors.bg, // темніше за картку — візуально відокремлює
-    borderRadius: 999,
-    paddingVertical: theme.space(1.5),
-    paddingHorizontal: theme.space(3.5),
-    marginBottom: theme.space(4),
-  },
-  genderBadgeText: { fontSize: 13, fontWeight: "700" },
+  genderTag: { fontSize: 13, fontWeight: "600" },
   example: {
     marginTop: theme.space(4),
     backgroundColor: theme.colors.bgElevated,

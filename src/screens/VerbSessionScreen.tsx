@@ -13,12 +13,14 @@ import {
   buildQueue,
   PROGRESS_KEYS,
 } from "../utils/progress";
+import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
 
 type Props = NativeStackScreenProps<RootStackParamList, "VerbSession">;
 
 export function VerbSessionScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { title, entryIds } = route.params;
+  useStopSpeechOnUnmount();
 
   const entries = useMemo(
     () => VERBS.filter((v) => entryIds.includes(v.id)),
@@ -71,6 +73,7 @@ export function VerbSessionScreen({ route, navigation }: Props) {
 
   async function answer(knewIt: boolean) {
     if (!current) return;
+    stopSpeech();
     const updated = {
       ...progress,
       [current.id]: updateCard(progress[current.id], current.id, knewIt),

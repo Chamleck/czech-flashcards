@@ -4,6 +4,8 @@ import { VerbEntry, VERB_ASPECT_LABEL } from "../types";
 import { theme } from "../utils/theme";
 import { VERB_CLASS_BY_KEY } from "../data/verbCategories";
 import { VerbConjugation } from "./VerbConjugation";
+import { Speakable } from "./Speakable";
+import { ShimmerOnMount } from "./ShimmerOnMount";
 
 interface Props {
   entry: VerbEntry;
@@ -34,22 +36,28 @@ export function VerbCard({ entry, revealed, onReveal }: Props) {
           contentContainerStyle={{ paddingBottom: 8 }}
           showsVerticalScrollIndicator={false}
         >
-          <View style={[styles.answerHead, { borderColor: accent }]}>
-            <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
-            <Text style={[styles.answerWord, { color: accent }]}>{infinitive}</Text>
-            <View style={styles.tags}>
-              <Text style={[styles.tag, { color: accent }]}>{classMeta.title}</Text>
-              <Text style={styles.tagDim}>· {VERB_ASPECT_LABEL[entry.aspect]}</Text>
+          <ShimmerOnMount>
+            <View style={[styles.answerHead, { borderColor: accent }]}>
+              <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
+              <Speakable
+                id={`${entry.id}:headline`}
+                text={infinitive}
+                style={[styles.answerWord, { color: accent }]}
+              />
+              <View style={styles.tags}>
+                <Text style={[styles.tag, { color: accent }]}>{classMeta.title}</Text>
+                <Text style={styles.tagDim}>· {VERB_ASPECT_LABEL[entry.aspect]}</Text>
+              </View>
             </View>
-          </View>
 
-          <VerbConjugation entry={entry} />
+            <VerbConjugation entry={entry} />
 
-          {entry.aspectPairNote && (
-            <View style={styles.pairNote}>
-              <Text style={styles.pairNoteText}>💡 {entry.aspectPairNote}</Text>
-            </View>
-          )}
+            {entry.aspectPairNote && (
+              <View style={styles.pairNote}>
+                <Text style={styles.pairNoteText}>💡 {entry.aspectPairNote}</Text>
+              </View>
+            )}
+          </ShimmerOnMount>
         </ScrollView>
       )}
     </View>

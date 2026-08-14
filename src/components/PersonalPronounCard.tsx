@@ -13,6 +13,8 @@ import { theme } from "../utils/theme";
 import { DeclensionTable } from "./DeclensionTable";
 import { GenderIcon } from "./GenderIcon";
 import { SegmentTabs } from "./SegmentTabs";
+import { Speakable } from "./Speakable";
+import { ShimmerOnMount } from "./ShimmerOnMount";
 
 interface Props {
   entry: PersonalPronounEntry;
@@ -41,6 +43,8 @@ export function PersonalPronounCard({ entry, revealed, onReveal }: Props) {
 
   const decl: PersonalDeclension = entry.gendered ? entry.declension[gender] : entry.declension;
   const example = entry.gendered ? entry.examples[gender] : { cz: entry.exampleCz, uk: entry.exampleUk };
+  const exampleId = entry.gendered ? `${entry.id}:${gender}:example` : `${entry.id}:example`;
+  const tableSpeakId = entry.gendered ? `${entry.id}:${gender}` : entry.id;
 
   return (
     <View style={styles.card}>
@@ -59,37 +63,50 @@ export function PersonalPronounCard({ entry, revealed, onReveal }: Props) {
           contentContainerStyle={{ paddingBottom: 8 }}
           showsVerticalScrollIndicator={false}
         >
-          <View style={[styles.answerHead, { borderColor: accent }]}>
-            <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
-            <Text style={[styles.answerWord, { color: accent }]}>{entry.cz}</Text>
-            <Text style={styles.patternText}>особовий займенник · нерегулярне відмінювання</Text>
-          </View>
-
-          {/* Таби роду — лише для 3-ї особи (on/ona/ono, oni/ony/ona) */}
-          {entry.gendered && (
-            <SegmentTabs
-              options={GENDER_ORDER}
-              active={gender}
-              onSelect={setGender}
-              colorFor={(g) => theme.genderColor[g]}
-              labelFor={(g) => GENDER_SHORT[g]}
-              iconFor={(g, on) => <GenderIcon gender={g} size={14} activeDark={on} />}
-            />
-          )}
-
-          <DeclensionTable table={toTable(decl)} columnLabels={columnLabels} singleColumn={singleColumn} />
-
-          {example && (
-            <View
-              style={[
-                styles.example,
-                { borderLeftColor: entry.gendered ? theme.genderColor[gender] : accent },
-              ]}
-            >
-              <Text style={styles.exampleCz}>💬 {example.cz}</Text>
-              <Text style={styles.exampleUk}>{example.uk}</Text>
+          <ShimmerOnMount>
+            <View style={[styles.answerHead, { borderColor: accent }]}>
+              <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
+              <Speakable
+                id={`${entry.id}:headline`}
+                text={entry.cz}
+                style={[styles.answerWord, { color: accent }]}
+              />
+              <Text style={styles.patternText}>особовий займенник · нерегулярне відмінювання</Text>
             </View>
-          )}
+
+            {/* Таби роду — лише для 3-ї особи (on/ona/ono, oni/ony/ona) */}
+            {entry.gendered && (
+              <SegmentTabs
+                options={GENDER_ORDER}
+                active={gender}
+                onSelect={setGender}
+                colorFor={(g) => theme.genderColor[g]}
+                labelFor={(g) => GENDER_SHORT[g]}
+                iconFor={(g, on) => <GenderIcon gender={g} size={14} activeDark={on} />}
+              />
+            )}
+
+            <DeclensionTable
+              table={toTable(decl)}
+              columnLabels={columnLabels}
+              singleColumn={singleColumn}
+              speakId={tableSpeakId}
+            />
+
+            {example && (
+              <View
+                style={[
+                  styles.example,
+                  { borderLeftColor: entry.gendered ? theme.genderColor[gender] : accent },
+                ]}
+              >
+                <Text style={styles.exampleCz}>
+                  💬 <Speakable id={exampleId} text={example.cz} style={styles.exampleCz} />
+                </Text>
+                <Text style={styles.exampleUk}>{example.uk}</Text>
+              </View>
+            )}
+          </ShimmerOnMount>
         </ScrollView>
       )}
     </View>

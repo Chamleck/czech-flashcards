@@ -16,12 +16,14 @@ import {
   buildQueue,
   PROGRESS_KEYS,
 } from "../utils/progress";
+import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
 
 type Props = NativeStackScreenProps<RootStackParamList, "DeclSession">;
 
 export function DeclSessionScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { title, kind, entryIds } = route.params;
+  useStopSpeechOnUnmount();
 
   const isPersonal = kind === "personal";
   const storageKey =
@@ -84,6 +86,7 @@ export function DeclSessionScreen({ route, navigation }: Props) {
 
   async function answer(knewIt: boolean) {
     if (!current) return;
+    stopSpeech();
     const updated = {
       ...progress,
       [current.id]: updateCard(progress[current.id], current.id, knewIt),

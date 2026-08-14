@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { VerbEntry, PERSON_ORDER, PERSON_LABELS } from "../types";
 import { theme } from "../utils/theme";
+import { Speakable } from "./Speakable";
 import {
   presentForm,
   futureForm,
@@ -14,14 +15,17 @@ import {
 type Mode = "present" | "past" | "future" | "imperative";
 
 // Таблиця з довільними підписами рядків (особа/підмет → форма).
+// speakIdBase: якщо переданий, кожна форма озвучувана з id `${speakIdBase}:{i}`.
 function FormTable({
   labels,
   forms,
   accent,
+  speakIdBase,
 }: {
   labels: { cz: string; uk: string }[];
   forms: { cz: string }[];
   accent: string;
+  speakIdBase?: string;
 }) {
   return (
     <View style={styles.table}>
@@ -31,7 +35,15 @@ function FormTable({
             <Text style={styles.personCz}>{lbl.cz}</Text>
             <Text style={styles.personUk}>{lbl.uk}</Text>
           </View>
-          <Text style={[styles.formText, { color: accent }]}>{forms[i].cz}</Text>
+          {speakIdBase && forms[i].cz ? (
+            <Speakable
+              id={`${speakIdBase}:${i}`}
+              text={forms[i].cz}
+              style={[styles.formText, { color: accent }]}
+            />
+          ) : (
+            <Text style={[styles.formText, { color: accent }]}>{forms[i].cz}</Text>
+          )}
         </View>
       ))}
     </View>
@@ -156,20 +168,28 @@ export function VerbConjugation({ entry }: { entry: VerbEntry }) {
 
       {/* Таблиця форм поточного режиму */}
       <View style={styles.section}>
-        <FormTable labels={rowLabels} forms={rows} accent={theme.colors.text} />
+        <FormTable
+          labels={rowLabels}
+          forms={rows}
+          accent={theme.colors.text}
+          speakIdBase={`${entry.id}:${mode}`}
+        />
 
         {/* Форми дієприкметника за родом — лише під табом "Минулий" */}
         {mode === "past" && (
           <View style={styles.participleBox}>
             <Text style={styles.participleLabel}>Дієприкметник за родом:</Text>
             <Text style={styles.participleForms}>
-              <Text style={styles.pMasc}>{pp.m}</Text> (чол.) ·{" "}
-              <Text style={styles.pFem}>{pp.f}</Text> (жін.) ·{" "}
-              <Text style={styles.pNeut}>{pp.n}</Text> (сер.)
+              <Speakable id={`${entry.id}:pp:m`} text={pp.m} style={styles.pMasc} /> (чол.) ·{" "}
+              <Speakable id={`${entry.id}:pp:f`} text={pp.f} style={styles.pFem} /> (жін.) ·{" "}
+              <Speakable id={`${entry.id}:pp:n`} text={pp.n} style={styles.pNeut} /> (сер.)
             </Text>
             <Text style={styles.participleForms}>
-              мн.: <Text style={styles.pMasc}>{pp.manim_pl}</Text> (чол. істот.) ·{" "}
-              <Text style={styles.pFem}>{pp.other_pl}</Text> (решта)
+              мн.:{" "}
+              <Speakable id={`${entry.id}:pp:manim_pl`} text={pp.manim_pl} style={styles.pMasc} />{" "}
+              (чол. істот.) ·{" "}
+              <Speakable id={`${entry.id}:pp:other_pl`} text={pp.other_pl} style={styles.pFem} />{" "}
+              (решта)
             </Text>
           </View>
         )}
@@ -178,7 +198,9 @@ export function VerbConjugation({ entry }: { entry: VerbEntry }) {
       {/* Приклад речення для поточного режиму */}
       {example && (
         <View style={[styles.example, { borderLeftColor: meta.color }]}>
-          <Text style={styles.exampleCz}>💬 {example.cz}</Text>
+          <Text style={styles.exampleCz}>
+            💬 <Speakable id={`${entry.id}:${mode}:example`} text={example.cz} style={styles.exampleCz} />
+          </Text>
           <Text style={styles.exampleUk}>{example.uk}</Text>
         </View>
       )}
