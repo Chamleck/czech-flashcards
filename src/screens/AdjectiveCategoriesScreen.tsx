@@ -77,7 +77,7 @@ export function AdjectiveCategoriesScreen({ navigation }: Props) {
 
       <Text style={styles.sectionLabel}>Категорії</Text>
 
-      {ADJ_CATEGORIES.map((c) => {
+      {ADJ_CATEGORIES.filter((c) => !c.hiddenFromPartOfSpeech).map((c) => {
         const count = countInCategory(c.key);
         const title = `${c.emoji} ${c.title}`;
         return (

@@ -15,7 +15,7 @@ import { plural } from "../utils/plural";
 type Props = NativeStackScreenProps<RootStackParamList, "WordsPartOfSpeech">;
 
 interface POSTile {
-  key: "nouns" | "verbs" | "adjectives" | "pronouns";
+  key: "nouns" | "verbs" | "adjectives" | "pronouns" | "numerals";
   emoji: string;
   title: string;
   subtitle: string;
@@ -23,11 +23,22 @@ interface POSTile {
   ready: boolean;
 }
 
+// Числівники винесено в окремий розділ. Порядкові живуть серед прикметників
+// (category "ordinal"), а sto/tisíc серед іменників (category "numbers"), обидві
+// приховані зі "своїх" розділів через hiddenFromPartOfSpeech. Тому лічильники в
+// плитках Іменники/Прикметники рахуємо БЕЗ прихованих категорій — щоб число
+// збігалося з тим, що учень реально бачить на екрані частини мови.
+const HIDDEN_NOUN_CATS = new Set(["numbers"]);
+const HIDDEN_ADJ_CATS = new Set(["ordinal"]);
+const VISIBLE_NOUNS = NOUNS.filter((n) => !HIDDEN_NOUN_CATS.has(n.category)).length;
+const VISIBLE_ADJS = ADJECTIVES.filter((a) => !HIDDEN_ADJ_CATS.has(a.category)).length;
+
 const TILES: POSTile[] = [
-  { key: "nouns", emoji: "🔤", title: "Іменники", subtitle: `${NOUNS.length} слів з відмінюванням`, color: theme.colors.honey, ready: true },
+  { key: "nouns", emoji: "🔤", title: "Іменники", subtitle: `${VISIBLE_NOUNS} слів з відмінюванням`, color: theme.colors.honey, ready: true },
   { key: "verbs", emoji: "🏃", title: "Дієслова", subtitle: `${VERBS.length} слів з дієвідміною`, color: theme.colors.mint, ready: true },
-  { key: "adjectives", emoji: "🎨", title: "Прикметники", subtitle: `${ADJECTIVES.length} слів з відмінюванням`, color: theme.colors.lilac, ready: true },
+  { key: "adjectives", emoji: "🎨", title: "Прикметники", subtitle: `${VISIBLE_ADJS} слів з відмінюванням`, color: theme.colors.lilac, ready: true },
   { key: "pronouns", emoji: "👉", title: "Займенники", subtitle: `${PRONOUNS.length} присвійних і вказівних`, color: theme.colors.coral, ready: true },
+  { key: "numerals", emoji: "🔢", title: "Числівники", subtitle: "порядкові, сотні, тисячі", color: "#e0a458", ready: true },
 ];
 
 export function WordsPartOfSpeechScreen({ navigation }: Props) {
@@ -71,6 +82,7 @@ export function WordsPartOfSpeechScreen({ navigation }: Props) {
     else if (key === "verbs") navigation.navigate("VerbCategories");
     else if (key === "adjectives") navigation.navigate("AdjectiveCategories");
     else if (key === "pronouns") navigation.navigate("PronounGroups");
+    else if (key === "numerals") navigation.navigate("Numerals");
   }
 
   function mistakesFor(key: POSTile["key"]): number {

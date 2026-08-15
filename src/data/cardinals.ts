@@ -1,0 +1,227 @@
+import { CardinalEntry } from "../types";
+
+// Кількісні числівники 1–12. Форми звірено з ÚJЧ / cesky-jazyk.cz /
+// montessorislanydoma / erikahanackova / umimecesky:
+//  • jeden — займенникове тверде відмінювання (як ten), лише однина;
+//  • dva/oba — «двоїнне» відмінювання (dvou, dvěma; форма dvěmi НЕ існує);
+//  • tři/čtyři — за зразком kost із винятками (Gsg tří/čtyř, Isg třemi/čtyřmi);
+//  • pět–dvanáct — лише дві форми: пряма (N/A) + спільна на -i (G/D/L/I).
+// Вокатив числівники не мають — його немає в NUMERAL_CASE_ORDER.
+// Дублети (tří / třech) зберігаються цілим рядком через " / " (як в іменниках).
+
+export const CARDINALS: CardinalEntry[] = [
+  // ─────────────── jeden (gendered, як ten) ───────────────
+  {
+    id: "card-jeden",
+    uk: "один",
+    cz: "jeden",
+    kind: "gendered",
+    declension: {
+      // pl дублює sg — множина до «один» не застосовна, поле лишається для типобезпеки.
+      masc_anim: {
+        nominativ: { sg: "jeden", pl: "jeden" },
+        genitiv: { sg: "jednoho", pl: "jednoho" },
+        dativ: { sg: "jednomu", pl: "jednomu" },
+        akuzativ: { sg: "jednoho", pl: "jednoho" },
+        vokativ: { sg: "—", pl: "—" },
+        lokal: { sg: "jednom", pl: "jednom" },
+        instrumental: { sg: "jedním", pl: "jedním" },
+      },
+      masc_inan: {
+        nominativ: { sg: "jeden", pl: "jeden" },
+        genitiv: { sg: "jednoho", pl: "jednoho" },
+        dativ: { sg: "jednomu", pl: "jednomu" },
+        akuzativ: { sg: "jeden", pl: "jeden" },
+        vokativ: { sg: "—", pl: "—" },
+        lokal: { sg: "jednom", pl: "jednom" },
+        instrumental: { sg: "jedním", pl: "jedním" },
+      },
+      fem: {
+        nominativ: { sg: "jedna", pl: "jedna" },
+        genitiv: { sg: "jedné", pl: "jedné" },
+        dativ: { sg: "jedné", pl: "jedné" },
+        akuzativ: { sg: "jednu", pl: "jednu" },
+        vokativ: { sg: "—", pl: "—" },
+        lokal: { sg: "jedné", pl: "jedné" },
+        instrumental: { sg: "jednou", pl: "jednou" },
+      },
+      neut: {
+        nominativ: { sg: "jedno", pl: "jedno" },
+        genitiv: { sg: "jednoho", pl: "jednoho" },
+        dativ: { sg: "jednomu", pl: "jednomu" },
+        akuzativ: { sg: "jedno", pl: "jedno" },
+        vokativ: { sg: "—", pl: "—" },
+        lokal: { sg: "jednom", pl: "jednom" },
+        instrumental: { sg: "jedním", pl: "jedním" },
+      },
+    },
+    examples: {
+      masc_anim: { cz: "Mám jednoho bratra.", uk: "У мене один брат." },
+      masc_inan: { cz: "Vidím jeden dům.", uk: "Я бачу один будинок." },
+      fem: { cz: "Mám jednu sestru.", uk: "У мене одна сестра." },
+      neut: { cz: "Máme jedno auto.", uk: "У нас одне авто." },
+    },
+  },
+
+  // ─────────────── dva / oba (twoForm) ───────────────
+  {
+    id: "card-dva",
+    uk: "два",
+    cz: "dva",
+    kind: "twoForm",
+    forms: {
+      nominativ: { masc: "dva", femNeut: "dvě" },
+      genitiv: { masc: "dvou", femNeut: "dvou" },
+      dativ: { masc: "dvěma", femNeut: "dvěma" },
+      akuzativ: { masc: "dva", femNeut: "dvě" },
+      vokativ: { masc: "—", femNeut: "—" },
+      lokal: { masc: "dvou", femNeut: "dvou" },
+      instrumental: { masc: "dvěma", femNeut: "dvěma" },
+    },
+    examples: {
+      masc_anim: { cz: "Vidím dva muže.", uk: "Я бачу двох чоловіків." },
+      masc_inan: { cz: "Mám dva stoly.", uk: "У мене два столи." },
+      fem: { cz: "Mám dvě sestry.", uk: "У мене дві сестри." },
+      neut: { cz: "Máme dvě auta.", uk: "У нас два авто." },
+    },
+  },
+  {
+    id: "card-oba",
+    uk: "обидва",
+    cz: "oba",
+    kind: "twoForm",
+    forms: {
+      nominativ: { masc: "oba", femNeut: "obě" },
+      genitiv: { masc: "obou", femNeut: "obou" },
+      dativ: { masc: "oběma", femNeut: "oběma" },
+      akuzativ: { masc: "oba", femNeut: "obě" },
+      vokativ: { masc: "—", femNeut: "—" },
+      lokal: { masc: "obou", femNeut: "obou" },
+      instrumental: { masc: "oběma", femNeut: "oběma" },
+    },
+    examples: {
+      masc_anim: { cz: "Znám oba bratry.", uk: "Я знаю обох братів." },
+      masc_inan: { cz: "Vidím oba domy.", uk: "Я бачу обидва будинки." },
+      fem: { cz: "Mám obě ruce plné.", uk: "У мене обидві руки зайняті." },
+      neut: { cz: "Obě auta jsou nová.", uk: "Обидва авто нові." },
+    },
+  },
+
+  // ─────────────── tři / čtyři (invariantDecl) ───────────────
+  {
+    id: "card-tri",
+    uk: "три",
+    cz: "tři",
+    kind: "invariantDecl",
+    forms: {
+      nominativ: "tři",
+      genitiv: "tří / třech",
+      dativ: "třem",
+      akuzativ: "tři",
+      vokativ: "—",
+      lokal: "třech",
+      instrumental: "třemi",
+    },
+    exampleCz: "Mám tři děti.",
+    exampleUk: "У мене троє дітей.",
+  },
+  {
+    id: "card-ctyri",
+    uk: "чотири",
+    cz: "čtyři",
+    kind: "invariantDecl",
+    forms: {
+      nominativ: "čtyři",
+      genitiv: "čtyř / čtyřech",
+      dativ: "čtyřem",
+      akuzativ: "čtyři",
+      vokativ: "—",
+      lokal: "čtyřech",
+      instrumental: "čtyřmi",
+    },
+    exampleCz: "Koupil jsem čtyři knihy.",
+    exampleUk: "Я купив чотири книжки.",
+  },
+
+  // ─────────────── pět–dvanáct (oblique) ───────────────
+  {
+    id: "card-pet",
+    uk: "п'ять",
+    cz: "pět",
+    kind: "oblique",
+    direct: "pět",
+    oblique: "pěti",
+    exampleCz: "Mám pět korun.",
+    exampleUk: "У мене п'ять крон.",
+  },
+  {
+    id: "card-sest",
+    uk: "шість",
+    cz: "šest",
+    kind: "oblique",
+    direct: "šest",
+    oblique: "šesti",
+    exampleCz: "Čekám šest minut.",
+    exampleUk: "Я чекаю шість хвилин.",
+  },
+  {
+    id: "card-sedm",
+    uk: "сім",
+    cz: "sedm",
+    kind: "oblique",
+    direct: "sedm",
+    oblique: "sedmi",
+    exampleCz: "Týden má sedm dní.",
+    exampleUk: "У тижні сім днів.",
+  },
+  {
+    id: "card-osm",
+    uk: "вісім",
+    cz: "osm",
+    kind: "oblique",
+    direct: "osm",
+    oblique: "osmi",
+    exampleCz: "Pracuji osm hodin.",
+    exampleUk: "Я працюю вісім годин.",
+  },
+  {
+    id: "card-devet",
+    uk: "дев'ять",
+    cz: "devět",
+    kind: "oblique",
+    direct: "devět",
+    oblique: "devíti",
+    exampleCz: "Je devět hodin.",
+    exampleUk: "Дев'ята година.",
+  },
+  {
+    id: "card-deset",
+    uk: "десять",
+    cz: "deset",
+    kind: "oblique",
+    direct: "deset",
+    oblique: "deseti / desíti",
+    exampleCz: "Mám deset prstů.",
+    exampleUk: "У мене десять пальців.",
+  },
+  {
+    id: "card-jedenact",
+    uk: "одинадцять",
+    cz: "jedenáct",
+    kind: "oblique",
+    direct: "jedenáct",
+    oblique: "jedenácti",
+    exampleCz: "Vlak jede v jedenáct.",
+    exampleUk: "Потяг їде об одинадцятій.",
+  },
+  {
+    id: "card-dvanact",
+    uk: "дванадцять",
+    cz: "dvanáct",
+    kind: "oblique",
+    direct: "dvanáct",
+    oblique: "dvanácti",
+    exampleCz: "Rok má dvanáct měsíců.",
+    exampleUk: "У році дванадцять місяців.",
+  },
+];

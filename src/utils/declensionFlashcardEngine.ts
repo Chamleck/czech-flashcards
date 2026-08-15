@@ -16,7 +16,13 @@ import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { NOUNS } from "../data/nouns";
+import { adjQuizUsable } from "../data/adjectiveCategories";
+import { nounUsableAsPartner } from "../data/categories";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
+
+// Пул прикметників, придатних як випадковий партнер/носій у чужому реченні
+// (без порядкових числівників — вони не мають з'являтись у квізі прикметників).
+const ADJECTIVE_PARTNER_POOL = ADJECTIVES.filter((a) => adjQuizUsable(a.category));
 
 // Питання квізу прикметників/займенників. Той самий контракт полів, що й у
 // іменників/дієслів (щоб екран працював без змін), + необов'язкове contextPhrase:
@@ -91,7 +97,9 @@ interface Tested {
 function buildTestedPool(): Tested[] {
   // Прикметники: звичайний ступінь + (для градуйованих) вищий і найвищий —
   // кожен окремим тестованим записом з унікальним id (окремий трекінг помилок).
-  const adj: Tested[] = ADJECTIVES.flatMap((a) => {
+  // Порядкові числівники (category "ordinal") виключено — вони тестуються лише
+  // у власному розділі "Числівники", не в загальному квізі прикметників.
+  const adj: Tested[] = ADJECTIVES.filter((a) => adjQuizUsable(a.category)).flatMap((a) => {
     const out: Tested[] = [
       { id: a.id, kind: "adjective", cz: a.cz, uk: a.uk, decl: a.declension },
     ];
@@ -152,8 +160,10 @@ function adjectivePartnerForm(
 
 // Іменник-якір для фрази: випадковий іменник потрібного роду з бази Фази 1.
 // Уся парадигма вже вивірена; беремо форму цієї ж клітинки (відмінок×число).
+// Виключаємо категорії, непридатні як носій (дні/місяці/сотні): "jeho ___ únoru"
+// граматично коректне, але семантично абсурдне.
 function nounCarrierForm(g: Gender, c: CzechCase, n: GrammaticalNumber): string {
-  const pool = NOUNS.filter((noun) => noun.gender === g);
+  const pool = NOUNS.filter((noun) => noun.gender === g && nounUsableAsPartner(noun.category));
   if (pool.length === 0) return "";
   const noun = pool[Math.floor(Math.random() * pool.length)];
   return firstForm(noun.declension[c][n]);
@@ -174,7 +184,7 @@ function buildContextPhrase(
     const p = PRONOUNS[Math.floor(Math.random() * PRONOUNS.length)];
     return `${pronounPartnerForm(p, g, c, n)} ___ ${noun}`;
   }
-  const a = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+  const a = ADJECTIVE_PARTNER_POOL[Math.floor(Math.random() * ADJECTIVE_PARTNER_POOL.length)];
   return `___ ${adjectivePartnerForm(a, g, c, n)} ${noun}`;
 }
 
@@ -370,8 +380,10 @@ function fillFrame(fr: Frame, ans: string, antecedent?: string): string {
 // (people/animals), щоб фрейми на кшталт «věřím mu» звучали природно.
 function buildAntecedent(g: Gender, n: GrammaticalNumber): string {
   // dítě нерегулярне у множині (děti — жіноче узгодження), тому не беремо його
-  // в антецедент множини, щоб «svá bílá děti» не траплялось.
-  const ok = (x: (typeof NOUNS)[number]) => x.gender === g && !(n === "pl" && x.cz === "dítě");
+  // в антецедент множини, щоб «svá bílá děti» не траплялось. Дні/місяці/сотні
+  // також виключаємо як носій (nounUsableAsPartner).
+  const ok = (x: (typeof NOUNS)[number]) =>
+    x.gender === g && nounUsableAsPartner(x.category) && !(n === "pl" && x.cz === "dítě");
   const animate = NOUNS.filter((x) => ok(x) && (x.category === "people" || x.category === "animals"));
   const genderPool = NOUNS.filter(ok);
   const pool = animate.length > 0 ? animate : genderPool;
@@ -379,7 +391,7 @@ function buildAntecedent(g: Gender, n: GrammaticalNumber): string {
   const noun = pool[Math.floor(Math.random() * pool.length)];
   const decl = PRONOUNS.filter((p) => p.declinable) as Extract<PronounEntry, { declinable: true }>[];
   const pr = decl[Math.floor(Math.random() * decl.length)];
-  const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+  const adj = ADJECTIVE_PARTNER_POOL[Math.floor(Math.random() * ADJECTIVE_PARTNER_POOL.length)];
   const prF = firstForm(pr.declension[g].akuzativ[n]);
   const adjF = firstForm(adj.declension[g].akuzativ[n]);
   const nounF = firstForm(noun.declension.akuzativ[n]);

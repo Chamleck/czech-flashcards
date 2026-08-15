@@ -2102,4 +2102,52 @@ export const NOUNS: NounEntry[] = [
     exampleSentenceCz: "V prosinci slavíme Vánoce.",
     exampleSentenceUk: "У грудні ми святкуємо Різдво.",
   },
+
+  // ═══════════════════ СОТНІ І ТИСЯЧІ ═══════════════════
+  // sto/tisíc — граматично ЗВИЧАЙНІ іменники (не окремий числівниковий тип):
+  // sto відмінюється як město (сер.), tisíc як stroj (чол. неіст.). Винятки в
+  // родовому множини звірено з ÚJЧ/umimecesky: sto → "set" (епентетичне -e-),
+  // tisíc → "tisíc" (нульове закінчення, не "tisíců"). У множниках (dvě stě /
+  // tři sta / pět set) — див. окрему тему в розділі Граматика.
+  {
+    id: "num-sto",
+    uk: "сто",
+    cz: "sto",
+    gender: "neut",
+    pattern: "mesto",
+    category: "numbers",
+    declension: {
+      // Родовий множини "set" — виняток (епентетичне -e-, як okno→oken).
+      nominativ: { sg: "sto", pl: "sta" },
+      genitiv: { sg: "sta", pl: "set" },
+      dativ: { sg: "stu", pl: "stům" },
+      akuzativ: { sg: "sto", pl: "sta" },
+      vokativ: { sg: "sto", pl: "sta" },
+      lokal: { sg: "stu", pl: "stech" },
+      instrumental: { sg: "stem", pl: "sty" },
+    },
+    exampleSentenceCz: "V knihovně je sto knih.",
+    exampleSentenceUk: "У бібліотеці сто книжок.",
+  },
+  {
+    id: "num-tisic",
+    uk: "тисяча",
+    cz: "tisíc",
+    gender: "masc_inan",
+    pattern: "stroj",
+    category: "numbers",
+    declension: {
+      // Родовий множини: "tisíc" (старобильна форма без закінчення) і новіша
+      // "tisíců" — обидві нормативні (звірено з ÚJЧ). Показуємо обидві.
+      nominativ: { sg: "tisíc", pl: "tisíce" },
+      genitiv: { sg: "tisíce", pl: "tisíc / tisíců" },
+      dativ: { sg: "tisíci", pl: "tisícům" },
+      akuzativ: { sg: "tisíc", pl: "tisíce" },
+      vokativ: { sg: "tisíci", pl: "tisíce" },
+      lokal: { sg: "tisíci", pl: "tisících" },
+      instrumental: { sg: "tisícem", pl: "tisíci" },
+    },
+    exampleSentenceCz: "Ve městě žije tisíc lidí.",
+    exampleSentenceUk: "У місті живе тисяча людей.",
+  },
 ];

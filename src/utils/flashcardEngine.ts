@@ -6,6 +6,7 @@ import {
   GrammaticalNumber,
 } from "../types";
 import { NOUNS } from "../data/nouns";
+import { nounQuizTestable } from "../data/categories";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
 
 export interface Question {
@@ -156,9 +157,13 @@ function enumerateCombos(pool: NounEntry[]): Combo[] {
 // Сесія: count питань. Вибір комбінацій (ваги помилок + зарезервовані слоти під
 // помилки + «не те саме слово поспіль») — спільний selectRoundCombos. Тип питання
 // (число/відмінок) чергується за позицією.
+// Пул за замовчуванням — усі іменники, КРІМ прихованих категорій (сотні/тисячі
+// живуть лише в розділі "Числівники", не тестуються у загальному квізі).
+const DEFAULT_NOUN_POOL = NOUNS.filter((n) => nounQuizTestable(n.category));
+
 export function generateSession(
   count: number,
-  pool: NounEntry[] = NOUNS,
+  pool: NounEntry[] = DEFAULT_NOUN_POOL,
   mistakes: MistakeStore = {}
 ): Question[] {
   const combos = enumerateCombos(pool);

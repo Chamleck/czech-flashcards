@@ -19,6 +19,7 @@ import { AdjectiveSelectionScreen } from "./src/screens/AdjectiveSelectionScreen
 import { PronounGroupsScreen } from "./src/screens/PronounGroupsScreen";
 import { PronounSelectionScreen } from "./src/screens/PronounSelectionScreen";
 import { PersonalPronounSelectionScreen } from "./src/screens/PersonalPronounSelectionScreen";
+import { NumeralsScreen } from "./src/screens/NumeralsScreen";
 import { DeclSessionScreen } from "./src/screens/DeclSessionScreen";
 import { BrowseListScreen } from "./src/screens/BrowseListScreen";
 import { BrowseCardScreen } from "./src/screens/BrowseCardScreen";
@@ -70,6 +71,7 @@ export default function App() {
           <Stack.Screen name="PronounGroups" component={PronounGroupsScreen} options={{ title: "Займенники" }} />
           <Stack.Screen name="PronounSelection" component={PronounSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="PersonalPronounSelection" component={PersonalPronounSelectionScreen} options={{ title: "Вибір слів" }} />
+          <Stack.Screen name="Numerals" component={NumeralsScreen} options={{ title: "Числівники" }} />
           <Stack.Screen name="DeclSession" component={DeclSessionScreen} options={{ title: "" }} />
           <Stack.Screen name="BrowseList" component={BrowseListScreen} options={{ title: "" }} />
           <Stack.Screen name="BrowseCard" component={BrowseCardScreen} options={{ title: "" }} />

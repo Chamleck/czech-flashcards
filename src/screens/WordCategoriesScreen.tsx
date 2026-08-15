@@ -81,7 +81,7 @@ export function WordCategoriesScreen({ navigation }: Props) {
 
       <Text style={styles.sectionLabel}>Категорії</Text>
 
-      {CATEGORIES.map((c) => {
+      {CATEGORIES.filter((c) => !c.hiddenFromPartOfSpeech).map((c) => {
         const count = countInCategory(c.key);
         const title = `${c.emoji} ${c.title}`;
         return (

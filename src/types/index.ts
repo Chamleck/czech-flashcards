@@ -70,7 +70,8 @@ export type WordCategory =
   | "nature"
   | "animals"
   | "days"
-  | "months";
+  | "months"
+  | "numbers";
 
 // Повна парадигма відмінювання: 7 відмінків x 2 числа
 export type DeclensionTable = Record<CzechCase, { sg: string; pl: string }>;
@@ -118,7 +119,7 @@ export const GENDER_SHORT: Record<Gender, string> = {
 // ── Прикметники ──
 export type AdjectivePattern = "tvrdy" | "mekky"; // mladý / jarní
 
-export type AdjectiveCategory = "size" | "quality" | "measure" | "colors" | "soft";
+export type AdjectiveCategory = "size" | "quality" | "measure" | "colors" | "soft" | "ordinal";
 
 export interface AdjectiveEntry {
   id: string;
@@ -213,6 +214,79 @@ export interface GenderedPersonalPronoun extends PersonalPronounBase {
 
 export type PersonalPronounEntry = PlainPersonalPronoun | GenderedPersonalPronoun;
 
+// ─────────────────── КІЛЬКІСНІ ЧИСЛІВНИКИ ───────────────────
+// Кількісні числівники НЕ вкладаються у FullDeclension: механіка різна для
+// кожної групи, тому чотири окремі "kind" в одному discriminated union
+// (за тим самим принципом, що PronounEntry). Вокатив числівники не мають —
+// у таблицях його не показуємо (нижче — власний порядок відмінків без нього).
+// Множина/однина тут не застосовна (число саме є кількістю), тому клітинки
+// зберігають ОДНУ форму на відмінок, не пару sg/pl.
+
+// Порядок відмінків для числівникових таблиць (без вокатива).
+export const NUMERAL_CASE_ORDER: CzechCase[] = [
+  "nominativ",
+  "genitiv",
+  "dativ",
+  "akuzativ",
+  "lokal",
+  "instrumental",
+];
+
+// 1) jeden — повна парадигма рід×відмінок (як ten). Лише однина.
+//    Використовує наявний FullDeclension, але значущі лише поля sg
+//    (pl не застосовне до "один"); заповнюємо sg=pl однаково для типобезпеки.
+export interface GenderedNumeral {
+  id: string;
+  uk: string;
+  cz: string;
+  kind: "gendered"; // jeden/jedna/jedno
+  declension: FullDeclension;
+  examples: GenderExamples;
+}
+
+// 2) dva — дві колонки за родом: masc vs fem/neut. Одна форма на відмінок.
+//    (oba/obě відмінюється ідентично — окремий запис із тією ж структурою.)
+export type NumeralTwoFormCol = "masc" | "femNeut";
+export interface TwoFormNumeral {
+  id: string;
+  uk: string;
+  cz: string;
+  kind: "twoForm"; // dva/dvě, oba/obě
+  // Кожен відмінок → { masc, femNeut }.
+  forms: Record<CzechCase, { masc: string; femNeut: string }>;
+  examples: GenderExamples; // приклад на кожен рід
+}
+
+// 3) tři, čtyři — без роду, одна колонка × відмінки (зразок kost із винятками).
+export interface InvariantDeclNumeral {
+  id: string;
+  uk: string;
+  cz: string;
+  kind: "invariantDecl"; // tři, čtyři
+  forms: Record<CzechCase, string>;
+  exampleCz: string;
+  exampleUk: string;
+}
+
+// 4) pět…dvanáct — лише дві форми: пряма (N/A) + спільна на решту відмінків (-i).
+export interface ObliqueNumeral {
+  id: string;
+  uk: string;
+  cz: string;
+  kind: "oblique"; // pět, šest…
+  direct: string; // N/A: pět
+  oblique: string; // G/D/L/I: pěti
+  exampleCz: string;
+  exampleUk: string;
+}
+
+export type CardinalEntry =
+  | GenderedNumeral
+  | TwoFormNumeral
+  | InvariantDeclNumeral
+  | ObliqueNumeral;
+
+
 // ─────────────────────────── ДІЄСЛОВА ───────────────────────────
 
 // Особи дієвідміни (однина 1/2/3 + множина 1/2/3)
@@ -295,7 +369,7 @@ export interface VerbEntry {
 
 // Параметри навігації (React Navigation, native stack)
 // Частина мови для режиму перегляду. Визначає джерело даних і компонент картки.
-export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "personal";
+export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "personal" | "cardinals";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -316,6 +390,8 @@ export type RootStackParamList = {
   PronounGroups: undefined;
   PronounSelection: undefined; // присвійні + вказівні
   PersonalPronounSelection: undefined; // особові
+  // Числівники (роутер: кількісні / порядкові / сотні-тисячі)
+  Numerals: undefined;
   // Спільна сесія прикметників/займенників (картка з табами роду).
   // kind "personal" → особові займенники (окрема картка PersonalPronounCard).
   DeclSession: { title: string; kind: "adjective" | "pronoun" | "personal"; entryIds: string[] };
