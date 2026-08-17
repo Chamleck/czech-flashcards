@@ -442,6 +442,7 @@ function enumeratePersonalCombos(): UnitCombo[] {
     units.push({
       id: c.id,
       wordId: c.wordId,
+      kind: "personal",
       make: () => {
         const distractor = shuffle(c.forms).find((f) => ppUsableDistractor(c.correct, avoidCollapsed, f));
         if (!distractor) return null;
@@ -588,6 +589,7 @@ function enumeratePersonalCombos(): UnitCombo[] {
 interface UnitCombo {
   id: string; // comboId (ваги)
   wordId: string; // «не те саме слово поспіль»
+  kind: "adjective" | "pronoun" | "personal"; // для балансу слотів за типом
   make: () => DeclQuestion | null;
 }
 
@@ -595,6 +597,7 @@ function adjPronUnits(pool: Tested[]): UnitCombo[] {
   return enumerateCombos(pool).map((c) => ({
     id: c.id,
     wordId: c.tested.id,
+    kind: c.tested.kind,
     make: () => makeQuestion(c),
   }));
 }
@@ -610,7 +613,16 @@ export function generateDeclensionSession(
   // Вибір (ваги + зарезервовані слоти помилок + «не те саме слово поспіль») —
   // спільний selectRoundCombos.
   const combos: UnitCombo[] = [...adjPronUnits(pool), ...enumeratePersonalCombos()];
-  const chosen = selectRoundCombos(combos, mistakes, count, (c) => c.wordId);
+  // Баланс за типом: гарантуємо ~5 з 12 слотів НЕ-прикметникам (звичайні +
+  // особові займенники), приблизно навпіл між ними. Прикметники (численний,
+  // відкритий клас) інакше витісняли б займенники (виміряно: 84%/15%/1.4%).
+  // Пріоритет віддачі зайвих слотів: personal → pronoun → загальний пул, тож
+  // якщо особових не вистачає, їхні слоти переходять звичайним займенникам,
+  // і лише потім прикметникам (крок 3 у selectRoundCombos).
+  const chosen = selectRoundCombos(combos, mistakes, count, (c) => c.wordId, undefined, {
+    kindOf: (c) => (c as UnitCombo).kind,
+    minSlots: { personal: 2, pronoun: 3 },
+  });
   const questions: DeclQuestion[] = [];
   for (const c of chosen) {
     const q = c.make();

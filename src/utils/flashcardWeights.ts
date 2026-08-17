@@ -122,12 +122,25 @@ function orderNoConsecutiveWord<C>(items: C[], wordIdOf: (c: C) => string): C[] 
   return out;
 }
 
+// Опційний баланс за типом (kind): гарантує мінімальну кількість слотів раунду
+// під «рідкісні» типи, щоб численніший тип (напр. прикметники) не витісняв їх.
+// Використовується ЛИШЕ adj-pron квізом; nouns/verbs передають undefined і
+// працюють як раніше (однорідний пул — балансувати нема що).
+export interface KindQuota<K extends string> {
+  kindOf: (c: { id: string }) => K;
+  // Мінімум слотів на кожен вказаний тип. Порядок ключів = пріоритет віддачі
+  // «зайвих» слотів: якщо типу не вистачає на його квоту, залишок переходить
+  // наступному в цьому списку, а вже потім — у загальний пул.
+  minSlots: Partial<Record<K, number>>;
+}
+
 export function selectRoundCombos<C extends { id: string }>(
   combos: C[],
   store: MistakeStore,
   roundSize: number,
   wordIdOf: (c: C) => string,
-  maxMistakeSlots: number = MAX_MISTAKE_SLOTS
+  maxMistakeSlots: number = MAX_MISTAKE_SLOTS,
+  kindQuota?: KindQuota<string>
 ): C[] {
   const usedIds = new Set<string>();
   const chosen: C[] = [];
@@ -142,7 +155,31 @@ export function selectRoundCombos<C extends { id: string }>(
     chosen.push(c);
   }
 
-  // 2. Решта раунду — звичайний зважений пул (помилки теж можуть випасти зверху).
+  // 2. Баланс за типом (якщо заданий): гарантуємо мінімум слотів під рідкісні
+  //    типи ДО заповнення загальним пулом. Уже вибрані помилки рахуються у квоту
+  //    свого типу. Якщо рідкісного типу не вистачає — незаповнені слоти просто
+  //    йдуть у загальний пул (крок 3), без хитрої передачі між типами.
+  if (kindQuota) {
+    const already: Record<string, number> = {};
+    for (const c of chosen) {
+      const k = kindQuota.kindOf(c);
+      already[k] = (already[k] ?? 0) + 1;
+    }
+    for (const kind of Object.keys(kindQuota.minSlots)) {
+      const want = kindQuota.minSlots[kind] ?? 0;
+      let need = Math.min(want - (already[kind] ?? 0), roundSize - chosen.length);
+      const kindPool = combos.filter((c) => kindQuota.kindOf(c) === kind);
+      while (need > 0) {
+        const c = pickWeighted(kindPool, usedIds, store);
+        if (!c) break;
+        usedIds.add(c.id);
+        chosen.push(c);
+        need--;
+      }
+    }
+  }
+
+  // 3. Решта раунду — звичайний зважений пул (помилки теж можуть випасти зверху).
   let guard = 0;
   while (chosen.length < roundSize && guard < roundSize * 40) {
     guard++;
@@ -152,6 +189,6 @@ export function selectRoundCombos<C extends { id: string }>(
     chosen.push(c);
   }
 
-  // 3. Впорядкування: не те саме слово поспіль, помилки розсіяні.
+  // 4. Впорядкування: не те саме слово поспіль, помилки розсіяні.
   return orderNoConsecutiveWord(chosen, wordIdOf);
 }
