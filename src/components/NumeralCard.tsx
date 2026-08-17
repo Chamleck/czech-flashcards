@@ -159,21 +159,28 @@ export function NumeralCard({ entry, revealed, onReveal }: Props) {
             </View>
           )}
 
-          {entry.kind === "oblique" && (
-            <View style={styles.obliqueBox}>
-              <View style={styles.obliqueRow}>
-                <Text style={styles.obliqueLabel}>Називний / Знахідний</Text>
-                <Speakable id={`${entry.id}:direct`} text={entry.direct} style={styles.obliqueForm} />
-              </View>
-              <View style={[styles.obliqueRow, styles.obliqueDivider]}>
-                <Text style={styles.obliqueLabel}>Решта відмінків (Р/Д/М/О)</Text>
-                <Speakable id={`${entry.id}:oblique`} text={entry.oblique} style={styles.obliqueForm} />
-              </View>
-              <Text style={styles.obliqueNote}>
-                Приклад: bez {entry.oblique} (Р), se {entry.oblique} (О).
-              </Text>
-            </View>
-          )}
+          {entry.kind === "oblique" &&
+            (() => {
+              // У ілюстративному прикладі беремо лише перший варіант дублета
+              // (deseti / desíti → "bez deseti"), щоб речення не виглядало як два
+              // слова. У самій формі вище дублет показано повністю.
+              const obliqueFirst = entry.oblique.split(" / ")[0];
+              return (
+                <View style={styles.obliqueBox}>
+                  <View style={styles.obliqueRow}>
+                    <Text style={styles.obliqueLabel}>Називний / Знахідний</Text>
+                    <Speakable id={`${entry.id}:direct`} text={entry.direct} style={styles.obliqueForm} />
+                  </View>
+                  <View style={[styles.obliqueRow, styles.obliqueDivider]}>
+                    <Text style={styles.obliqueLabel}>Решта відмінків (Р/Д/М/О)</Text>
+                    <Speakable id={`${entry.id}:oblique`} text={entry.oblique} style={styles.obliqueForm} />
+                  </View>
+                  <Text style={styles.obliqueNote}>
+                    Приклад: bez {obliqueFirst} (Р), se {obliqueFirst} (О).
+                  </Text>
+                </View>
+              );
+            })()}
 
           {/* Приклад(и) речення */}
           {(entry.kind === "gendered" || entry.kind === "twoForm") && (

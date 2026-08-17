@@ -11,6 +11,7 @@ import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { plural } from "../utils/plural";
+import { ALL_NUMERAL_IDS } from "../utils/numeralEntries";
 
 type Props = NativeStackScreenProps<RootStackParamList, "WordsPartOfSpeech">;
 
@@ -47,6 +48,7 @@ export function WordsPartOfSpeechScreen({ navigation }: Props) {
   const [verbMistakes, setVerbMistakes] = useState(0);
   const [adjMistakes, setAdjMistakes] = useState(0);
   const [pronMistakes, setPronMistakes] = useState(0);
+  const [numeralMistakes, setNumeralMistakes] = useState(0);
 
   // Рахуємо помилки по всіх колодах при кожному фокусі екрана.
   useFocusEffect(
@@ -57,8 +59,10 @@ export function WordsPartOfSpeechScreen({ navigation }: Props) {
         loadProgressFrom(PROGRESS_KEYS.verbs),
         loadProgressFrom(PROGRESS_KEYS.adjectives),
         loadProgressFrom(PROGRESS_KEYS.pronouns),
+        loadProgressFrom(PROGRESS_KEYS.numerals),
       ]).then(
-        ([np, vp, ap, pp]: [
+        ([np, vp, ap, pp, mp]: [
+          Record<string, CardProgress>,
           Record<string, CardProgress>,
           Record<string, CardProgress>,
           Record<string, CardProgress>,
@@ -69,6 +73,8 @@ export function WordsPartOfSpeechScreen({ navigation }: Props) {
           setVerbMistakes(getMistakeIds(vp).size);
           setAdjMistakes(getMistakeIds(ap).size);
           setPronMistakes(getMistakeIds(pp).size);
+          const numeralIds = [...getMistakeIds(mp)].filter((id) => ALL_NUMERAL_IDS.includes(id));
+          setNumeralMistakes(numeralIds.length);
         }
       );
       return () => {
@@ -90,6 +96,7 @@ export function WordsPartOfSpeechScreen({ navigation }: Props) {
     if (key === "verbs") return verbMistakes;
     if (key === "adjectives") return adjMistakes;
     if (key === "pronouns") return pronMistakes;
+    if (key === "numerals") return numeralMistakes;
     return 0;
   }
 

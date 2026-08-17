@@ -6,14 +6,17 @@ import { RootStackParamList, CardProgress, NounEntry } from "../types";
 import { theme } from "../utils/theme";
 import { FlashCard } from "../components/FlashCard";
 import { NOUNS } from "../data/nouns";
-import { loadProgress, saveProgress, updateCard, buildQueue } from "../utils/progress";
+import { loadProgressFrom, saveProgressTo, updateCard, buildQueue, PROGRESS_KEYS } from "../utils/progress";
 import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
 
 type Props = NativeStackScreenProps<RootStackParamList, "WordSession">;
 
 export function WordSessionScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const { title, entryIds } = route.params;
+  // storageKey опційний: за замовчуванням загальна колода іменників (як завжди
+  // було), але "Сотні і тисячі" передають PROGRESS_KEYS.numerals — окреме
+  // сховище розділу "Числівники", не змішується зі звичайними іменниками.
+  const { title, entryIds, storageKey = PROGRESS_KEYS.nouns } = route.params;
   useStopSpeechOnUnmount(); // не тягнемо звук за екран при виході
 
   // Обрані слова цієї сесії (у порядку, як у базі)
@@ -29,11 +32,11 @@ export function WordSessionScreen({ route, navigation }: Props) {
   const [stats, setStats] = useState({ done: 0, known: 0 });
 
   useEffect(() => {
-    loadProgress().then((p) => {
+    loadProgressFrom(storageKey).then((p) => {
       setProgress(p);
       setLoaded(true);
     });
-  }, []);
+  }, [storageKey]);
 
   const queue = useMemo<NounEntry[]>(
     () => (loaded ? buildQueue(entries, progress) : []),
@@ -74,7 +77,7 @@ export function WordSessionScreen({ route, navigation }: Props) {
       [current.id]: updateCard(progress[current.id], current.id, knewIt),
     };
     setProgress(updated);
-    await saveProgress(updated);
+    await saveProgressTo(storageKey, updated);
     setStats((s) => ({ done: s.done + 1, known: s.known + (knewIt ? 1 : 0) }));
     setRevealed(false);
     setIdx((i) => i + 1);

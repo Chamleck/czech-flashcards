@@ -378,7 +378,7 @@ export type RootStackParamList = {
   // Іменники
   WordCategories: undefined;
   WordSelection: { category: WordCategory };
-  WordSession: { title: string; entryIds: string[] };
+  WordSession: { title: string; entryIds: string[]; storageKey?: string };
   // Дієслова
   VerbCategories: undefined;
   VerbSelection: { verbClass: VerbClass };
@@ -394,7 +394,15 @@ export type RootStackParamList = {
   Numerals: undefined;
   // Спільна сесія прикметників/займенників (картка з табами роду).
   // kind "personal" → особові займенники (окрема картка PersonalPronounCard).
-  DeclSession: { title: string; kind: "adjective" | "pronoun" | "personal"; entryIds: string[] };
+  // kind "ordinal" → порядкові числівники: той самий рендер/датасет, що "adjective",
+  // але окреме сховище прогресу (PROGRESS_KEYS.numerals, не змішується зі звичайними
+  // прикметниками). kind "cardinal" → кількісні числівники (картка NumeralCard,
+  // датасет CARDINALS), теж пише в PROGRESS_KEYS.numerals.
+  DeclSession: {
+    title: string;
+    kind: "adjective" | "pronoun" | "personal" | "ordinal" | "cardinal" | "numeral-mixed";
+    entryIds: string[];
+  };
   // Режим ПЕРЕГЛЯДУ слів (не тренування): список без чекбоксів → картка з горизонтальним
   // свайпом між сусідніми словами. Спільний для всіх частин мови через BrowseKind:
   // kind визначає і джерело даних, і компонент картки (як у DeclSession за "kind").

@@ -6,9 +6,14 @@ import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { AdjPronounCard, DeclEntry } from "../components/AdjPronounCard";
 import { PersonalPronounCard } from "../components/PersonalPronounCard";
+import { NumeralCard } from "../components/NumeralCard";
+import { FlashCard } from "../components/FlashCard";
 import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
+import { CARDINALS } from "../data/cardinals";
+import { NOUNS } from "../data/nouns";
+import { resolveNumeral } from "../utils/numeralEntries";
 import {
   loadProgressFrom,
   saveProgressTo,
@@ -26,14 +31,31 @@ export function DeclSessionScreen({ route, navigation }: Props) {
   useStopSpeechOnUnmount();
 
   const isPersonal = kind === "personal";
+  const isCardinal = kind === "cardinal";
+  const isMixed = kind === "numeral-mixed";
+  // "ordinal"/"cardinal"/"numeral-mixed" пишуть в ОКРЕМЕ спільне сховище
+  // "Числівники" — не змішуються зі звичайними прикметниками/займенниками, навіть
+  // коли рендер/датасет перевикористовує ту саму структуру (ordinal = ADJECTIVES).
   const storageKey =
     kind === "adjective"
       ? PROGRESS_KEYS.adjectives
       : kind === "personal"
       ? PROGRESS_KEYS.personal
+      : kind === "ordinal" || kind === "cardinal" || kind === "numeral-mixed"
+      ? PROGRESS_KEYS.numerals
       : PROGRESS_KEYS.pronouns;
+  // Для "numeral-mixed" датасет — об'єднання всіх трьох джерел розділу; конкретна
+  // картка вибирається ПОКАРТКОВО за префіксом id (див. renderCard нижче).
   const dataset: { id: string }[] =
-    kind === "adjective" ? ADJECTIVES : kind === "personal" ? PERSONAL_PRONOUNS : PRONOUNS;
+    kind === "adjective" || kind === "ordinal"
+      ? ADJECTIVES
+      : kind === "personal"
+      ? PERSONAL_PRONOUNS
+      : kind === "cardinal"
+      ? CARDINALS
+      : isMixed
+      ? [...CARDINALS, ...ADJECTIVES, ...NOUNS]
+      : PRONOUNS;
 
   const entries = useMemo(
     () => dataset.filter((e) => entryIds.includes(e.id)),
@@ -125,23 +147,29 @@ export function DeclSessionScreen({ route, navigation }: Props) {
     );
   }
 
+  // Рендер картки поточного слова. Для звичайних режимів — за kind сесії;
+  // для "numeral-mixed" — покартково за префіксом id (той самий принцип
+  // диспетчеризації, що CardFor у BrowseCardScreen).
+  function renderCard() {
+    const p = { revealed, onReveal: () => setRevealed(true) };
+    if (isMixed) {
+      const r = resolveNumeral(current.id);
+      if (!r) return null;
+      if (r.cardType === "cardinal")
+        return <NumeralCard entry={r.entry as (typeof CARDINALS)[number]} {...p} />;
+      if (r.cardType === "hundreds")
+        return <FlashCard entry={r.entry as (typeof NOUNS)[number]} {...p} />;
+      return <AdjPronounCard entry={r.entry as DeclEntry} {...p} />;
+    }
+    if (isPersonal)
+      return <PersonalPronounCard entry={current as (typeof PERSONAL_PRONOUNS)[number]} {...p} />;
+    if (isCardinal) return <NumeralCard entry={current as (typeof CARDINALS)[number]} {...p} />;
+    return <AdjPronounCard entry={current as DeclEntry} {...p} />;
+  }
+
   return (
     <View style={styles.safe}>
-      <View style={styles.cardArea}>
-        {isPersonal ? (
-          <PersonalPronounCard
-            entry={current as (typeof PERSONAL_PRONOUNS)[number]}
-            revealed={revealed}
-            onReveal={() => setRevealed(true)}
-          />
-        ) : (
-          <AdjPronounCard
-            entry={current as DeclEntry}
-            revealed={revealed}
-            onReveal={() => setRevealed(true)}
-          />
-        )}
-      </View>
+      <View style={styles.cardArea}>{renderCard()}</View>
 
       {revealed && (
         <View style={[styles.actions, { paddingBottom: insets.bottom + theme.space(4) }]}>
