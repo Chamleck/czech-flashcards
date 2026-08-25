@@ -36,4 +36,12 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
     color: theme.colors.lilac,
     ready: true,
   },
+  {
+    id: "numerals",
+    emoji: "🔢",
+    title: "Числівники",
+    subtitle: "Узгодження з іменником (1, 2-4, 5+)",
+    color: theme.colors.honey,
+    ready: true,
+  },
 ];

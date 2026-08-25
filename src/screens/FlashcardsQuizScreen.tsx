@@ -8,6 +8,7 @@ import { theme } from "../utils/theme";
 import { generateSession, Question } from "../utils/flashcardEngine";
 import { generateVerbSession, VerbQuestion } from "../utils/verbFlashcardEngine";
 import { generateDeclensionSession, DeclQuestion } from "../utils/declensionFlashcardEngine";
+import { generateNumeralAgreementSession, AgreementQuestion } from "../utils/numeralAgreementEngine";
 import { loadFlashcardStats, saveFlashcardStats, mergeSession } from "../utils/flashcardStats";
 import { markRoundFinished } from "../utils/quizRoundFlag";
 import {
@@ -34,6 +35,7 @@ type QuizQuestion = Pick<
 function buildSession(categoryId: string, mistakes: MistakeStore): QuizQuestion[] {
   if (categoryId === "verbs") return generateVerbSession(SESSION_LEN, undefined, mistakes);
   if (categoryId === "adj-pron") return generateDeclensionSession(SESSION_LEN, undefined, mistakes);
+  if (categoryId === "numerals") return generateNumeralAgreementSession(SESSION_LEN, undefined, mistakes);
   return generateSession(SESSION_LEN, undefined, mistakes);
 }
 

@@ -86,6 +86,10 @@ export interface NounEntry {
   declension: DeclensionTable;
   exampleSentenceCz?: string;
   exampleSentenceUk?: string;
+  // true → незлічуване (maso, voda, rýže…): не годиться як лічений предмет у
+  // квизі узгодження числівників («osm mas» безглузде). Відмінюється й тестується
+  // як звичайний іменник, лише виключене з ролі лічильникового партнера.
+  uncountable?: boolean;
 }
 
 export interface CardProgress {

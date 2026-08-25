@@ -196,6 +196,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "food",
+    uncountable: true,
     declension: {
       nominativ: { sg: "káva", pl: "kávy" },
       genitiv: { sg: "kávy", pl: "káv" },
@@ -872,6 +873,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "food",
+    uncountable: true,
     declension: {
       nominativ: { sg: "maso", pl: "masa" },
       genitiv: { sg: "masa", pl: "mas" },
@@ -910,6 +912,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "food",
+    uncountable: true,
     declension: {
       nominativ: { sg: "máslo", pl: "másla" },
       genitiv: { sg: "másla", pl: "másel" },
@@ -929,6 +932,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "food",
+    uncountable: true,
     declension: {
       nominativ: { sg: "voda", pl: "vody" },
       genitiv: { sg: "vody", pl: "vod" },
@@ -1006,6 +1010,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "food",
+    uncountable: true,
     declension: {
       nominativ: { sg: "rýže", pl: "rýže" },
       genitiv: { sg: "rýže", pl: "rýží" },
