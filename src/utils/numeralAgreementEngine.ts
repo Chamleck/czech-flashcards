@@ -225,6 +225,86 @@ interface Combo {
   make: () => AgreementQuestion | null;
 }
 
+// ─────────────────── sto/tisíc/milion/miliarda як лічильне слово ───────────────────
+// Ці чотири — NounEntry (не CardinalEntry), але в ролі числівника. Правило
+// узгодження (звірено з Elon.io + акад. праця dspace.cuni.cz): іменник-предмет
+// ЗАВЖДИ в родовому множини (sto korun, tisíc korun, k tisíci korun, o milionu
+// lidí). Для tisíc/milion/miliarda це безвиняткове правило в усіх відмінках; для
+// sto існує варіативність у непрямих, але беремо єдиний найпоширеніший варіант
+// (родовий) — щоб у квизі була одна правильна відповідь.
+const HUNDRED_IDS = ["num-sto", "num-tisic", "num-milion", "num-miliarda"];
+const HUNDRED_NOUNS = NOUNS.filter((n) => HUNDRED_IDS.includes(n.id));
+
+function nounGenPlDistractor(entry: NounEntry, correct: string): string | null {
+  // Інша форма ТОГО Ж числа-слова (sto/tisíc…) в іншому відмінку.
+  const otherCases = shuffle(NUMERAL_CASE_ORDER.filter((cc) => cc !== "genitiv"));
+  for (const cc of otherCases) {
+    for (const n of ["sg", "pl"] as GrammaticalNumber[]) {
+      const f = firstForm(entry.declension[cc][n]);
+      if (isUsable(correct, f)) return f;
+    }
+  }
+  return null;
+}
+
+function buildHundredQuestion(hundred: NounEntry, phraseCase: CzechCase, partner: NounEntry): AgreementQuestion | null {
+  // Форма числа-слова (sto/tisíc…) — за його власною парадигмою у відмінку фрази,
+  // число: sg для "один" сенсу (sto/tisíc), але тут завжди однина самого слова.
+  const numCorrect = firstForm(hundred.declension[phraseCase].sg);
+  // Партнер завжди в родовому множини.
+  const nounCorrect = firstForm(partner.declension.genitiv.pl);
+  if (!numCorrect || numCorrect === "—" || !nounCorrect || nounCorrect === "—") return null;
+
+  const blank: "numeral" | "noun" = Math.random() < 0.5 ? "numeral" : "noun";
+  const correct = blank === "numeral" ? numCorrect : nounCorrect;
+  const distractor =
+    blank === "numeral"
+      ? nounGenPlDistractor(hundred, numCorrect)
+      : nounDistractor(partner, { c: "genitiv", n: "pl" }, nounCorrect);
+  if (!distractor) return null;
+
+  const frame = CASE_FRAME[phraseCase];
+  const shownNum = blank === "numeral" ? "___" : numCorrect;
+  const shownNoun = blank === "noun" ? "___" : nounCorrect;
+  let contextPhrase: string;
+  if (frame?.prep) {
+    const p = vocalize(frame.prep, numCorrect);
+    contextPhrase = `${p} ${shownNum} ${shownNoun}`;
+  } else if (frame?.pre) {
+    contextPhrase = `${frame.pre}${shownNum} ${shownNoun}`;
+  } else if (phraseCase === "akuzativ") {
+    contextPhrase = `Mám ${shownNum} ${shownNoun}`;
+  } else {
+    contextPhrase = `${shownNum} ${shownNoun}`;
+  }
+
+  const lbl = CASE_LABELS[phraseCase];
+  const genderUk: Record<Gender, string> = {
+    masc_anim: "чол. іст.",
+    masc_inan: "чол. неіст.",
+    fem: "жін.",
+    neut: "сер.",
+  };
+  const taskText =
+    blank === "numeral"
+      ? `Оберіть числівник: ${lbl.number} ${lbl.uk} (${lbl.cz}) — ${lbl.question}`
+      : `Оберіть іменник: ${genderUk[partner.gender]}, Родовий (Genitiv) — Koho? Čeho?, множина`;
+
+  const promptWord = blank === "numeral" ? hundred.cz : partner.cz;
+  const promptUk = blank === "numeral" ? hundred.uk : partner.uk;
+
+  return {
+    comboId: comboId(hundred.id, phraseCase, blank),
+    blank,
+    promptWord,
+    promptUk,
+    taskText,
+    contextPhrase,
+    correct,
+    options: shuffle([correct, distractor]),
+  };
+}
+
 function enumerateAgreementCombos(): Combo[] {
   const combos: Combo[] = [];
   for (const card of CARDINALS) {
@@ -235,6 +315,19 @@ function enumerateAgreementCombos(): Combo[] {
         make: () => {
           const noun = PARTNER_POOL[Math.floor(Math.random() * PARTNER_POOL.length)];
           return buildQuestion(card, c, noun);
+        },
+      });
+    }
+  }
+  // sto/tisíc/milion/miliarda — той самий механізм, окрема гілка побудови.
+  for (const hundred of HUNDRED_NOUNS) {
+    for (const c of NUMERAL_CASE_ORDER) {
+      combos.push({
+        id: comboId(hundred.id, c, "x"),
+        wordId: hundred.id,
+        make: () => {
+          const noun = PARTNER_POOL[Math.floor(Math.random() * PARTNER_POOL.length)];
+          return buildHundredQuestion(hundred, c, noun);
         },
       });
     }
