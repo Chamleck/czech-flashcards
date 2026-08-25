@@ -192,8 +192,8 @@ function buildQuestion(card: CardinalEntry, phraseCase: CzechCase, noun: NounEnt
   };
   const taskText =
     blank === "numeral"
-      ? `Оберіть числівник: ${lbl.uk} (${lbl.cz}) — ${lbl.question}`
-      : `Оберіть іменник: ${genderUk[noun.gender]}, ${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${
+      ? `Оберіть числівник: ${lbl.number} ${lbl.uk} (${lbl.cz}) — ${lbl.question}`
+      : `Оберіть іменник: ${genderUk[noun.gender]}, ${lbl.number} ${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${
           cell.n === "sg" ? "однина" : "множина"
         }`;
 
@@ -235,14 +235,18 @@ interface Combo {
 const HUNDRED_IDS = ["num-sto", "num-tisic", "num-milion", "num-miliarda"];
 const HUNDRED_NOUNS = NOUNS.filter((n) => HUNDRED_IDS.includes(n.id));
 
-function nounGenPlDistractor(entry: NounEntry, correct: string): string | null {
-  // Інша форма ТОГО Ж числа-слова (sto/tisíc…) в іншому відмінку.
-  const otherCases = shuffle(NUMERAL_CASE_ORDER.filter((cc) => cc !== "genitiv"));
+function nounGenPlDistractor(entry: NounEntry, correct: string, phraseCase: CzechCase): string | null {
+  // Інша форма ТОГО Ж числа-слова (sto/tisíc…) в ІНШОМУ відмінку, завжди в
+  // однині (бо correct теж завжди береться з .sg — див. buildHundredQuestion).
+  // Виключаємо і genitiv, і сам phraseCase: якщо не виключити phraseCase,
+  // цикл може дійти до pl-форми ТОГО Ж відмінка (напр. lokal.sg="tisíci" /
+  // lokal.pl="tisících") — а це вже не дистрактор, а другий граматично
+  // коректний варіант («o tisíci domů» і «o tisících domů» обидва правильні,
+  // партнер завжди в родовому множини незалежно від числа самого числівника).
+  const otherCases = shuffle(NUMERAL_CASE_ORDER.filter((cc) => cc !== "genitiv" && cc !== phraseCase));
   for (const cc of otherCases) {
-    for (const n of ["sg", "pl"] as GrammaticalNumber[]) {
-      const f = firstForm(entry.declension[cc][n]);
-      if (isUsable(correct, f)) return f;
-    }
+    const f = firstForm(entry.declension[cc].sg);
+    if (isUsable(correct, f)) return f;
   }
   return null;
 }
@@ -259,7 +263,7 @@ function buildHundredQuestion(hundred: NounEntry, phraseCase: CzechCase, partner
   const correct = blank === "numeral" ? numCorrect : nounCorrect;
   const distractor =
     blank === "numeral"
-      ? nounGenPlDistractor(hundred, numCorrect)
+      ? nounGenPlDistractor(hundred, numCorrect, phraseCase)
       : nounDistractor(partner, { c: "genitiv", n: "pl" }, nounCorrect);
   if (!distractor) return null;
 
@@ -287,7 +291,7 @@ function buildHundredQuestion(hundred: NounEntry, phraseCase: CzechCase, partner
   };
   const taskText =
     blank === "numeral"
-      ? `Оберіть числівник: ${lbl.uk} (${lbl.cz}) — ${lbl.question}`
+      ? `Оберіть числівник: ${lbl.number} ${lbl.uk} (${lbl.cz}) — ${lbl.question}`
       : `Оберіть іменник: ${genderUk[partner.gender]}, Родовий (Genitiv) — Koho? Čeho?, множина`;
 
   const promptWord = blank === "numeral" ? hundred.cz : partner.cz;
