@@ -29,6 +29,7 @@ export const CATEGORIES: CategoryMeta[] = [
   { key: "days", emoji: "📅", title: "Дні тижня", color: "#7fb8e0", unsuitableAsPartner: true },
   { key: "months", emoji: "🗓️", title: "Місяці", color: "#c98ed0", unsuitableAsPartner: true },
   { key: "numbers", emoji: "💯", title: "Сотні і тисячі", color: "#e0a458", hiddenFromPartOfSpeech: true },
+  { key: "time", emoji: "🕐", title: "Час (година/хвилина)", color: "#7fb8e0", hiddenFromPartOfSpeech: true },
 ];
 
 export const CATEGORY_BY_KEY: Record<WordCategory, CategoryMeta> = CATEGORIES.reduce(

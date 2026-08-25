@@ -44,4 +44,12 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
     color: theme.colors.honey,
     ready: true,
   },
+  {
+    id: "datetime",
+    emoji: "🕐",
+    title: "Час і дата",
+    subtitle: "Дати (родовий) та читання годин",
+    color: theme.colors.lilac,
+    ready: true,
+  },
 ];

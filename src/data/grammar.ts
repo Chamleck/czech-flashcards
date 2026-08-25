@@ -457,6 +457,91 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
     ],
   },
+  {
+    id: "date-time",
+    emoji: "🕐",
+    title: "Дати й час",
+    subtitle: "Число місяця та як казати години",
+    ready: true,
+    blocks: [
+      { type: "heading", text: "Як назвати дату" },
+      {
+        type: "paragraph",
+        text: "Дата в чеській — це порядковий числівник (день) + назва місяця, обидва в РОДОВОМУ відмінку, без прийменника. Формула: «pátého května» (п'ятого травня). Порядковий відповідає на питання kolikátého? (котрого?).",
+      },
+      {
+        type: "list",
+        items: [
+          { term: "1. května", note: "prvního května — першого травня" },
+          { term: "5. října", note: "pátého října — п'ятого жовтня" },
+          { term: "20. dubna", note: "dvacátého dubna — двадцятого квітня" },
+        ],
+      },
+      {
+        type: "tip",
+        text: "💡 Крапка після цифри в даті — це не крапка речення, а позначка порядкового числівника: «5. května» читається «pátého května», не «pět». Тому день завжди пишуть з крапкою.",
+      },
+      { type: "heading", text: "Складені числа 13–31" },
+      {
+        type: "paragraph",
+        text: "Для складених дат (21–29, 31) є два нормативні способи. Аналітичний — обидві частини порядкові й обидві відмінюються: «dvacátého pátého» (не можна відмінити лише першу половину!). Злитий (за німецькою моделлю) — одиниця приєднується до десятка: «pětadvacátého». Обидва правильні; аналітичний офіційніший.",
+      },
+      {
+        type: "list",
+        items: [
+          { term: "21.", note: "dvacátého prvního / jednadvacátého" },
+          { term: "24. prosince", note: "dvacátého čtvrtého / čtyřiadvacátého — Святвечір" },
+          { term: "25. května", note: "dvacátého pátého / pětadvacátého" },
+        ],
+      },
+      { type: "heading", text: "Родовий чи називний?" },
+      {
+        type: "paragraph",
+        text: "Зазвичай дата в родовому — бо відповідає на «коли?»: «Narodil jsem se pátého května» (я народився п'ятого травня). Але коли дата САМА є підметом (про що йдеться), вона в називному: «První leden je státní svátek» (Перше січня — державне свято).",
+      },
+      {
+        type: "tip",
+        text: "💡 Відчуй різницю: «prvního ledna se slaví Nový rok» (першого січня — коли, родовий) проти «první leden je svátek» (перше січня — сам предмет розмови, називний).",
+      },
+      {
+        type: "tip",
+        text: "💡 Коли місяць названий СЛОВОМ — обидва в родовому: «čtrnáctého února». Але якщо місяць позначений числом, усталена практика (ÚJЧ): день у родовому, а місяць-число в називному — «čtrnáctého druhý» — щоб уникнути плутанини двох однакових закінчень.",
+      },
+      { type: "heading", text: "Котра година: офіційно" },
+      {
+        type: "paragraph",
+        text: "У формальному контексті (розклади, радіо, вокзал) — 24-годинна система: просто «година хвилина» без слова hodina. «Je patnáct dvacet» (15:20). Ціла година: «Je patnáct hodin».",
+      },
+      { type: "heading", text: "Котра година: розмовно" },
+      {
+        type: "paragraph",
+        text: "У побуті все відлічується ВПЕРЕД, до наступної години (як українське «пів на другу»). Але чеська йде далі — так само працюють і чверті:",
+      },
+      {
+        type: "list",
+        items: [
+          { term: "čtvrt na + Zn.в.", note: "1:15 → čtvrt na dvě (чверть на другу) — кількісне у знахідному: na jednu, na dvě" },
+          { term: "půl + Р.в.", note: "1:30 → půl druhé (пів другої) — ПОРЯДКОВЕ у родовому жін.: druhé, třetí…" },
+          { term: "tři čtvrtě na + Zn.в.", note: "1:45 → tři čtvrtě na dvě (три чверті на другу)" },
+        ],
+      },
+      {
+        type: "tip",
+        text: "💡 Увага на два різні числівники: після čtvrt na / tři čtvrtě na йде КІЛЬКІСНЕ у знахідному (na jednu, na dvě), а після půl — ПОРЯДКОВЕ у родовому (druhé, třetí). І виняток: 12:30 = «půl jedné», не «půl první».",
+      },
+      {
+        type: "paragraph",
+        text: "Проміжні хвилини — через «za X minut <опорна точка>»: «za pět minut půl druhé» (за 5 хв пів другої, тобто 1:25), «za deset minut tři čtvrtě na dvě» (1:35).",
+      },
+      {
+        type: "list",
+        items: [
+          { term: "poledne / půlnoc", note: "v poledne (опівдні) — але o půlnoci (опівночі): різні прийменники" },
+          { term: "цілі 2-4", note: "«Jsou dvě hodiny», «Jsou tři hodiny» — дієслово в множині; для 1 і 5+ — «Je»" },
+        ],
+      },
+    ],
+  },
 ];
 
 export const GRAMMAR_BY_ID: Record<string, GrammarTopic> = GRAMMAR_TOPICS.reduce(

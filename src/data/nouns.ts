@@ -2195,4 +2195,47 @@ export const NOUNS: NounEntry[] = [
     exampleSentenceCz: "Na Zemi žije osm miliard lidí.",
     exampleSentenceUk: "На Землі живе вісім мільярдів людей.",
   },
+
+  // ─────────────── hodina / minuta (жін., зразок žena) ───────────────
+  // Категорія "time": відмінюються й доступні в перегляді, але приховані з
+  // плитки частини мови (hiddenFromPartOfSpeech на категорії) — вони службові
+  // для конструкцій часу, не самостійна тема словника.
+  {
+    id: "hodina",
+    uk: "година",
+    cz: "hodina",
+    gender: "fem",
+    pattern: "zena",
+    category: "time",
+    declension: {
+      nominativ: { sg: "hodina", pl: "hodiny" },
+      genitiv: { sg: "hodiny", pl: "hodin" },
+      dativ: { sg: "hodině", pl: "hodinám" },
+      akuzativ: { sg: "hodinu", pl: "hodiny" },
+      vokativ: { sg: "hodino", pl: "hodiny" },
+      lokal: { sg: "hodině", pl: "hodinách" },
+      instrumental: { sg: "hodinou", pl: "hodinami" },
+    },
+    exampleSentenceCz: "Sejdeme se za hodinu.",
+    exampleSentenceUk: "Зустрінемось за годину.",
+  },
+  {
+    id: "minuta",
+    uk: "хвилина",
+    cz: "minuta",
+    gender: "fem",
+    pattern: "zena",
+    category: "time",
+    declension: {
+      nominativ: { sg: "minuta", pl: "minuty" },
+      genitiv: { sg: "minuty", pl: "minut" },
+      dativ: { sg: "minutě", pl: "minutám" },
+      akuzativ: { sg: "minutu", pl: "minuty" },
+      vokativ: { sg: "minuto", pl: "minuty" },
+      lokal: { sg: "minutě", pl: "minutách" },
+      instrumental: { sg: "minutou", pl: "minutami" },
+    },
+    exampleSentenceCz: "Přijdu za pět minut.",
+    exampleSentenceUk: "Я прийду за п'ять хвилин.",
+  },
 ];

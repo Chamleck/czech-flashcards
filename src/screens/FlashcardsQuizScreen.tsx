@@ -9,6 +9,7 @@ import { generateSession, Question } from "../utils/flashcardEngine";
 import { generateVerbSession, VerbQuestion } from "../utils/verbFlashcardEngine";
 import { generateDeclensionSession, DeclQuestion } from "../utils/declensionFlashcardEngine";
 import { generateNumeralAgreementSession, AgreementQuestion } from "../utils/numeralAgreementEngine";
+import { generateDateTimeSession, DateTimeQuestion } from "../utils/datetimeEngine";
 import { loadFlashcardStats, saveFlashcardStats, mergeSession } from "../utils/flashcardStats";
 import { markRoundFinished } from "../utils/quizRoundFlag";
 import {
@@ -22,20 +23,24 @@ type Props = NativeStackScreenProps<RootStackParamList, "FlashcardsQuiz">;
 
 const SESSION_LEN = 12;
 
-// Обидва движки повертають питання зі спільним контрактом полів,
+// Всі движки повертають питання зі спільним контрактом полів,
 // які читає екран (promptWord/promptUk/taskText/correct/options/comboId).
-// contextPhrase — необов'язкове поле (лише квиз прикметників/займенників):
+// contextPhrase — необов'язкове поле (квиз прикметників/займенників/дат):
 // фраза з партнером і пропуском. Іменники/дієслова його не задають.
+// promptLabel — необов'язковий підпис над заголовком; якщо не заданий,
+// показуємо дефолт «слово 🇨🇿». Для дат/часу заголовок — не слово (це дата
+// або час цифрами), тому движок часу/дат передає власний підпис.
 type QuizQuestion = Pick<
   Question,
   "promptWord" | "promptUk" | "taskText" | "correct" | "options" | "comboId"
-> & { contextPhrase?: string };
+> & { contextPhrase?: string; promptLabel?: string };
 
 // Диспетчер: генерує сесію відповідно до категорії.
 function buildSession(categoryId: string, mistakes: MistakeStore): QuizQuestion[] {
   if (categoryId === "verbs") return generateVerbSession(SESSION_LEN, undefined, mistakes);
   if (categoryId === "adj-pron") return generateDeclensionSession(SESSION_LEN, undefined, mistakes);
   if (categoryId === "numerals") return generateNumeralAgreementSession(SESSION_LEN, undefined, mistakes);
+  if (categoryId === "datetime") return generateDateTimeSession(SESSION_LEN, undefined, mistakes);
   return generateSession(SESSION_LEN, undefined, mistakes);
 }
 
@@ -198,9 +203,9 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
       <View style={styles.top}>
         {stats.streak >= 2 && <Text style={styles.streak}>🔥 Серія: {stats.streak}</Text>}
         <View style={styles.promptCard}>
-          <Text style={styles.promptLabel}>слово 🇨🇿</Text>
+          <Text style={styles.promptLabel}>{current.promptLabel ?? "слово 🇨🇿"}</Text>
           <Text style={styles.promptWord}>{current.promptWord}</Text>
-          <Text style={styles.promptUk}>{current.promptUk}</Text>
+          {current.promptUk ? <Text style={styles.promptUk}>{current.promptUk}</Text> : null}
           {current.contextPhrase && (
             <View style={styles.phraseBox}>
               <Text style={styles.phraseText}>{current.contextPhrase}</Text>

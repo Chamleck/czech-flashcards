@@ -192,8 +192,8 @@ function buildQuestion(card: CardinalEntry, phraseCase: CzechCase, noun: NounEnt
   };
   const taskText =
     blank === "numeral"
-      ? `Оберіть числівник: ${lbl.number} ${lbl.uk} (${lbl.cz}) — ${lbl.question}`
-      : `Оберіть іменник: ${genderUk[noun.gender]}, ${lbl.number} ${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${
+      ? `Оберіть числівник: ${lbl.uk} (${lbl.cz}) — ${lbl.question}`
+      : `Оберіть іменник: ${genderUk[noun.gender]}, ${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${
           cell.n === "sg" ? "однина" : "множина"
         }`;
 
@@ -287,7 +287,7 @@ function buildHundredQuestion(hundred: NounEntry, phraseCase: CzechCase, partner
   };
   const taskText =
     blank === "numeral"
-      ? `Оберіть числівник: ${lbl.number} ${lbl.uk} (${lbl.cz}) — ${lbl.question}`
+      ? `Оберіть числівник: ${lbl.uk} (${lbl.cz}) — ${lbl.question}`
       : `Оберіть іменник: ${genderUk[partner.gender]}, Родовий (Genitiv) — Koho? Čeho?, множина`;
 
   const promptWord = blank === "numeral" ? hundred.cz : partner.cz;

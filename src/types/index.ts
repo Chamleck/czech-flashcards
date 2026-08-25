@@ -71,7 +71,8 @@ export type WordCategory =
   | "animals"
   | "days"
   | "months"
-  | "numbers";
+  | "numbers"
+  | "time";
 
 // Повна парадигма відмінювання: 7 відмінків x 2 числа
 export type DeclensionTable = Record<CzechCase, { sg: string; pl: string }>;
@@ -289,6 +290,26 @@ export type CardinalEntry =
   | TwoFormNumeral
   | InvariantDeclNumeral
   | ObliqueNumeral;
+
+
+// ─────────────────────────── ДАТИ Й ЧАС ───────────────────────────
+// Порядковий-день для дати: лише дві потрібні форми (не повна парадигма).
+// nom — «дата як підмет» (První leden je svátek); gen — «коли» (prvního ledna).
+// Дублети складених 21–31 («dvacátého pátého / pětadvacátého») — рядком через " / ".
+export interface DateOrdinal {
+  day: number; // 1..31
+  uk: string; // «двадцять п'ятий»
+  nom: string; // називний: «dvacátý pátý / pětadvacátý»
+  gen: string; // родовий (у даті): «dvacátého pátého / pětadvacátého»
+}
+
+// Назва місяця: називний + родовий (родовий — форма в даті).
+export interface MonthName {
+  num: number; // 1..12
+  uk: string;
+  nom: string; // «leden»
+  gen: string; // «ledna»
+}
 
 
 // ─────────────────────────── ДІЄСЛОВА ───────────────────────────
