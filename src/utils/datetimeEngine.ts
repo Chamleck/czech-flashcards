@@ -1,7 +1,7 @@
 import { DateOrdinal, MonthName, CASE_LABELS } from "../types";
 import { DATE_ORDINALS, MONTHS } from "../data/dates";
-import { formal24, colloquial12, TimePoint } from "../data/timeforms";
-import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
+import { formal24, colloquial12, dayPart, TimePoint } from "../data/timeforms";
+import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
 
 // ─────────────── Квіз «Час і дата» ───────────────
 // Дві підкатегорії в одному пулі (як розділ «Числівники» об'єднує різнотипні
@@ -33,6 +33,15 @@ function firstForm(s: string): string {
   return s.split(" / ")[0];
 }
 
+// На відміну від firstForm() — випадково обирає ОДИН із дублетних варіантів
+// (для складених дат: аналітичний "dvacátého pátého" АБО злитий "pětadvacátého").
+// Раніше квіз тестував лише перший (аналітичний), другий ніколи не з'являвся
+// як правильна відповідь — реальний баг, знайдений при перевірці покриття.
+function randomForm(s: string): string {
+  const forms = s.split(" / ");
+  return forms[Math.floor(Math.random() * forms.length)];
+}
+
 function collapseVowelLength(s: string): string {
   return s
     .replace(/á/g, "a")
@@ -57,10 +66,11 @@ function usable(correct: string, d: string | null | undefined): d is string {
 type DateMode = "gen" | "nom";
 
 function buildDateQuestion(d: DateOrdinal, month: MonthName, mode: DateMode): DateTimeQuestion | null {
-  const genForm = firstForm(d.gen);
-  const nomForm = firstForm(d.nom);
-  const correct = mode === "gen" ? genForm : nomForm;
-  const distractor = mode === "gen" ? nomForm : genForm;
+  // correct — випадковий дублет (аналітичний/злитий, коли є); distractor — канонічна
+  // форма ІНШОГО відмінка (не дублет, просто "неправильний відмінок", тому
+  // firstForm() тут ще доречний — варіативність потрібна лише для correct).
+  const correct = randomForm(mode === "gen" ? d.gen : d.nom);
+  const distractor = firstForm(mode === "gen" ? d.nom : d.gen);
   if (!usable(correct, distractor)) return null;
 
   const monthGen = firstForm(month.gen);
@@ -153,10 +163,44 @@ function buildTimeQuestion(tp: TimePoint, sys: TimeSystem): DateTimeQuestion | n
   };
 }
 
-// ─────────────── Пул комбінацій ───────────────
+// ─────────────── Підкатегорія «Частина доби» ───────────────
+// «Дано час → обери правильно уточнену фразу» (v půl druhé ODPOLEDNE, не RÁNO).
+// Дистрактор — та сама фраза з ІНШОЮ частиною доби (реальна помилка: плутати
+// ранок/день/вечір при уточненому розмовному часі). Використовуємо лише
+// "безпечні" години з середини кожного проміжку (див. dayPart() у timeforms.ts) —
+// не беремо години біля межі, де сама межа є предметом суперечки в джерелах.
+const DAYPART_SAFE_HOURS = [7, 8, 10, 11, 13, 14, 15, 16, 19, 20, 21, 23, 1, 2, 3];
+const DAYPART_ALL: string[] = ["ráno", "dopoledne", "odpoledne", "večer", "v noci"];
+
+function buildDayPartQuestion(tp: TimePoint): DateTimeQuestion | null {
+  const bare = readTime(tp, "colloquial");
+  if (!bare) return null;
+  const correctPart = dayPart(tp.h24);
+  const otherParts = DAYPART_ALL.filter((p) => p !== correctPart);
+  const wrongPart = otherParts[Math.floor(Math.random() * otherParts.length)];
+
+  const correct = `${bare} ${correctPart}`;
+  const distractor = `${bare} ${wrongPart}`;
+  if (!usable(correct, distractor)) return null;
+
+  return {
+    comboId: comboId(`time-daypart-${tp.h24}-${tp.m}`, "daypart", "x"),
+    promptWord: fmtDigital(tp),
+    promptUk: "",
+    promptLabel: "котра година? 🕐",
+    taskText: "Оберіть правильне читання — з уточненням частини доби",
+    correct,
+    options: shuffle([correct, distractor]),
+  };
+}
+
+
+type ComboKind = "date-gen" | "date-nom" | "time" | "daypart";
+
 interface Combo {
   id: string;
   wordId: string;
+  kind: ComboKind;
   make: () => DateTimeQuestion | null;
 }
 
@@ -181,16 +225,33 @@ const FORMAL_POINTS: TimePoint[] = (() => {
   return pts;
 })();
 
+// Точки для «частини доби» — лише безпечні години з середини кожного проміжку
+// (DAYPART_SAFE_HOURS вище) × ті самі розмовні хвилини.
+const DAYPART_POINTS: TimePoint[] = (() => {
+  const pts: TimePoint[] = [];
+  const mins = [0, 15, 30, 45];
+  for (const h of DAYPART_SAFE_HOURS) {
+    for (const m of mins) pts.push({ h24: h, m });
+  }
+  return pts;
+})();
+
 function enumerateCombos(): Combo[] {
   const combos: Combo[] = [];
 
-  // Дати: кожен день × режим (gen переважає, nom рідкісний). Місяць — випадковий
-  // при генерації (не впливає на ваги: вага рахується на день+режим).
+  // Дати. Обидва режими — gen («коли?», родовий) і nom (дата як підмет речення,
+  // «První leden je svátek») — доступні для КОЖНОГО з 31 дня: обмеження на
+  // кілька "репрезентативних" днів заважало б узагальненню правила (учень
+  // запам'ятав би конкретні приклади, а не саму закономірність "дата-підмет →
+  // називний"). Натомість рідкісність nom забезпечує kindQuota нижче (окремий,
+  // менший ліміт слотів на раунд для "date-nom" відносно "date-gen") — так
+  // зберігаються і повне охоплення днів, і низька частота.
   for (const d of DATE_ORDINALS) {
     for (const mode of ["gen", "nom"] as DateMode[]) {
       combos.push({
         id: comboId(`date-${d.day}`, mode, "x"),
         wordId: `date-${d.day}`,
+        kind: mode === "gen" ? "date-gen" : "date-nom",
         make: () => {
           const month = MONTHS[Math.floor(Math.random() * MONTHS.length)];
           return buildDateQuestion(d, month, mode);
@@ -204,6 +265,7 @@ function enumerateCombos(): Combo[] {
     combos.push({
       id: comboId(`time-colloquial-${tp.h24}-${tp.m}`, "colloquial", "x"),
       wordId: `time-colloquial-${tp.h24}-${tp.m}`,
+      kind: "time",
       make: () => buildTimeQuestion(tp, "colloquial"),
     });
   }
@@ -212,19 +274,56 @@ function enumerateCombos(): Combo[] {
     combos.push({
       id: comboId(`time-formal-${tp.h24}-${tp.m}`, "formal", "x"),
       wordId: `time-formal-${tp.h24}-${tp.m}`,
+      kind: "time",
       make: () => buildTimeQuestion(tp, "formal"),
+    });
+  }
+  // Час — з уточненням частини доби.
+  for (const tp of DAYPART_POINTS) {
+    combos.push({
+      id: comboId(`time-daypart-${tp.h24}-${tp.m}`, "daypart", "x"),
+      wordId: `time-daypart-${tp.h24}-${tp.m}`,
+      kind: "daypart",
+      make: () => buildDayPartQuestion(tp),
     });
   }
 
   return combos;
 }
 
+// Гарантована квота на раунд (12 карток): дати й уточнення частини доби —
+// значно менші пули за розмовний+формальний час разом, тому без квоти
+// пропорційний зважений вибір їх майже витісняє (реальний баг, знайдений на
+// тестуванні — «майже всі питання про час, дати рідко»). Той самий механізм,
+// що вже застосований для adj-pron квізу.
+//
+// "date-gen"/"date-nom" — окремі підтипи. Обидва мають ПОВНЕ охоплення (по 31
+// дню кожен) — так узагальнюється правило "дата-підмет → називний" на будь-який
+// день, а не завчання кількох "репрезентативних" прикладів. Але nom навмисно
+// БЕЗ гарантованого мінімуму слотів (на відміну від date-gen і daypart): якщо
+// дати квоту, він з'являвся б у 100% раундів, що суперечить самій ідеї
+// "рідкісний" (рідкісний = іноді є, іноді немає, а не "завжди присутній, просто
+// мало"). Без floor'а nom спирається лише на органічний зважений вибір із
+// загального пулу — виміряно: ~53% раундів мають хоч 1 nom-питання, ~16% усіх
+// дат — nom.
+const DATETIME_KIND_QUOTA: KindQuota<ComboKind> = {
+  kindOf: (c) => (c as Combo).kind,
+  minSlots: { "date-gen": 3, daypart: 3 },
+};
+
 export function generateDateTimeSession(
   count: number,
   pool: Combo[] = enumerateCombos(),
   mistakes: MistakeStore = {}
 ): DateTimeQuestion[] {
-  const chosen = selectRoundCombos(pool, mistakes, count, (c) => c.wordId);
+  const chosen = selectRoundCombos(
+    pool,
+    mistakes,
+    count,
+    (c) => c.wordId,
+    undefined,
+    DATETIME_KIND_QUOTA
+  );
   const questions: DateTimeQuestion[] = [];
   for (const c of chosen) {
     const q = c.make();

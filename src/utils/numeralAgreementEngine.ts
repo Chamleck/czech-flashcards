@@ -203,7 +203,11 @@ function buildQuestion(card: CardinalEntry, phraseCase: CzechCase, noun: NounEnt
   const promptUk = blank === "numeral" ? card.uk : noun.uk;
 
   return {
-    comboId: comboId(card.id, phraseCase, blank),
+    // Вага рахується на рівні числівник+відмінок, НЕЗАЛЕЖНО від випадкового
+    // blank (numeral/noun) — тому фіксуємо "x", щоб цей id збігався з id у пулі
+    // (enumerateAgreementCombos). Інакше mistake-стор пише один id, а
+    // selectRoundCombos шукає інший — і резервація помилок не спрацьовує.
+    comboId: comboId(card.id, phraseCase, "x"),
     blank,
     promptWord,
     promptUk,
@@ -298,7 +302,8 @@ function buildHundredQuestion(hundred: NounEntry, phraseCase: CzechCase, partner
   const promptUk = blank === "numeral" ? hundred.uk : partner.uk;
 
   return {
-    comboId: comboId(hundred.id, phraseCase, blank),
+    // Див. коментар у buildQuestion: фіксуємо "x", щоб id збігався з пулом.
+    comboId: comboId(hundred.id, phraseCase, "x"),
     blank,
     promptWord,
     promptUk,

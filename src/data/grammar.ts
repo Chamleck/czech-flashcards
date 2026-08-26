@@ -527,6 +527,23 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           { term: "цілі 2-4", note: "«Jsou dvě hodiny», «Jsou tři hodiny» — дієслово в множині; для 1 і 5+ — «Je»" },
         ],
       },
+      { type: "heading", text: "Уточнення: ранок, день чи вечір?" },
+      {
+        type: "paragraph",
+        text: "Розмовний час сам по собі не показує ранок це чи вечір (на відміну від 24-год формату). Якщо це не ясно з контексту, додають слово-уточнення ПІСЛЯ всієї фрази: ráno, dopoledne, odpoledne, večer, v noci.",
+      },
+      {
+        type: "list",
+        items: [
+          { term: "v půl druhé ráno", note: "пів другої РАНКУ (1:30)" },
+          { term: "v půl druhé odpoledne", note: "пів другої ДНЯ (13:30)" },
+          { term: "ve tři čtvrtě na sedm večer", note: "за чверть сьома ВЕЧОРА (18:45)" },
+        ],
+      },
+      {
+        type: "tip",
+        text: "💡 Межі цих слів у чеській дещо розмиті (навіть мовознавці це визнають) — приблизно: ráno 6–9, dopoledne 9–12, odpoledne 12–18, večer 18–22, v noci 22–6. Не намагайся визначити межу з точністю до хвилини — носії теж не завжди погоджуються.",
+      },
     ],
   },
   {
