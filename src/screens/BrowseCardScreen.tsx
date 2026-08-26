@@ -19,6 +19,7 @@ import { VerbCard } from "../components/VerbCard";
 import { AdjPronounCard } from "../components/AdjPronounCard";
 import { PersonalPronounCard } from "../components/PersonalPronounCard";
 import { NumeralCard } from "../components/NumeralCard";
+import { PrepositionCard } from "../components/PrepositionCard";
 import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
 
 type Props = NativeStackScreenProps<RootStackParamList, "BrowseCard">;
@@ -37,6 +38,8 @@ function CardFor({ kind, entry }: { kind: BrowseKind; entry: any }) {
       return <PersonalPronounCard entry={entry} {...p} />;
     case "cardinals":
       return <NumeralCard entry={entry} {...p} />;
+    case "prepositions":
+      return <PrepositionCard entry={entry} {...p} />;
     case "adjectives":
     case "pronouns":
     default:

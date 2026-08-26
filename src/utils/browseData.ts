@@ -5,6 +5,7 @@ import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { CARDINALS } from "../data/cardinals";
+import { PREPOSITIONS } from "../data/prepositions";
 
 // Мінімальний спільний тип запису для СПИСКУ перегляду (усі датасети його мають).
 export interface BrowseListItem {
@@ -27,6 +28,8 @@ export function browseSource(kind: BrowseKind): readonly { id: string; uk: strin
       return PERSONAL_PRONOUNS;
     case "cardinals":
       return CARDINALS;
+    case "prepositions":
+      return PREPOSITIONS;
     case "pronouns":
     default:
       return PRONOUNS;

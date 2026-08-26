@@ -542,6 +542,74 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
     ],
   },
+  {
+    id: "prepositions-fixed",
+    emoji: "🔗",
+    title: "Прийменники (фіксований відмінок)",
+    subtitle: "Який відмінок вимагає кожен прийменник",
+    ready: true,
+    blocks: [
+      { type: "heading", text: "Прийменник керує відмінком" },
+      {
+        type: "paragraph",
+        text: "Прийменник — незмінне слово, але він ВИМАГАЄ від наступного іменника певного відмінка. У чеській це жорстке правило: щоб правильно поставити слово після прийменника, треба знати, яким відмінком цей прийменник керує. Багато прийменників завжди керують одним і тим самим відмінком — їх і зібрано тут.",
+      },
+      { type: "heading", text: "Родовий (2. — Koho? Čeho?)" },
+      {
+        type: "list",
+        items: [
+          { term: "bez", note: "без — «káva bez cukru» (кава без цукру)" },
+          { term: "do", note: "до (всередину/до часу) — «jdu do školy»" },
+          { term: "od", note: "від — «dopis od kamaráda»" },
+          { term: "z / ze", note: "з (звідкись) — «vracím se z práce»" },
+          { term: "u", note: "біля / у когось — «bydlím u nádraží»" },
+          { term: "vedle", note: "поряд — «vedle okna»" },
+          { term: "kolem", note: "навколо / повз — «kolem domu»" },
+          { term: "kromě", note: "крім — «všichni kromě Petra»" },
+          { term: "místo", note: "замість — «místo tebe»" },
+          { term: "podle", note: "згідно з — «podle návodu»" },
+        ],
+      },
+      { type: "heading", text: "Давальний (3. — Komu? Čemu?)" },
+      {
+        type: "list",
+        items: [
+          { term: "k / ke", note: "до (у напрямку) — «jdu k lékaři»" },
+          { term: "kvůli", note: "через (причина) — «kvůli nemoci»" },
+          { term: "díky", note: "завдяки — «díky tobě»" },
+          { term: "proti", note: "проти / навпроти — «proti návrhu»" },
+        ],
+      },
+      { type: "heading", text: "Знахідний (4. — Koho? Co?)" },
+      {
+        type: "list",
+        items: [
+          { term: "pro", note: "для / за (піти по когось) — «pro tebe»" },
+          { term: "přes", note: "через (поперек) / понад — «přes most»" },
+          { term: "skrz", note: "крізь — «skrz dav»" },
+          { term: "mimo", note: "поза / окрім — «mimo město»" },
+        ],
+      },
+      { type: "heading", text: "Місцевий (6. — O kom? O čem?)" },
+      {
+        type: "list",
+        items: [{ term: "při", note: "при / під час — «při práci»" }],
+      },
+      { type: "heading", text: "Орудний (7. — Kým? Čím?)" },
+      {
+        type: "list",
+        items: [{ term: "s / se", note: "з (разом із) — «s kamarádem»" }],
+      },
+      {
+        type: "tip",
+        text: "💡 Вокалізація: короткі прийменники k/s/z/v отримують -e перед збігом приголосних або тим самим звуком: ke stolu, se sestrou, ze zahrady. Це для милозвучності — значення не змінюється.",
+      },
+      {
+        type: "tip",
+        text: "💡 Не плутай: деякі слова бувають і прийменником, і прислівником. «Stál vedle mě» (прийменник + іменник) проти «stál vedle» (прислівник, сам по собі). Прийменник завжди тягне за собою слово в потрібному відмінку.",
+      },
+    ],
+  },
 ];
 
 export const GRAMMAR_BY_ID: Record<string, GrammarTopic> = GRAMMAR_TOPICS.reduce(

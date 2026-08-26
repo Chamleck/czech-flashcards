@@ -311,6 +311,26 @@ export interface MonthName {
   gen: string; // «ledna»
 }
 
+// ─────────────────────────── ПРИЙМЕННИКИ ───────────────────────────
+// Прийменник — незмінна частина мови (немає власної парадигми), тому НЕ
+// натягуємо на DeclEntry/NounEntry: окрема легка структура за принципом
+// проєкту «моделюємо рівно те, що потрібно» (як CardinalEntry, DateOrdinal).
+// type: "fixed" — керує ОДНИМ відмінком завжди (ця фаза).
+//       "dual"  — керує ДВОМА відмінками (рух/спокій, наступна фаза). Поле
+//                 закладаємо заздалегідь, щоб не переробляти тип удруге.
+export type PrepositionType = "fixed" | "dual";
+
+export interface PrepositionEntry {
+  id: string;
+  cz: string; // канонічна форма: «od», «k», «s»
+  uk: string; // «від», «до», «з»
+  govCase: CzechCase; // відмінок, яким керує (для fixed — єдиний)
+  type: PrepositionType;
+  vocalized?: string; // «ke»/«se»/«ze»/«ve»/«ze» — варіант перед збігом приголосних
+  vocalNote?: string; // коли саме з'являється вокалізована форма (для картки)
+  examples: { cz: string; uk: string }[];
+}
+
 
 // ─────────────────────────── ДІЄСЛОВА ───────────────────────────
 
@@ -394,7 +414,7 @@ export interface VerbEntry {
 
 // Параметри навігації (React Navigation, native stack)
 // Частина мови для режиму перегляду. Визначає джерело даних і компонент картки.
-export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "personal" | "cardinals";
+export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "personal" | "cardinals" | "prepositions";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -417,6 +437,10 @@ export type RootStackParamList = {
   PersonalPronounSelection: undefined; // особові
   // Числівники (роутер: кількісні / порядкові / сотні-тисячі)
   Numerals: undefined;
+  // Прийменники (роутер: групи за відмінком) + власна self-report сесія
+  // (прийменник незмінний, тому не через WordSession/DeclSession).
+  Prepositions: undefined;
+  PrepositionSession: { title: string; entryIds: string[] };
   // Спільна сесія прикметників/займенників (картка з табами роду).
   // kind "personal" → особові займенники (окрема картка PersonalPronounCard).
   // kind "ordinal" → порядкові числівники: той самий рендер/датасет, що "adjective",
