@@ -3,11 +3,12 @@ import { Text, StyleSheet, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList, CardProgress } from "../types";
+import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
+import { ALL_PRONOUN_MIXED_IDS } from "../utils/pronounEntries";
 import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 
@@ -21,8 +22,19 @@ export function PronounGroupsScreen({ navigation }: Props) {
   useFocusEffect(
     useCallback(() => {
       let alive = true;
-      loadProgressFrom(PROGRESS_KEYS.pronouns).then((p: Record<string, CardProgress>) => {
-        if (alive) setMistakeIds(getMistakeIds(p));
+      // Помилки "Особові" (PROGRESS_KEYS.personal) і "Присвійні та вказівні"
+      // (PROGRESS_KEYS.pronouns) — два ОКРЕМІ сховища, тому лічильник і кнопка
+      // "Повторити помилки" на цьому спільному екрані мають об'єднувати обидва,
+      // інакше помилки з "Особові" ніколи не потраплять у список повторення
+      // (реальний баг, знайдений на тестуванні: позначив "не знаю" в Особові —
+      // не з'явилось у повторенні, бо рахувався лише PROGRESS_KEYS.pronouns).
+      Promise.all([
+        loadProgressFrom(PROGRESS_KEYS.pronouns),
+        loadProgressFrom(PROGRESS_KEYS.personal),
+      ]).then(([pr, pp]) => {
+        if (!alive) return;
+        const merged = new Set([...getMistakeIds(pr), ...getMistakeIds(pp)]);
+        setMistakeIds(new Set([...merged].filter((id) => ALL_PRONOUN_MIXED_IDS.includes(id))));
       });
       return () => {
         alive = false;
@@ -33,9 +45,9 @@ export function PronounGroupsScreen({ navigation }: Props) {
   const mistakeCount = mistakeIds.size;
 
   function startMistakes() {
-    const ids = PRONOUNS.filter((p) => mistakeIds.has(p.id)).map((p) => p.id);
+    const ids = ALL_PRONOUN_MIXED_IDS.filter((id) => mistakeIds.has(id));
     if (ids.length === 0) return;
-    navigation.navigate("DeclSession", { title: "Повторити помилки", kind: "pronoun", entryIds: ids });
+    navigation.navigate("DeclSession", { title: "Повторити помилки", kind: "pronoun-mixed", entryIds: ids });
   }
 
   // Тап по групі: тренування — сесія; перегляд — список слів групи.

@@ -7,6 +7,7 @@ import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { plural } from "../utils/plural";
+import { ALL_NUMERAL_IDS } from "../utils/numeralEntries";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -31,17 +32,49 @@ export function HomeScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [wordMistakes, setWordMistakes] = useState(0);
 
-  // Сумарні помилки по «Словах» (іменники + дієслова) для індикатора на плитці.
+  // Сумарні помилки по «Словах» — УСІ частини мови й підкатегорії, не лише
+  // іменники+дієслова (реальний баг, знайдений на тестуванні: лічильник тут
+  // лишився від найранішої фази, коли інших частин мови ще не було, і його
+  // забули розширити при додаванні прикметників/займенників/числівників/
+  // прийменників). Займенники — два сховища (personal+pronouns), числівники —
+  // одне спільне сховище, відфільтроване за ALL_NUMERAL_IDS (той самий принцип,
+  // що і в WordsPartOfSpeechScreen).
   useFocusEffect(
     useCallback(() => {
       let alive = true;
       Promise.all([
         loadProgressFrom(PROGRESS_KEYS.nouns),
         loadProgressFrom(PROGRESS_KEYS.verbs),
-      ]).then(([np, vp]: [Record<string, CardProgress>, Record<string, CardProgress>]) => {
-        if (!alive) return;
-        setWordMistakes(getMistakeIds(np).size + getMistakeIds(vp).size);
-      });
+        loadProgressFrom(PROGRESS_KEYS.adjectives),
+        loadProgressFrom(PROGRESS_KEYS.pronouns),
+        loadProgressFrom(PROGRESS_KEYS.personal),
+        loadProgressFrom(PROGRESS_KEYS.numerals),
+        loadProgressFrom(PROGRESS_KEYS.prepositions),
+      ]).then(
+        ([np, vp, ap, pp, perp, mp, prp]: [
+          Record<string, CardProgress>,
+          Record<string, CardProgress>,
+          Record<string, CardProgress>,
+          Record<string, CardProgress>,
+          Record<string, CardProgress>,
+          Record<string, CardProgress>,
+          Record<string, CardProgress>
+        ]) => {
+          if (!alive) return;
+          const numeralCount = [...getMistakeIds(mp)].filter((id) =>
+            ALL_NUMERAL_IDS.includes(id)
+          ).length;
+          setWordMistakes(
+            getMistakeIds(np).size +
+              getMistakeIds(vp).size +
+              getMistakeIds(ap).size +
+              getMistakeIds(pp).size +
+              getMistakeIds(perp).size +
+              numeralCount +
+              getMistakeIds(prp).size
+          );
+        }
+      );
       return () => {
         alive = false;
       };

@@ -42,6 +42,18 @@ const CASE_COLOR: Record<CzechCase, string> = {
   instrumental: "#e0a458",
 };
 
+// Іконка групи — номер відмінка (той самий "число." з CASE_LABELS), а не
+// довільна картинка: одразу видно, який відмінок, а не просто "щось спільне".
+const CASE_EMOJI: Record<CzechCase, string> = {
+  nominativ: "1️⃣",
+  genitiv: "2️⃣",
+  dativ: "3️⃣",
+  akuzativ: "4️⃣",
+  vokativ: "5️⃣",
+  lokal: "6️⃣",
+  instrumental: "7️⃣",
+};
+
 export function PrepositionsScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [mode, setMode] = useState<BrowseMode>("browse");
@@ -114,7 +126,7 @@ export function PrepositionsScreen({ navigation }: Props) {
             style={[styles.row, { borderLeftColor: color }]}
             onPress={() => openGroup(g)}
           >
-            <Text style={styles.emoji}>🔗</Text>
+            <Text style={styles.emoji}>{CASE_EMOJI[g.gCase]}</Text>
             <View style={{ flex: 1 }}>
               <Text style={styles.title}>
                 {lbl.uk} ({lbl.cz})

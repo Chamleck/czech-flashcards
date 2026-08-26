@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { View, Text, StyleSheet, Pressable, Animated } from "react-native";
+import { View, Text, StyleSheet, Pressable, Animated, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { playCorrect, playWrong } from "../utils/soundCache";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -200,60 +200,72 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
 
   return (
     <View style={styles.safe}>
-      <View style={styles.top}>
-        {stats.streak >= 2 && <Text style={styles.streak}>🔥 Серія: {stats.streak}</Text>}
-        <View style={styles.promptCard}>
-          <Text style={styles.promptLabel}>{current.promptLabel ?? "слово 🇨🇿"}</Text>
-          <Text style={styles.promptWord}>{current.promptWord}</Text>
-          {current.promptUk ? <Text style={styles.promptUk}>{current.promptUk}</Text> : null}
-          {current.contextPhrase && (
-            <View style={styles.phraseBox}>
-              <Text style={styles.phraseText}>{current.contextPhrase}</Text>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.top}>
+          {stats.streak >= 2 && <Text style={styles.streak}>🔥 Серія: {stats.streak}</Text>}
+          <View style={styles.promptCard}>
+            <Text style={styles.promptLabel}>{current.promptLabel ?? "слово 🇨🇿"}</Text>
+            <Text style={styles.promptWord}>{current.promptWord}</Text>
+            {current.promptUk ? <Text style={styles.promptUk}>{current.promptUk}</Text> : null}
+            {current.contextPhrase && (
+              <View style={styles.phraseBox}>
+                <Text style={styles.phraseText}>{current.contextPhrase}</Text>
+              </View>
+            )}
+            <View style={styles.taskBox}>
+              <Text style={styles.taskText}>{current.taskText}</Text>
             </View>
-          )}
-          <View style={styles.taskBox}>
-            <Text style={styles.taskText}>{current.taskText}</Text>
           </View>
         </View>
-      </View>
 
-      <Animated.View style={[styles.options, { transform: [{ translateX: shake }] }]}>
-        {current.options.map((opt, i) => {
-          const isCorrect = solved && opt === current.correct;
-          const isWrong = selectedWrong === i;
-          return (
-            <Pressable
-              key={i}
-              style={[
-                styles.optionCard,
-                isCorrect && styles.optionCorrect,
-                isWrong && styles.optionWrong,
-              ]}
-              onPress={() => onPick(opt, i)}
-              disabled={solved || isWrong}
-            >
-              <Text
+        <Animated.View style={[styles.options, { transform: [{ translateX: shake }] }]}>
+          {current.options.map((opt, i) => {
+            const isCorrect = solved && opt === current.correct;
+            const isWrong = selectedWrong === i;
+            // Довгі фрази (квіз "Час і дата" — цілі речення, не одне слово, як
+            // скрізь інде) — менший кегль, щоб перенос рядків не робив кнопку
+            // затісною. Коротких відповідей це не чіпає (поріг вище їхньої довжини).
+            const longText = opt.length > 24;
+            return (
+              <Pressable
+                key={i}
                 style={[
-                  styles.optionText,
-                  (isCorrect || isWrong) && styles.optionTextActive,
+                  styles.optionCard,
+                  isCorrect && styles.optionCorrect,
+                  isWrong && styles.optionWrong,
                 ]}
+                onPress={() => onPick(opt, i)}
+                disabled={solved || isWrong}
               >
-                {opt}
-              </Text>
-              {isCorrect && <Text style={styles.mark}>✓</Text>}
-              {isWrong && <Text style={styles.mark}>✕</Text>}
-            </Pressable>
-          );
-        })}
-      </Animated.View>
+                <Text
+                  style={[
+                    styles.optionText,
+                    longText && styles.optionTextLong,
+                    (isCorrect || isWrong) && styles.optionTextActive,
+                  ]}
+                >
+                  {opt}
+                </Text>
+                {isCorrect && <Text style={styles.mark}>✓</Text>}
+                {isWrong && <Text style={styles.mark}>✕</Text>}
+              </Pressable>
+            );
+          })}
+        </Animated.View>
 
-      <View style={{ height: insets.bottom + theme.space(3) }} />
+        <View style={{ height: insets.bottom + theme.space(3) }} />
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: theme.colors.bg, paddingHorizontal: theme.space(4) },
+  scrollContent: { flexGrow: 1, justifyContent: "center" },
   loading: { color: theme.colors.textDim, textAlign: "center", marginTop: 40 },
   counter: { color: theme.colors.textDim, fontSize: 15, fontWeight: "700" },
   top: { flex: 1, justifyContent: "center" },
@@ -300,13 +312,22 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     borderWidth: 2,
     borderColor: "transparent",
-    paddingVertical: theme.space(5),
+    paddingVertical: theme.space(4),
+    paddingHorizontal: theme.space(4),
   },
   optionCorrect: { borderColor: theme.colors.mint, backgroundColor: "rgba(78,205,196,0.15)" },
   optionWrong: { borderColor: theme.colors.coral, backgroundColor: "rgba(255,107,107,0.15)" },
-  optionText: { color: theme.colors.text, fontSize: 22, fontWeight: "700" },
+  optionText: {
+    color: theme.colors.text,
+    fontSize: 22,
+    fontWeight: "700",
+    flexShrink: 1,
+    flexWrap: "wrap",
+    textAlign: "center",
+  },
   optionTextActive: { fontWeight: "800" },
-  mark: { fontSize: 20, fontWeight: "900", color: theme.colors.text },
+  optionTextLong: { fontSize: 17, lineHeight: 22 },
+  mark: { fontSize: 20, fontWeight: "900", color: theme.colors.text, flexShrink: 0 },
   doneWrap: { flex: 1, justifyContent: "center", alignItems: "center", padding: theme.space(4) },
   doneEmoji: { fontSize: 64 },
   doneTitle: { color: theme.colors.text, fontSize: 24, fontWeight: "800", marginTop: 8 },

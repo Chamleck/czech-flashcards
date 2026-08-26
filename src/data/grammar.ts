@@ -344,19 +344,6 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
     ],
   },
   {
-    id: "prepositions",
-    emoji: "🔗",
-    title: "Прийменники",
-    subtitle: "Який відмінок вимагає кожен",
-    ready: false,
-    blocks: [
-      {
-        type: "paragraph",
-        text: "Розділ у розробці. Прийменники (v, na, do, k, s, o…) та відмінки, яких вони вимагають.",
-      },
-    ],
-  },
-  {
     id: "numbers-dates",
     emoji: "🔢",
     title: "Числівники й дати",
@@ -544,7 +531,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   },
   {
     id: "prepositions-fixed",
-    emoji: "🔗",
+    emoji: "🧭",
     title: "Прийменники (фіксований відмінок)",
     subtitle: "Який відмінок вимагає кожен прийменник",
     ready: true,

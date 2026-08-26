@@ -41,7 +41,7 @@ const TILES: POSTile[] = [
   { key: "adjectives", emoji: "🎨", title: "Прикметники", subtitle: `${VISIBLE_ADJS} слів з відмінюванням`, color: theme.colors.lilac, ready: true },
   { key: "pronouns", emoji: "👉", title: "Займенники", subtitle: `${PRONOUNS.length} присвійних і вказівних`, color: theme.colors.coral, ready: true },
   { key: "numerals", emoji: "🔢", title: "Числівники", subtitle: "порядкові, сотні, тисячі", color: "#e0a458", ready: true },
-  { key: "prepositions", emoji: "🔗", title: "Прийменники", subtitle: `${PREPOSITIONS.length} з фіксованим відмінком`, color: "#7fb8e0", ready: true },
+  { key: "prepositions", emoji: "🧭", title: "Прийменники", subtitle: `${PREPOSITIONS.length} з фіксованим відмінком`, color: "#7fb8e0", ready: true },
 ];
 
 export function WordsPartOfSpeechScreen({ navigation }: Props) {
@@ -62,10 +62,12 @@ export function WordsPartOfSpeechScreen({ navigation }: Props) {
         loadProgressFrom(PROGRESS_KEYS.verbs),
         loadProgressFrom(PROGRESS_KEYS.adjectives),
         loadProgressFrom(PROGRESS_KEYS.pronouns),
+        loadProgressFrom(PROGRESS_KEYS.personal),
         loadProgressFrom(PROGRESS_KEYS.numerals),
         loadProgressFrom(PROGRESS_KEYS.prepositions),
       ]).then(
-        ([np, vp, ap, pp, mp, prp]: [
+        ([np, vp, ap, pp, perp, mp, prp]: [
+          Record<string, CardProgress>,
           Record<string, CardProgress>,
           Record<string, CardProgress>,
           Record<string, CardProgress>,
@@ -77,7 +79,11 @@ export function WordsPartOfSpeechScreen({ navigation }: Props) {
           setNounMistakes(getMistakeIds(np).size);
           setVerbMistakes(getMistakeIds(vp).size);
           setAdjMistakes(getMistakeIds(ap).size);
-          setPronMistakes(getMistakeIds(pp).size);
+          // "Займенники" = дві групи, два сховища (personal + pronouns) —
+          // об'єднуємо, інакше помилки з "Особові" не потраплять у лічильник
+          // плитки на головному екрані (той самий баг, що в PronounGroupsScreen).
+          const pronMerged = new Set([...getMistakeIds(pp), ...getMistakeIds(perp)]);
+          setPronMistakes(pronMerged.size);
           const numeralIds = [...getMistakeIds(mp)].filter((id) => ALL_NUMERAL_IDS.includes(id));
           setNumeralMistakes(numeralIds.length);
           setPrepMistakes(getMistakeIds(prp).size);

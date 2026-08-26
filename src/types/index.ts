@@ -449,7 +449,7 @@ export type RootStackParamList = {
   // датасет CARDINALS), теж пише в PROGRESS_KEYS.numerals.
   DeclSession: {
     title: string;
-    kind: "adjective" | "pronoun" | "personal" | "ordinal" | "cardinal" | "numeral-mixed";
+    kind: "adjective" | "pronoun" | "personal" | "ordinal" | "cardinal" | "numeral-mixed" | "pronoun-mixed";
     entryIds: string[];
   };
   // Режим ПЕРЕГЛЯДУ слів (не тренування): список без чекбоксів → картка з горизонтальним
