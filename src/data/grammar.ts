@@ -614,6 +614,52 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
     ],
   },
+  {
+    id: "prepositions-dual",
+    emoji: "🧭",
+    title: "Прийменники руху й спокою",
+    subtitle: "Один прийменник — два відмінки (куди? / де?)",
+    ready: true,
+    blocks: [
+      { type: "heading", text: "Два відмінки — залежно від руху" },
+      {
+        type: "paragraph",
+        text: "Деякі прийменники керують РІЗНИМИ відмінками залежно від того, це рух чи спокій. Це те саме, що в німецькій (in, auf, unter…). Головне питання: якщо «kam?» (куди прямує дія) — знахідний (4.); якщо «kde?» (де щось перебуває) — місцевий (6.) або орудний (7.).",
+      },
+      {
+        type: "list",
+        items: [
+          { term: "куди? → знахідний", note: "Jdu na poštu. Dal boty pod postel. Schoval se za dveře." },
+          { term: "де? → місцевий / орудний", note: "Jsem na poště. Boty jsou pod postelí. Stojí za dveřmi." },
+        ],
+      },
+      { type: "heading", text: "Дві групи" },
+      {
+        type: "paragraph",
+        text: "Прийменники поділяються за тим, який відмінок беруть на «де?»:",
+      },
+      {
+        type: "list",
+        items: [
+          { term: "na, o, po, v", note: "куди → 4. (akuzativ), де → 6. (lokál): na stůl / na stole" },
+          { term: "nad, pod, před, za, mezi", note: "куди → 4. (akuzativ), де → 7. (instrumentál): pod stůl / pod stolem" },
+        ],
+      },
+      {
+        type: "tip",
+        text: "💡 Порівняй пару: «Kočka leze POD STŮL» (куди? — знахідний, рух) проти «Kočka spí POD STOLEM» (де? — орудний, спокій). Той самий прийменник pod, але різні відмінки.",
+      },
+      { type: "heading", text: "Особливий випадок: za" },
+      {
+        type: "paragraph",
+        text: "Прийменник «za» має, крім просторового, ще й значення обміну/ціни — і там він завжди знахідний (4.), незалежно від руху: «Zaplatil jsem za oběd» (я заплатив за обід), «Koupil to za sto korun» (купив за сто крон).",
+      },
+      {
+        type: "tip",
+        text: "💡 Вокалізація v → ve перед збігом приголосних: ve škole, ve třídě, ve městě — так само, як k→ke, s→se, z→ze.",
+      },
+    ],
+  },
 ];
 
 export const GRAMMAR_BY_ID: Record<string, GrammarTopic> = GRAMMAR_TOPICS.reduce(

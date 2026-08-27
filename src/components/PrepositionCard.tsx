@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
-import { PrepositionEntry, CASE_LABELS } from "../types";
+import { PrepositionEntry, PrepositionSense, CASE_LABELS } from "../types";
 import { theme } from "../utils/theme";
 import { Speakable } from "./Speakable";
+import { SegmentTabs } from "./SegmentTabs";
 
 interface Props {
   entry: PrepositionEntry;
@@ -10,9 +11,54 @@ interface Props {
   onReveal: () => void;
 }
 
+// Один приклад-рядок з озвученням. Speakable — СИБЛІНГ у View row (ніколи не
+// вкладений у <Text>), згідно з правилом проєкту про незалежну opacity.
+function ExampleRow({ id, cz, uk, accent }: { id: string; cz: string; uk: string; accent: string }) {
+  return (
+    <View style={[styles.example, { borderLeftColor: accent }]}>
+      <View style={styles.exampleRow}>
+        <Text style={styles.exampleCz}>💬 </Text>
+        <Speakable id={id} text={cz} style={styles.exampleCz} />
+      </View>
+      <Text style={styles.exampleUk}>{uk}</Text>
+    </View>
+  );
+}
+
+// Блок одного "сенсу" дуального прийменника: заголовок + відмінок + приклади.
+function SenseBlock({
+  idPrefix,
+  heading,
+  sense,
+  accent,
+}: {
+  idPrefix: string;
+  heading: string;
+  sense: PrepositionSense;
+  accent: string;
+}) {
+  const lbl = CASE_LABELS[sense.govCase];
+  return (
+    <View style={styles.senseBlock}>
+      <Text style={[styles.senseHeading, { color: accent }]}>{heading}</Text>
+      <Text style={styles.senseCase}>
+        {lbl.uk} ({lbl.cz}) — {lbl.question}
+      </Text>
+      {sense.examples.map((ex, i) => (
+        <ExampleRow key={i} id={`${idPrefix}:ex${i}`} cz={ex.cz} uk={ex.uk} accent={accent} />
+      ))}
+    </View>
+  );
+}
+
+// Вкладки для «za»: просторове значення (рух/спокій) vs обмін/ціна — різні сенси.
+type ZaTab = "space" | "exchange";
+
 export function PrepositionCard({ entry, revealed, onReveal }: Props) {
   const accent = theme.colors.mint;
-  const caseLbl = CASE_LABELS[entry.govCase];
+  const isDual = entry.type === "dual" && !!entry.dual;
+  const hasExchange = isDual && !!entry.dual?.exchange;
+  const [zaTab, setZaTab] = useState<ZaTab>("space");
 
   return (
     <View style={styles.card}>
@@ -41,31 +87,74 @@ export function PrepositionCard({ entry, revealed, onReveal }: Props) {
             )}
           </View>
 
-          {/* Відмінок, яким керує прийменник */}
-          <View style={styles.caseBox}>
-            <Text style={styles.caseBoxLabel}>керує відмінком</Text>
-            <Text style={styles.caseBoxCase}>
-              {caseLbl.uk} ({caseLbl.cz})
-            </Text>
-            <Text style={styles.caseBoxQ}>{caseLbl.question}</Text>
-          </View>
-
           {entry.vocalNote && (
             <View style={styles.noteBox}>
               <Text style={styles.noteText}>💡 {entry.vocalNote}</Text>
             </View>
           )}
 
-          {/* Приклади */}
-          {entry.examples.map((ex, i) => (
-            <View key={i} style={[styles.example, { borderLeftColor: accent }]}>
-              <View style={styles.exampleRow}>
-                <Text style={styles.exampleCz}>💬 </Text>
-                <Speakable id={`${entry.id}:ex${i}`} text={ex.cz} style={styles.exampleCz} />
+          {!isDual ? (
+            <>
+              <View style={styles.caseBox}>
+                <Text style={styles.caseBoxLabel}>керує відмінком</Text>
+                <Text style={styles.caseBoxCase}>
+                  {CASE_LABELS[entry.govCase].uk} ({CASE_LABELS[entry.govCase].cz})
+                </Text>
+                <Text style={styles.caseBoxQ}>{CASE_LABELS[entry.govCase].question}</Text>
               </View>
-              <Text style={styles.exampleUk}>{ex.uk}</Text>
-            </View>
-          ))}
+              {entry.examples.map((ex, i) => (
+                <ExampleRow key={i} id={`${entry.id}:ex${i}`} cz={ex.cz} uk={ex.uk} accent={accent} />
+              ))}
+            </>
+          ) : (
+            <>
+              <View style={styles.dualHint}>
+                <Text style={styles.dualHintText}>
+                  Керує ДВОМА відмінками — залежно від того, рух це чи спокій.
+                </Text>
+              </View>
+
+              {hasExchange && (
+                <SegmentTabs<ZaTab>
+                  options={["space", "exchange"] as const}
+                  active={zaTab}
+                  onSelect={setZaTab}
+                  colorFor={() => accent}
+                  labelFor={(v) => (v === "space" ? "простір" : "обмін / ціна")}
+                  iconFor={(v) => <Text style={styles.tabIcon}>{v === "space" ? "📍" : "💰"}</Text>}
+                  minWidth={120}
+                  flexBasis="46%"
+                  style={{ marginBottom: theme.space(3) }}
+                />
+              )}
+
+              {(!hasExchange || zaTab === "space") && (
+                <>
+                  <SenseBlock
+                    idPrefix={`${entry.id}:motion`}
+                    heading="куди? (рух) →"
+                    sense={entry.dual!.motion}
+                    accent={accent}
+                  />
+                  <SenseBlock
+                    idPrefix={`${entry.id}:location`}
+                    heading="де? (спокій) •"
+                    sense={entry.dual!.location}
+                    accent={theme.colors.lilac}
+                  />
+                </>
+              )}
+
+              {hasExchange && zaTab === "exchange" && (
+                <SenseBlock
+                  idPrefix={`${entry.id}:exchange`}
+                  heading="обмін / ціна"
+                  sense={entry.dual!.exchange!}
+                  accent={theme.colors.honey}
+                />
+              )}
+            </>
+          )}
         </ScrollView>
       )}
     </View>
@@ -114,6 +203,19 @@ const styles = StyleSheet.create({
     marginBottom: theme.space(3),
   },
   noteText: { color: theme.colors.text, fontSize: 13, lineHeight: 19 },
+  dualHint: {
+    backgroundColor: theme.colors.bgElevated,
+    borderRadius: theme.radius.md,
+    padding: theme.space(3),
+    marginBottom: theme.space(3),
+  },
+  dualHintText: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19 },
+  senseBlock: {
+    marginBottom: theme.space(4),
+  },
+  senseHeading: { fontSize: 16, fontWeight: "800", marginBottom: 2 },
+  senseCase: { color: theme.colors.textFaint, fontSize: 13, marginBottom: theme.space(2) },
+  tabIcon: { fontSize: 15, marginRight: 4 },
   example: {
     marginTop: theme.space(2),
     marginBottom: theme.space(1),

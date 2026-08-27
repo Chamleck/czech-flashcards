@@ -12,14 +12,14 @@ import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progres
 
 type Props = NativeStackScreenProps<RootStackParamList, "Prepositions">;
 
-// Розділ "Прийменники". Ця фаза — лише фіксовані (керують одним відмінком),
-// згруповані за відмінком. Дуальні (na/v/pod/nad/před/za/mezi) додамо наступною
-// фазою окремою групою. Прогрес усіх прийменників — одне спільне сховище
-// PROGRESS_KEYS.prepositions (як "Числівники" мають один store на розділ).
+// Розділ "Прийменники". Дві структурно різні групи слів під одним розділом
+// (як "Числівники" об'єднують 3 типи): ФІКСОВАНІ (керують одним відмінком,
+// згруповані за відмінком) і ДУАЛЬНІ (керують двома — рух/спокій, окрема група).
+// Прогрес усіх — одне спільне сховище PROGRESS_KEYS.prepositions.
 
 const ALL_PREP_IDS = PREPOSITIONS.map((p) => p.id);
 
-// Порядок груп за відмінком (fixed-прийменники цієї фази покривають 5 відмінків).
+// Фіксовані — групуємо за відмінком (кожен має рівно один govCase).
 const GROUP_CASES: CzechCase[] = ["genitiv", "dativ", "akuzativ", "lokal", "instrumental"];
 
 interface Group {
@@ -29,8 +29,11 @@ interface Group {
 
 const GROUPS: Group[] = GROUP_CASES.map((c) => ({
   gCase: c,
-  ids: PREPOSITIONS.filter((p) => p.govCase === c).map((p) => p.id),
+  ids: PREPOSITIONS.filter((p) => p.type === "fixed" && p.govCase === c).map((p) => p.id),
 })).filter((g) => g.ids.length > 0);
+
+// Дуальні — одна група (розбивати за відмінком немає сенсу, у кожного їх два).
+const DUAL_IDS = PREPOSITIONS.filter((p) => p.type === "dual").map((p) => p.id);
 
 const CASE_COLOR: Record<CzechCase, string> = {
   nominativ: theme.colors.honey,
@@ -91,6 +94,15 @@ export function PrepositionsScreen({ navigation }: Props) {
     }
   }
 
+  function openDual() {
+    const title = "Дуальні (рух / спокій)";
+    if (mode === "browse") {
+      navigation.navigate("BrowseList", { kind: "prepositions", entryIds: DUAL_IDS, title });
+    } else {
+      navigation.navigate("PrepositionSession", { title, entryIds: DUAL_IDS });
+    }
+  }
+
   return (
     <ScrollView
       style={styles.safe}
@@ -117,6 +129,7 @@ export function PrepositionsScreen({ navigation }: Props) {
         </Pressable>
       )}
 
+      <SectionHeader label="за відмінком" />
       {GROUPS.map((g) => {
         const lbl = CASE_LABELS[g.gCase];
         const color = CASE_COLOR[g.gCase];
@@ -139,7 +152,30 @@ export function PrepositionsScreen({ navigation }: Props) {
           </Pressable>
         );
       })}
+
+      <SectionHeader label="рух і спокій" />
+      <Pressable style={[styles.row, { borderLeftColor: theme.colors.coral }]} onPress={openDual}>
+        <Text style={styles.emoji}>🧭</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.title}>Дуальні прийменники</Text>
+          <Text style={styles.hint}>куди? (4.) / де? (6. або 7.)</Text>
+          <Text style={styles.sub}>
+            {DUAL_IDS.length} {plural(DUAL_IDS.length, "прийменник", "прийменники", "прийменників")}
+          </Text>
+        </View>
+      </Pressable>
     </ScrollView>
+  );
+}
+
+// Заголовок секції (варіант B): текст між двома тонкими лініями.
+function SectionHeader({ label }: { label: string }) {
+  return (
+    <View style={styles.sectionHeader}>
+      <View style={styles.sectionLine} />
+      <Text style={styles.sectionText}>{label}</Text>
+      <View style={styles.sectionLine} />
+    </View>
   );
 }
 
@@ -187,4 +223,19 @@ const styles = StyleSheet.create({
   title: { color: theme.colors.text, fontSize: 17, fontWeight: "800" },
   hint: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
   sub: { color: theme.colors.textFaint, fontSize: 12, marginTop: 4 },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.space(3),
+    marginTop: theme.space(2),
+    marginBottom: theme.space(3),
+  },
+  sectionLine: { flex: 1, height: 1, backgroundColor: theme.colors.bgElevated },
+  sectionText: {
+    color: theme.colors.textFaint,
+    fontSize: 11,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
 });

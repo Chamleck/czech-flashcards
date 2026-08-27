@@ -293,4 +293,241 @@ export const PREPOSITIONS: PrepositionEntry[] = [
       { cz: "Přijela s dětmi na návštěvu.", uk: "Вона приїхала в гості з дітьми." },
     ],
   },
+
+  // ═══════════ ДУАЛЬНІ (два відмінки: рух/спокій) ═══════════
+  // Джерело розбиття «прийменник → akuzativ(куди) / lokál|instrumentál(де)»:
+  // czencyclopedia.org (акад.), підтверджено czechstepbystep.cz, ilearnczech.
+  // Правило: akuzativ = «kam?» (рух, напрямок), lokál/instrumentál = «kde?» (спокій).
+  // govCase у dual-записах = akuzativ (спільний "рух"), реальні відмінки — у полі dual.
+
+  // ─── na/o/po/v → akuzativ (куди) / lokál (де) ───
+  {
+    id: "prep-na",
+    cz: "na",
+    uk: "на / в",
+    govCase: "akuzativ",
+    type: "dual",
+    examples: [],
+    dual: {
+      motion: {
+        govCase: "akuzativ",
+        examples: [
+          { cz: "Jdu na poštu.", uk: "Я йду на пошту. (куди)" },
+          { cz: "Polož to na stůl.", uk: "Поклади це на стіл. (куди)" },
+        ],
+      },
+      location: {
+        govCase: "lokal",
+        examples: [
+          { cz: "Jsem na poště.", uk: "Я на пошті. (де)" },
+          { cz: "Kniha leží na stole.", uk: "Книга лежить на столі. (де)" },
+        ],
+      },
+    },
+  },
+  {
+    id: "prep-o",
+    cz: "o",
+    uk: "об / про",
+    govCase: "akuzativ",
+    type: "dual",
+    examples: [],
+    dual: {
+      motion: {
+        govCase: "akuzativ",
+        examples: [
+          { cz: "Opřel kolo o zeď.", uk: "Він сперся велосипедом об стіну. (куди)" },
+          { cz: "Zakopl o kámen.", uk: "Він спіткнувся об камінь. (куди)" },
+        ],
+      },
+      location: {
+        govCase: "lokal",
+        examples: [
+          { cz: "Mluvíme o práci.", uk: "Ми говоримо про роботу. (де/тема)" },
+          { cz: "Film o lásce.", uk: "Фільм про кохання. (тема)" },
+        ],
+      },
+    },
+  },
+  {
+    id: "prep-po",
+    cz: "po",
+    uk: "по / після",
+    govCase: "akuzativ",
+    type: "dual",
+    examples: [],
+    dual: {
+      motion: {
+        govCase: "akuzativ",
+        examples: [
+          { cz: "Voda mu sahá po pás.", uk: "Вода йому по пояс. (до якої межі)" },
+          { cz: "Počkej po celý den.", uk: "Чекай цілий день. (протягом)" },
+        ],
+      },
+      location: {
+        govCase: "lokal",
+        examples: [
+          { cz: "Chodím po městě.", uk: "Я ходжу по місту. (де)" },
+          { cz: "Přijdu po obědě.", uk: "Я прийду після обіду. (коли)" },
+        ],
+      },
+    },
+  },
+  {
+    id: "prep-v",
+    cz: "v",
+    uk: "в / у",
+    govCase: "akuzativ",
+    type: "dual",
+    vocalized: "ve",
+    vocalNote: "ve — перед збігом приголосних: ve škole, ve třídě, ve městě.",
+    examples: [],
+    dual: {
+      motion: {
+        govCase: "akuzativ",
+        examples: [
+          { cz: "Věřím v tebe.", uk: "Я вірю в тебе. (напрямок віри)" },
+          { cz: "Proměnil se v ledovou sochu.", uk: "Він перетворився на крижану статую. (у що)" },
+        ],
+      },
+      location: {
+        govCase: "lokal",
+        examples: [
+          { cz: "Jsem ve škole.", uk: "Я в школі. (де)" },
+          { cz: "Bydlím v Praze.", uk: "Я живу в Празі. (де)" },
+        ],
+      },
+    },
+  },
+
+  // ─── nad/pod/před/za/mezi → akuzativ (куди) / instrumentál (де) ───
+  {
+    id: "prep-nad",
+    cz: "nad",
+    uk: "над",
+    govCase: "akuzativ",
+    type: "dual",
+    examples: [],
+    dual: {
+      motion: {
+        govCase: "akuzativ",
+        examples: [
+          { cz: "Pověsil obraz nad postel.", uk: "Він повісив картину над ліжко. (куди)" },
+          { cz: "Letadlo vzlétlo nad město.", uk: "Літак злетів над місто. (куди)" },
+        ],
+      },
+      location: {
+        govCase: "instrumental",
+        examples: [
+          { cz: "Obraz visí nad postelí.", uk: "Картина висить над ліжком. (де)" },
+          { cz: "Slunce je nad městem.", uk: "Сонце над містом. (де)" },
+        ],
+      },
+    },
+  },
+  {
+    id: "prep-pod",
+    cz: "pod",
+    uk: "під",
+    govCase: "akuzativ",
+    type: "dual",
+    examples: [],
+    dual: {
+      motion: {
+        govCase: "akuzativ",
+        examples: [
+          { cz: "Dal boty pod postel.", uk: "Він поставив взуття під ліжко. (куди)" },
+          { cz: "Kočka vlezla pod stůl.", uk: "Кіт заліз під стіл. (куди)" },
+        ],
+      },
+      location: {
+        govCase: "instrumental",
+        examples: [
+          { cz: "Boty jsou pod postelí.", uk: "Взуття під ліжком. (де)" },
+          { cz: "Kočka spí pod stolem.", uk: "Кіт спить під столом. (де)" },
+        ],
+      },
+    },
+  },
+  {
+    id: "prep-pred",
+    cz: "před",
+    uk: "перед",
+    govCase: "akuzativ",
+    type: "dual",
+    examples: [],
+    dual: {
+      motion: {
+        govCase: "akuzativ",
+        examples: [
+          { cz: "Postavil auto před dům.", uk: "Він поставив авто перед будинок. (куди)" },
+          { cz: "Předstoupil před soud.", uk: "Він постав перед судом. (куди)" },
+        ],
+      },
+      location: {
+        govCase: "instrumental",
+        examples: [
+          { cz: "Auto stojí před domem.", uk: "Авто стоїть перед будинком. (де)" },
+          { cz: "Čekám před školou.", uk: "Я чекаю перед школою. (де)" },
+        ],
+      },
+    },
+  },
+  {
+    id: "prep-za",
+    cz: "za",
+    uk: "за",
+    govCase: "akuzativ",
+    type: "dual",
+    examples: [],
+    dual: {
+      motion: {
+        govCase: "akuzativ",
+        examples: [
+          { cz: "Schoval se za dveře.", uk: "Він сховався за двері. (куди)" },
+          { cz: "Slunce zašlo za mrak.", uk: "Сонце зайшло за хмару. (куди)" },
+        ],
+      },
+      location: {
+        govCase: "instrumental",
+        examples: [
+          { cz: "Stojí za dveřmi.", uk: "Він стоїть за дверима. (де)" },
+          { cz: "Zahrada je za domem.", uk: "Сад за будинком. (де)" },
+        ],
+      },
+      // Окремий сенс «za» — обмін/ціна (akuzativ), НЕ просторовий. Показується
+      // окремою вкладкою в картці, щоб не сплутати з рухом/спокоєм.
+      exchange: {
+        govCase: "akuzativ",
+        examples: [
+          { cz: "Zaplatil jsem za oběd.", uk: "Я заплатив за обід. (ціна)" },
+          { cz: "Koupil to za sto korun.", uk: "Він купив це за сто крон. (ціна)" },
+        ],
+      },
+    },
+  },
+  {
+    id: "prep-mezi",
+    cz: "mezi",
+    uk: "між",
+    govCase: "akuzativ",
+    type: "dual",
+    examples: [],
+    dual: {
+      motion: {
+        govCase: "akuzativ",
+        examples: [
+          { cz: "Sedl si mezi nás.", uk: "Він сів між нас. (куди)" },
+          { cz: "Vložil papír mezi knihy.", uk: "Він вклав папір між книги. (куди)" },
+        ],
+      },
+      location: {
+        govCase: "instrumental",
+        examples: [
+          { cz: "Sedí mezi námi.", uk: "Він сидить між нами. (де)" },
+          { cz: "Papír je mezi knihami.", uk: "Папір між книгами. (де)" },
+        ],
+      },
+    },
+  },
 ];

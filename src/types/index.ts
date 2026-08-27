@@ -320,15 +320,32 @@ export interface MonthName {
 //                 закладаємо заздалегідь, щоб не переробляти тип удруге.
 export type PrepositionType = "fixed" | "dual";
 
+// Один "сенс" дуального прийменника: відмінок + приклади для нього.
+export interface PrepositionSense {
+  govCase: CzechCase;
+  examples: { cz: string; uk: string }[];
+}
+
 export interface PrepositionEntry {
   id: string;
   cz: string; // канонічна форма: «od», «k», «s»
   uk: string; // «від», «до», «з»
-  govCase: CzechCase; // відмінок, яким керує (для fixed — єдиний)
+  govCase: CzechCase; // ВІДМІНОК, ЯКИМ КЕРУЄ. Для fixed — єдиний і реальний.
+  // Для dual це поле означає лише "основний/типовий" відмінок (використовується
+  // там, де треба одне значення, напр. заголовок) — реальні два відмінки лежать
+  // у полі dual нижче. Ставимо akuzativ, бо це спільний "рух" усіх дуальних.
   type: PrepositionType;
   vocalized?: string; // «ke»/«se»/«ze»/«ve»/«ze» — варіант перед збігом приголосних
   vocalNote?: string; // коли саме з'являється вокалізована форма (для картки)
-  examples: { cz: string; uk: string }[];
+  examples: { cz: string; uk: string }[]; // для fixed — приклади; для dual порожній (див. dual)
+  // Тільки для type === "dual": контраст "куди?" (рух, akuzativ) vs "де?" (спокій,
+  // lokál або instrumentál). exchange — лише для «za» (обмін/ціна, akuzativ), інший
+  // сенс, показується окремою вкладкою.
+  dual?: {
+    motion: PrepositionSense; // куди? (akuzativ)
+    location: PrepositionSense; // де? (lokál / instrumentál)
+    exchange?: PrepositionSense; // тільки «za»: обмін/ціна (akuzativ)
+  };
 }
 
 
