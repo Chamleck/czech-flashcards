@@ -10,6 +10,7 @@ import { generateVerbSession, VerbQuestion } from "../utils/verbFlashcardEngine"
 import { generateDeclensionSession, DeclQuestion } from "../utils/declensionFlashcardEngine";
 import { generateNumeralAgreementSession, AgreementQuestion } from "../utils/numeralAgreementEngine";
 import { generateDateTimeSession, DateTimeQuestion } from "../utils/datetimeEngine";
+import { generatePrepositionSession, PrepQuestion } from "../utils/prepositionQuizEngine";
 import { loadFlashcardStats, saveFlashcardStats, mergeSession } from "../utils/flashcardStats";
 import { markRoundFinished } from "../utils/quizRoundFlag";
 import {
@@ -41,6 +42,7 @@ function buildSession(categoryId: string, mistakes: MistakeStore): QuizQuestion[
   if (categoryId === "adj-pron") return generateDeclensionSession(SESSION_LEN, undefined, mistakes);
   if (categoryId === "numerals") return generateNumeralAgreementSession(SESSION_LEN, undefined, mistakes);
   if (categoryId === "datetime") return generateDateTimeSession(SESSION_LEN, undefined, mistakes);
+  if (categoryId === "prepositions") return generatePrepositionSession(SESSION_LEN, undefined, mistakes);
   return generateSession(SESSION_LEN, undefined, mistakes);
 }
 

@@ -52,4 +52,12 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
     color: theme.colors.lilac,
     ready: true,
   },
+  {
+    id: "prepositions",
+    emoji: "🧭",
+    title: "Прийменники",
+    subtitle: "Відмінок після прийменника, рух / спокій",
+    color: "#7fb8e0",
+    ready: true,
+  },
 ];
