@@ -75,43 +75,44 @@ function randomPartner(): NounEntry {
   return PARTNER_POOL[Math.floor(Math.random() * PARTNER_POOL.length)];
 }
 
-// Форма партнера в заданому відмінку (однина — прийменникові фрази зазвичай sg).
-function partnerForm(noun: NounEntry, c: CzechCase): string {
-  return firstForm(noun.declension[c].sg);
+// Пул злічуваних партнерів (для «mezi» — незлічувані не годяться семантично).
+const COUNTABLE_POOL = PARTNER_POOL.filter(
+  (n) => !(n as unknown as { uncountable?: boolean }).uncountable
+);
+function randomCountablePartner(): NounEntry {
+  return COUNTABLE_POOL[Math.floor(Math.random() * COUNTABLE_POOL.length)];
 }
 
-// Форма партнера в заданому відмінку І числі (для «mezi» потрібна множина).
+// Форма партнера в заданому відмінку І числі.
 function partnerFormN(noun: NounEntry, c: CzechCase, n: GrammaticalNumber): string {
   return firstForm(noun.declension[c][n]);
 }
 
-// Дистрактор у тому ж числі: той самий партнер в іншому з двох відмінків (dual).
+// Чи можна брати партнера в множині: uncountable (káva, maso…) — тільки однина
+// (множина «másla/vody» як лічильна звучить неприродно, той самий принцип, що в
+// numeral). Решта — можна і множину.
+function pickNumber(noun: NounEntry, forcePlural: boolean): GrammaticalNumber {
+  if (forcePlural) return "pl";
+  if ((noun as unknown as { uncountable?: boolean }).uncountable) return "sg";
+  return Math.random() < 0.5 ? "sg" : "pl";
+}
+
+// Дистрактор у ТОМУ Ж числі, що й correct (щоб тестувався відмінок, а не число):
+// той самий партнер в іншому відмінку. preferCase — «інший з двох» для dual.
 function nounDistractorN(
   noun: NounEntry,
   correctCase: CzechCase,
   n: GrammaticalNumber,
   correct: string,
-  preferCase: CzechCase
+  preferCase?: CzechCase
 ): string | null {
-  const f = partnerFormN(noun, preferCase, n);
-  if (isUsable(correct, f)) return f;
+  if (preferCase) {
+    const f = partnerFormN(noun, preferCase, n);
+    if (isUsable(correct, f)) return f;
+  }
   for (const cc of shuffle(CASES.filter((c) => c !== correctCase && c !== "vokativ"))) {
     const alt = partnerFormN(noun, cc, n);
     if (isUsable(correct, alt)) return alt;
-  }
-  return null;
-}
-
-// Дистрактор-іменник: той самий партнер в ІНШОМУ відмінку (для dual — конкретно
-// в «іншому з двох», передається preferCase; інакше — будь-який інший робочий).
-function nounDistractor(noun: NounEntry, correctCase: CzechCase, correct: string, preferCase?: CzechCase): string | null {
-  if (preferCase) {
-    const f = partnerForm(noun, preferCase);
-    if (isUsable(correct, f)) return f;
-  }
-  for (const cc of shuffle(CASES.filter((c) => c !== correctCase && c !== "vokativ"))) {
-    const f = partnerForm(noun, cc);
-    if (isUsable(correct, f)) return f;
   }
   return null;
 }
@@ -120,8 +121,9 @@ function nounDistractor(noun: NounEntry, correctCase: CzechCase, correct: string
 function buildFixedNoun(prep: PrepositionEntry): PrepQuestion | null {
   const c = prep.govCase;
   const noun = randomPartner();
-  const correct = partnerForm(noun, c);
-  const distractor = nounDistractor(noun, c, correct);
+  const n = pickNumber(noun, false);
+  const correct = partnerFormN(noun, c, n);
+  const distractor = nounDistractorN(noun, c, n, correct);
   if (!isUsable(correct, distractor)) return null;
 
   const lbl = CASE_LABELS[c];
@@ -160,7 +162,8 @@ function buildFixedPrep(prep: PrepositionEntry): PrepQuestion | null {
   if (neighbors.length === 0) return null;
   const distractorPrep = neighbors[Math.floor(Math.random() * neighbors.length)];
   const noun = randomPartner();
-  const correctForm = partnerForm(noun, c);
+  const n = pickNumber(noun, false);
+  const correctForm = partnerFormN(noun, c, n);
 
   const correct = prep.cz;
   const distractor = distractorPrep.cz;
@@ -237,9 +240,12 @@ function buildDual(prep: PrepositionEntry, sense: DualSense): PrepQuestion | nul
 
   // «mezi» семантично вимагає МНОЖИНИ партнера («між будинками», не «між
   // будинком») — єдиний виняток з 9; решта беруть однину.
-  const num: GrammaticalNumber = prep.cz === "mezi" ? "pl" : "sg";
-
-  const noun = randomPartner();
+  // «mezi» семантично вимагає МНОЖИНИ («між будинками», не «між будинком») і
+  // НЕ працює з незлічуваними («mezi vodami/másly» — і множина, і зміст абсурдні),
+  // тому для mezi беремо злічуваного партнера; решта — будь-який, sg/pl випадково.
+  const forceMezi = prep.cz === "mezi";
+  const noun = forceMezi ? randomCountablePartner() : randomPartner();
+  const num = pickNumber(noun, forceMezi);
   const correct = partnerFormN(noun, c, num);
   // Дистрактор — той самий партнер у ТОМУ Ж числі, але в ІНШОМУ з двох відмінків.
   const distractor = nounDistractorN(noun, c, num, correct, otherCase);
@@ -268,8 +274,9 @@ function buildZaExchange(prep: PrepositionEntry): PrepQuestion | null {
   if (!prep.dual?.exchange) return null;
   const c = prep.dual.exchange.govCase; // akuzativ
   const noun = randomPartner();
-  const correct = partnerForm(noun, c);
-  const distractor = nounDistractor(noun, c, correct);
+  const n = pickNumber(noun, false);
+  const correct = partnerFormN(noun, c, n);
+  const distractor = nounDistractorN(noun, c, n, correct);
   if (!isUsable(correct, distractor)) return null;
 
   const lbl = CASE_LABELS[c];
