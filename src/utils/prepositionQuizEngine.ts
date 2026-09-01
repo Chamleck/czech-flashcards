@@ -66,6 +66,15 @@ function vocalize(prep: string, vocalized: string | undefined, next: string): st
 
 const CASES: CzechCase[] = ["nominativ", "genitiv", "dativ", "akuzativ", "lokal", "instrumental"];
 
+const NUMBER_LABEL: Record<GrammaticalNumber, string> = { sg: "однина", pl: "множина" };
+
+// Єдиний "хвіст" завдання: відмінок (укр+чес) + контрольне питання + число.
+// Той самий формат, що в квізі прикметників/займенників (consistency).
+function caseTail(c: CzechCase, n: GrammaticalNumber): string {
+  const lbl = CASE_LABELS[c];
+  return `${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${NUMBER_LABEL[n]}`;
+}
+
 // Партнер-пул: ті самі фільтри, що в numeral (не декоративні категорії).
 // Незлічувані лишаємо — для прийменників «bez másla» цілком нормально (на відміну
 // від «osm mas» у числівниках), тому НЕ виключаємо uncountable.
@@ -110,7 +119,14 @@ function nounDistractorN(
     const f = partnerFormN(noun, preferCase, n);
     if (isUsable(correct, f)) return f;
   }
-  for (const cc of shuffle(CASES.filter((c) => c !== correctCase && c !== "vokativ"))) {
+  // Виключаємо nominativ і vokativ: жоден прийменник ними не керує, тому голий
+  // називний («hrad», «klíč») як дистрактор надто очевидно неправильний після
+  // прийменника. Беремо лише відмінки, якими прийменники реально керують —
+  // так дистрактор правдоподібний (різниця саме у відмінковому закінченні).
+  const distractorCases = CASES.filter(
+    (c) => c !== correctCase && c !== "vokativ" && c !== "nominativ"
+  );
+  for (const cc of shuffle(distractorCases)) {
     const alt = partnerFormN(noun, cc, n);
     if (isUsable(correct, alt)) return alt;
   }
@@ -126,14 +142,13 @@ function buildFixedNoun(prep: PrepositionEntry): PrepQuestion | null {
   const distractor = nounDistractorN(noun, c, n, correct);
   if (!isUsable(correct, distractor)) return null;
 
-  const lbl = CASE_LABELS[c];
   const prepShown = vocalize(prep.cz, prep.vocalized, correct);
   return {
     comboId: comboId(prep.id, "fixnoun", c),
     promptWord: prep.cz,
     promptUk: prep.uk,
     promptLabel: "прийменник 🇨🇿",
-    taskText: `Оберіть форму іменника після «${prep.cz}»: ${lbl.uk} (${lbl.cz}) — ${lbl.question}`,
+    taskText: `Оберіть форму іменника після «${prep.cz}»: ${caseTail(c, n)}`,
     contextPhrase: `${prepShown} ___`,
     correct,
     options: shuffle([correct, distractor]),
@@ -175,7 +190,7 @@ function buildFixedPrep(prep: PrepositionEntry): PrepQuestion | null {
     promptWord: prep.uk,
     promptUk: "",
     promptLabel: "українською 🇺🇦 — оберіть прийменник",
-    taskText: `Який прийменник підходить за змістом? Керує відмінком ${lbl.uk} (${lbl.cz}).`,
+    taskText: `Який прийменник підходить за змістом? Керує відмінком ${lbl.uk} (${lbl.cz}) — ${lbl.question}`,
     contextPhrase: `___ ${correctForm}`,
     correct,
     options: shuffle([correct, distractor]),
@@ -251,7 +266,6 @@ function buildDual(prep: PrepositionEntry, sense: DualSense): PrepQuestion | nul
   const distractor = nounDistractorN(noun, c, num, correct, otherCase);
   if (!isUsable(correct, distractor)) return null;
 
-  const lbl = CASE_LABELS[c];
   const prepShown = vocalize(prep.cz, prep.vocalized, correct);
   const frames = DUAL_FRAMES[prep.id]?.[sense] ?? ["{p} ___"];
   const frame = frames[Math.floor(Math.random() * frames.length)];
@@ -262,7 +276,7 @@ function buildDual(prep: PrepositionEntry, sense: DualSense): PrepQuestion | nul
     promptWord: prep.cz,
     promptUk: prep.uk,
     promptLabel: "прийменник 🇨🇿",
-    taskText: `«${prep.cz}» — ${senseUk} Оберіть форму: ${lbl.uk} (${lbl.cz}).`,
+    taskText: `«${prep.cz}» — ${senseUk} Оберіть форму: ${caseTail(c, num)}`,
     contextPhrase,
     correct,
     options: shuffle([correct, distractor]),
@@ -279,13 +293,12 @@ function buildZaExchange(prep: PrepositionEntry): PrepQuestion | null {
   const distractor = nounDistractorN(noun, c, n, correct);
   if (!isUsable(correct, distractor)) return null;
 
-  const lbl = CASE_LABELS[c];
   return {
     comboId: comboId(prep.id, "za-exchange", c),
     promptWord: prep.cz,
     promptUk: "за (обмін / ціна)",
     promptLabel: "прийменник 🇨🇿",
-    taskText: `«za» — обмін / ціна (скільки заплатив). Оберіть форму: ${lbl.uk} (${lbl.cz}).`,
+    taskText: `«za» — обмін / ціна (скільки заплатив). Оберіть форму: ${caseTail(c, n)}`,
     contextPhrase: `Zaplatil jsem za ___`,
     correct,
     options: shuffle([correct, distractor]),
@@ -348,7 +361,11 @@ function enumerateCombos(): Combo[] {
 // щоб пропорційний вибір не витіснив (той самий підхід, що в datetime/adj-pron).
 const PREP_KIND_QUOTA: KindQuota<PrepKind> = {
   kindOf: (c) => (c as Combo).kind,
-  minSlots: { fixnoun: 4, fixprep: 3, dual: 3, exchange: 1 },
+  // fixprep («обери прийменник за значенням») — унікальніший навик: більше ніде
+  // в застосунку не тестується вибір САМОГО прийменника, тоді як відмінювання
+  // іменника (fixnoun) частково перетинається з окремим квізом «Відмінки».
+  // Тому fixprep пріоритетніший — вищий мінімум, ніж fixnoun.
+  minSlots: { fixnoun: 3, fixprep: 4, dual: 3, exchange: 1 },
 };
 
 export function generatePrepositionSession(
