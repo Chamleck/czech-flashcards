@@ -184,13 +184,12 @@ function buildFixedPrep(prep: PrepositionEntry): PrepQuestion | null {
   const distractor = distractorPrep.cz;
   if (correct === distractor) return null;
 
-  const lbl = CASE_LABELS[c];
   return {
     comboId: comboId(prep.id, "fixprep", c),
     promptWord: prep.uk,
     promptUk: "",
     promptLabel: "українською 🇺🇦 — оберіть прийменник",
-    taskText: `Який прийменник підходить за змістом? Керує відмінком ${lbl.uk} (${lbl.cz}) — ${lbl.question}`,
+    taskText: `Який прийменник підходить за змістом? Керує відмінком ${caseTail(c, n)}`,
     contextPhrase: `___ ${correctForm}`,
     correct,
     options: shuffle([correct, distractor]),
@@ -270,7 +269,7 @@ function buildDual(prep: PrepositionEntry, sense: DualSense): PrepQuestion | nul
   const frames = DUAL_FRAMES[prep.id]?.[sense] ?? ["{p} ___"];
   const frame = frames[Math.floor(Math.random() * frames.length)];
   const contextPhrase = frame.replace("{p}", prepShown);
-  const senseUk = sense === "motion" ? "рух — куди?" : "спокій — де?";
+  const senseUk = sense === "motion" ? "рух — куди?" : "спокій / дія без напрямку — де?";
   return {
     comboId: comboId(prep.id, `dual-${sense}`, c),
     promptWord: prep.cz,

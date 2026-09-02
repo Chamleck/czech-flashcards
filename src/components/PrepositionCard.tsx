@@ -110,7 +110,7 @@ export function PrepositionCard({ entry, revealed, onReveal }: Props) {
             <>
               <View style={styles.dualHint}>
                 <Text style={styles.dualHintText}>
-                  Керує ДВОМА відмінками — залежно від того, рух це чи спокій.
+                  Керує ДВОМА відмінками — залежно від того, рух це чи спокій (дія без напрямку).
                 </Text>
               </View>
 
@@ -138,7 +138,7 @@ export function PrepositionCard({ entry, revealed, onReveal }: Props) {
                   />
                   <SenseBlock
                     idPrefix={`${entry.id}:location`}
-                    heading="де? (спокій) •"
+                    heading="де? (спокій / без напрямку) •"
                     sense={entry.dual!.location}
                     accent={theme.colors.lilac}
                   />

@@ -278,9 +278,9 @@ const styles = StyleSheet.create({
     padding: theme.space(5),
     alignItems: "center",
   },
-  promptLabel: { color: theme.colors.textDim, fontSize: 13 },
-  promptWord: { color: theme.colors.text, fontSize: 34, fontWeight: "900", marginTop: 4 },
-  promptUk: { color: theme.colors.textDim, fontSize: 16, marginTop: 2 },
+  promptLabel: { color: theme.colors.textDim, fontSize: 13, textAlign: "center" },
+  promptWord: { color: theme.colors.text, fontSize: 34, fontWeight: "900", marginTop: 4, textAlign: "center" },
+  promptUk: { color: theme.colors.textDim, fontSize: 16, marginTop: 2, textAlign: "center" },
   phraseBox: {
     marginTop: theme.space(3),
     backgroundColor: theme.colors.bgElevated,
