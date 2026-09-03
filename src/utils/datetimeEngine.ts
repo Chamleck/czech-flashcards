@@ -236,6 +236,13 @@ const DAYPART_POINTS: TimePoint[] = (() => {
   return pts;
 })();
 
+// Максимум днів у місяці (лютий — 29, щоб не виключати рідкісний, але реальний
+// 29 лютого; для дня 29 це залишає лютий валідним, для 30/31 — ні).
+const MAX_DAY_IN_MONTH: Record<number, number> = {
+  1: 31, 2: 29, 3: 31, 4: 30, 5: 31, 6: 30,
+  7: 31, 8: 31, 9: 30, 10: 31, 11: 30, 12: 31,
+};
+
 function enumerateCombos(): Combo[] {
   const combos: Combo[] = [];
 
@@ -247,13 +254,17 @@ function enumerateCombos(): Combo[] {
   // менший ліміт слотів на раунд для "date-nom" відносно "date-gen") — так
   // зберігаються і повне охоплення днів, і низька частота.
   for (const d of DATE_ORDINALS) {
+    // Місяць обираємо лише серед тих, де такий день календарно можливий —
+    // інакше квіз генерував би «31. února» чи «31. dubna» (реальний баг,
+    // знайдений на аудиті: місяць раніше обирався незалежно від дня).
+    const validMonths = MONTHS.filter((m) => MAX_DAY_IN_MONTH[m.num] >= d.day);
     for (const mode of ["gen", "nom"] as DateMode[]) {
       combos.push({
         id: comboId(`date-${d.day}`, mode, "x"),
         wordId: `date-${d.day}`,
         kind: mode === "gen" ? "date-gen" : "date-nom",
         make: () => {
-          const month = MONTHS[Math.floor(Math.random() * MONTHS.length)];
+          const month = validMonths[Math.floor(Math.random() * validMonths.length)];
           return buildDateQuestion(d, month, mode);
         },
       });

@@ -1,13 +1,20 @@
 import { CardinalEntry } from "../types";
 
-// Кількісні числівники 1–12. Форми звірено з ÚJЧ / cesky-jazyk.cz /
-// montessorislanydoma / erikahanackova / umimecesky:
+// Кількісні числівники 1–19 + круглі десятки 20–90. Форми звірено з ÚJЧ
+// (prirucka.ujc.cas.cz) / czechency.org / cesky-jazyk.cz / erikahanackova /
+// umimecesky / mozaika.eu:
 //  • jeden — займенникове тверде відмінювання (як ten), лише однина;
 //  • dva/oba — «двоїнне» відмінювання (dvou, dvěma; форма dvěmi НЕ існує);
 //  • tři/čtyři — за зразком kost із винятками (Gsg tří/čtyř, Isg třemi/čtyřmi);
-//  • pět–dvanáct — лише дві форми: пряма (N/A) + спільна на -i (G/D/L/I).
+//  • pět–devatenáct + десятки dvacet–devadesát — лише дві форми: пряма (N/A)
+//    + спільна на -i (G/D/L/I). Однаковий kind "oblique" на всіх.
 // Вокатив числівники не мають — його немає в NUMERAL_CASE_ORDER.
-// Дублети (tří / třech) зберігаються цілим рядком через " / " (як в іменниках).
+// Дублети (tří / třech, deseti / desíti) зберігаються цілим рядком через " / "
+// (як в іменниках). Дублет за довготою мають лише deset і dvacet (звірено з
+// ÚJЧ: dvaceti i dvacíti); 30–90 — одна форма (-desáti / -ceti).
+// Складені числа 21–99 (dvacet jeden…) НЕ мають окремих записів — вони
+// генеруються композиційно в квизі (desítka + jednotka), див.
+// numeralAgreementEngine.ts.
 
 export const CARDINALS: CardinalEntry[] = [
   // ─────────────── jeden (gendered, як ten) ───────────────
@@ -243,5 +250,137 @@ export const CARDINALS: CardinalEntry[] = [
     oblique: "čtrnácti",
     exampleCz: "Čekám čtrnáct dní.",
     exampleUk: "Я чекаю чотирнадцять днів.",
+  },
+  {
+    id: "card-patnact",
+    uk: "п'ятнадцять",
+    cz: "patnáct",
+    kind: "oblique",
+    direct: "patnáct",
+    oblique: "patnácti",
+    exampleCz: "Je mi patnáct let.",
+    exampleUk: "Мені п'ятнадцять років.",
+  },
+  {
+    id: "card-sestnact",
+    uk: "шістнадцять",
+    cz: "šestnáct",
+    kind: "oblique",
+    direct: "šestnáct",
+    oblique: "šestnácti",
+    exampleCz: "Autobus jede v šestnáct hodin.",
+    exampleUk: "Автобус їде о шістнадцятій годині.",
+  },
+  {
+    id: "card-sedmnact",
+    uk: "сімнадцять",
+    cz: "sedmnáct",
+    kind: "oblique",
+    direct: "sedmnáct",
+    oblique: "sedmnácti",
+    exampleCz: "Mé sestře je sedmnáct.",
+    exampleUk: "Моїй сестрі сімнадцять.",
+  },
+  {
+    id: "card-osmnact",
+    uk: "вісімнадцять",
+    cz: "osmnáct",
+    kind: "oblique",
+    direct: "osmnáct",
+    oblique: "osmnácti",
+    exampleCz: "V osmnácti letech jsem dospělý.",
+    exampleUk: "У вісімнадцять років я дорослий.",
+  },
+  {
+    id: "card-devatenact",
+    uk: "дев'ятнадцять",
+    cz: "devatenáct",
+    kind: "oblique",
+    direct: "devatenáct",
+    oblique: "devatenácti",
+    exampleCz: "Kniha má devatenáct kapitol.",
+    exampleUk: "У книзі дев'ятнадцять розділів.",
+  },
+
+  // ─────────────── круглі десятки 20–90 (oblique) ───────────────
+  {
+    id: "card-dvacet",
+    uk: "двадцять",
+    cz: "dvacet",
+    kind: "oblique",
+    direct: "dvacet",
+    oblique: "dvaceti / dvacíti",
+    exampleCz: "Mám dvacet korun.",
+    exampleUk: "У мене двадцять крон.",
+  },
+  {
+    id: "card-tricet",
+    uk: "тридцять",
+    cz: "třicet",
+    kind: "oblique",
+    direct: "třicet",
+    oblique: "třiceti",
+    exampleCz: "Čekám třicet minut.",
+    exampleUk: "Я чекаю тридцять хвилин.",
+  },
+  {
+    id: "card-ctyricet",
+    uk: "сорок",
+    cz: "čtyřicet",
+    kind: "oblique",
+    direct: "čtyřicet",
+    oblique: "čtyřiceti",
+    exampleCz: "Do práce mám čtyřicet kilometrů.",
+    exampleUk: "До роботи в мене сорок кілометрів.",
+  },
+  {
+    id: "card-padesat",
+    uk: "п'ятдесят",
+    cz: "padesát",
+    kind: "oblique",
+    direct: "padesát",
+    oblique: "padesáti",
+    exampleCz: "Babičce je padesát let.",
+    exampleUk: "Бабусі п'ятдесят років.",
+  },
+  {
+    id: "card-sedesat",
+    uk: "шістдесят",
+    cz: "šedesát",
+    kind: "oblique",
+    direct: "šedesát",
+    oblique: "šedesáti",
+    exampleCz: "Rychlost je šedesát kilometrů za hodinu.",
+    exampleUk: "Швидкість — шістдесят кілометрів на годину.",
+  },
+  {
+    id: "card-sedmdesat",
+    uk: "сімдесят",
+    cz: "sedmdesát",
+    kind: "oblique",
+    direct: "sedmdesát",
+    oblique: "sedmdesáti",
+    exampleCz: "Dědečkovi je sedmdesát.",
+    exampleUk: "Дідусеві сімдесят.",
+  },
+  {
+    id: "card-osmdesat",
+    uk: "вісімдесят",
+    cz: "osmdesát",
+    kind: "oblique",
+    direct: "osmdesát",
+    oblique: "osmdesáti",
+    exampleCz: "Ta budova má osmdesát oken.",
+    exampleUk: "У тій будівлі вісімдесят вікон.",
+  },
+  {
+    id: "card-devadesat",
+    uk: "дев'яносто",
+    cz: "devadesát",
+    kind: "oblique",
+    direct: "devadesát",
+    oblique: "devadesáti",
+    exampleCz: "Test má devadesát otázek.",
+    exampleUk: "У тесті дев'яносто питань.",
   },
 ];

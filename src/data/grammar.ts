@@ -407,6 +407,23 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         type: "paragraph",
         text: "milion і miliarda — теж звичайні іменники (milion за зразком hrad, miliarda за зразком žena), і на відміну від sto/tisíc — БЕЗ жодних винятків у відмінюванні. Узгоджуються з тим самим правилом 1/2-4/5+: milion, dva miliony, pět milionů; miliarda, dvě miliardy, pět miliard.",
       },
+      { type: "heading", text: "Складені числа 21–99 з іменником" },
+      {
+        type: "paragraph",
+        text: "У складеному числі (dvacet jedna, třicet pět…) узгодження іменника вирішує ОСТАННЯ цифра — за тим самим правилом 1 / 2-4 / 5+, що й прості числа. Тобто спершу дивимось на одиницю, а вже вона диктує форму іменника.",
+      },
+      {
+        type: "list",
+        items: [
+          { term: "…1 → як jeden", note: "dvacet jeden dům, třicet jedna žena — однина, узгоджена в роді." },
+          { term: "…2, …3, …4 → як 2-4", note: "dvacet dva domy, čtyřicet tři ženy — множина." },
+          { term: "…5–…9 → як 5+", note: "dvacet pět domů, šedesát osm žen — родовий множини." },
+        ],
+      },
+      {
+        type: "tip",
+        text: "💡 У непрямих відмінках чисел на …5–…9 відмінюються ОБИДВІ частини: «bez čtyřiceti sedmi oken» (47), «o šedesáti osmi lidech» (68). А от для чисел на …1–…4 непрямі відмінки в реальній мові хиткі — носії часто лишають число незмінним. Тому тут досить знати називний і знахідний, а в непрямих орієнтуйся на …5+ як надійний зразок.",
+      },
       { type: "heading", text: "Як складаються великі числа" },
       {
         type: "paragraph",
