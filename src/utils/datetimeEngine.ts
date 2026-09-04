@@ -195,7 +195,7 @@ function buildDayPartQuestion(tp: TimePoint): DateTimeQuestion | null {
 }
 
 
-type ComboKind = "date-gen" | "date-nom" | "time" | "daypart";
+type ComboKind = "date-gen" | "date-gen-compound" | "date-nom" | "time" | "daypart";
 
 interface Combo {
   id: string;
@@ -253,16 +253,26 @@ function enumerateCombos(): Combo[] {
   // називний"). Натомість рідкісність nom забезпечує kindQuota нижче (окремий,
   // менший ліміт слотів на раунд для "date-nom" відносно "date-gen") — так
   // зберігаються і повне охоплення днів, і низька частота.
+  // Складені дні (21–29, 31) мають дублет аналітична/злита форма (перевіряється
+  // рандомно 50/50 всередині buildDateQuestion). Виділяємо їх в окремий kind
+  // ЛИШЕ для gen-режиму (nom навмисно лишається без floor — рідкісний за
+  // задумом), щоб garantувати регулярну появу самого питання про складений
+  // день — floor не форсує ЯКИЙ саме варіант (аналітична/злита), лише сам факт
+  // появи combo. Знайдено харнессом: без цього злита форма — лише ~51% раундів.
+  const COMPOUND_DAYS = new Set([21, 22, 23, 24, 25, 26, 27, 28, 29, 31]);
+
   for (const d of DATE_ORDINALS) {
     // Місяць обираємо лише серед тих, де такий день календарно можливий —
     // інакше квіз генерував би «31. února» чи «31. dubna» (реальний баг,
     // знайдений на аудиті: місяць раніше обирався незалежно від дня).
     const validMonths = MONTHS.filter((m) => MAX_DAY_IN_MONTH[m.num] >= d.day);
     for (const mode of ["gen", "nom"] as DateMode[]) {
+      const kind: ComboKind =
+        mode === "nom" ? "date-nom" : COMPOUND_DAYS.has(d.day) ? "date-gen-compound" : "date-gen";
       combos.push({
         id: comboId(`date-${d.day}`, mode, "x"),
         wordId: `date-${d.day}`,
-        kind: mode === "gen" ? "date-gen" : "date-nom",
+        kind,
         make: () => {
           const month = validMonths[Math.floor(Math.random() * validMonths.length)];
           return buildDateQuestion(d, month, mode);
@@ -319,7 +329,7 @@ function enumerateCombos(): Combo[] {
 // дат — nom.
 const DATETIME_KIND_QUOTA: KindQuota<ComboKind> = {
   kindOf: (c) => (c as Combo).kind,
-  minSlots: { "date-gen": 3, daypart: 3 },
+  minSlots: { "date-gen": 2, "date-gen-compound": 1, daypart: 3 },
 };
 
 export function generateDateTimeSession(
