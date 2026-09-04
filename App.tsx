@@ -22,6 +22,8 @@ import { PersonalPronounSelectionScreen } from "./src/screens/PersonalPronounSel
 import { NumeralsScreen } from "./src/screens/NumeralsScreen";
 import { PrepositionsScreen } from "./src/screens/PrepositionsScreen";
 import { PrepositionSessionScreen } from "./src/screens/PrepositionSessionScreen";
+import { AdverbsScreen } from "./src/screens/AdverbsScreen";
+import { AdverbSessionScreen } from "./src/screens/AdverbSessionScreen";
 import { DeclSessionScreen } from "./src/screens/DeclSessionScreen";
 import { BrowseListScreen } from "./src/screens/BrowseListScreen";
 import { BrowseCardScreen } from "./src/screens/BrowseCardScreen";
@@ -76,6 +78,8 @@ export default function App() {
           <Stack.Screen name="Numerals" component={NumeralsScreen} options={{ title: "Числівники" }} />
           <Stack.Screen name="Prepositions" component={PrepositionsScreen} options={{ title: "Прийменники" }} />
           <Stack.Screen name="PrepositionSession" component={PrepositionSessionScreen} options={{ title: "" }} />
+          <Stack.Screen name="Adverbs" component={AdverbsScreen} options={{ title: "Прислівники" }} />
+          <Stack.Screen name="AdverbSession" component={AdverbSessionScreen} options={{ title: "" }} />
           <Stack.Screen name="DeclSession" component={DeclSessionScreen} options={{ title: "" }} />
           <Stack.Screen name="BrowseList" component={BrowseListScreen} options={{ title: "" }} />
           <Stack.Screen name="BrowseCard" component={BrowseCardScreen} options={{ title: "" }} />

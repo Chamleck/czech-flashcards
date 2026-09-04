@@ -50,8 +50,10 @@ export function HomeScreen({ navigation }: Props) {
         loadProgressFrom(PROGRESS_KEYS.personal),
         loadProgressFrom(PROGRESS_KEYS.numerals),
         loadProgressFrom(PROGRESS_KEYS.prepositions),
+        loadProgressFrom(PROGRESS_KEYS.adverbs),
       ]).then(
-        ([np, vp, ap, pp, perp, mp, prp]: [
+        ([np, vp, ap, pp, perp, mp, prp, advp]: [
+          Record<string, CardProgress>,
           Record<string, CardProgress>,
           Record<string, CardProgress>,
           Record<string, CardProgress>,
@@ -71,7 +73,8 @@ export function HomeScreen({ navigation }: Props) {
               getMistakeIds(pp).size +
               getMistakeIds(perp).size +
               numeralCount +
-              getMistakeIds(prp).size
+              getMistakeIds(prp).size +
+              getMistakeIds(advp).size
           );
         }
       );

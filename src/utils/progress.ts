@@ -10,6 +10,7 @@ const PRON_KEY = "czech_pronouns_progress_v1"; // присвійні + вказ�
 const PERSONAL_KEY = "czech_personal_pronouns_progress_v1"; // особові
 const NUMERALS_KEY = "czech_numerals_progress_v1"; // кількісні + порядкові + сотні/тисячі/мільйони — один спільний розділ "Числівники"
 const PREPOSITIONS_KEY = "czech_prepositions_progress_v1"; // прийменники (фіксовані + дуальні — один спільний розділ)
+const ADVERBS_KEY = "czech_adverbs_progress_v1"; // прислівники місця (де/куди/звідки)
 
 // За замовчуванням працюємо з колодою іменників (зворотна сумісність).
 const KEY = NOUN_KEY;
@@ -22,6 +23,7 @@ export const PROGRESS_KEYS = {
   personal: PERSONAL_KEY,
   numerals: NUMERALS_KEY,
   prepositions: PREPOSITIONS_KEY,
+  adverbs: ADVERBS_KEY,
 };
 
 // Прості інтервали повторення (мс). Індекс = поточний streak правильних відповідей.

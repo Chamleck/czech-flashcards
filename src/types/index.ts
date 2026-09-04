@@ -349,7 +349,25 @@ export interface PrepositionEntry {
 }
 
 
-// ─────────────────────────── ДІЄСЛОВА ───────────────────────────
+// ─────────────────────────── НЕЗМІННІ ПРИСЛІВНИКИ МІСЦЯ ───────────────────────────
+// vlevo/doleva/zleva тощо — незмінна частина мови (як прийменники), тому
+// власна структура + власна self-report сесія (не WordSession/DeclSession).
+// Модель "стільки сенсів, скільки реально є" (як CardinalEntry/DateOrdinal):
+// повні слова мають 3 сенси (де/куди/звідки), винятки (tam, doma) — 2, rovně — 1.
+export interface AdverbSense {
+  label: string; // "де?" | "куди?" | "звідки?" (для tam — комбінований напис)
+  cz: string;
+  examples: { cz: string; uk: string }[];
+}
+
+export interface SpatialAdverbEntry {
+  id: string;
+  uk: string; // орієнтир-переклад, напр. "ліворуч"
+  senses: AdverbSense[];
+  note?: string; // пояснення винятку (tam: одна форма на де+куди; doma: нема звідки)
+}
+
+
 
 // Особи дієвідміни (однина 1/2/3 + множина 1/2/3)
 export type VerbPerson = "ja" | "ty" | "on" | "my" | "vy" | "oni";
@@ -431,7 +449,7 @@ export interface VerbEntry {
 
 // Параметри навігації (React Navigation, native stack)
 // Частина мови для режиму перегляду. Визначає джерело даних і компонент картки.
-export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "personal" | "cardinals" | "prepositions";
+export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "personal" | "cardinals" | "prepositions" | "adverbs";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -458,6 +476,10 @@ export type RootStackParamList = {
   // (прийменник незмінний, тому не через WordSession/DeclSession).
   Prepositions: undefined;
   PrepositionSession: { title: string; entryIds: string[] };
+  // Прислівники місця (де/куди/звідки) — та сама логіка, що прийменники:
+  // незмінна частина мови, власна self-report сесія.
+  Adverbs: undefined;
+  AdverbSession: { title: string; entryIds: string[] };
   // Спільна сесія прикметників/займенників (картка з табами роду).
   // kind "personal" → особові займенники (окрема картка PersonalPronounCard).
   // kind "ordinal" → порядкові числівники: той самий рендер/датасет, що "adjective",
