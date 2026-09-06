@@ -1,5 +1,6 @@
-import { DateOrdinal, MonthName, CASE_LABELS } from "../types";
+import { DateOrdinal, MonthName, CASE_LABELS, NounEntry } from "../types";
 import { DATE_ORDINALS, MONTHS } from "../data/dates";
+import { NOUNS } from "../data/nouns";
 import { formal24, colloquial12, dayPart, TimePoint } from "../data/timeforms";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
 
@@ -163,6 +164,125 @@ function buildTimeQuestion(tp: TimePoint, sys: TimeSystem): DateTimeQuestion | n
   };
 }
 
+// ─────────────── Підкатегорія «Дні тижня» ───────────────
+// Дні тижня вже існують як NOUNS (category "days", повне відмінювання) —
+// перевикористовуємо ті самі записи (uk/cz/akuzativ), не дублюємо дані.
+//
+// Дві РІЗНІ конструкції, які виглядять схоже, а керуються по-різному
+// (звірено джерелами: dspace.cuni.cz, dobryslovnik.cz, dictio.info,
+// czechency.org — «Svatba je v sobotu, dnes je čtvrtek» — обидві поруч):
+//   • weekday-NAME («Zítra bude čtvrtek») — НАЗИВАННЯ дня, називний, без
+//     прийменника. Та сама навичка, що вже тестує загальний квиз «Відмінки» —
+//     тут лише природніша подача, тому БЕЗ floor (органічно, як date-nom).
+//   • weekday-WHEN («Schůzka je ve čtvrtek») — КОЛИ відбувається подія,
+//     прийменник v/ve + знахідний. Це нова навичка (вокалізація v/ve саме
+//     для днів), тому з floor — гарантована поява щораунду.
+//
+// v/ve — ЗАКРИТИЙ список рівно 7 днів, тому просто фіксуємо готову форму,
+// а не пишемо загальне регекс-правило: наявний vocalize() в інших рушіях
+// перевіряє лише "той самий/парний приголосний" (v перед v/f) — для днів це
+// не підійшло б, бо "ve středu"/"ve čtvrtek" починаються на s-/č-, не на v/f.
+// Ширше правило "перед збігом приголосних" тут просто зафіксоване як дані,
+// а не виведене регексом — безпечніше для закритого списку з 7 елементів.
+const WEEKDAY_IDS = ["pondeli", "utery", "streda", "ctvrtek", "patek", "sobota", "nedele"];
+const WEEKDAY_PREP: Record<string, "v" | "ve"> = {
+  pondeli: "v",
+  utery: "v",
+  streda: "ve",
+  ctvrtek: "ve",
+  patek: "v",
+  sobota: "v",
+  nedele: "v",
+};
+const WEEKDAYS: NounEntry[] = WEEKDAY_IDS.map((id) => NOUNS.find((n) => n.id === id)!);
+
+// Декоратор — кілька видів речень для різноманіття (не те саме щоразу).
+const WEEKDAY_WHEN_FRAMES: string[] = [
+  "Schůzka je ___.",
+  "Mám narozeniny ___.",
+  "Vrátíme se domů ___.",
+  "Obchod bude zavřený ___.",
+  "Jedeme na výlet ___.",
+];
+// З датою в контексті — з'єднує вже наявну тему «дати» (родовий) з новою
+// навичкою (v/ve). Дата — випадкова й календарно валідна (перевикористовуємо
+// DATE_ORDINALS/MONTHS/MAX_DAY_IN_MONTH — той самий фікс, що для date-gen,
+// інакше знову ризик «31. února»).
+const WEEKDAY_WHEN_DATE_FRAMES: string[] = [
+  "Sejdeme se {DATE}, ___.",
+  "Přijedu {DATE}, ___.",
+  "Narozeniny mám {DATE}, ___.",
+];
+
+function randomDateGenPhrase(): string {
+  const d = DATE_ORDINALS[Math.floor(Math.random() * DATE_ORDINALS.length)];
+  const validMonths = MONTHS.filter((m) => MAX_DAY_IN_MONTH[m.num] >= d.day);
+  const month = validMonths[Math.floor(Math.random() * validMonths.length)];
+  return `${randomForm(d.gen)} ${firstForm(month.gen)}`;
+}
+
+function buildWeekdayWhenQuestion(day: NounEntry): DateTimeQuestion | null {
+  const prep = WEEKDAY_PREP[day.id];
+  const akuz = firstForm(day.declension.akuzativ.sg);
+  const correct = `${prep} ${akuz}`;
+
+  // Два типи дистрактора впереміш: (a) той самий день, неправильна
+  // вокалізація (типова помилка — забути ve саме для цього дня); (b) інший
+  // день з ЙОГО правильною вокалізацією (типова помилка — переплутати
+  // переклад дня). Той самий принцип, що чергування distractorKind
+  // "case"/"number" у квизі «Відмінки».
+  let distractor: string;
+  if (Math.random() < 0.5) {
+    const wrongPrep = prep === "v" ? "ve" : "v";
+    distractor = `${wrongPrep} ${akuz}`;
+  } else {
+    const others = WEEKDAYS.filter((d) => d.id !== day.id);
+    const other = others[Math.floor(Math.random() * others.length)];
+    distractor = `${WEEKDAY_PREP[other.id]} ${firstForm(other.declension.akuzativ.sg)}`;
+  }
+  if (!usable(correct, distractor)) return null;
+
+  const withDate = Math.random() < 0.5;
+  const contextPhrase = withDate
+    ? WEEKDAY_WHEN_DATE_FRAMES[Math.floor(Math.random() * WEEKDAY_WHEN_DATE_FRAMES.length)].replace(
+        "{DATE}",
+        randomDateGenPhrase()
+      )
+    : WEEKDAY_WHEN_FRAMES[Math.floor(Math.random() * WEEKDAY_WHEN_FRAMES.length)];
+
+  return {
+    comboId: comboId("weekday-when", day.id, "x"),
+    promptWord: day.uk,
+    promptUk: "",
+    promptLabel: "українською 🇺🇦",
+    taskText: "Яким днем? Оберіть прийменник (v/ve) і форму дня — знахідний.",
+    contextPhrase,
+    correct,
+    options: shuffle([correct, distractor]),
+  };
+}
+
+const WEEKDAY_NAME_FRAMES: string[] = ["Dnes je ___.", "Zítra bude ___.", "Pozítří bude ___."];
+
+function buildWeekdayNameQuestion(day: NounEntry): DateTimeQuestion | null {
+  const correct = firstForm(day.cz);
+  const others = WEEKDAYS.filter((d) => d.id !== day.id);
+  const other = others[Math.floor(Math.random() * others.length)];
+  const distractor = firstForm(other.cz);
+  if (!usable(correct, distractor)) return null;
+
+  return {
+    comboId: comboId("weekday-name", day.id, "x"),
+    promptWord: day.uk,
+    promptUk: "",
+    promptLabel: "українською 🇺🇦",
+    taskText: "Яким днем? Оберіть називний відмінок (без прийменника).",
+    contextPhrase: WEEKDAY_NAME_FRAMES[Math.floor(Math.random() * WEEKDAY_NAME_FRAMES.length)],
+    correct,
+    options: shuffle([correct, distractor]),
+  };
+}
+
 // ─────────────── Підкатегорія «Частина доби» ───────────────
 // «Дано час → обери правильно уточнену фразу» (v půl druhé ODPOLEDNE, не RÁNO).
 // Дистрактор — та сама фраза з ІНШОЮ частиною доби (реальна помилка: плутати
@@ -195,7 +315,7 @@ function buildDayPartQuestion(tp: TimePoint): DateTimeQuestion | null {
 }
 
 
-type ComboKind = "date-gen" | "date-gen-compound" | "date-nom" | "time" | "daypart";
+type ComboKind = "date-gen" | "date-gen-compound" | "date-nom" | "time" | "daypart" | "weekday-when" | "weekday-name";
 
 interface Combo {
   id: string;
@@ -309,6 +429,25 @@ function enumerateCombos(): Combo[] {
     });
   }
 
+  // Дні тижня — weekday-when (нова навичка v/ve) і weekday-name (повторення
+  // називного, красивіша подача). Кожен день — окремий combo (як date-${d.day}),
+  // щоб вага помилок трекалась per-день: v/ve — 7 незалежних фактів для
+  // запам'ятовування (лише středa/čtvrtek потребують ve), не одне правило.
+  for (const day of WEEKDAYS) {
+    combos.push({
+      id: comboId("weekday-when", day.id, "x"),
+      wordId: `weekday-when-${day.id}`,
+      kind: "weekday-when",
+      make: () => buildWeekdayWhenQuestion(day),
+    });
+    combos.push({
+      id: comboId("weekday-name", day.id, "x"),
+      wordId: `weekday-name-${day.id}`,
+      kind: "weekday-name",
+      make: () => buildWeekdayNameQuestion(day),
+    });
+  }
+
   return combos;
 }
 
@@ -329,7 +468,7 @@ function enumerateCombos(): Combo[] {
 // дат — nom.
 const DATETIME_KIND_QUOTA: KindQuota<ComboKind> = {
   kindOf: (c) => (c as Combo).kind,
-  minSlots: { "date-gen": 2, "date-gen-compound": 1, daypart: 3 },
+  minSlots: { "date-gen": 2, "date-gen-compound": 1, daypart: 3, "weekday-when": 2 },
 };
 
 export function generateDateTimeSession(
