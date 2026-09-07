@@ -12,6 +12,8 @@ import {
   ImperativePerson,
   IMPERATIVE_ORDER,
   IMPERATIVE_LABELS,
+  firstForm,
+  randomForm,
 } from "./verbForms";
 
 // Питання квізу дієслів. Той самий контракт полів, що й у Question іменників,
@@ -82,7 +84,7 @@ function allFormsInTense(v: VerbEntry, tense: VerbQuestion["tense"]): string[] {
     if (!v.imperative) return [];
     return IMPERATIVE_ORDER.map((p) => imperativeForm(v, p)!).filter(Boolean);
   }
-  return PAST_SUBJECT_ORDER.map((s) => pastForm(v, s));
+  return PAST_SUBJECT_ORDER.map((s) => firstForm(pastForm(v, s)));
 }
 
 // Усі форми дієслова у всіх доступних часах — остаточний fallback для дистрактора.
@@ -164,7 +166,11 @@ function aspectFormFor(v: VerbEntry, frame: AspectFrame): string | null {
     return futureForm(v, frame.subject as VerbPerson);
   }
   // past
-  return pastForm(v, frame.subject as PastSubject);
+  // randomForm безпечний тут (не як у buildDistractor вище): дистрактор
+  // aspect-питання завжди від ІНШОГО дієслова (видового партнера), тому
+  // колізія "друга половина того самого дублета як дистрактор" неможлива —
+  // форми correct і distractor походять від різних лем.
+  return randomForm(pastForm(v, frame.subject as PastSubject));
 }
 
 // aspectId → сам entry (для швидкого пошуку партнера).
@@ -260,7 +266,13 @@ function enumerateCombos(pool: VerbEntry[]): Combo[] {
     }
     // past — 9 підметів (з розбивкою за родом/числом)
     for (const s of PAST_SUBJECT_ORDER) {
-      const c = makeCombo(v, "past", s, pastForm(v, s));
+      // firstForm (НЕ randomForm) — навмисно детерміновано, той самий вибір,
+      // що й у пулі дистракторів (allFormsInTense). Якби тут randomForm міг
+      // випадково обрати ІНШУ половину дублета за correct, а пул дистракторів
+      // (завжди firstForm) підсунув би ПЕРШУ половину як "неправильний" варіант
+      // — хоча обидві половини дублета насправді правильні. Реальний ризик
+      // колізії, спійманий до того, як став багом.
+      const c = makeCombo(v, "past", s, firstForm(pastForm(v, s)));
       if (c) combos.push(c);
     }
     // imperative — 3 форми (ty/vy/my), лише якщо дієслово має наказовий спосіб

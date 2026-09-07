@@ -96,15 +96,40 @@ export function futureForm(v: VerbEntry, p: VerbPerson): string {
   return `${BYT_FUTURE[p]} ${refl}${v.cz}`;
 }
 
+// Дублетні форми зберігаються як "форма1 / форма2" (як усюди в проєкті —
+// іменники, дати). firstForm — детермінований вибір (для дистрактора),
+// randomForm — випадковий (для правильної відповіді, щоб обидва варіанти
+// траплялись з часом).
+function firstForm(s: string): string {
+  return s.split(" / ")[0];
+}
+function randomForm(s: string): string {
+  const parts = s.split(" / ");
+  return parts[Math.floor(Math.random() * parts.length)];
+}
+
 // Минулий час для підмета: [дієприкметник] [допоміжне] se ("učil jsem se").
 // У 3-й особі допоміжного немає: "učil se".
 export function pastForm(v: VerbEntry, s: PastSubject): string {
-  const refl = v.reflexive ? ` ${v.reflexive}` : "";
   const participle = participleFor(v, s);
+
+  // Виняток для "ty" (2 особи однини) зі зворотним дієсловом: "jsi" + se/si
+  // стягується в ОДНЕ слово — ses/sis. Це кодифікована норма (не розмовне
+  // спрощення!), повна форма "jsi se/si" досі офіційно некодифікована, хоч і
+  // часта усно (ÚJЧ prirucka.ujc.cas.cz/?id=580). Дублет, як усюди в проєкті:
+  // стягнена форма першою (кодифікована), повна — другою.
+  if (s === "ty" && v.reflexive) {
+    const contracted = v.reflexive === "se" ? "ses" : "sis";
+    return `${participle} ${contracted} / ${participle} jsi ${v.reflexive}`;
+  }
+
+  const refl = v.reflexive ? ` ${v.reflexive}` : "";
   const auxP = auxPersonFor(s);
   const aux = auxP === "on" ? "" : PAST_AUX[auxP]; // 3-тя особа → без допоміжного
   return aux ? `${participle} ${aux}${refl}` : `${participle}${refl}`;
 }
+
+export { firstForm, randomForm };
 
 // Зручний доступ до 6 стандартних осіб для теп./майб. таблиць.
 export { PERSON_ORDER };
