@@ -21,7 +21,17 @@ export function BrowseListScreen({ route, navigation }: Props) {
   );
 
   useLayoutEffect(() => {
-    navigation.setOptions({ title });
+    navigation.setOptions({
+      title,
+      // Іконка пошуку — тільки тут навмисно (Перегляд), у Тренуванні (інші
+      // екрани) її немає: там сесія за алгоритмом, шукати конкретне слово —
+      // не той сценарій.
+      headerRight: () => (
+        <Pressable onPress={() => navigation.navigate("WordsPartOfSpeech", { focusSearch: true })} hitSlop={10}>
+          <Text style={styles.searchIcon}>🔍</Text>
+        </Pressable>
+      ),
+    });
   }, [navigation, title]);
 
   function open(index: number) {
@@ -48,6 +58,7 @@ export function BrowseListScreen({ route, navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
+  searchIcon: { fontSize: 18, marginRight: 8 },
   safe: { flex: 1, backgroundColor: theme.colors.bg },
   content: { padding: theme.space(4) },
   hint: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19, marginBottom: theme.space(3) },

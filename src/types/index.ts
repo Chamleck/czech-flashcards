@@ -459,7 +459,9 @@ export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "person
 export type RootStackParamList = {
   Home: undefined;
   // Проміжний екран вибору частини мови (Іменники / Дієслова / …)
-  WordsPartOfSpeech: undefined;
+  // focusSearch: true — тільки коли сюди ведуть іконкою пошуку з BrowseList/
+  // BrowseCard (навмисний намір шукати); звичайне "назад" — БЕЗ автофокусу.
+  WordsPartOfSpeech: { focusSearch?: boolean } | undefined;
   // Іменники
   WordCategories: undefined;
   WordSelection: { category: WordCategory };

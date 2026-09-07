@@ -3,6 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
+  Pressable,
   FlatList,
   useWindowDimensions,
   NativeSyntheticEvent,
@@ -66,12 +67,21 @@ export function BrowseCardScreen({ route, navigation }: Props) {
   useLayoutEffect(() => {
     navigation.setOptions({
       title,
-      headerRight: () =>
-        entries.length > 0 ? (
-          <Text style={styles.counter}>
-            {Math.min(idx + 1, entries.length)} / {entries.length}
-          </Text>
-        ) : null,
+      headerRight: () => (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+          {entries.length > 0 && (
+            <Text style={styles.counter}>
+              {Math.min(idx + 1, entries.length)} / {entries.length}
+            </Text>
+          )}
+          <Pressable
+            onPress={() => navigation.navigate("WordsPartOfSpeech", { focusSearch: true })}
+            hitSlop={10}
+          >
+            <Text style={styles.searchIcon}>🔍</Text>
+          </Pressable>
+        </View>
+      ),
     });
   }, [navigation, title, idx, entries.length]);
 
@@ -130,6 +140,7 @@ export function BrowseCardScreen({ route, navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
+  searchIcon: { fontSize: 18 },
   safe: { flex: 1, backgroundColor: theme.colors.bg },
   page: { flex: 1, paddingHorizontal: theme.space(4), paddingVertical: theme.space(3) },
   counter: { color: theme.colors.textDim, fontSize: 15, fontWeight: "700" },

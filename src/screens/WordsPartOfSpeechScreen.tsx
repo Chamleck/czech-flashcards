@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from "react";
-import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { View, Text, StyleSheet, Pressable, ScrollView, TextInput } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -14,6 +14,7 @@ import { ADVERBS } from "../data/adverbs";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { plural } from "../utils/plural";
 import { ALL_NUMERAL_IDS } from "../utils/numeralEntries";
+import { searchWords, SearchEntry } from "../utils/searchIndex";
 
 type Props = NativeStackScreenProps<RootStackParamList, "WordsPartOfSpeech">;
 
@@ -46,7 +47,7 @@ const TILES: POSTile[] = [
   { key: "adverbs", emoji: "🗺️", title: "Прислівники", subtitle: `${ADVERBS.length} — де? куди? звідки?`, color: "#8ed081", ready: true },
 ];
 
-export function WordsPartOfSpeechScreen({ navigation }: Props) {
+export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
   const insets = useSafeAreaInsets();
   const [nounMistakes, setNounMistakes] = useState(0);
   const [verbMistakes, setVerbMistakes] = useState(0);
@@ -55,6 +56,24 @@ export function WordsPartOfSpeechScreen({ navigation }: Props) {
   const [numeralMistakes, setNumeralMistakes] = useState(0);
   const [prepMistakes, setPrepMistakes] = useState(0);
   const [adverbMistakes, setAdverbMistakes] = useState(0);
+
+  // Пошук: query порожній → звичайний грід тайлів; непорожній → результати.
+  // Автофокус — ЛИШЕ коли сюди прийшли з іконки пошуку (focusSearch:true),
+  // не при звичайному "назад" (інакше клавіатура вискакувала б несподівано).
+  const [query, setQuery] = useState("");
+  const searchInputRef = useRef<TextInput>(null);
+  useEffect(() => {
+    if (route.params?.focusSearch) {
+      const t = setTimeout(() => searchInputRef.current?.focus(), 350);
+      // Скидаємо параметр одразу — інакше застигле focusSearch:true могло б
+      // спрацювати ще раз при звичайному "назад" з глибшого екрана, залежно
+      // від того, чи React Navigation тримає інстанс живим. Краще не покладатись
+      // на це і скинути явно.
+      navigation.setParams({ focusSearch: undefined });
+      return () => clearTimeout(t);
+    }
+  }, [route.params?.focusSearch]);
+  const results = query.trim().length >= 2 ? searchWords(query) : [];
 
   // Рахуємо помилки по всіх колодах при кожному фокусі екрана.
   useFocusEffect(
@@ -122,32 +141,92 @@ export function WordsPartOfSpeechScreen({ navigation }: Props) {
     return 0;
   }
 
+  // Тап по результату пошуку: "пуш" трьох екранів поспіль, точно як реальна
+  // навігаційна глибина від кореня (parentScreen → BrowseList → BrowseCard).
+  // Усі проміжні екрани вибору категорії не приймають параметрів, тож це
+  // коштує майже нічого — і "назад" тепер веде туди ж, куди привів би
+  // звичайний тап по категорії, без скорочень.
+  function openSearchResult(entry: SearchEntry) {
+    const initialIndex = Math.max(0, entry.entryIds.indexOf(entry.id));
+    navigation.push(entry.parentScreen);
+    navigation.push("BrowseList", { kind: entry.kind, entryIds: entry.entryIds, title: entry.title });
+    navigation.push("BrowseCard", {
+      kind: entry.kind,
+      entryIds: entry.entryIds,
+      initialIndex,
+      title: entry.title,
+    });
+  }
+
   return (
     <ScrollView
       style={styles.safe}
       contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + theme.space(6) }]}
+      keyboardShouldPersistTaps="handled"
     >
-      <Text style={styles.intro}>Оберіть частину мови для вивчення</Text>
-
-      <View style={styles.grid}>
-        {TILES.map((t) => {
-          const m = mistakesFor(t.key);
-          const subtitle =
-            m > 0 ? `🔁 ${m} ${plural(m, "слово", "слова", "слів")} на повторення` : t.subtitle;
-          return (
-            <Pressable
-              key={t.key}
-              style={[styles.tile, { borderColor: t.color }, !t.ready && styles.tileDim]}
-              onPress={() => t.ready && open(t.key)}
-            >
-              <Text style={styles.tileEmoji}>{t.emoji}</Text>
-              <Text style={styles.tileTitle}>{t.title}</Text>
-              <Text style={[styles.tileSub, m > 0 && styles.tileSubAlert]}>{subtitle}</Text>
-              {!t.ready && <Text style={styles.soon}>🔒</Text>}
-            </Pressable>
-          );
-        })}
+      <View style={styles.searchBar}>
+        <Text style={styles.searchIcon}>🔍</Text>
+        <TextInput
+          ref={searchInputRef}
+          value={query}
+          onChangeText={setQuery}
+          placeholder="Пошук слова — чеською або українською…"
+          placeholderTextColor={theme.colors.textFaint}
+          style={styles.searchInput}
+        />
+        {query.length > 0 && (
+          <Pressable onPress={() => setQuery("")} hitSlop={10}>
+            <Text style={styles.searchClear}>✕</Text>
+          </Pressable>
+        )}
       </View>
+
+      {query.trim().length >= 2 ? (
+        results.length > 0 ? (
+          <View style={styles.resultsList}>
+            {results.map((r) => (
+              <Pressable key={`${r.kind}:${r.id}`} style={styles.resultRow} onPress={() => openSearchResult(r)}>
+                <Text style={styles.resultIcon}>{r.emoji}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.resultCz}>{r.cz}</Text>
+                  <Text style={styles.resultUk}>{r.uk}</Text>
+                </View>
+                <Text style={styles.resultKind} numberOfLines={2}>{r.title}</Text>
+              </Pressable>
+            ))}
+          </View>
+        ) : (
+          <View style={styles.noResults}>
+            <Text style={styles.noResultsIcon}>🔍</Text>
+            <Text style={styles.noResultsTitle}>Нічого не знайдено за «{query.trim()}»</Text>
+            <Text style={styles.noResultsHint}>Спробуй іншою мовою або перевір написання</Text>
+          </View>
+        )
+      ) : (
+        <>
+          <Text style={styles.intro}>Оберіть частину мови для вивчення</Text>
+
+          <View style={styles.grid}>
+            {TILES.map((t) => {
+              const m = mistakesFor(t.key);
+              const subtitle =
+                m > 0 ? `🔁 ${m} ${plural(m, "слово", "слова", "слів")} на повторення` : t.subtitle;
+              return (
+                <Pressable
+                  key={t.key}
+                  style={[styles.tile, { borderColor: t.color }, !t.ready && styles.tileDim]}
+                  onPress={() => t.ready && open(t.key)}
+                >
+                  <Text style={styles.tileEmoji}>{t.emoji}</Text>
+                  <Text style={styles.tileTitle}>{t.title}</Text>
+                  <Text style={[styles.tileSub, m > 0 && styles.tileSubAlert]}>{subtitle}</Text>
+                  {!t.ready && <Text style={styles.soon}>🔒</Text>}
+                </Pressable>
+              );
+            })}
+          </View>
+        </>
+      )}
     </ScrollView>
   );
 }
@@ -156,6 +235,38 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: theme.colors.bg },
   content: { padding: theme.space(5) },
   intro: { color: theme.colors.textDim, fontSize: 15, marginBottom: theme.space(5) },
+  searchBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.space(2),
+    backgroundColor: theme.colors.bgCard,
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.lilac,
+    borderRadius: theme.radius.md,
+    paddingVertical: theme.space(3),
+    paddingHorizontal: theme.space(3.5),
+    marginBottom: theme.space(5),
+  },
+  searchIcon: { fontSize: 16 },
+  searchInput: { flex: 1, color: theme.colors.text, fontSize: 15, padding: 0 },
+  searchClear: { color: theme.colors.textFaint, fontSize: 16, paddingHorizontal: 4 },
+  resultsList: { gap: theme.space(2) },
+  resultRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.space(3),
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.radius.md,
+    padding: theme.space(3),
+  },
+  resultIcon: { fontSize: 22 },
+  resultCz: { color: theme.colors.honey, fontSize: 16, fontWeight: "800" },
+  resultUk: { color: theme.colors.textDim, fontSize: 12, marginTop: 1 },
+  resultKind: { color: theme.colors.textFaint, fontSize: 10, textTransform: "uppercase", maxWidth: 70, textAlign: "right" },
+  noResults: { alignItems: "center", paddingVertical: theme.space(8) },
+  noResultsIcon: { fontSize: 32, opacity: 0.4 },
+  noResultsTitle: { color: theme.colors.text, fontSize: 15, fontWeight: "700", marginTop: theme.space(2), textAlign: "center" },
+  noResultsHint: { color: theme.colors.textFaint, fontSize: 12, marginTop: 4 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: theme.space(3) },
   tile: {
     width: "47%",
