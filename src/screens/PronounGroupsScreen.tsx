@@ -7,6 +7,7 @@ import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
+import { PRONOUN_GROUP_TITLE, PERSONAL_GROUP_TITLE } from "../data/groupTitles";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { ALL_PRONOUN_MIXED_IDS } from "../utils/pronounEntries";
 import { plural } from "../utils/plural";
@@ -53,16 +54,14 @@ export function PronounGroupsScreen({ navigation }: Props) {
   // Тап по групі: тренування — сесія; перегляд — список слів групи.
   function openAll() {
     const ids = PRONOUNS.map((p) => p.id);
-    const title = "👉 Присвійні та вказівні";
-    if (mode === "browse") navigation.navigate("BrowseList", { kind: "pronouns", entryIds: ids, title });
-    else navigation.navigate("DeclSession", { title, kind: "pronoun", entryIds: ids });
+    if (mode === "browse") navigation.navigate("BrowseList", { kind: "pronouns", entryIds: ids, title: PRONOUN_GROUP_TITLE });
+    else navigation.navigate("DeclSession", { title: PRONOUN_GROUP_TITLE, kind: "pronoun", entryIds: ids });
   }
 
   function openPersonal() {
     const ids = PERSONAL_PRONOUNS.map((p) => p.id);
-    const title = "🙋 Особові";
-    if (mode === "browse") navigation.navigate("BrowseList", { kind: "personal", entryIds: ids, title });
-    else navigation.navigate("DeclSession", { title, kind: "personal", entryIds: ids });
+    if (mode === "browse") navigation.navigate("BrowseList", { kind: "personal", entryIds: ids, title: PERSONAL_GROUP_TITLE });
+    else navigation.navigate("DeclSession", { title: PERSONAL_GROUP_TITLE, kind: "personal", entryIds: ids });
   }
 
   return (

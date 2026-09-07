@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress, CzechCase, CASE_LABELS } from "../types";
 import { theme } from "../utils/theme";
 import { PREPOSITIONS } from "../data/prepositions";
+import { PREP_DUAL_TITLE } from "../data/groupTitles";
 import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
@@ -95,11 +96,10 @@ export function PrepositionsScreen({ navigation }: Props) {
   }
 
   function openDual() {
-    const title = "Дуальні (рух / спокій)";
     if (mode === "browse") {
-      navigation.navigate("BrowseList", { kind: "prepositions", entryIds: DUAL_IDS, title });
+      navigation.navigate("BrowseList", { kind: "prepositions", entryIds: DUAL_IDS, title: PREP_DUAL_TITLE });
     } else {
-      navigation.navigate("PrepositionSession", { title, entryIds: DUAL_IDS });
+      navigation.navigate("PrepositionSession", { title: PREP_DUAL_TITLE, entryIds: DUAL_IDS });
     }
   }
 

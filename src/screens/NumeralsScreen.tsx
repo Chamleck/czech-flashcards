@@ -12,6 +12,7 @@ import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { ALL_NUMERAL_IDS } from "../utils/numeralEntries";
+import { NUMERAL_CARDINAL_TITLE, NUMERAL_ORDINAL_TITLE, NUMERAL_HUNDREDS_TITLE } from "../data/groupTitles";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Numerals">;
 
@@ -42,7 +43,7 @@ const ITEMS: Item[] = [
   {
     key: "cardinal",
     emoji: "🔢",
-    title: "Кількісні",
+    title: NUMERAL_CARDINAL_TITLE,
     hint: "jeden, dva, pět… (окреме відмінювання)",
     count: CARDINAL_IDS.length,
     color: theme.colors.honey,
@@ -50,7 +51,7 @@ const ITEMS: Item[] = [
   {
     key: "ordinal",
     emoji: "🥇",
-    title: "Порядкові",
+    title: NUMERAL_ORDINAL_TITLE,
     hint: "перший, другий… (зразок mladý/jarní)",
     count: ORDINAL_IDS.length,
     color: theme.colors.lilac,
@@ -58,7 +59,7 @@ const ITEMS: Item[] = [
   {
     key: "hundreds",
     emoji: "💯",
-    title: "Сотні, тисячі, мільйони",
+    title: NUMERAL_HUNDREDS_TITLE,
     hint: "sto, tisíc, milion, miliarda (звичайні іменники)",
     count: NUMBER_IDS.length,
     color: theme.colors.mint,
