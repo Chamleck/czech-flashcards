@@ -24,6 +24,13 @@ import {
   NUMERAL_HUNDREDS_TITLE,
   PREP_DUAL_TITLE,
   ADVERBS_GROUP_TITLE,
+  KIND_LABEL_NOUNS,
+  KIND_LABEL_VERBS,
+  KIND_LABEL_ADJECTIVES,
+  KIND_LABEL_PRONOUNS,
+  KIND_LABEL_NUMERALS,
+  KIND_LABEL_PREPOSITIONS,
+  KIND_LABEL_ADVERBS,
 } from "../data/groupTitles";
 
 // ─────────────────────────── Індекс пошуку слів ───────────────────────────
@@ -41,7 +48,12 @@ export interface SearchEntry {
   emoji: string;
   searchTextsNorm: string[]; // усі форми (у т.ч. усі сенси), вже нормалізовані
   entryIds: string[]; // сусідня група — той самий масив, що дав би тап по категорії
-  title: string; // заголовок групи для BrowseList
+  title: string; // заголовок групи для BrowseList (навігаційний, може бути вузьким — "Родовий (Genitiv)")
+  // Широка категорія для РЯДКА РЕЗУЛЬТАТУ пошуку ("Прийменники", не "Родовий
+  // (Genitiv)") — навігаційний title занадто вузький і неінформативний як
+  // ярлик у списку результатів (реальна знахідка користувача: "місто" за
+  // прийменником показувало відмінок, не зрозуміло взагалі яка частина мови).
+  kindLabel: string;
   // Проміжний екран вибору категорії, куди реально веде тап (враховує приховані
   // маршрути: "numbers"/"ordinal" ведуть на Numerals, не на WordCategories/
   // AdjectiveCategories). Всі ці екрани не приймають параметрів — "пуш" перед
@@ -72,6 +84,21 @@ const KIND_EMOJI: Record<BrowseKind, string> = {
   adverbs: "🗺️",
 };
 
+// Широка категорія за замовчуванням — та сама, що назви тайлів на корені
+// "Слова" (переюзано з groupTitles.ts, не задубльовано текстом ще раз).
+// Для прихованих маршрутів (numbers/ordinal → Числівники) push() приймає
+// явний override, бо дефолт за kind тут був би оманливим.
+const KIND_LABEL: Record<BrowseKind, string> = {
+  nouns: KIND_LABEL_NOUNS,
+  verbs: KIND_LABEL_VERBS,
+  adjectives: KIND_LABEL_ADJECTIVES,
+  pronouns: KIND_LABEL_PRONOUNS,
+  personal: KIND_LABEL_PRONOUNS,
+  cardinals: KIND_LABEL_NUMERALS,
+  prepositions: KIND_LABEL_PREPOSITIONS,
+  adverbs: KIND_LABEL_ADVERBS,
+};
+
 function push(
   arr: SearchEntry[],
   id: string,
@@ -81,10 +108,22 @@ function push(
   extraTexts: string[],
   entryIds: string[],
   title: string,
-  parentScreen: SearchEntry["parentScreen"]
+  parentScreen: SearchEntry["parentScreen"],
+  kindLabelOverride?: string
 ) {
   const texts = [cz, uk, ...extraTexts].map(normalize);
-  arr.push({ id, kind, cz, uk, emoji: KIND_EMOJI[kind], searchTextsNorm: texts, entryIds, title, parentScreen });
+  arr.push({
+    id,
+    kind,
+    cz,
+    uk,
+    emoji: KIND_EMOJI[kind],
+    searchTextsNorm: texts,
+    entryIds,
+    title,
+    parentScreen,
+    kindLabel: kindLabelOverride ?? KIND_LABEL[kind],
+  });
 }
 
 function buildIndex(): SearchEntry[] {
@@ -97,7 +136,7 @@ function buildIndex(): SearchEntry[] {
   for (const n of NOUNS) {
     if (n.category === "time") continue;
     if (n.category === "numbers") {
-      push(out, n.id, "nouns", n.cz, n.uk, [], numberIds, NUMERAL_HUNDREDS_TITLE, "Numerals");
+      push(out, n.id, "nouns", n.cz, n.uk, [], numberIds, NUMERAL_HUNDREDS_TITLE, "Numerals", KIND_LABEL.cardinals);
       continue;
     }
     const meta = CATEGORY_BY_KEY[n.category];
@@ -110,7 +149,7 @@ function buildIndex(): SearchEntry[] {
   const ordinalIds = ADJECTIVES.filter((a) => a.category === "ordinal").map((a) => a.id);
   for (const a of ADJECTIVES) {
     if (a.category === "ordinal") {
-      push(out, a.id, "adjectives", a.cz, a.uk, [], ordinalIds, NUMERAL_ORDINAL_TITLE, "Numerals");
+      push(out, a.id, "adjectives", a.cz, a.uk, [], ordinalIds, NUMERAL_ORDINAL_TITLE, "Numerals", KIND_LABEL.cardinals);
       continue;
     }
     const meta = ADJ_CATEGORY_BY_KEY[a.category];
@@ -178,9 +217,29 @@ function buildIndex(): SearchEntry[] {
 
 const INDEX: SearchEntry[] = buildIndex();
 
+// Ранг збігу для одного слова: 0 = точний збіг, 1 = слово ПОЧИНАЄТЬСЯ з
+// запиту, 2 = запит десь усередині. Менше = релевантніше. Беремо найкращий
+// (найменший) ранг серед усіх форм запису.
+function matchRank(entry: SearchEntry, q: string): number {
+  let best = 99;
+  for (const t of entry.searchTextsNorm) {
+    if (t === q) return 0; // точний збіг — одразу найкращий
+    if (t.startsWith(q)) best = Math.min(best, 1);
+    else if (t.includes(q)) best = Math.min(best, 2);
+  }
+  return best;
+}
+
 // Мінімум 2 символи — інакше 1 літера дає забагато шуму.
 export function searchWords(query: string): SearchEntry[] {
   const q = normalize(query);
   if (q.length < 2) return [];
-  return INDEX.filter((e) => e.searchTextsNorm.some((t) => t.includes(q)));
+  // Обчислюємо ранг ОДИН раз на запис (map), а не багато разів усередині
+  // компаратора sort. Точний збіг і початок слова — угорі, збіг усередині —
+  // нижче. Без сортування точний збіг тонув унизу серед часткових (напр.
+  // "pět" з'являвся б після десятків іменників, що містять "pet" усередині).
+  return INDEX.map((e) => ({ e, r: matchRank(e, q) }))
+    .filter((x) => x.r < 99)
+    .sort((a, b) => a.r - b.r)
+    .map((x) => x.e);
 }

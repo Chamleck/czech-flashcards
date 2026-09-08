@@ -15,6 +15,15 @@ import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progres
 import { plural } from "../utils/plural";
 import { ALL_NUMERAL_IDS } from "../utils/numeralEntries";
 import { searchWords, SearchEntry } from "../utils/searchIndex";
+import {
+  KIND_LABEL_NOUNS,
+  KIND_LABEL_VERBS,
+  KIND_LABEL_ADJECTIVES,
+  KIND_LABEL_PRONOUNS,
+  KIND_LABEL_NUMERALS,
+  KIND_LABEL_PREPOSITIONS,
+  KIND_LABEL_ADVERBS,
+} from "../data/groupTitles";
 
 type Props = NativeStackScreenProps<RootStackParamList, "WordsPartOfSpeech">;
 
@@ -38,13 +47,13 @@ const VISIBLE_NOUNS = NOUNS.filter((n) => !HIDDEN_NOUN_CATS.has(n.category)).len
 const VISIBLE_ADJS = ADJECTIVES.filter((a) => !HIDDEN_ADJ_CATS.has(a.category)).length;
 
 const TILES: POSTile[] = [
-  { key: "nouns", emoji: "🔤", title: "Іменники", subtitle: `${VISIBLE_NOUNS} слів з відмінюванням`, color: theme.colors.honey, ready: true },
-  { key: "verbs", emoji: "🏃", title: "Дієслова", subtitle: `${VERBS.length} слів з дієвідміною`, color: theme.colors.mint, ready: true },
-  { key: "adjectives", emoji: "🎨", title: "Прикметники", subtitle: `${VISIBLE_ADJS} слів з відмінюванням`, color: theme.colors.lilac, ready: true },
-  { key: "pronouns", emoji: "👉", title: "Займенники", subtitle: `${PRONOUNS.length} присвійних і вказівних`, color: theme.colors.coral, ready: true },
-  { key: "numerals", emoji: "🔢", title: "Числівники", subtitle: "порядкові, сотні, тисячі", color: "#e0a458", ready: true },
-  { key: "prepositions", emoji: "🧭", title: "Прийменники", subtitle: `${PREPOSITIONS.length} з фіксованим відмінком`, color: "#7fb8e0", ready: true },
-  { key: "adverbs", emoji: "🗺️", title: "Прислівники", subtitle: `${ADVERBS.length} — де? куди? звідки?`, color: "#8ed081", ready: true },
+  { key: "nouns", emoji: "🔤", title: KIND_LABEL_NOUNS, subtitle: `${VISIBLE_NOUNS} слів з відмінюванням`, color: theme.colors.honey, ready: true },
+  { key: "verbs", emoji: "🏃", title: KIND_LABEL_VERBS, subtitle: `${VERBS.length} слів з дієвідміною`, color: theme.colors.mint, ready: true },
+  { key: "adjectives", emoji: "🎨", title: KIND_LABEL_ADJECTIVES, subtitle: `${VISIBLE_ADJS} слів з відмінюванням`, color: theme.colors.lilac, ready: true },
+  { key: "pronouns", emoji: "👉", title: KIND_LABEL_PRONOUNS, subtitle: `${PRONOUNS.length} присвійних і вказівних`, color: theme.colors.coral, ready: true },
+  { key: "numerals", emoji: "🔢", title: KIND_LABEL_NUMERALS, subtitle: "порядкові, сотні, тисячі", color: "#e0a458", ready: true },
+  { key: "prepositions", emoji: "🧭", title: KIND_LABEL_PREPOSITIONS, subtitle: `${PREPOSITIONS.length} з фіксованим відмінком`, color: "#7fb8e0", ready: true },
+  { key: "adverbs", emoji: "🗺️", title: KIND_LABEL_ADVERBS, subtitle: `${ADVERBS.length} — де? куди? звідки?`, color: "#8ed081", ready: true },
 ];
 
 export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
@@ -64,15 +73,19 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
   const searchInputRef = useRef<TextInput>(null);
   useEffect(() => {
     if (route.params?.focusSearch) {
-      const t = setTimeout(() => searchInputRef.current?.focus(), 350);
-      // Скидаємо параметр одразу — інакше застигле focusSearch:true могло б
-      // спрацювати ще раз при звичайному "назад" з глибшого екрана, залежно
-      // від того, чи React Navigation тримає інстанс живим. Краще не покладатись
-      // на це і скинути явно.
-      navigation.setParams({ focusSearch: undefined });
-      return () => clearTimeout(t);
+      // transitionEnd (не setTimeout з підібраним числом) — офіційна подія
+      // React Navigation, спрацьовує РІВНО коли анімація переходу реально
+      // завершилась, незалежно від швидкості пристрою. 350ms був єдиним
+      // таким магічним числом у проєкті — реальна крихкість, спіймана
+      // аудитом: на повільному пристрої анімація могла тривати довше, і
+      // фокус спрацював би до того, як екран справді готовий.
+      const unsubscribe = navigation.addListener("transitionEnd", () => {
+        searchInputRef.current?.focus();
+        navigation.setParams({ focusSearch: undefined });
+      });
+      return unsubscribe;
     }
-  }, [route.params?.focusSearch]);
+  }, [route.params?.focusSearch, navigation]);
   const results = query.trim().length >= 2 ? searchWords(query) : [];
 
   // Рахуємо помилки по всіх колодах при кожному фокусі екрана.
@@ -170,7 +183,7 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
           ref={searchInputRef}
           value={query}
           onChangeText={setQuery}
-          placeholder="Пошук слова — чеською або українською…"
+          placeholder="Пошук слова (cz/укр)…"
           placeholderTextColor={theme.colors.textFaint}
           style={styles.searchInput}
         />
@@ -188,10 +201,10 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
               <Pressable key={`${r.kind}:${r.id}`} style={styles.resultRow} onPress={() => openSearchResult(r)}>
                 <Text style={styles.resultIcon}>{r.emoji}</Text>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.resultCz}>{r.cz}</Text>
-                  <Text style={styles.resultUk}>{r.uk}</Text>
+                  <Text style={styles.resultCz} numberOfLines={1}>{r.cz}</Text>
+                  <Text style={styles.resultUk} numberOfLines={1}>{r.uk}</Text>
                 </View>
-                <Text style={styles.resultKind} numberOfLines={2}>{r.title}</Text>
+                <Text style={styles.resultKind} numberOfLines={2}>{r.kindLabel}</Text>
               </Pressable>
             ))}
           </View>

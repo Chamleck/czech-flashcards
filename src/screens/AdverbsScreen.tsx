@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { ADVERBS } from "../data/adverbs";
+import { ADVERBS_GROUP_TITLE } from "../data/groupTitles";
 import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
@@ -45,11 +46,10 @@ export function AdverbsScreen({ navigation }: Props) {
   }
 
   function openAll() {
-    const title = "Прислівники місця";
     if (mode === "browse") {
-      navigation.navigate("BrowseList", { kind: "adverbs", entryIds: ALL_ADVERB_IDS, title });
+      navigation.navigate("BrowseList", { kind: "adverbs", entryIds: ALL_ADVERB_IDS, title: ADVERBS_GROUP_TITLE });
     } else {
-      navigation.navigate("AdverbSession", { title, entryIds: ALL_ADVERB_IDS });
+      navigation.navigate("AdverbSession", { title: ADVERBS_GROUP_TITLE, entryIds: ALL_ADVERB_IDS });
     }
   }
 

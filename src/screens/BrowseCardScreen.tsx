@@ -75,7 +75,9 @@ export function BrowseCardScreen({ route, navigation }: Props) {
             </Text>
           )}
           <Pressable
-            onPress={() => navigation.navigate("WordsPartOfSpeech", { focusSearch: true })}
+            onPress={() =>
+              navigation.reset({ index: 0, routes: [{ name: "WordsPartOfSpeech", params: { focusSearch: true } }] })
+            }
             hitSlop={10}
           >
             <Text style={styles.searchIcon}>🔍</Text>

@@ -27,7 +27,17 @@ export function BrowseListScreen({ route, navigation }: Props) {
       // екрани) її немає: там сесія за алгоритмом, шукати конкретне слово —
       // не той сценарій.
       headerRight: () => (
-        <Pressable onPress={() => navigation.navigate("WordsPartOfSpeech", { focusSearch: true })} hitSlop={10}>
+        <Pressable
+          onPress={() =>
+            // reset (не navigate) — гарантовано обнуляє ВЕСЬ стек до одного
+            // екрана. navigate міг би нашарувати новий корінь поверх
+            // старого замість "згорнути" його — реальний баг: повторний
+            // пошук призводив до накопичення шарів і "зациклення" на
+            // "назад" (проходив той самий шлях знову).
+            navigation.reset({ index: 0, routes: [{ name: "WordsPartOfSpeech", params: { focusSearch: true } }] })
+          }
+          hitSlop={10}
+        >
           <Text style={styles.searchIcon}>🔍</Text>
         </Pressable>
       ),

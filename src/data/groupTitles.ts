@@ -14,3 +14,15 @@ export const NUMERAL_ORDINAL_TITLE = "Порядкові";
 export const NUMERAL_HUNDREDS_TITLE = "Сотні, тисячі, мільйони";
 export const PREP_DUAL_TITLE = "Дуальні (рух / спокій)";
 export const ADVERBS_GROUP_TITLE = "Прислівники місця";
+
+// Широкі назви частин мови — використовуються і тайлами на корені "Слова"
+// (WordsPartOfSpeechScreen), і searchIndex.ts (kindLabel у результатах
+// пошуку). Той самий принцип: одне джерело істини замість двох незалежних
+// хардкоджених копій одного тексту.
+export const KIND_LABEL_NOUNS = "Іменники";
+export const KIND_LABEL_VERBS = "Дієслова";
+export const KIND_LABEL_ADJECTIVES = "Прикметники";
+export const KIND_LABEL_PRONOUNS = "Займенники";
+export const KIND_LABEL_NUMERALS = "Числівники";
+export const KIND_LABEL_PREPOSITIONS = "Прийменники";
+export const KIND_LABEL_ADVERBS = "Прислівники";
