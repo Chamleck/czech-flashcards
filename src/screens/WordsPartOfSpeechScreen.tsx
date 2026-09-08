@@ -204,7 +204,7 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
                   <Text style={styles.resultCz} numberOfLines={1}>{r.cz}</Text>
                   <Text style={styles.resultUk} numberOfLines={1}>{r.uk}</Text>
                 </View>
-                <Text style={styles.resultKind} numberOfLines={2}>{r.kindLabel}</Text>
+                <Text style={styles.resultKind} numberOfLines={1}>{r.kindLabel}</Text>
               </Pressable>
             ))}
           </View>
@@ -275,7 +275,13 @@ const styles = StyleSheet.create({
   resultIcon: { fontSize: 22 },
   resultCz: { color: theme.colors.honey, fontSize: 16, fontWeight: "800" },
   resultUk: { color: theme.colors.textDim, fontSize: 12, marginTop: 1 },
-  resultKind: { color: theme.colors.textFaint, fontSize: 10, textTransform: "uppercase", maxWidth: 70, textAlign: "right" },
+  // Ярлик категорії — ЗАВЖДИ в один рядок за шириною вмісту. flexShrink:0 не
+  // дає йому стискатись (усі назви — одне слово, найдовше 11 літер), натомість
+  // стискається середня колонка cz/uk (у них numberOfLines={1} з трикрапкою).
+  // Раніше був maxWidth:70 + numberOfLines={2}: одне слово ~72px не влізало і
+  // RN ламав його ПОСЕРЕДИНІ — одинока літера падала на другий рядок. Тепер
+  // адаптивно для будь-якої довжини ярлика й ширини екрана, без магічних чисел.
+  resultKind: { color: theme.colors.textFaint, fontSize: 10, textTransform: "uppercase", flexShrink: 0, textAlign: "right" },
   noResults: { alignItems: "center", paddingVertical: theme.space(8) },
   noResultsIcon: { fontSize: 32, opacity: 0.4 },
   noResultsTitle: { color: theme.colors.text, fontSize: 15, fontWeight: "700", marginTop: theme.space(2), textAlign: "center" },

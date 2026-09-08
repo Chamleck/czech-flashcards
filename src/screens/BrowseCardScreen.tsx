@@ -76,7 +76,17 @@ export function BrowseCardScreen({ route, navigation }: Props) {
           )}
           <Pressable
             onPress={() =>
-              navigation.reset({ index: 0, routes: [{ name: "WordsPartOfSpeech", params: { focusSearch: true } }] })
+              // Лишаємо Home ПІД "Словами" (index:1), а не єдиний маршрут:
+              // інакше "назад" зі "Слів" згортає застосунок замість повернення
+              // на головну. Browse завжди відкривають через Home → Слова, тож
+              // Home — легітимна основа стека. Деталі — у BrowseListScreen.
+              navigation.reset({
+                index: 1,
+                routes: [
+                  { name: "Home" },
+                  { name: "WordsPartOfSpeech", params: { focusSearch: true } },
+                ],
+              })
             }
             hitSlop={10}
           >

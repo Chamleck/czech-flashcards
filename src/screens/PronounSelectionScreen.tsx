@@ -5,6 +5,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { PRONOUNS } from "../data/pronouns";
+import { PRONOUN_GROUP_TITLE } from "../data/groupTitles";
 
 type Props = NativeStackScreenProps<RootStackParamList, "PronounSelection">;
 
@@ -14,7 +15,7 @@ export function PronounSelectionScreen({ navigation }: Props) {
   const [selected, setSelected] = useState<Set<string>>(() => new Set(words.map((w) => w.id)));
 
   useLayoutEffect(() => {
-    navigation.setOptions({ title: "👉 Присвійні та вказівні" });
+    navigation.setOptions({ title: PRONOUN_GROUP_TITLE });
   }, [navigation]);
 
   const allSelected = selected.size === words.length;
@@ -36,7 +37,7 @@ export function PronounSelectionScreen({ navigation }: Props) {
     if (selected.size === 0) return;
     const ids = words.filter((w) => selected.has(w.id)).map((w) => w.id);
     navigation.navigate("DeclSession", {
-      title: "👉 Присвійні та вказівні",
+      title: PRONOUN_GROUP_TITLE,
       kind: "pronoun",
       entryIds: ids,
     });
