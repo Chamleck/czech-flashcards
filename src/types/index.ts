@@ -72,7 +72,9 @@ export type WordCategory =
   | "days"
   | "months"
   | "numbers"
-  | "time";
+  | "time"
+  | "body"
+  | "work";
 
 // Повна парадигма відмінювання: 7 відмінків x 2 числа
 export type DeclensionTable = Record<CzechCase, { sg: string; pl: string }>;

@@ -55,9 +55,10 @@ function collapseVowelLength(s: string): string {
 }
 
 // Дистрактор придатний, якщо він не збігається з правильною формою і не є візуально
-// невідрізнюваним від неї (різниця лише в довготі голосної).
+// невідрізнюваним від неї (різниця лише в довготі голосної). "—" (форма не існує,
+// напр. однина pluralia tantum — peníze) НІКОЛИ не придатний дистрактор.
 function isUsableDistractor(correct: string, d: string | null | undefined): d is string {
-  return !!d && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
+  return !!d && d !== "—" && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
 }
 
 // Дистрактор = РЕАЛЬНА форма з парадигми того ж слова, але не та, що питають.
@@ -117,12 +118,17 @@ function makeQuestionForCombo(
   if (!distractor) return null; // немає візуально-різного дистрактора — комбінацію пропускаємо
 
   const lbl = CASE_LABELS[targetCase];
+  // Headline-слово — зазвичай називний однини, АЛЕ для pluralia tantum
+  // (peníze — однини не існує) це "—"; тоді беремо називний множини —
+  // саме він і є словниковою формою для таких слів.
+  const nomSg = entry.declension.nominativ.sg;
+  const promptWord = nomSg !== "—" ? nomSg : entry.declension.nominativ.pl;
   return {
     entry,
     targetCase,
     targetNumber,
     comboId: comboId(entry.id, targetCase, targetNumber),
-    promptWord: entry.declension.nominativ.sg,
+    promptWord,
     promptUk: entry.uk,
     taskText: `Оберіть форму: ${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${NUMBER_LABEL[targetNumber]}`,
     correct,
@@ -144,8 +150,13 @@ function enumerateCombos(pool: NounEntry[]): Combo[] {
   for (const entry of pool) {
     for (const c of CASE_ORDER) {
       for (const n of ["sg", "pl"] as GrammaticalNumber[]) {
+        const correct = entry.declension[c][n];
+        // "—" = форма не існує (pluralia tantum на кшталт peníze не мають
+        // однини) — таку комбінацію не тестуємо взагалі, незалежно від
+        // дистрактора.
+        if (correct === "—") continue;
         // валідна, якщо існує дистрактор (перевіряємо через побудову з fallback)
-        if (buildDistractor(entry, c, n, entry.declension[c][n], "case")) {
+        if (buildDistractor(entry, c, n, correct, "case")) {
           combos.push({ entry, targetCase: c, targetNumber: n, id: comboId(entry.id, c, n) });
         }
       }
