@@ -130,11 +130,11 @@ function buildIndex(): SearchEntry[] {
   const out: SearchEntry[] = [];
 
   // Іменники — group за category, KРІМ "numbers" (сотні/тисячі, прихована з
-  // тайлу іменників, реальний вхід — «Числівники») і "time" (прихована,
-  // немає власного екрану групування — не індексуємо, нема куди вести тап).
+  // тайлу іменників, реальний вхід — «Числівники»). "time" з 2026-09 більше не
+  // прихована — індексується через загальну гілку нижче (той самий шлях, що
+  // "months").
   const numberIds = NOUNS.filter((n) => n.category === "numbers").map((n) => n.id);
   for (const n of NOUNS) {
-    if (n.category === "time") continue;
     if (n.category === "numbers") {
       push(out, n.id, "nouns", n.cz, n.uk, [], numberIds, NUMERAL_HUNDREDS_TITLE, "Numerals", KIND_LABEL.cardinals);
       continue;
