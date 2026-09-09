@@ -20,7 +20,7 @@ export interface AdverbQuestion {
   taskText: string;
   contextPhrase?: string; // чеське речення з пропуском ___
   correct: string;
-  options: string[]; // усі форми сенсів того самого концепту, перемішані
+  options: string[]; // [правильна, дистрактор] — перемішані (2 варіанти, як усюди)
 }
 
 // Просторова роль = грамматична конструкція теми. kind для kindQuota.
@@ -103,9 +103,16 @@ function makeQuestion(c: Combo): AdverbQuestion {
   const ex = c.sense.examples[Math.floor(Math.random() * c.sense.examples.length)];
   const blanked = blankOut(ex.cz, c.sense.cz);
 
-  // Дистрактори — форми ІНШИХ сенсів того самого концепту (реальні, не вигадані).
+  // РІВНО ОДИН дистрактор — та сама конвенція, що й у ВСІХ інших движків
+  // застосунку (Іменники/Дієслова/Прикметники/Числівники/Час/Прийменники —
+  // усюди 2 варіанти, жодного винятку; contract-коментар у VerbQuestion теж
+  // прямо каже "[правильна, дистрактор]", однина). У повних трійках (де є 2
+  // інших сенси) обираємо ОДИН з них випадково — форма реальна (не вигадана),
+  // просто не всі альтернативи одночасно. tam/doma (лише 1 інший сенс) —
+  // без змін, там і так було 2.
   const others = c.entry.senses.filter((s) => s !== c.sense).map((s) => s.cz);
-  const options = shuffle([c.sense.cz, ...others]);
+  const distractor = others[Math.floor(Math.random() * others.length)];
+  const options = shuffle([c.sense.cz, distractor]);
 
   return {
     entry: c.entry,
