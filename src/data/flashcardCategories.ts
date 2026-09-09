@@ -60,4 +60,12 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
     color: "#7fb8e0",
     ready: true,
   },
+  {
+    id: "adverbs",
+    emoji: "🗺️",
+    title: "Прислівники місця",
+    subtitle: "Де? Куди? Звідки? — обрати форму за реченням",
+    color: "#8ed081",
+    ready: true,
+  },
 ];
