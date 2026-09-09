@@ -1442,11 +1442,18 @@ export const VERBS: VerbEntry[] = [
     verbClass: "IV",
     future: { ja: "uvidím", ty: "uvidíš", on: "uvidí", my: "uvidíme", vy: "uvidíte", oni: "uvidí" },
     pastParticiple: { m: "uviděl", f: "uviděla", n: "uvidělo", manim_pl: "uviděli", other_pl: "uviděly" },
+    // Наказовий спосіб РЕАЛЬНО існує (uviď/uviďte/uviďme — звірено dobryslovnik.cz),
+    // на відміну від недоконаного партнера vidět, чий наказовий спосіб (viz/vizte/
+    // vizme) — інша, лексикалізована архаїчна форма (від старого кореня, не від
+    // регулярної парадигми vid-). Форма рідковживана (perfective перцептивне
+    // дієслово — важко «наказати» раптово побачити), але не відсутня.
+    imperative: { ty: "uviď", vy: "uviďte", my: "uviďme" },
     aspectPairNote: "недоконаний партнер: vidět (бачити); наказовий спосіб рідковживаний",
     aspectPairId: "videt",
     examples: {
       past: { cz: "Uviděl jsem ji na ulici.", uk: "Я побачив її на вулиці." },
       future: { cz: "Uvidíme se zítra.", uk: "Побачимося завтра." },
+      imperative: { cz: "Uviď to sám!", uk: "Побач це сам!" },
     },
   },
   {
@@ -1475,11 +1482,16 @@ export const VERBS: VerbEntry[] = [
     verbClass: "IV",
     future: { ja: "uslyším", ty: "uslyšíš", on: "uslyší", my: "uslyšíme", vy: "uslyšíte", oni: "uslyší" },
     pastParticiple: { m: "uslyšel", f: "uslyšela", n: "uslyšelo", manim_pl: "uslyšeli", other_pl: "uslyšely" },
+    // Наказовий спосіб РЕАЛЬНО існує (uslyš/uslyšte/uslyšme — звірено dobryslovnik.cz),
+    // регулярна форма (на відміну від viz/vizte/vizme у vidět — той випадок
+    // лексикалізовано-архаїчний). Рідковживана з тієї ж причини, що й uvidět.
+    imperative: { ty: "uslyš", vy: "uslyšte", my: "uslyšme" },
     aspectPairNote: "недоконаний партнер: slyšet (чути); наказовий спосіб рідковживаний",
     aspectPairId: "slyset",
     examples: {
       past: { cz: "Uslyšel jsem hlasitý zvuk.", uk: "Я почув гучний звук." },
       future: { cz: "Uslyšíš to sám.", uk: "Ти сам це почуєш." },
+      imperative: { cz: "Uslyš mě!", uk: "Почуй мене!" },
     },
   },
   {
