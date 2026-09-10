@@ -2,11 +2,13 @@ import React, { useLayoutEffect } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList, CASE_ORDER, CASE_LABELS } from "../types";
+import { RootStackParamList, CASE_ORDER, CASE_LABELS, BrowseKind } from "../types";
 import { theme } from "../utils/theme";
-import { GRAMMAR_BY_ID, GrammarBlock } from "../data/grammar";
+import { GRAMMAR_BY_ID, GrammarBlock, ParagraphSegment } from "../data/grammar";
+import { findSearchEntry } from "../utils/searchIndex";
 
 type Props = NativeStackScreenProps<RootStackParamList, "GrammarTopic">;
+type GrammarNav = Props["navigation"];
 
 // Згруповані зразки відмінювання для блоку "patterns"
 const PATTERN_GROUPS = [
@@ -70,7 +72,62 @@ function PatternsBlock() {
   );
 }
 
-function Block({ block }: { block: GrammarBlock }) {
+// Клікабельне слово всередині речення — відкриває картку слова в словнику
+// (BrowseCard). Стиль СВІДОМО відрізняється від Speakable (озвучення): колір
+// lilac (уже зарезервований у темі під "інформацію"), БЕЗ підкреслення й БЕЗ
+// анімації — щоб два різні жести (почути / відкрити картку) не виглядали
+// однаково. Nested-Text-з-onPress — той самий безпечний патерн, що вже working
+// у caseCz (кольоровий Text всередині Text) і в Speakable (Text з onPress).
+function ClickableWord({
+  word,
+  wordId,
+  kind,
+  navigation,
+}: {
+  word: string;
+  wordId: string;
+  kind: BrowseKind;
+  navigation: GrammarNav;
+}) {
+  function onPress() {
+    const entry = findSearchEntry(wordId, kind);
+    if (!entry) return; // wordId не знайдено в словнику — тихо ігноруємо тап
+    const initialIndex = Math.max(0, entry.entryIds.indexOf(entry.id));
+    // Та сама навігаційна глибина, що openSearchResult (WordsPartOfSpeechScreen):
+    // parentScreen → BrowseList → BrowseCard, щоб "назад" вело туди, куди привів
+    // би звичайний тап по категорії, а не скорочував стек.
+    navigation.push(entry.parentScreen);
+    navigation.push("BrowseList", { kind: entry.kind, entryIds: entry.entryIds, title: entry.title });
+    navigation.push("BrowseCard", {
+      kind: entry.kind,
+      entryIds: entry.entryIds,
+      initialIndex,
+      title: entry.title,
+    });
+  }
+
+  return (
+    <Text style={styles.clickableWord} onPress={onPress} suppressHighlighting>
+      {word}
+    </Text>
+  );
+}
+
+function Segments({ segments, navigation }: { segments: ParagraphSegment[]; navigation: GrammarNav }) {
+  return (
+    <>
+      {segments.map((seg, i) =>
+        "word" in seg ? (
+          <ClickableWord key={i} word={seg.word} wordId={seg.wordId} kind={seg.kind} navigation={navigation} />
+        ) : (
+          <Text key={i}>{seg.text}</Text>
+        )
+      )}
+    </>
+  );
+}
+
+function Block({ block, navigation }: { block: GrammarBlock; navigation: GrammarNav }) {
   switch (block.type) {
     case "paragraph":
       return <Text style={styles.p}>{block.text}</Text>;
@@ -82,12 +139,33 @@ function Block({ block }: { block: GrammarBlock }) {
           <Text style={styles.tipText}>{block.text}</Text>
         </View>
       );
+    case "rich-tip":
+      return (
+        <View style={styles.tip}>
+          <Text style={styles.tipText}>
+            <Segments segments={block.segments} navigation={navigation} />
+          </Text>
+        </View>
+      );
     case "list":
       return (
         <View style={styles.listBox}>
           {block.items.map((it, i) => (
             <View key={i} style={styles.listItem}>
               <Text style={styles.listTerm}>{it.term}</Text>
+              <Text style={styles.listNote}>{it.note}</Text>
+            </View>
+          ))}
+        </View>
+      );
+    case "rich-list":
+      return (
+        <View style={styles.listBox}>
+          {block.items.map((it, i) => (
+            <View key={i} style={styles.listItem}>
+              <Text style={styles.listTerm}>
+                <Segments segments={it.term} navigation={navigation} />
+              </Text>
               <Text style={styles.listNote}>{it.note}</Text>
             </View>
           ))}
@@ -124,7 +202,7 @@ export function GrammarTopicScreen({ route, navigation }: Props) {
       contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + theme.space(8) }]}
     >
       {topic.blocks.map((b, i) => (
-        <Block key={i} block={b} />
+        <Block key={i} block={b} navigation={navigation} />
       ))}
     </ScrollView>
   );
@@ -157,6 +235,7 @@ const styles = StyleSheet.create({
   },
   listTerm: { color: theme.colors.text, fontSize: 15, fontWeight: "700" },
   listNote: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19, marginTop: 3 },
+  clickableWord: { color: theme.colors.lilac, fontWeight: "700" },
   caseBox: {
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.md,

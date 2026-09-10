@@ -230,6 +230,16 @@ function matchRank(entry: SearchEntry, q: string): number {
   return best;
 }
 
+// Пошук ОДНОГО запису за id+kind — для клікабельних слів у граматиці
+// (GrammarTopicScreen): переюзаємо той самий INDEX і ту саму структуру
+// {kind, entryIds, title, parentScreen}, що вже дає "сусідню групу" для
+// результатів пошуку. Kind у парі з id — бо id унікальні лише в межах
+// одного kind (namespace різних частин мови не перетинається за задумом,
+// але явна перевірка kind тут дешева і рятує від тихого збігу в майбутньому).
+export function findSearchEntry(id: string, kind: BrowseKind): SearchEntry | undefined {
+  return INDEX.find((e) => e.id === id && e.kind === kind);
+}
+
 // Мінімум 2 символи — інакше 1 літера дає забагато шуму.
 export function searchWords(query: string): SearchEntry[] {
   const q = normalize(query);

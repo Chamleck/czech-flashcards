@@ -2,13 +2,27 @@
 // Кожна тема складається з блоків, які рендерить GrammarTopicScreen.
 // Блоки типізовані — легко додавати нові теми без зміни коду екрана.
 
+import { BrowseKind } from "../types";
+
+// Сегмент "багатого" тексту — звичайний фрагмент або клікабельне слово, що
+// відкриває картку слова в словнику (BrowseCard) через ту саму навігаційну
+// глибину, що вже безпечно працює для результатів пошуку (WordsPartOfSpeechScreen
+// openSearchResult): parentScreen → BrowseList → BrowseCard. wordId+kind —
+// пара для пошуку в searchIndex.ts (findSearchEntry), а НЕ довільний текст:
+// value — це те, що ПОКАЗУЄТЬСЯ (форма як у реченні), wordId — куди веде тап
+// (завжди словникова форма). Розмітка РУЧНА (не автоматичний матчинг форм —
+// узгоджено окремо, див. нотатки проєкту).
+export type ParagraphSegment = { text: string } | { word: string; wordId: string; kind: BrowseKind };
+
 export type GrammarBlock =
   | { type: "paragraph"; text: string }
   | { type: "heading"; text: string } // кольоровий підзаголовок секції
   | { type: "cases" } // рендерить таблицю 7 відмінків із контрольними питаннями
   | { type: "patterns" } // рендерить згруповані зразки відмінювання
   | { type: "tip"; text: string }
-  | { type: "list"; items: { term: string; note: string }[] };
+  | { type: "rich-tip"; segments: ParagraphSegment[] } // tip із клікабельними словами
+  | { type: "list"; items: { term: string; note: string }[] }
+  | { type: "rich-list"; items: { term: ParagraphSegment[]; note: string }[] }; // список, де term клікабельний
 
 export interface GrammarTopic {
   id: string;
@@ -605,57 +619,71 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       { type: "heading", text: "Родовий (2. — Koho? Čeho?)" },
       {
-        type: "list",
+        type: "rich-list",
         items: [
-          { term: "bez", note: "без — «káva bez cukru» (кава без цукру)" },
-          { term: "do", note: "до (всередину/до часу) — «jdu do školy»" },
-          { term: "od", note: "від — «dopis od kamaráda»" },
-          { term: "z / ze", note: "з (звідкись) — «vracím se z práce»" },
-          { term: "u", note: "біля / у когось — «bydlím u nádraží»" },
-          { term: "vedle", note: "поряд — «vedle okna»" },
-          { term: "kolem", note: "навколо / повз — «kolem domu»" },
-          { term: "kromě", note: "крім — «všichni kromě Petra»" },
-          { term: "místo", note: "замість — «místo tebe»" },
-          { term: "podle", note: "згідно з — «podle návodu»" },
+          { term: [{ word: "bez", wordId: "prep-bez", kind: "prepositions" }], note: "без — «káva bez cukru» (кава без цукру)" },
+          { term: [{ word: "do", wordId: "prep-do", kind: "prepositions" }], note: "до (всередину/до часу) — «jdu do školy»" },
+          { term: [{ word: "od", wordId: "prep-od", kind: "prepositions" }], note: "від — «dopis od kamaráda»" },
+          { term: [{ word: "z / ze", wordId: "prep-z", kind: "prepositions" }], note: "з (звідкись) — «vracím se z práce»" },
+          { term: [{ word: "u", wordId: "prep-u", kind: "prepositions" }], note: "біля / у когось — «bydlím u nádraží»" },
+          { term: [{ word: "vedle", wordId: "prep-vedle", kind: "prepositions" }], note: "поряд — «vedle okna»" },
+          { term: [{ word: "kolem", wordId: "prep-kolem", kind: "prepositions" }], note: "навколо / повз — «kolem domu»" },
+          { term: [{ word: "kromě", wordId: "prep-kromě", kind: "prepositions" }], note: "крім — «všichni kromě Petra»" },
+          { term: [{ word: "místo", wordId: "prep-misto", kind: "prepositions" }], note: "замість — «místo tebe»" },
+          { term: [{ word: "podle", wordId: "prep-podle", kind: "prepositions" }], note: "згідно з — «podle návodu»" },
         ],
       },
       { type: "heading", text: "Давальний (3. — Komu? Čemu?)" },
       {
-        type: "list",
+        type: "rich-list",
         items: [
-          { term: "k / ke", note: "до (у напрямку) — «jdu k lékaři»" },
-          { term: "kvůli", note: "через (причина) — «kvůli nemoci»" },
-          { term: "díky", note: "завдяки — «díky tobě»" },
-          { term: "proti", note: "проти / навпроти — «proti návrhu»" },
+          { term: [{ word: "k / ke", wordId: "prep-k", kind: "prepositions" }], note: "до (у напрямку) — «jdu k lékaři»" },
+          { term: [{ word: "kvůli", wordId: "prep-kvuli", kind: "prepositions" }], note: "через (причина) — «kvůli nemoci»" },
+          { term: [{ word: "díky", wordId: "prep-diky", kind: "prepositions" }], note: "завдяки — «díky tobě»" },
+          { term: [{ word: "proti", wordId: "prep-proti", kind: "prepositions" }], note: "проти / навпроти — «proti návrhu»" },
         ],
       },
       { type: "heading", text: "Знахідний (4. — Koho? Co?)" },
       {
-        type: "list",
+        type: "rich-list",
         items: [
-          { term: "pro", note: "для / за (піти по когось) — «pro tebe»" },
-          { term: "přes", note: "через (поперек) / понад — «přes most»" },
-          { term: "skrz", note: "крізь — «skrz dav»" },
-          { term: "mimo", note: "поза / окрім — «mimo město»" },
+          { term: [{ word: "pro", wordId: "prep-pro", kind: "prepositions" }], note: "для / за (піти по когось) — «pro tebe»" },
+          { term: [{ word: "přes", wordId: "prep-pres", kind: "prepositions" }], note: "через (поперек) / понад — «přes most»" },
+          { term: [{ word: "skrz", wordId: "prep-skrz", kind: "prepositions" }], note: "крізь — «skrz dav»" },
+          { term: [{ word: "mimo", wordId: "prep-mimo", kind: "prepositions" }], note: "поза / окрім — «mimo město»" },
         ],
       },
       { type: "heading", text: "Місцевий (6. — O kom? O čem?)" },
       {
-        type: "list",
-        items: [{ term: "při", note: "при / під час — «při práci»" }],
+        type: "rich-list",
+        items: [{ term: [{ word: "při", wordId: "prep-pri", kind: "prepositions" }], note: "при / під час — «při práci»" }],
       },
       { type: "heading", text: "Орудний (7. — Kým? Čím?)" },
       {
-        type: "list",
-        items: [{ term: "s / se", note: "з (разом із) — «s kamarádem»" }],
+        type: "rich-list",
+        items: [{ term: [{ word: "s / se", wordId: "prep-s", kind: "prepositions" }], note: "з (разом із) — «s kamarádem»" }],
       },
       {
-        type: "tip",
-        text: "💡 Вокалізація: короткі прийменники k/s/z/v отримують -e перед збігом приголосних або тим самим звуком: ke stolu, se sestrou, ze zahrady. Це для милозвучності — значення не змінюється.",
+        type: "rich-tip",
+        segments: [
+          { text: "💡 Вокалізація: короткі прийменники " },
+          { word: "k", wordId: "prep-k", kind: "prepositions" },
+          { text: "/" },
+          { word: "s", wordId: "prep-s", kind: "prepositions" },
+          { text: "/" },
+          { word: "z", wordId: "prep-z", kind: "prepositions" },
+          { text: "/" },
+          { word: "v", wordId: "prep-v", kind: "prepositions" },
+          { text: " отримують -e перед збігом приголосних або тим самим звуком: ke stolu, se sestrou, ze zahrady. Це для милозвучності — значення не змінюється." },
+        ],
       },
       {
-        type: "tip",
-        text: "💡 Не плутай: деякі слова бувають і прийменником, і прислівником. «Stál vedle mě» (прийменник + іменник) проти «stál vedle» (прислівник, сам по собі). Прийменник завжди тягне за собою слово в потрібному відмінку.",
+        type: "rich-tip",
+        segments: [
+          { text: "💡 Не плутай: деякі слова бувають і прийменником, і прислівником. «Stál " },
+          { word: "vedle", wordId: "prep-vedle", kind: "prepositions" },
+          { text: " mě» (прийменник + іменник) проти «stál vedle» (прислівник, сам по собі). Прийменник завжди тягне за собою слово в потрібному відмінку." },
+        ],
       },
     ],
   },
@@ -684,19 +712,51 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         text: "Прийменники поділяються за тим, який відмінок беруть на «де?»:",
       },
       {
-        type: "list",
+        type: "rich-list",
         items: [
-          { term: "na, o, po, v", note: "куди → знахідний (4., akuzativ), де → місцевий (6., lokál): na stůl / na stole" },
-          { term: "nad, pod, před, za, mezi", note: "куди → знахідний (4., akuzativ), де → орудний (7., instrumentál): pod stůl / pod stolem" },
+          {
+            term: [
+              { word: "na", wordId: "prep-na", kind: "prepositions" },
+              { text: ", " },
+              { word: "o", wordId: "prep-o", kind: "prepositions" },
+              { text: ", " },
+              { word: "po", wordId: "prep-po", kind: "prepositions" },
+              { text: ", " },
+              { word: "v", wordId: "prep-v", kind: "prepositions" },
+            ],
+            note: "куди → знахідний (4., akuzativ), де → місцевий (6., lokál): na stůl / na stole",
+          },
+          {
+            term: [
+              { word: "nad", wordId: "prep-nad", kind: "prepositions" },
+              { text: ", " },
+              { word: "pod", wordId: "prep-pod", kind: "prepositions" },
+              { text: ", " },
+              { word: "před", wordId: "prep-pred", kind: "prepositions" },
+              { text: ", " },
+              { word: "za", wordId: "prep-za", kind: "prepositions" },
+              { text: ", " },
+              { word: "mezi", wordId: "prep-mezi", kind: "prepositions" },
+            ],
+            note: "куди → знахідний (4., akuzativ), де → орудний (7., instrumentál): pod stůl / pod stolem",
+          },
         ],
       },
       {
-        type: "tip",
-        text: "💡 Порівняй пару: «Kočka leze POD STŮL» (куди? — знахідний, рух) проти «Kočka spí POD STOLEM» (де? — орудний, спокій / дія без напрямку). Той самий прийменник pod, але різні відмінки.",
+        type: "rich-tip",
+        segments: [
+          { text: "💡 Порівняй пару: «Kočka leze POD STŮL» (куди? — знахідний, рух) проти «Kočka spí POD STOLEM» (де? — орудний, спокій / дія без напрямку). Той самий прийменник " },
+          { word: "pod", wordId: "prep-pod", kind: "prepositions" },
+          { text: ", але різні відмінки." },
+        ],
       },
       {
-        type: "tip",
-        text: "💡 «o» має ще й непросторове значення «про» (тема розмови) — і там воно ЗАВЖДИ місцевий, без пари «куди»: «Mluvíme o práci» (говоримо про роботу). Просторова пара «куди/де» діє лише для фізичного значення o (напр. opřít se o zeď — знахідний, спертися об щось).",
+        type: "rich-tip",
+        segments: [
+          { text: "💡 «" },
+          { word: "o", wordId: "prep-o", kind: "prepositions" },
+          { text: "» має ще й непросторове значення «про» (тема розмови) — і там воно ЗАВЖДИ місцевий, без пари «куди»: «Mluvíme o práci» (говоримо про роботу). Просторова пара «куди/де» діє лише для фізичного значення o (напр. opřít se o zeď — знахідний, спертися об щось)." },
+        ],
       },
       { type: "heading", text: "Особливий випадок: za" },
       {
@@ -704,8 +764,18 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         text: "Прийменник «za» має, крім просторового, ще й значення обміну/ціни — і там він завжди знахідний (4.), незалежно від руху: «Zaplatil jsem za oběd» (я заплатив за обід), «Koupil to za sto korun» (купив за сто крон).",
       },
       {
-        type: "tip",
-        text: "💡 Вокалізація v → ve перед збігом приголосних: ve škole, ve třídě, ve městě — так само, як k→ke, s→se, z→ze.",
+        type: "rich-tip",
+        segments: [
+          { text: "💡 Вокалізація " },
+          { word: "v", wordId: "prep-v", kind: "prepositions" },
+          { text: " → ve перед збігом приголосних: ve škole, ve třídě, ve městě — так само, як " },
+          { word: "k", wordId: "prep-k", kind: "prepositions" },
+          { text: "→ke, " },
+          { word: "s", wordId: "prep-s", kind: "prepositions" },
+          { text: "→se, " },
+          { word: "z", wordId: "prep-z", kind: "prepositions" },
+          { text: "→ze." },
+        ],
       },
     ],
   },
