@@ -2823,4 +2823,28 @@ export const VERBS: VerbEntry[] = [
       imperative: { cz: "Naroď se zdravý!", uk: "Народися здоровим!" },
     },
   },
+
+  // ═══════════════════ Окреме доповнення: nacházet se ═══════════════════
+  // "se" тут МІНЯЄ значення (не просто зворотність) — "nacházet" (без se) реально
+  // означає "знаходити" (пара з najít, звірено czechency.org: "najít(dok.)>nacházet
+  // (nedok.)"), а "nacházet se" — окреме, дуже частотне значення "розташовуватися".
+  // Тому окремий запис, НЕ aspectPairId з najít (це вже інше значення).
+  {
+    id: "nachazet-se",
+    uk: "розташовуватися (знаходитися десь)",
+    cz: "nacházet",
+    aspect: "imperfective",
+    verbClass: "IV",
+    reflexive: "se",
+    present: { ja: "nacházím", ty: "nacházíš", on: "nachází", my: "nacházíme", vy: "nacházíte", oni: "nacházejí" },
+    pastParticiple: { m: "nacházel", f: "nacházela", n: "nacházelo", manim_pl: "nacházeli", other_pl: "nacházely" },
+    imperative: { ty: "nacházej se", vy: "nacházejte se", my: "nacházejme se" },
+    aspectPairNote: "самостійне, відмінне значення від nacházet «знаходити» (не видова пара з najít); наказовий спосіб вкрай рідковживаний — важко «наказати» бути розташованим",
+    examples: {
+      present: { cz: "Škola se nachází ve městě.", uk: "Школа розташована в місті." },
+      past: { cz: "Škola se nacházela ve městě.", uk: "Школа розташовувалася в місті." },
+      future: { cz: "Škola se bude nacházet ve městě.", uk: "Школа буде розташована в місті." },
+      imperative: { cz: "Nacházej se blízko mě!", uk: "Знаходься поблизу мене!" },
+    },
+  },
 ];
