@@ -14,11 +14,26 @@ import { BrowseKind } from "../types";
 // узгоджено окремо, див. нотатки проєкту).
 export type ParagraphSegment = { text: string } | { word: string; wordId: string; kind: BrowseKind };
 
+// Зразок відмінювання (взір) — одна позиція в темі "Зразки відмінювання".
+// nameWordId — коли сама назва зразка є словниковим словом (10 з 11: усі,
+// крім "stavení" — той зразок у словнику представлений іншим словом,
+// nádraží, яке вже клікабельне всередині note).
+export interface PatternExample {
+  name: string;
+  nameWordId?: string;
+  note: ParagraphSegment[];
+}
+export interface PatternGroup {
+  emoji: string;
+  title: string;
+  items: PatternExample[];
+}
+
 export type GrammarBlock =
   | { type: "paragraph"; text: string }
   | { type: "heading"; text: string } // кольоровий підзаголовок секції
   | { type: "cases" } // рендерить таблицю 7 відмінків із контрольними питаннями
-  | { type: "patterns" } // рендерить згруповані зразки відмінювання
+  | { type: "patterns"; groups: PatternGroup[] } // згруповані зразки відмінювання, дані тут-таки
   | { type: "tip"; text: string }
   | { type: "rich-tip"; segments: ParagraphSegment[] } // tip із клікабельними словами
   | { type: "list"; items: { term: string; note: string }[] }
@@ -97,7 +112,151 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         text: "Кожен іменник відмінюється за одним із зразків (взорів). Знаючи рід і зразок — можеш побудувати всі 14 форм слова. Зразок визначають за родом і за тим, тверда чи м'яка основа (за останнім приголосним).",
       },
       { type: "heading", text: "11 базових зразків" },
-      { type: "patterns" },
+      {
+        type: "patterns",
+        groups: [
+          {
+            emoji: "🧑",
+            title: "Чол. рід — істоти",
+            items: [
+              {
+                name: "pán",
+                nameWordId: "muz-pan",
+                note: [
+                  { text: "твердий: " },
+                  { word: "student", wordId: "student", kind: "nouns" },
+                  { text: ", " },
+                  { word: "pán", wordId: "muz-pan", kind: "nouns" },
+                  { text: ", " },
+                  { word: "syn", wordId: "syn", kind: "nouns" },
+                  { text: " — називний однини на приголосний, родовий однини на -a" },
+                ],
+              },
+              {
+                name: "muž",
+                nameWordId: "muz-muz",
+                note: [
+                  { text: "м'який: " },
+                  { word: "učitel", wordId: "ucitel", kind: "nouns" },
+                  { text: ", " },
+                  { word: "muž", wordId: "muz-muz", kind: "nouns" },
+                  { text: ", " },
+                  { word: "otec", wordId: "otec", kind: "nouns" },
+                  { text: " — родовий однини на -e, часто називний множини на -i/-é" },
+                ],
+              },
+            ],
+          },
+          {
+            emoji: "📦",
+            title: "Чол. рід — неістоти",
+            items: [
+              {
+                name: "hrad",
+                nameWordId: "hrad",
+                note: [
+                  { text: "твердий: " },
+                  { word: "stůl", wordId: "stul", kind: "nouns" },
+                  { text: ", " },
+                  { word: "dům", wordId: "dum", kind: "nouns" },
+                  { text: ", " },
+                  { word: "les", wordId: "les", kind: "nouns" },
+                  { text: " — родовий однини на -u, місцевий однини на -e/-u" },
+                ],
+              },
+              {
+                name: "stroj",
+                nameWordId: "stroj",
+                note: [
+                  { text: "м'який: " },
+                  { word: "pokoj", wordId: "pokoj", kind: "nouns" },
+                  { text: ", " },
+                  { word: "čaj", wordId: "caj", kind: "nouns" },
+                  { text: " — родовий однини на -e, називний множини на -e" },
+                ],
+              },
+            ],
+          },
+          {
+            emoji: "🌷",
+            title: "Жін. рід",
+            items: [
+              {
+                name: "žena",
+                nameWordId: "zena",
+                note: [
+                  { text: "твердий на -a: " },
+                  { word: "káva", wordId: "kava", kind: "nouns" },
+                  { text: ", " },
+                  { word: "škola", wordId: "skola", kind: "nouns" },
+                  { text: " — родовий однини на -y, орудний однини на -ou" },
+                ],
+              },
+              {
+                name: "růže",
+                nameWordId: "ruze",
+                note: [
+                  { text: "м'який на -e: " },
+                  { word: "restaurace", wordId: "restaurace", kind: "nouns" },
+                  { text: " — родовий однини на -e, називний множини на -e" },
+                ],
+              },
+              {
+                name: "kost",
+                nameWordId: "kost",
+                note: [
+                  { text: "на приголосний (i-відміна): " },
+                  { word: "věc", wordId: "vec", kind: "nouns" },
+                  { text: ", noc — орудний однини на -í" },
+                ],
+              },
+            ],
+          },
+          {
+            emoji: "⚪",
+            title: "Сер. рід",
+            items: [
+              {
+                name: "město",
+                nameWordId: "mesto",
+                note: [
+                  { text: "твердий на -o: " },
+                  { word: "auto", wordId: "auto", kind: "nouns" },
+                  { text: ", " },
+                  { word: "okno", wordId: "okno", kind: "nouns" },
+                  { text: " — називний множини на -a" },
+                ],
+              },
+              {
+                name: "moře",
+                nameWordId: "more",
+                note: [
+                  { text: "м'який на -e: " },
+                  { word: "pole", wordId: "pole", kind: "nouns" },
+                  { text: " — родовий однини на -e, називний множини на -e" },
+                ],
+              },
+              {
+                name: "kuře",
+                nameWordId: "kure",
+                note: [
+                  { text: "малята (тип -ete): " },
+                  { word: "dítě", wordId: "dite", kind: "nouns" },
+                  { text: "-подібні — родовий однини на -ete, називний множини на -ata" },
+                ],
+              },
+              {
+                name: "stavení",
+                note: [
+                  { text: "на -í: " },
+                  { word: "nádraží", wordId: "nadrazi", kind: "nouns" },
+                  { text: " — незмінне в однині, орудний множини на -ími" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
       {
         type: "tip",
         text: "💡 У чол. роду істот той самий принцип чергування, що й у прикметників: перед закінченням -i у називному множини кінцевий приголосний основи часто змінюється — k→c (kluk→kluci, žák→žáci), r→ř (bratr→bratři), h→z, ch→š. Стосується лише називного множини цього роду — решта форм основу не чіпають.",

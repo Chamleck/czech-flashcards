@@ -4,34 +4,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CASE_ORDER, CASE_LABELS, BrowseKind } from "../types";
 import { theme } from "../utils/theme";
-import { GRAMMAR_BY_ID, GrammarBlock, ParagraphSegment } from "../data/grammar";
+import { GRAMMAR_BY_ID, GrammarBlock, ParagraphSegment, PatternGroup } from "../data/grammar";
 import { findSearchEntry } from "../utils/searchIndex";
 
 type Props = NativeStackScreenProps<RootStackParamList, "GrammarTopic">;
 type GrammarNav = Props["navigation"];
-
-// Згруповані зразки відмінювання для блоку "patterns"
-const PATTERN_GROUPS = [
-  { g: "🧑 Чол. рід — істоти", items: [
-    { name: "pán", note: "твердий: студент, pán, syn — називний однини на приголосний, родовий однини на -a" },
-    { name: "muž", note: "м'який: učitel, muž, otec — родовий однини на -e, часто називний множини на -i/-é" },
-  ]},
-  { g: "📦 Чол. рід — неістоти", items: [
-    { name: "hrad", note: "твердий: stůl, dům, les — родовий однини на -u, місцевий однини на -e/-u" },
-    { name: "stroj", note: "м'який: pokoj, čaj — родовий однини на -e, називний множини на -e" },
-  ]},
-  { g: "🌷 Жін. рід", items: [
-    { name: "žena", note: "твердий на -a: káva, škola — родовий однини на -y, орудний однини на -ou" },
-    { name: "růže", note: "м'який на -e: restaurace — родовий однини на -e, називний множини на -e" },
-    { name: "kost", note: "на приголосний (i-відміна): věc, noc — орудний однини на -í" },
-  ]},
-  { g: "⚪ Сер. рід", items: [
-    { name: "město", note: "твердий на -o: auto, okno — називний множини на -a" },
-    { name: "moře", note: "м'який на -e: pole — родовий однини на -e, називний множини на -e" },
-    { name: "kuře", note: "малята (тип -ete): dítě-подібні — родовий однини на -ete, називний множини на -ata" },
-    { name: "stavení", note: "на -í: nádraží — незмінне в однині, орудний множини на -ími" },
-  ]},
-];
 
 function CasesBlock() {
   return (
@@ -54,16 +31,26 @@ function CasesBlock() {
   );
 }
 
-function PatternsBlock() {
+function PatternsBlock({ groups, navigation }: { groups: PatternGroup[]; navigation: GrammarNav }) {
   return (
     <>
-      {PATTERN_GROUPS.map((grp) => (
-        <View key={grp.g} style={styles.grpBox}>
-          <Text style={styles.grpTitle}>{grp.g}</Text>
+      {groups.map((grp) => (
+        <View key={grp.title} style={styles.grpBox}>
+          <Text style={styles.grpTitle}>
+            {grp.emoji} {grp.title}
+          </Text>
           {grp.items.map((it) => (
             <View key={it.name} style={styles.patRow}>
-              <Text style={styles.patName}>{it.name}</Text>
-              <Text style={styles.patNote}>{it.note}</Text>
+              <Text style={styles.patName}>
+                {it.nameWordId ? (
+                  <ClickableWord word={it.name} wordId={it.nameWordId} kind="nouns" navigation={navigation} />
+                ) : (
+                  it.name
+                )}
+              </Text>
+              <Text style={styles.patNote}>
+                <Segments segments={it.note} navigation={navigation} />
+              </Text>
             </View>
           ))}
         </View>
@@ -174,7 +161,7 @@ function Block({ block, navigation }: { block: GrammarBlock; navigation: Grammar
     case "cases":
       return <CasesBlock />;
     case "patterns":
-      return <PatternsBlock />;
+      return <PatternsBlock groups={block.groups} navigation={navigation} />;
     default:
       return null;
   }
