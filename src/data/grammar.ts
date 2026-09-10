@@ -15,9 +15,9 @@ import { BrowseKind } from "../types";
 export type ParagraphSegment = { text: string } | { word: string; wordId: string; kind: BrowseKind };
 
 // Зразок відмінювання (взір) — одна позиція в темі "Зразки відмінювання".
-// nameWordId — коли сама назва зразка є словниковим словом (10 з 11: усі,
-// крім "stavení" — той зразок у словнику представлений іншим словом,
-// nádraží, яке вже клікабельне всередині note).
+// nameWordId — коли сама назва зразка є словниковим словом (тепер усі 11 — і
+// stavení теж, додано окремою карткою, бо в словнику досі був лише
+// представник цього типу, nádraží, а не саме слово-зразок).
 export interface PatternExample {
   name: string;
   nameWordId?: string;
@@ -31,13 +31,14 @@ export interface PatternGroup {
 
 export type GrammarBlock =
   | { type: "paragraph"; text: string }
+  | { type: "rich-paragraph"; segments: ParagraphSegment[] } // paragraph із клікабельними словами
   | { type: "heading"; text: string } // кольоровий підзаголовок секції
   | { type: "cases" } // рендерить таблицю 7 відмінків із контрольними питаннями
   | { type: "patterns"; groups: PatternGroup[] } // згруповані зразки відмінювання, дані тут-таки
   | { type: "tip"; text: string }
   | { type: "rich-tip"; segments: ParagraphSegment[] } // tip із клікабельними словами
   | { type: "list"; items: { term: string; note: string }[] }
-  | { type: "rich-list"; items: { term: ParagraphSegment[]; note: string }[] }; // список, де term клікабельний
+  | { type: "rich-list"; items: { term: ParagraphSegment[]; note: ParagraphSegment[] }[] }; // список, де term і note клікабельні
 
 export interface GrammarTopic {
   id: string;
@@ -247,6 +248,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
               },
               {
                 name: "stavení",
+                nameWordId: "staveni",
                 note: [
                   { text: "на -í: " },
                   { word: "nádraží", wordId: "nadrazi", kind: "nouns" },
@@ -780,47 +782,111 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-list",
         items: [
-          { term: [{ word: "bez", wordId: "prep-bez", kind: "prepositions" }], note: "без — «káva bez cukru» (кава без цукру)" },
-          { term: [{ word: "do", wordId: "prep-do", kind: "prepositions" }], note: "до (всередину/до часу) — «jdu do školy»" },
-          { term: [{ word: "od", wordId: "prep-od", kind: "prepositions" }], note: "від — «dopis od kamaráda»" },
-          { term: [{ word: "z / ze", wordId: "prep-z", kind: "prepositions" }], note: "з (звідкись) — «vracím se z práce»" },
-          { term: [{ word: "u", wordId: "prep-u", kind: "prepositions" }], note: "біля / у когось — «bydlím u nádraží»" },
-          { term: [{ word: "vedle", wordId: "prep-vedle", kind: "prepositions" }], note: "поряд — «vedle okna»" },
-          { term: [{ word: "kolem", wordId: "prep-kolem", kind: "prepositions" }], note: "навколо / повз — «kolem domu»" },
-          { term: [{ word: "kromě", wordId: "prep-kromě", kind: "prepositions" }], note: "крім — «všichni kromě Petra»" },
-          { term: [{ word: "místo", wordId: "prep-misto", kind: "prepositions" }], note: "замість — «místo tebe»" },
-          { term: [{ word: "podle", wordId: "prep-podle", kind: "prepositions" }], note: "згідно з — «podle návodu»" },
+          {
+            term: [{ word: "bez", wordId: "prep-bez", kind: "prepositions" }],
+            note: [{ text: "без — «káva bez cukru» (кава без цукру)" }],
+          },
+          {
+            term: [{ word: "do", wordId: "prep-do", kind: "prepositions" }],
+            note: [{ text: "до (всередину/до часу) — «jdu do školy»" }],
+          },
+          {
+            term: [{ word: "od", wordId: "prep-od", kind: "prepositions" }],
+            note: [{ text: "від — «dopis od kamaráda»" }],
+          },
+          {
+            term: [{ word: "z / ze", wordId: "prep-z", kind: "prepositions" }],
+            note: [{ text: "з (звідкись) — «vracím se z práce»" }],
+          },
+          {
+            term: [{ word: "u", wordId: "prep-u", kind: "prepositions" }],
+            note: [{ text: "біля / у когось — «bydlím u nádraží»" }],
+          },
+          {
+            term: [{ word: "vedle", wordId: "prep-vedle", kind: "prepositions" }],
+            note: [{ text: "поряд — «vedle okna»" }],
+          },
+          {
+            term: [{ word: "kolem", wordId: "prep-kolem", kind: "prepositions" }],
+            note: [{ text: "навколо / повз — «kolem domu»" }],
+          },
+          {
+            term: [{ word: "kromě", wordId: "prep-kromě", kind: "prepositions" }],
+            note: [{ text: "крім — «všichni kromě Petra»" }],
+          },
+          {
+            term: [{ word: "místo", wordId: "prep-misto", kind: "prepositions" }],
+            note: [{ text: "замість — «místo tebe»" }],
+          },
+          {
+            term: [{ word: "podle", wordId: "prep-podle", kind: "prepositions" }],
+            note: [{ text: "згідно з — «podle návodu»" }],
+          },
         ],
       },
       { type: "heading", text: "Давальний (3. — Komu? Čemu?)" },
       {
         type: "rich-list",
         items: [
-          { term: [{ word: "k / ke", wordId: "prep-k", kind: "prepositions" }], note: "до (у напрямку) — «jdu k lékaři»" },
-          { term: [{ word: "kvůli", wordId: "prep-kvuli", kind: "prepositions" }], note: "через (причина) — «kvůli nemoci»" },
-          { term: [{ word: "díky", wordId: "prep-diky", kind: "prepositions" }], note: "завдяки — «díky tobě»" },
-          { term: [{ word: "proti", wordId: "prep-proti", kind: "prepositions" }], note: "проти / навпроти — «proti návrhu»" },
+          {
+            term: [{ word: "k / ke", wordId: "prep-k", kind: "prepositions" }],
+            note: [{ text: "до (у напрямку) — «jdu k lékaři»" }],
+          },
+          {
+            term: [{ word: "kvůli", wordId: "prep-kvuli", kind: "prepositions" }],
+            note: [{ text: "через (причина) — «kvůli nemoci»" }],
+          },
+          {
+            term: [{ word: "díky", wordId: "prep-diky", kind: "prepositions" }],
+            note: [{ text: "завдяки — «díky tobě»" }],
+          },
+          {
+            term: [{ word: "proti", wordId: "prep-proti", kind: "prepositions" }],
+            note: [{ text: "проти / навпроти — «proti návrhu»" }],
+          },
         ],
       },
       { type: "heading", text: "Знахідний (4. — Koho? Co?)" },
       {
         type: "rich-list",
         items: [
-          { term: [{ word: "pro", wordId: "prep-pro", kind: "prepositions" }], note: "для / за (піти по когось) — «pro tebe»" },
-          { term: [{ word: "přes", wordId: "prep-pres", kind: "prepositions" }], note: "через (поперек) / понад — «přes most»" },
-          { term: [{ word: "skrz", wordId: "prep-skrz", kind: "prepositions" }], note: "крізь — «skrz dav»" },
-          { term: [{ word: "mimo", wordId: "prep-mimo", kind: "prepositions" }], note: "поза / окрім — «mimo město»" },
+          {
+            term: [{ word: "pro", wordId: "prep-pro", kind: "prepositions" }],
+            note: [{ text: "для / за (піти по когось) — «pro tebe»" }],
+          },
+          {
+            term: [{ word: "přes", wordId: "prep-pres", kind: "prepositions" }],
+            note: [{ text: "через (поперек) / понад — «přes most»" }],
+          },
+          {
+            term: [{ word: "skrz", wordId: "prep-skrz", kind: "prepositions" }],
+            note: [{ text: "крізь — «skrz dav»" }],
+          },
+          {
+            term: [{ word: "mimo", wordId: "prep-mimo", kind: "prepositions" }],
+            note: [{ text: "поза / окрім — «mimo město»" }],
+          },
         ],
       },
       { type: "heading", text: "Місцевий (6. — O kom? O čem?)" },
       {
         type: "rich-list",
-        items: [{ term: [{ word: "při", wordId: "prep-pri", kind: "prepositions" }], note: "при / під час — «při práci»" }],
+        items: [
+          {
+            term: [{ word: "při", wordId: "prep-pri", kind: "prepositions" }],
+            note: [{ text: "при / під час — «při práci»" }],
+          },
+        ],
       },
       { type: "heading", text: "Орудний (7. — Kým? Čím?)" },
       {
         type: "rich-list",
-        items: [{ term: [{ word: "s / se", wordId: "prep-s", kind: "prepositions" }], note: "з (разом із) — «s kamarádem»" }],
+        items: [
+          {
+            term: [{ word: "s / se", wordId: "prep-s", kind: "prepositions" }],
+            note: [{ text: "з (разом із) — «s kamarádem»" }],
+          },
+        ],
       },
       {
         type: "rich-tip",
@@ -883,7 +949,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
               { text: ", " },
               { word: "v", wordId: "prep-v", kind: "prepositions" },
             ],
-            note: "куди → знахідний (4., akuzativ), де → місцевий (6., lokál): na stůl / na stole",
+            note: [{ text: "куди → знахідний (4., akuzativ), де → місцевий (6., lokál): na stůl / na stole" }],
           },
           {
             term: [
@@ -897,7 +963,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
               { text: ", " },
               { word: "mezi", wordId: "prep-mezi", kind: "prepositions" },
             ],
-            note: "куди → знахідний (4., akuzativ), де → орудний (7., instrumentál): pod stůl / pod stolem",
+            note: [{ text: "куди → знахідний (4., akuzativ), де → орудний (7., instrumentál): pod stůl / pod stolem" }],
           },
         ],
       },
@@ -919,8 +985,12 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       { type: "heading", text: "Особливий випадок: za" },
       {
-        type: "paragraph",
-        text: "Прийменник «za» має, крім просторового, ще й значення обміну/ціни — і там він завжди знахідний (4.), незалежно від руху: «Zaplatil jsem za oběd» (я заплатив за обід), «Koupil to za sto korun» (купив за сто крон).",
+        type: "rich-paragraph",
+        segments: [
+          { text: "Прийменник «" },
+          { word: "za", wordId: "prep-za", kind: "prepositions" },
+          { text: "» має, крім просторового, ще й значення обміну/ціни — і там він завжди знахідний (4.), незалежно від руху: «Zaplatil jsem za oběd» (я заплатив за обід), «Koupil to za sto korun» (купив за сто крон)." },
+        ],
       },
       {
         type: "rich-tip",

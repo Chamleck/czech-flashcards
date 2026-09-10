@@ -3628,4 +3628,28 @@ export const NOUNS: NounEntry[] = [
     exampleSentenceCz: "Bolí mě koleno.",
     exampleSentenceUk: "У мене болить коліно.",
   },
+  {
+    id: "staveni",
+    uk: "будівля",
+    cz: "stavení",
+    gender: "neut",
+    pattern: "stavani",
+    category: "city",
+    // Сам зразок відмінювання (vzor) для типу "stavani" — раніше в словнику був
+    // лише представник цього типу (nádraží), а не саме слово-зразок. Парадигма
+    // ідентична nádraží (перевірено: той самий тип, звірено з prirucka.ujc.cas.cz
+    // і паралельно з уже наявним nádraží-записом нижче — обидва мають
+    // незмінну однину і dativ.pl/instr.pl на -ím/-ími).
+    declension: {
+      nominativ: { sg: "stavení", pl: "stavení" },
+      genitiv: { sg: "stavení", pl: "stavení" },
+      dativ: { sg: "stavení", pl: "stavením" },
+      akuzativ: { sg: "stavení", pl: "stavení" },
+      vokativ: { sg: "stavení", pl: "stavení" },
+      lokal: { sg: "stavení", pl: "staveních" },
+      instrumental: { sg: "stavením", pl: "staveními" },
+    },
+    exampleSentenceCz: "To staré stavení je prázdné.",
+    exampleSentenceUk: "Та стара будівля порожня.",
+  },
 ];

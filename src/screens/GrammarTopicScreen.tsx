@@ -80,11 +80,9 @@ function ClickableWord({
     const entry = findSearchEntry(wordId, kind);
     if (!entry) return; // wordId не знайдено в словнику — тихо ігноруємо тап
     const initialIndex = Math.max(0, entry.entryIds.indexOf(entry.id));
-    // Та сама навігаційна глибина, що openSearchResult (WordsPartOfSpeechScreen):
-    // parentScreen → BrowseList → BrowseCard, щоб "назад" вело туди, куди привів
-    // би звичайний тап по категорії, а не скорочував стек.
-    navigation.push(entry.parentScreen);
-    navigation.push("BrowseList", { kind: entry.kind, entryIds: entry.entryIds, title: entry.title });
+    // ОДИН push картки на поточний стек (а НЕ ланцюжок parentScreen→BrowseList,
+    // як для результатів пошуку) — тут інша логіка: "назад" має вести прямо в
+    // граматику, звідки тапнули, а не крізь проміжні екрани вибору категорії.
     navigation.push("BrowseCard", {
       kind: entry.kind,
       entryIds: entry.entryIds,
@@ -118,6 +116,12 @@ function Block({ block, navigation }: { block: GrammarBlock; navigation: Grammar
   switch (block.type) {
     case "paragraph":
       return <Text style={styles.p}>{block.text}</Text>;
+    case "rich-paragraph":
+      return (
+        <Text style={styles.p}>
+          <Segments segments={block.segments} navigation={navigation} />
+        </Text>
+      );
     case "heading":
       return <Text style={styles.h2}>{block.text}</Text>;
     case "tip":
@@ -153,7 +157,9 @@ function Block({ block, navigation }: { block: GrammarBlock; navigation: Grammar
               <Text style={styles.listTerm}>
                 <Segments segments={it.term} navigation={navigation} />
               </Text>
-              <Text style={styles.listNote}>{it.note}</Text>
+              <Text style={styles.listNote}>
+                <Segments segments={it.note} navigation={navigation} />
+              </Text>
             </View>
           ))}
         </View>
