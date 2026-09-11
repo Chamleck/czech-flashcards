@@ -168,8 +168,13 @@ function Block({ block, navigation }: { block: GrammarBlock; navigation: Grammar
       return <CasesBlock />;
     case "patterns":
       return <PatternsBlock groups={block.groups} navigation={navigation} />;
-    default:
+    default: {
+      // Exhaustiveness guard: якщо в GrammarBlock додати новий варіант і забути
+      // дописати case вище — цей рядок не скомпілюється (block матиме тип,
+      // відмінний від never), а не мовчки відрендериться як null.
+      const _exhaustive: never = block;
       return null;
+    }
   }
 }
 
