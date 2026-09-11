@@ -1,5 +1,6 @@
 import React from "react";
-import { Text, Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
+import { Home, Search } from "lucide-react-native";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 
@@ -22,7 +23,7 @@ type Nav = {
 export function HomeHeaderButton({ navigation }: { navigation: Nav }) {
   return (
     <Pressable onPress={() => navigation.popToTop()} hitSlop={10} accessibilityLabel="На головну">
-      <Text style={styles.homeIcon}>🏠</Text>
+      <Home size={21} color={theme.colors.text} strokeWidth={2.2} />
     </Pressable>
   );
 }
@@ -44,13 +45,12 @@ export function SearchHeaderButton({ navigation }: { navigation: Nav }) {
       style={styles.searchPill}
       accessibilityLabel="Пошук"
     >
-      <Text style={styles.searchIcon}>🔍</Text>
+      <Search size={16} color={theme.colors.honey} strokeWidth={2.4} />
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  homeIcon: { fontSize: 19, color: theme.colors.text },
   searchPill: {
     width: 30,
     height: 30,
@@ -59,5 +59,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  searchIcon: { fontSize: 16, color: theme.colors.honey },
 });
