@@ -398,7 +398,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       { type: "heading", text: "Кличний відмінок" },
       {
         type: "rich-paragraph",
-        segments: [{ text: "У прикметника кличний відмінок (5.) завжди збігається з називним: «" }, { word: "milý", wordId: "mily", kind: "adjectives" }, { text: " " }, { word: "pan", wordId: "muz-pan", kind: "nouns" }, { text: "e!» (milý — як у називному). Окремої форми, як в іменника (pan → pane), прикметник не має: при звертанні змінюється лише сам іменник." }],
+        segments: [{ text: "У прикметника кличний відмінок (5.) завжди збігається з називним: «" }, { word: "milý", wordId: "mily", kind: "adjectives" }, { text: " " }, { word: "pane", wordId: "muz-pan", kind: "nouns" }, { text: "!» (milý — як у називному). Окремої форми, як в іменника (pan → pane), прикметник не має: при звертанні змінюється лише сам іменник." }],
       },
       {
         type: "rich-tip",
@@ -589,7 +589,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           { term: [{ text: "Теперішній (лише недоконані)" }], note: [{ text: "особові закінчення додаються до основи: dělá-m, dělá-š, dělá…" }] },
           {
             term: [{ text: "Минулий" }],
-            note: [{ text: "дієприкметник на -l + допоміжне jsem/jsi (у 3-й особі — без нього). Дієприкметник узгоджується в роді й числі з підметом: dělal (він) / dělala (вона) / dělalo (воно) / dělali (вони, чол. істот.) / dělaly (решта). Тому «я робив» = dělal jsem, а «я робила» = dělala jsem." }],
+            note: [{ text: "дієприкметник на -l (тобто «л-форма» — форма, що закінчується на -l) + допоміжне jsem/jsi (у 3-й особі — без нього). Дієприкметник узгоджується в роді й числі з підметом: dělal (він) / dělala (вона) / dělalo (воно) / dělali (вони, чол. істот.) / dělaly (решта). Тому «я робив» = dělal jsem, а «я робила» = dělala jsem." }],
           },
           {
             term: [{ text: "Майбутній" }],
@@ -927,9 +927,9 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           {
             term: [{ text: "Форми після прийменника (3-тя особа)" }],
             note: [
-              { text: "У " },
-              { word: "він/вона/воно/вони", wordId: "pp-on", kind: "personal" },
-              { text: " після прийменника початкове j- переходить у м'яке n-: jemu → k němu, jí → s ní, jich → od nich, je → na ně. Це м'яке n традиційно називають «ň», але окремої літери з гачком тут ніколи не буде — перед ě/í/i м'якість n передається самим написанням (němu, ní, nich, ně), тому в прикладах бачиш звичайне n. Без прийменника — j-форма (znám ho), з прийменником — n-форма (jdu k němu)." },
+              { text: "У третьої особи (" },
+              { word: "on/ona/ono", wordId: "pp-on", kind: "personal" },
+              { text: ") після прийменника початкове j- переходить у м'яке n-: jemu → k němu, jí → s ní, jich → od nich, je → na ně. Це м'яке n традиційно називають «ň», але окремої літери з гачком тут ніколи не буде — перед ě/í/i м'якість n передається самим написанням (němu, ní, nich, ně), тому в прикладах бачиш звичайне n. Без прийменника — j-форма (znám ho), з прийменником — n-форма (jdu k němu)." },
             ],
           },
           {
@@ -1178,7 +1178,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-list",
         items: [
-          { term: [{ text: "21." }], note: [{ text: "dvacátého prvního / jednadvacátého" }] },
+          { term: [{ text: "21. " }, { word: "května", wordId: "kveten", kind: "nouns" }], note: [{ text: "dvacátého prvního / jednadvacátého" }] },
           { term: [{ text: "24. " }, { word: "prosince", wordId: "prosinec", kind: "nouns" }], note: [{ text: "dvacátého čtvrtého / čtyřiadvacátého — Святвечір" }] },
           { term: [{ text: "25. " }, { word: "května", wordId: "kveten", kind: "nouns" }], note: [{ text: "dvacátého pátého / pětadvacátého" }] },
         ],
