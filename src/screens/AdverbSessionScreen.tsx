@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress, SpatialAdverbEntry } from "../types";
 import { theme } from "../utils/theme";
+import { HomeHeaderButton } from "../components/HeaderIcons";
 import { AdverbCard } from "../components/AdverbCard";
 import { ADVERBS } from "../data/adverbs";
 import { loadProgressFrom, saveProgressTo, updateCard, buildQueue, PROGRESS_KEYS } from "../utils/progress";
@@ -48,12 +49,16 @@ export function AdverbSessionScreen({ route, navigation }: Props) {
   useLayoutEffect(() => {
     navigation.setOptions({
       title,
-      headerRight: () =>
-        queue.length > 0 ? (
-          <Text style={styles.counter}>
-            {finished ? queue.length : idx + 1} / {queue.length}
-          </Text>
-        ) : null,
+      headerRight: () => (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+          {queue.length > 0 && (
+            <Text style={styles.counter}>
+              {finished ? queue.length : idx + 1} / {queue.length}
+            </Text>
+          )}
+          <HomeHeaderButton navigation={navigation} />
+        </View>
+      ),
     });
   }, [navigation, title, idx, finished, queue.length]);
 

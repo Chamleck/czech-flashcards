@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Pressable,
   FlatList,
   useWindowDimensions,
   NativeSyntheticEvent,
@@ -23,6 +22,7 @@ import { NumeralCard } from "../components/NumeralCard";
 import { PrepositionCard } from "../components/PrepositionCard";
 import { AdverbCard } from "../components/AdverbCard";
 import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
+import { HomeHeaderButton, SearchHeaderButton } from "../components/HeaderIcons";
 
 type Props = NativeStackScreenProps<RootStackParamList, "BrowseCard">;
 
@@ -74,24 +74,8 @@ export function BrowseCardScreen({ route, navigation }: Props) {
               {Math.min(idx + 1, entries.length)} / {entries.length}
             </Text>
           )}
-          <Pressable
-            onPress={() =>
-              // Лишаємо Home ПІД "Словами" (index:1), а не єдиний маршрут:
-              // інакше "назад" зі "Слів" згортає застосунок замість повернення
-              // на головну. Browse завжди відкривають через Home → Слова, тож
-              // Home — легітимна основа стека. Деталі — у BrowseListScreen.
-              navigation.reset({
-                index: 1,
-                routes: [
-                  { name: "Home" },
-                  { name: "WordsPartOfSpeech", params: { focusSearch: true } },
-                ],
-              })
-            }
-            hitSlop={10}
-          >
-            <Text style={styles.searchIcon}>🔍</Text>
-          </Pressable>
+          <HomeHeaderButton navigation={navigation} />
+          <SearchHeaderButton navigation={navigation} />
         </View>
       ),
     });
@@ -152,7 +136,6 @@ export function BrowseCardScreen({ route, navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  searchIcon: { fontSize: 18 },
   safe: { flex: 1, backgroundColor: theme.colors.bg },
   page: { flex: 1, paddingHorizontal: theme.space(4), paddingVertical: theme.space(3) },
   counter: { color: theme.colors.textDim, fontSize: 15, fontWeight: "700" },

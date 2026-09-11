@@ -5,6 +5,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { browseSource, browseEntries, BrowseListItem } from "../utils/browseData";
+import { HomeHeaderButton, SearchHeaderButton } from "../components/HeaderIcons";
 
 type Props = NativeStackScreenProps<RootStackParamList, "BrowseList">;
 
@@ -25,33 +26,13 @@ export function BrowseListScreen({ route, navigation }: Props) {
       title,
       // Іконка пошуку — тільки тут навмисно (Перегляд), у Тренуванні (інші
       // екрани) її немає: там сесія за алгоритмом, шукати конкретне слово —
-      // не той сценарій.
+      // не той сценарій. 🏠 — цей екран завжди 3+ пуші від Home (категорія
+      // → BrowseList, або й глибше через пошук), тому отримує прямий перехід.
       headerRight: () => (
-        <Pressable
-          onPress={() =>
-            // reset (не navigate) — гарантовано схлопує ВЕСЬ проміжний стек
-            // (категорія → BrowseList → BrowseCard) незалежно від глибини.
-            // navigate міг би нашарувати новий корінь поверх старого замість
-            // "згорнути" його — реальний баг: повторний пошук накопичував шари
-            // і "зациклював" "назад".
-            // ВАЖЛИВО: лишаємо Home ПІД "Словами" (index:1, два маршрути), а не
-            // єдиний маршрут. Інакше "назад" зі "Слів" не має куди вести —
-            // застосунок згортається замість повернення на головну (баг, що
-            // прийшов на зміну зацикленню після попереднього неповного фіксу).
-            // У Browse завжди заходять через Home → Слова, тож Home завжди
-            // легітимна основа стека.
-            navigation.reset({
-              index: 1,
-              routes: [
-                { name: "Home" },
-                { name: "WordsPartOfSpeech", params: { focusSearch: true } },
-              ],
-            })
-          }
-          hitSlop={10}
-        >
-          <Text style={styles.searchIcon}>🔍</Text>
-        </Pressable>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+          <HomeHeaderButton navigation={navigation} />
+          <SearchHeaderButton navigation={navigation} />
+        </View>
       ),
     });
   }, [navigation, title]);
@@ -80,7 +61,6 @@ export function BrowseListScreen({ route, navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  searchIcon: { fontSize: 18, marginRight: 8 },
   safe: { flex: 1, backgroundColor: theme.colors.bg },
   content: { padding: theme.space(4) },
   hint: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19, marginBottom: theme.space(3) },

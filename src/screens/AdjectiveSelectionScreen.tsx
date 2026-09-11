@@ -6,6 +6,7 @@ import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { ADJECTIVES } from "../data/adjectives";
 import { ADJ_CATEGORY_BY_KEY } from "../data/adjectiveCategories";
+import { HomeHeaderButton } from "../components/HeaderIcons";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AdjectiveSelection">;
 
@@ -18,7 +19,10 @@ export function AdjectiveSelectionScreen({ route, navigation }: Props) {
   const [selected, setSelected] = useState<Set<string>>(() => new Set(words.map((w) => w.id)));
 
   useLayoutEffect(() => {
-    navigation.setOptions({ title: `${meta.emoji} ${meta.title}` });
+    navigation.setOptions({
+      title: `${meta.emoji} ${meta.title}`,
+      headerRight: () => <HomeHeaderButton navigation={navigation} />,
+    });
   }, [navigation, meta]);
 
   const allSelected = selected.size === words.length;

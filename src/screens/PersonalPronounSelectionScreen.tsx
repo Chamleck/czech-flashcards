@@ -5,6 +5,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
+import { HomeHeaderButton } from "../components/HeaderIcons";
 
 type Props = NativeStackScreenProps<RootStackParamList, "PersonalPronounSelection">;
 
@@ -14,7 +15,10 @@ export function PersonalPronounSelectionScreen({ navigation }: Props) {
   const [selected, setSelected] = useState<Set<string>>(() => new Set(words.map((w) => w.id)));
 
   useLayoutEffect(() => {
-    navigation.setOptions({ title: "🙋 Особові" });
+    navigation.setOptions({
+      title: "🙋 Особові",
+      headerRight: () => <HomeHeaderButton navigation={navigation} />,
+    });
   }, [navigation]);
 
   const allSelected = selected.size === words.length;

@@ -7,6 +7,7 @@ import { theme } from "../utils/theme";
 import { NOUNS } from "../data/nouns";
 import { CATEGORY_BY_KEY } from "../data/categories";
 import { GenderIcon } from "../components/GenderIcon";
+import { HomeHeaderButton } from "../components/HeaderIcons";
 
 type Props = NativeStackScreenProps<RootStackParamList, "WordSelection">;
 
@@ -20,7 +21,10 @@ export function WordSelectionScreen({ route, navigation }: Props) {
   const [selected, setSelected] = useState<Set<string>>(() => new Set(words.map((w) => w.id)));
 
   useLayoutEffect(() => {
-    navigation.setOptions({ title: `${meta.emoji} ${meta.title}` });
+    navigation.setOptions({
+      title: `${meta.emoji} ${meta.title}`,
+      headerRight: () => <HomeHeaderButton navigation={navigation} />,
+    });
   }, [navigation, meta]);
 
   const allSelected = selected.size === words.length;

@@ -6,6 +6,7 @@ import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { VERBS } from "../data/verbs";
 import { VERB_CLASS_BY_KEY } from "../data/verbCategories";
+import { HomeHeaderButton } from "../components/HeaderIcons";
 
 type Props = NativeStackScreenProps<RootStackParamList, "VerbSelection">;
 
@@ -18,7 +19,10 @@ export function VerbSelectionScreen({ route, navigation }: Props) {
   const [selected, setSelected] = useState<Set<string>>(() => new Set(verbs.map((v) => v.id)));
 
   useLayoutEffect(() => {
-    navigation.setOptions({ title: meta.title });
+    navigation.setOptions({
+      title: meta.title,
+      headerRight: () => <HomeHeaderButton navigation={navigation} />,
+    });
   }, [navigation, meta]);
 
   const allSelected = selected.size === verbs.length;
