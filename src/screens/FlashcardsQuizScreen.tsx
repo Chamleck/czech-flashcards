@@ -29,13 +29,14 @@ const SESSION_LEN = 12;
 // які читає екран (promptWord/promptUk/taskText/correct/options/comboId).
 // contextPhrase — необов'язкове поле (квиз прикметників/займенників/дат):
 // фраза з партнером і пропуском. Іменники/дієслова його не задають.
-// promptLabel — необов'язковий підпис над заголовком; якщо не заданий,
-// показуємо дефолт «слово 🇨🇿». Для дат/часу заголовок — не слово (це дата
-// або час цифрами), тому движок часу/дат передає власний підпис.
+// promptLabel — заголовок-підпис картки: частина мови основного тестованого
+// слова (іменник/прикметник/дієслово/займенник/прийменник/числівник/прислівник)
+// або часова сутність (дата/день/час). Обов'язковий — кожен движок його задає,
+// тому дефолту немає.
 type QuizQuestion = Pick<
   Question,
-  "promptWord" | "promptUk" | "taskText" | "correct" | "options" | "comboId"
-> & { contextPhrase?: string; promptLabel?: string };
+  "promptWord" | "promptUk" | "taskText" | "correct" | "options" | "comboId" | "promptLabel"
+> & { contextPhrase?: string };
 
 // Диспетчер: генерує сесію відповідно до категорії.
 function buildSession(categoryId: string, mistakes: MistakeStore): QuizQuestion[] {
@@ -212,7 +213,7 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
         <View style={styles.top}>
           {stats.streak >= 2 && <Text style={styles.streak}>🔥 Серія: {stats.streak}</Text>}
           <View style={styles.promptCard}>
-            <Text style={styles.promptLabel}>{current.promptLabel ?? "слово 🇨🇿"}</Text>
+            <Text style={styles.promptLabel}>{current.promptLabel}</Text>
             <Text style={styles.promptWord}>{current.promptWord}</Text>
             {current.promptUk ? <Text style={styles.promptUk}>{current.promptUk}</Text> : null}
             {current.contextPhrase && (

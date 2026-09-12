@@ -27,7 +27,7 @@ export interface AgreementQuestion {
   blank: "numeral" | "noun";
   promptWord: string; // called-form пара в називному — стабільний заголовок незалежно від тестованого відмінка
   promptUk: string; // напр. "п'ять хлопців"
-  promptLabel?: string; // необов'язковий підпис над заголовком (складені: «українською»)
+  promptLabel: string; // заголовок-підпис: частина мови ("числівник"/"іменник")
   taskText: string; // "Оберіть іменник: чол. іст., Родовий (Genitiv) — Koho? Čeho?, множина"
   contextPhrase: string; // "bez ___ chlapců" / "bez pěti ___"
   correct: string;
@@ -202,6 +202,7 @@ function buildQuestion(card: CardinalEntry, phraseCase: CzechCase, noun: NounEnt
   // + її переклад. Декоратор (друге слово) не перекладається, він лише у фразі.
   const promptWord = blank === "numeral" ? card.cz : noun.cz;
   const promptUk = blank === "numeral" ? card.uk : noun.uk;
+  const promptLabel = blank === "numeral" ? "числівник" : "іменник";
 
   return {
     // Вага рахується на рівні числівник+відмінок, НЕЗАЛЕЖНО від випадкового
@@ -212,6 +213,7 @@ function buildQuestion(card: CardinalEntry, phraseCase: CzechCase, noun: NounEnt
     blank,
     promptWord,
     promptUk,
+    promptLabel,
     taskText,
     contextPhrase,
     correct,
@@ -301,6 +303,7 @@ function buildHundredQuestion(hundred: NounEntry, phraseCase: CzechCase, partner
 
   const promptWord = blank === "numeral" ? hundred.cz : partner.cz;
   const promptUk = blank === "numeral" ? hundred.uk : partner.uk;
+  const promptLabel = blank === "numeral" ? "числівник" : "іменник";
 
   return {
     // Див. коментар у buildQuestion: фіксуємо "x", щоб id збігався з пулом.
@@ -308,6 +311,7 @@ function buildHundredQuestion(hundred: NounEntry, phraseCase: CzechCase, partner
     blank,
     promptWord,
     promptUk,
+    promptLabel,
     taskText,
     contextPhrase,
     correct,
@@ -444,7 +448,7 @@ function buildCompoundQuestion(group: number, phraseCase: CzechCase, noun: NounE
   const compoundUk = `${decade.uk} ${unit.uk}`;
   const promptWord = blank === "numeral" ? compoundUk : noun.cz;
   const promptUk = blank === "numeral" ? "" : noun.uk;
-  const promptLabel = blank === "numeral" ? "українською 🇺🇦" : undefined;
+  const promptLabel = blank === "numeral" ? "числівник" : "іменник";
 
   return {
     // Вага — за групою останньої цифри (compound-N), НЕ за конкретним

@@ -36,6 +36,7 @@ export interface DeclQuestion {
   comboId: string;
   promptWord: string; // словникова форма тестованого слова (starý, můj, ten)
   promptUk: string;
+  promptLabel: string; // заголовок-підпис: частина мови ("прикметник"/"займенник")
   taskText: string;
   contextPhrase: string; // партнер + пропуск
   correct: string;
@@ -308,6 +309,13 @@ function taskTextFor(tested: Tested, g: Gender, c: CzechCase, n: GrammaticalNumb
   return `Оберіть ${kindLabel}: ${GENDER_SHORT[g]}, ${l.uk} (${l.cz}) — ${l.question}, ${NUMBER_LABEL[n]}`;
 }
 
+// Заголовок-підпис картки = частина мови основного тестованого слова. У цьому
+// квізі змішані прикметники й займенники (присвійні/вказівні/особові/питальні
+// — усі займенники), тож заголовок обчислюється за kind, а не статичний.
+function partOfSpeechLabel(kind: DeclQuestion["kind"]): string {
+  return kind === "adjective" ? "прикметник" : "займенник";
+}
+
 function makeQuestion(combo: Combo): DeclQuestion | null {
   const { tested, gender, targetCase, targetNumber, correct } = combo;
   const distractor = buildDistractor(tested.decl, gender, targetCase, targetNumber, correct);
@@ -321,6 +329,7 @@ function makeQuestion(combo: Combo): DeclQuestion | null {
     // Для ступенів показуємо базове слово (vysoký), а не готову форму ступеня.
     promptWord: tested.baseCz ?? tested.cz,
     promptUk: tested.baseUk ?? tested.uk,
+    promptLabel: partOfSpeechLabel(tested.kind),
     taskText: taskTextFor(tested, gender, targetCase, targetNumber),
     contextPhrase: buildContextPhrase(tested, gender, targetCase, targetNumber),
     correct,
@@ -493,6 +502,7 @@ function enumeratePersonalCombos(): UnitCombo[] {
           comboId: c.id,
           promptWord: c.promptWord,
           promptUk: c.promptUk,
+          promptLabel: "займенник",
           taskText: c.taskText,
           contextPhrase: c.contextFactory(),
           correct: c.correct,
@@ -694,6 +704,7 @@ function enumerateInterrogativeCoreCombos(): UnitCombo[] {
             comboId: id,
             promptWord: entry.cz,
             promptUk: entry.uk,
+            promptLabel: "займенник",
             taskText: interrogativeCoreTaskText(c),
             contextPhrase: frame,
             correct,

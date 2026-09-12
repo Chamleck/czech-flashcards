@@ -25,7 +25,7 @@ export interface VerbQuestion {
   comboId: string;
   promptWord: string; // інфінітив (cz), напр. "dělat" / "učit se"
   promptUk: string; // українською
-  promptLabel?: string; // необов'язковий підпис (aspect: "українською 🇺🇦")
+  promptLabel: string; // заголовок-підпис: частина мови ("дієслово")
   taskText: string; // "Минулий час — ona (вона)"
   contextPhrase?: string; // речення з пропуском (лише для aspect-питань)
   correct: string;
@@ -211,7 +211,7 @@ function buildAspectQuestion(testVerb: VerbEntry): VerbQuestion | null {
       // інтеграції, знайдена аудитом: раніше ціле речення йшло в promptWord.
       promptWord: testVerb.uk,
       promptUk: "",
-      promptLabel: "українською 🇺🇦 — оберіть вид",
+      promptLabel: "дієслово",
       taskText:
         testVerb.aspect === "imperfective"
           ? "Оберіть ВИД: дія повторювана / у процесі → недоконаний"
@@ -329,6 +329,7 @@ function makeQuestion(combo: Combo): VerbQuestion | null {
     comboId: combo.id,
     promptWord: infinitiveOf(combo.entry),
     promptUk: combo.entry.uk,
+    promptLabel: "дієслово",
     taskText: taskTextFor(combo.tense, combo.personKey),
     correct: combo.correct,
     options: shuffle([combo.correct, distractor]),

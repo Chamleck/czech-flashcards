@@ -16,7 +16,7 @@ export interface AdverbQuestion {
   comboId: string;
   promptWord: string; // концепт українською, напр. "ліворуч" — headline-слот
   promptUk: string; // порожній: концепт уже в promptWord (екран гардить "" як falsy)
-  promptLabel?: string;
+  promptLabel: string; // заголовок-підпис: частина мови ("прислівник")
   taskText: string;
   contextPhrase?: string; // чеське речення з пропуском ___
   correct: string;
@@ -43,7 +43,7 @@ const ROLE_TASK: Record<AdverbRole, string> = {
   orig: "Звідки? (рух ВІД місця)",
 };
 
-const PROMPT_LABEL = "українською 🇺🇦 — оберіть прислівник";
+const PROMPT_LABEL = "прислівник";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];

@@ -16,6 +16,7 @@ export interface Question {
   comboId: string; // атомарна одиниця "слово+відмінок+число" для трекінгу помилок
   promptWord: string; // базова форма (називний однини)
   promptUk: string; // українською
+  promptLabel: string; // заголовок-підпис: частина мови основного слова ("іменник")
   taskText: string; // що зробити
   correct: string; // правильна форма
   options: string[]; // [правильна, дистрактор] — вже перемішані
@@ -130,6 +131,7 @@ function makeQuestionForCombo(
     comboId: comboId(entry.id, targetCase, targetNumber),
     promptWord,
     promptUk: entry.uk,
+    promptLabel: "іменник",
     taskText: `Оберіть форму: ${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${NUMBER_LABEL[targetNumber]}`,
     correct,
     options: shuffle([correct, distractor]),
