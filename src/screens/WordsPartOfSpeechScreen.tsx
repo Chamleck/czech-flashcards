@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView, TextInput } from "react-native";
+import { Search } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -176,7 +177,10 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
       keyboardShouldPersistTaps="handled"
     >
       <View style={styles.searchBar}>
-        <Text style={styles.searchIcon}>🔍</Text>
+        {/* lucide Search, той самий колір/іконка, що HomeHeaderButton/SearchHeaderButton
+            (theme.colors.lilac) — але БЕЗ пігулки-фону: тут іконка вже сидить
+            всередині власного контейнера серч-бару, ще один фон-акцент був би зайвим. */}
+        <Search size={16} color={theme.colors.lilac} strokeWidth={2.2} />
         <TextInput
           ref={searchInputRef}
           value={query}
@@ -258,7 +262,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.space(3.5),
     marginBottom: theme.space(5),
   },
-  searchIcon: { fontSize: 16 },
   searchInput: { flex: 1, color: theme.colors.text, fontSize: 15, padding: 0 },
   searchClear: { color: theme.colors.textFaint, fontSize: 16, paddingHorizontal: 4 },
   resultsList: { gap: theme.space(2) },
