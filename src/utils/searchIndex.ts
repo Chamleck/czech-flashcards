@@ -3,6 +3,7 @@ import { VERBS } from "../data/verbs";
 import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
+import { INTERROGATIVE_ALL } from "../data/interrogativePronouns";
 import { CARDINALS } from "../data/cardinals";
 import { PREPOSITIONS } from "../data/prepositions";
 import { ADVERBS } from "../data/adverbs";
@@ -19,6 +20,7 @@ import { BrowseKind, CASE_LABELS, CzechCase } from "../types";
 import {
   PRONOUN_GROUP_TITLE,
   PERSONAL_GROUP_TITLE,
+  INTERROGATIVE_GROUP_TITLE,
   NUMERAL_CARDINAL_TITLE,
   NUMERAL_ORDINAL_TITLE,
   NUMERAL_HUNDREDS_TITLE,
@@ -82,6 +84,7 @@ const KIND_EMOJI: Record<BrowseKind, string> = {
   cardinals: "🔢",
   prepositions: "🧭",
   adverbs: "🗺️",
+  interrogative: "❓",
 };
 
 // Широка категорія за замовчуванням — та сама, що назви тайлів на корені
@@ -97,6 +100,7 @@ const KIND_LABEL: Record<BrowseKind, string> = {
   cardinals: KIND_LABEL_NUMERALS,
   prepositions: KIND_LABEL_PREPOSITIONS,
   adverbs: KIND_LABEL_ADVERBS,
+  interrogative: KIND_LABEL_PRONOUNS,
 };
 
 function push(
@@ -177,6 +181,12 @@ function buildIndex(): SearchEntry[] {
   const personalIds = PERSONAL_PRONOUNS.map((p) => p.id);
   for (const p of PERSONAL_PRONOUNS) {
     push(out, p.id, "personal", p.cz, p.uk, [], personalIds, PERSONAL_GROUP_TITLE, "PronounGroups");
+  }
+  // Питальні — третя плитка на тому самому екрані PronounGroups, змішана
+  // група (jaký/который/čí + kdo/co), суцільний список без підгруп.
+  const interrogativeIds = INTERROGATIVE_ALL.map((p) => p.id);
+  for (const p of INTERROGATIVE_ALL) {
+    push(out, p.id, "interrogative", p.cz, p.uk, [], interrogativeIds, INTERROGATIVE_GROUP_TITLE, "PronounGroups");
   }
 
   // Числівники (кількісні) — суцільний список (той самий CARDINAL_IDS, що в NumeralsScreen).

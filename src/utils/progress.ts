@@ -11,6 +11,7 @@ const PERSONAL_KEY = "czech_personal_pronouns_progress_v1"; // особові
 const NUMERALS_KEY = "czech_numerals_progress_v1"; // кількісні + порядкові + сотні/тисячі/мільйони — один спільний розділ "Числівники"
 const PREPOSITIONS_KEY = "czech_prepositions_progress_v1"; // прийменники (фіксовані + дуальні — один спільний розділ)
 const ADVERBS_KEY = "czech_adverbs_progress_v1"; // прислівники місця (де/куди/звідки)
+const INTERROGATIVE_KEY = "czech_interrogative_progress_v1"; // питальні займенники (jaký/который/čí/kdo/co)
 
 // За замовчуванням працюємо з колодою іменників (зворотна сумісність).
 const KEY = NOUN_KEY;
@@ -19,8 +20,7 @@ export const PROGRESS_KEYS = {
   nouns: NOUN_KEY,
   verbs: VERB_KEY,
   adjectives: ADJ_KEY,
-  pronouns: PRON_KEY,
-  personal: PERSONAL_KEY,
+  pronouns: PRON_KEY, // єдиний ключ усього розділу "Займенники" (особові+присвійні+питальні)
   numerals: NUMERALS_KEY,
   prepositions: PREPOSITIONS_KEY,
   adverbs: ADVERBS_KEY,
@@ -57,6 +57,49 @@ export async function saveProgressTo(
     await AsyncStorage.setItem(storageKey, JSON.stringify(all));
   } catch {
     // тихо ігноруємо — прогрес не критичний для роботи
+  }
+}
+
+// ── Одноразова консолідація сховищ розділу "Займенники" ──
+// Історично Особові / Присвійні+Вказівні / Питальні писали у ТРИ окремі ключі
+// (перші дві — бо зроблені в різний час до появи спільного екрана; питальні —
+// бо були новою групою). Це вимагало крихкого резолвера сховищ і вже раз
+// спричинило пропущені помилки в "Повторити помилки". Тепер увесь розділ живе
+// в ОДНОМУ ключі PROGRESS_KEYS.pronouns (як Числівники — одне сховище на розділ).
+//
+// id трьох груп не перетинаються ("pp-" особові, "-int" питальні, решта —
+// присвійні/вказівні), тож простий merge безпечний. Старі два ключі
+// ВИДАЛЯЄМО одразу (за рішенням: втрата частини історії прогресу прийнятна,
+// головне — коректна робота нового сховища). Ідемпотентність без прапорця:
+// коли старих ключів уже нема, повторний виклик — no-op.
+const LEGACY_PRONOUN_KEYS = [PERSONAL_KEY, INTERROGATIVE_KEY];
+
+export async function migratePronounStores(): Promise<void> {
+  try {
+    const legacyRaws = await Promise.all(LEGACY_PRONOUN_KEYS.map((k) => AsyncStorage.getItem(k)));
+    // Жодного старого ключа не лишилось → міграція вже відбулась, виходимо.
+    if (legacyRaws.every((r) => r === null)) return;
+
+    const main = await loadProgressFrom(PRON_KEY);
+    const merged: Record<string, CardProgress> = { ...main };
+    for (const raw of legacyRaws) {
+      if (!raw) continue;
+      try {
+        const parsed = JSON.parse(raw) as Record<string, CardProgress>;
+        // main має пріоритет лише якщо id збігся б (не збігається — namespace
+        // роздільні), тож напрям merge тут некритичний; беремо legacy-значення.
+        for (const [id, prog] of Object.entries(parsed)) {
+          if (!(id in merged)) merged[id] = prog;
+        }
+      } catch {
+        // пошкоджений старий запис — пропускаємо, не валимо міграцію
+      }
+    }
+    await saveProgressTo(PRON_KEY, merged);
+    // Прибираємо старі ключі лише ПІСЛЯ успішного запису об'єднаного сховища.
+    await Promise.all(LEGACY_PRONOUN_KEYS.map((k) => AsyncStorage.removeItem(k)));
+  } catch {
+    // тихо ігноруємо — при невдачі старі ключі лишаються, наступний запуск повторить
   }
 }
 

@@ -4,6 +4,7 @@ import { VERBS } from "../data/verbs";
 import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
+import { INTERROGATIVE_ALL } from "../data/interrogativePronouns";
 import { CARDINALS } from "../data/cardinals";
 import { PREPOSITIONS } from "../data/prepositions";
 import { ADVERBS } from "../data/adverbs";
@@ -37,6 +38,8 @@ export function browseSource(kind: BrowseKind): readonly { id: string; uk: strin
       // (...a), не новий урізаний об'єкт — інакше BrowseCardScreen (той самий
       // browseSource) втратив би senses/note, потрібні для рендеру AdverbCard.
       return ADVERBS.map((a) => ({ ...a, cz: a.senses.map((s) => s.cz).join(" / ") }));
+    case "interrogative":
+      return INTERROGATIVE_ALL;
     case "pronouns":
     default:
       return PRONOUNS;

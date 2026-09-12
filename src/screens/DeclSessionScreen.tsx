@@ -16,6 +16,8 @@ import { CARDINALS } from "../data/cardinals";
 import { NOUNS } from "../data/nouns";
 import { resolveNumeral } from "../utils/numeralEntries";
 import { resolvePronoun } from "../utils/pronounEntries";
+import { INTERROGATIVE_ALL } from "../data/interrogativePronouns";
+import { resolveInterrogative } from "../utils/interrogativeEntries";
 import {
   loadProgressFrom,
   saveProgressTo,
@@ -36,22 +38,24 @@ export function DeclSessionScreen({ route, navigation }: Props) {
   const isCardinal = kind === "cardinal";
   const isMixed = kind === "numeral-mixed";
   const isPronounMixed = kind === "pronoun-mixed";
-  // "ordinal"/"cardinal"/"numeral-mixed" пишуть в ОКРЕМЕ спільне сховище
-  // "Числівники" — не змішуються зі звичайними прикметниками/займенниками, навіть
-  // коли рендер/датасет перевикористовує ту саму структуру (ordinal = ADJECTIVES).
-  // "pronoun-mixed" — ІНАКШЕ: два сховища лишаються окремими (не мігруємо вже
-  // записаний прогрес користувача), тому storageKey тут НЕ використовується —
-  // читання/запис для цього kind йде окремою гілкою нижче через resolvePronoun().
+  const isInterrogative = kind === "interrogative";
+  // "ordinal"/"cardinal"/"numeral-mixed" пишуть у спільне сховище "Числівники".
+  // Увесь розділ "Займенники" (personal / pronoun / interrogative / pronoun-mixed)
+  // тепер теж пише в ОДНЕ сховище PROGRESS_KEYS.pronouns (консолідовано міграцією
+  // migratePronounStores) — тому окремих гілок сховища для них більше немає.
   const storageKey =
     kind === "adjective"
       ? PROGRESS_KEYS.adjectives
-      : kind === "personal"
-      ? PROGRESS_KEYS.personal
       : kind === "ordinal" || kind === "cardinal" || kind === "numeral-mixed"
       ? PROGRESS_KEYS.numerals
+      : kind === "personal"
+      ? PROGRESS_KEYS.pronouns
+      : isInterrogative
+      ? PROGRESS_KEYS.pronouns
       : PROGRESS_KEYS.pronouns;
-  // Для "numeral-mixed"/"pronoun-mixed" датасет — об'єднання джерел розділу;
-  // конкретна картка вибирається ПОКАРТКОВО за id (див. renderCard нижче).
+  // Для "numeral-mixed"/"pronoun-mixed"/"interrogative"/"personal" датасет —
+  // об'єднання джерел розділу; конкретна картка вибирається ПОКАРТКОВО за id
+  // (див. renderCard нижче через resolveNumeral/resolvePronoun).
   const dataset: { id: string }[] =
     kind === "adjective" || kind === "ordinal"
       ? ADJECTIVES
@@ -62,7 +66,9 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       : isMixed
       ? [...CARDINALS, ...ADJECTIVES, ...NOUNS]
       : isPronounMixed
-      ? [...PRONOUNS, ...PERSONAL_PRONOUNS]
+      ? [...PRONOUNS, ...PERSONAL_PRONOUNS, ...INTERROGATIVE_ALL]
+      : isInterrogative
+      ? INTERROGATIVE_ALL
       : PRONOUNS;
 
   const entries = useMemo(
@@ -71,45 +77,23 @@ export function DeclSessionScreen({ route, navigation }: Props) {
   );
 
   const [progress, setProgress] = useState<Record<string, CardProgress>>({});
-  // Тільки для "pronoun-mixed": ДВА окремих сховища завантажуються паралельно
-  // і зберігаються паралельно (кожен id пише назад у СВОЄ сховище). "progress"
-  // вище лишається як МЕРДЖЕНИЙ вигляд обох — для buildQueue/рендера без змін
-  // решти коду.
-  const [progressPronouns, setProgressPronouns] = useState<Record<string, CardProgress>>({});
-  const [progressPersonal, setProgressPersonal] = useState<Record<string, CardProgress>>({});
   const [loaded, setLoaded] = useState(false);
   const [idx, setIdx] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [stats, setStats] = useState({ done: 0, known: 0 });
 
   useEffect(() => {
-    if (isPronounMixed) {
-      Promise.all([
-        loadProgressFrom(PROGRESS_KEYS.pronouns),
-        loadProgressFrom(PROGRESS_KEYS.personal),
-      ]).then(([pr, pp]) => {
-        setProgressPronouns(pr);
-        setProgressPersonal(pp);
-        setLoaded(true);
-      });
-      return;
-    }
+    // Усі kind (включно з pronoun-mixed) читають з одного storageKey —
+    // розділ "Займенники" консолідований в PROGRESS_KEYS.pronouns.
     loadProgressFrom(storageKey).then((p) => {
       setProgress(p);
       setLoaded(true);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storageKey, isPronounMixed]);
-
-  // Мерджений вигляд для pronoun-mixed (id не перетинаються — "pp-" префікс
-  // особових проти звичайних, звірено в pronounEntries.ts).
-  const mergedProgress = useMemo(
-    () => (isPronounMixed ? { ...progressPronouns, ...progressPersonal } : progress),
-    [isPronounMixed, progressPronouns, progressPersonal, progress]
-  );
+  }, [storageKey]);
 
   const queue = useMemo<{ id: string }[]>(
-    () => (loaded ? buildQueue(entries, mergedProgress) : []),
+    () => (loaded ? buildQueue(entries, progress) : []),
     // фіксуємо чергу лише при завантаженні, щоб картки не перестрибували
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [loaded]
@@ -146,34 +130,14 @@ export function DeclSessionScreen({ route, navigation }: Props) {
   async function answer(knewIt: boolean) {
     if (!current) return;
     stopSpeech();
-    if (isPronounMixed) {
-      // Пишемо назад лише у СВОЄ сховище цього конкретного id (personal чи
-      // pronouns), зберігаючи всі ІНШІ записи цього сховища незмінними.
-      const resolved = resolvePronoun(current.id);
-      if (!resolved) return;
-      if (resolved.cardType === "personal") {
-        const updated = {
-          ...progressPersonal,
-          [current.id]: updateCard(progressPersonal[current.id], current.id, knewIt),
-        };
-        setProgressPersonal(updated);
-        await saveProgressTo(PROGRESS_KEYS.personal, updated);
-      } else {
-        const updated = {
-          ...progressPronouns,
-          [current.id]: updateCard(progressPronouns[current.id], current.id, knewIt),
-        };
-        setProgressPronouns(updated);
-        await saveProgressTo(PROGRESS_KEYS.pronouns, updated);
-      }
-    } else {
-      const updated = {
-        ...progress,
-        [current.id]: updateCard(progress[current.id], current.id, knewIt),
-      };
-      setProgress(updated);
-      await saveProgressTo(storageKey, updated);
-    }
+    // Усі kind (включно з pronoun-mixed) пишуть в один storageKey — розділ
+    // "Займенники" консолідований, тому окремої гілки для змішаної сесії немає.
+    const updated = {
+      ...progress,
+      [current.id]: updateCard(progress[current.id], current.id, knewIt),
+    };
+    setProgress(updated);
+    await saveProgressTo(storageKey, updated);
     setStats((s) => ({ done: s.done + 1, known: s.known + (knewIt ? 1 : 0) }));
     setRevealed(false);
     setIdx((i) => i + 1);
@@ -224,6 +188,22 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       const r = resolvePronoun(current.id);
       if (!r) return null;
       if (r.cardType === "personal")
+        return <PersonalPronounCard entry={r.entry as (typeof PERSONAL_PRONOUNS)[number]} {...p} />;
+      if (r.cardType === "interrogative")
+        // Питальні всередині pronoun-mixed — теж змішана форма (kdo/co без
+        // роду проти jaký/который/čí адʼєктивних), той самий принцип
+        // диспетчеризації по формі запису, що й в BrowseCardScreen/CardFor.
+        return "gendered" in (r.entry as object) ? (
+          <PersonalPronounCard entry={r.entry as (typeof PERSONAL_PRONOUNS)[number]} {...p} />
+        ) : (
+          <AdjPronounCard entry={r.entry as DeclEntry} {...p} />
+        );
+      return <AdjPronounCard entry={r.entry as DeclEntry} {...p} />;
+    }
+    if (isInterrogative) {
+      const r = resolveInterrogative(current.id);
+      if (!r) return null;
+      if (r.cardType === "core")
         return <PersonalPronounCard entry={r.entry as (typeof PERSONAL_PRONOUNS)[number]} {...p} />;
       return <AdjPronounCard entry={r.entry as DeclEntry} {...p} />;
     }

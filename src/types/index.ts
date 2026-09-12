@@ -149,7 +149,7 @@ export interface AdjectiveEntry {
 }
 
 // ── Займенники (присвійні + вказівні) ──
-export type PronounSubtype = "possessive" | "demonstrative";
+export type PronounSubtype = "possessive" | "demonstrative" | "interrogative";
 
 interface PronounBase {
   id: string;
@@ -456,7 +456,7 @@ export interface VerbEntry {
 
 // Параметри навігації (React Navigation, native stack)
 // Частина мови для режиму перегляду. Визначає джерело даних і компонент картки.
-export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "personal" | "cardinals" | "prepositions" | "adverbs";
+export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "personal" | "cardinals" | "prepositions" | "adverbs" | "interrogative";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -479,6 +479,7 @@ export type RootStackParamList = {
   PronounGroups: undefined;
   PronounSelection: undefined; // присвійні + вказівні
   PersonalPronounSelection: undefined; // особові
+  InterrogativeSelection: undefined; // питальні (jaký/который/čí + kdo/co)
   // Числівники (роутер: кількісні / порядкові / сотні-тисячі)
   Numerals: undefined;
   // Прийменники (роутер: групи за відмінком) + власна self-report сесія
@@ -497,7 +498,7 @@ export type RootStackParamList = {
   // датасет CARDINALS), теж пише в PROGRESS_KEYS.numerals.
   DeclSession: {
     title: string;
-    kind: "adjective" | "pronoun" | "personal" | "ordinal" | "cardinal" | "numeral-mixed" | "pronoun-mixed";
+    kind: "adjective" | "pronoun" | "personal" | "ordinal" | "cardinal" | "numeral-mixed" | "pronoun-mixed" | "interrogative";
     entryIds: string[];
   };
   // Режим ПЕРЕГЛЯДУ слів (не тренування): список без чекбоксів → картка з горизонтальним

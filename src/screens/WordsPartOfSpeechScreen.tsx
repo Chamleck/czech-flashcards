@@ -97,13 +97,11 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
         loadProgressFrom(PROGRESS_KEYS.verbs),
         loadProgressFrom(PROGRESS_KEYS.adjectives),
         loadProgressFrom(PROGRESS_KEYS.pronouns),
-        loadProgressFrom(PROGRESS_KEYS.personal),
         loadProgressFrom(PROGRESS_KEYS.numerals),
         loadProgressFrom(PROGRESS_KEYS.prepositions),
         loadProgressFrom(PROGRESS_KEYS.adverbs),
       ]).then(
-        ([np, vp, ap, pp, perp, mp, prp, advp]: [
-          Record<string, CardProgress>,
+        ([np, vp, ap, pp, mp, prp, advp]: [
           Record<string, CardProgress>,
           Record<string, CardProgress>,
           Record<string, CardProgress>,
@@ -116,11 +114,11 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
           setNounMistakes(getMistakeIds(np).size);
           setVerbMistakes(getMistakeIds(vp).size);
           setAdjMistakes(getMistakeIds(ap).size);
-          // "Займенники" = дві групи, два сховища (personal + pronouns) —
-          // об'єднуємо, інакше помилки з "Особові" не потраплять у лічильник
-          // плитки на головному екрані (той самий баг, що в PronounGroupsScreen).
-          const pronMerged = new Set([...getMistakeIds(pp), ...getMistakeIds(perp)]);
-          setPronMistakes(pronMerged.size);
+          // "Займенники" тепер одне сховище PROGRESS_KEYS.pronouns на всі три
+          // групи (особові+присвійні+питальні) — раніше було два ключі + merge,
+          // і питальні взагалі не рахувались у цьому лічильнику (existing-баг,
+          // виправлений консолідацією).
+          setPronMistakes(getMistakeIds(pp).size);
           const numeralIds = [...getMistakeIds(mp)].filter((id) => ALL_NUMERAL_IDS.includes(id));
           setNumeralMistakes(numeralIds.length);
           setPrepMistakes(getMistakeIds(prp).size);

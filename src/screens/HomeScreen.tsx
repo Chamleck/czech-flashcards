@@ -47,13 +47,11 @@ export function HomeScreen({ navigation }: Props) {
         loadProgressFrom(PROGRESS_KEYS.verbs),
         loadProgressFrom(PROGRESS_KEYS.adjectives),
         loadProgressFrom(PROGRESS_KEYS.pronouns),
-        loadProgressFrom(PROGRESS_KEYS.personal),
         loadProgressFrom(PROGRESS_KEYS.numerals),
         loadProgressFrom(PROGRESS_KEYS.prepositions),
         loadProgressFrom(PROGRESS_KEYS.adverbs),
       ]).then(
-        ([np, vp, ap, pp, perp, mp, prp, advp]: [
-          Record<string, CardProgress>,
+        ([np, vp, ap, pp, mp, prp, advp]: [
           Record<string, CardProgress>,
           Record<string, CardProgress>,
           Record<string, CardProgress>,
@@ -66,12 +64,13 @@ export function HomeScreen({ navigation }: Props) {
           const numeralCount = [...getMistakeIds(mp)].filter((id) =>
             ALL_NUMERAL_IDS.includes(id)
           ).length;
+          // pp = PROGRESS_KEYS.pronouns — тепер увесь розділ "Займенники"
+          // (особові+присвійні+питальні) в одному ключі, окремого personal нема.
           setWordMistakes(
             getMistakeIds(np).size +
               getMistakeIds(vp).size +
               getMistakeIds(ap).size +
               getMistakeIds(pp).size +
-              getMistakeIds(perp).size +
               numeralCount +
               getMistakeIds(prp).size +
               getMistakeIds(advp).size

@@ -9,6 +9,7 @@
 // підтягнув би React Native транзитивно і зламав би це.
 export const PRONOUN_GROUP_TITLE = "👉 Присвійні та вказівні";
 export const PERSONAL_GROUP_TITLE = "🙋 Особові";
+export const INTERROGATIVE_GROUP_TITLE = "❓ Питальні";
 export const NUMERAL_CARDINAL_TITLE = "Кількісні";
 export const NUMERAL_ORDINAL_TITLE = "Порядкові";
 export const NUMERAL_HUNDREDS_TITLE = "Сотні, тисячі, мільйони";

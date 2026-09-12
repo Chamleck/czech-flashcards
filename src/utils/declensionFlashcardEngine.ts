@@ -15,6 +15,7 @@ import {
 import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
+import { INTERROGATIVE_ADJ, INTERROGATIVE_CORE } from "../data/interrogativePronouns";
 import { NOUNS } from "../data/nouns";
 import { adjQuizUsable } from "../data/adjectiveCategories";
 import { nounUsableAsPartner } from "../data/categories";
@@ -28,7 +29,7 @@ const ADJECTIVE_PARTNER_POOL = ADJECTIVES.filter((a) => adjQuizUsable(a.category
 // іменників/дієслів (щоб екран працював без змін), + необов'язкове contextPhrase:
 // фраза-контекст із партнером і пропуском (напр. "jeho ___" або "___ nového").
 export interface DeclQuestion {
-  kind: "adjective" | "pronoun" | "personal";
+  kind: "adjective" | "pronoun" | "personal" | "interrogative-adj" | "interrogative-core";
   gender: Gender;
   targetCase: CzechCase;
   targetNumber: GrammaticalNumber;
@@ -82,7 +83,7 @@ function isUsableDistractor(correct: string, d: string | null | undefined): d is
 // ── Нормалізований тестований запис (спільний для прикметника й займенника) ──
 interface Tested {
   id: string;
-  kind: "adjective" | "pronoun";
+  kind: "adjective" | "pronoun" | "interrogative-adj";
   cz: string;
   uk: string;
   decl: FullDeclension;
@@ -135,7 +136,20 @@ function buildTestedPool(): Tested[] {
     uk: p.uk,
     decl: (p as Extract<PronounEntry, { declinable: true }>).declension,
   }));
-  return [...adj, ...pron];
+  // Питальні адʼєктивного типу (jaký/который/čí) — структурно ідентичні до
+  // PRONOUNS вище (та сама FullDeclension), але СВІЙ kind — окремий floor у
+  // generateDeclensionSession, щоб не розбавляти наявні присвійні/вказівні
+  // (і не вигадувати новий contextPhrase: гілка buildContextPhrase уже working
+  // correctly для будь-якого kind !== "adjective" — пропуск першим, декорація
+  // після, граматично коректно і для питальних).
+  const interrogativeAdj: Tested[] = INTERROGATIVE_ADJ.filter((p) => p.declinable).map((p) => ({
+    id: p.id,
+    kind: "interrogative-adj",
+    cz: p.cz,
+    uk: p.uk,
+    decl: (p as Extract<PronounEntry, { declinable: true }>).declension,
+  }));
+  return [...adj, ...pron, ...interrogativeAdj];
 }
 
 // Форма партнера у тій самій клітинці (рід×відмінок×число), завжди коректна.
@@ -261,7 +275,9 @@ function taskTextFor(tested: Tested, g: Gender, c: CzechCase, n: GrammaticalNumb
   const kindLabel =
     tested.kind === "pronoun"
       ? "займенник"
-      : tested.degree === "comparative"
+      : tested.kind === "interrogative-adj"
+        ? "питальний займенник"
+        : tested.degree === "comparative"
         ? "прикметник (вищий ст.)"
         : tested.degree === "superlative"
           ? "прикметник (найвищий ст.)"
@@ -584,12 +600,92 @@ function enumeratePersonalCombos(): UnitCombo[] {
   return units;
 }
 
+// ═══════════ ПИТАЛЬНІ БЕЗ РОДУ (kdo/co) У КВІЗІ ═══════════
+// kdo/co: без роду й числа, 5 відмінків — той самий набір, що PP_QUIZ_CASES
+// (nominativ пропущено: це словникова форма kdo/co, тестувати нема сенсу,
+// той самий принцип, що вже для já/ty). Дистрактор — інша форма ТОГО САМОГО
+// слова; isUsableDistractor сам відфільтровує збіг форм (kdo: genitiv і
+// akuzativ обидва "koho" — реальний синкретизм чол. істот., звірено
+// джерелами), явний avoid-набір, на відміну від особових, тут не потрібен
+// (нема міжрегістрового перетину форм — kdo/co мають одну форму на відмінок).
+// Фрейми: для genitiv/dativ/akuzativ/lokal одне речення природне і для
+// істоти, і для неістоти (bát se/věřit/vidět/mluvit o). Instrumental —
+// виняток: "s kým" (супровід, з прийменником) проти "čím" (знаряддя, без
+// прийменника) — семантично різні конструкції, звідси два різні фрейми.
+// Фрейми: масив 2 варіантів на кожну пару (відмінок, слово) — вибір
+// випадковий у make() (той самий принцип генеративності, що вже є для
+// іменника-носія/декоративного прикметника в adjPronUnits, лише тут
+// варіанти рукописні, не комбінаторні). Для genitiv/dativ/akuzativ/lokal —
+// одне й те саме дієслово природне і для істоти, і для неістоти (той самий
+// масив під обома ключами). Instrumental — виняток: "s kým" (супровід, з
+// прийменником) проти "čím" (знаряддя, без прийменника) — різні дієслова,
+// різні масиви. Джерело на "vyhýbat se čemu" (дативне керування) — MUNI,
+// дисертація з дієслівної валентності (is.muni.cz/th/ds5eg).
+const CORE_FRAMES_GENITIV = ["___ se bojíš?", "___ sis všiml?"];
+const CORE_FRAMES_DATIV = ["Věříš ___?", "___ se vyhýbáš?"];
+const CORE_FRAMES_AKUZATIV = ["___ vidíš?", "___ hledáš?"];
+const CORE_FRAMES_LOKAL = ["O ___ jste mluvili?", "O ___ přemýšlíš?"];
+const INTERROGATIVE_CORE_FRAMES: Partial<Record<CzechCase, { kdo: string[]; co: string[] }>> = {
+  genitiv: { kdo: CORE_FRAMES_GENITIV, co: CORE_FRAMES_GENITIV },
+  dativ: { kdo: CORE_FRAMES_DATIV, co: CORE_FRAMES_DATIV },
+  akuzativ: { kdo: CORE_FRAMES_AKUZATIV, co: CORE_FRAMES_AKUZATIV },
+  lokal: { kdo: CORE_FRAMES_LOKAL, co: CORE_FRAMES_LOKAL },
+  instrumental: { kdo: ["S ___ jedeš?", "S ___ ses bavil?"], co: ["___ píšeš?", "___ to otevřeš?"] },
+};
+
+function interrogativeCoreTaskText(c: CzechCase): string {
+  const l = CASE_LABELS[c];
+  // Без роду/числа/регістру — на відміну від taskTextFor/ppTaskText, тут
+  // немає що дописувати після питання (немає осі, якої стосувалось би "однина"/"короткий").
+  return `Оберіть займенник: ${l.uk} (${l.cz}) — ${l.question}`;
+}
+
+function enumerateInterrogativeCoreCombos(): UnitCombo[] {
+  const units: UnitCombo[] = [];
+  for (const entry of INTERROGATIVE_CORE) {
+    if (entry.gendered) continue; // типажний guard — kdo/co завжди gendered:false
+    const wordKey: "kdo" | "co" = entry.id === "kdo-int" ? "kdo" : "co";
+    const decl: PersonalDeclension = entry.declension;
+    for (const c of PP_QUIZ_CASES) {
+      const frames = INTERROGATIVE_CORE_FRAMES[c]?.[wordKey];
+      const correct = firstForm(decl[c].a);
+      if (!frames || frames.length === 0 || !correct || correct === "—") continue;
+      const id = comboId(entry.id, c, "0");
+      units.push({
+        id,
+        wordId: entry.id,
+        kind: "interrogative-core",
+        make: () => {
+          const candidates = PP_QUIZ_CASES.filter((cc) => cc !== c).map((cc) => firstForm(decl[cc].a));
+          const distractor = shuffle(candidates).find((f) => isUsableDistractor(correct, f));
+          if (!distractor) return null;
+          const frame = frames[Math.floor(Math.random() * frames.length)];
+          return {
+            kind: "interrogative-core",
+            gender: "masc_anim", // немає роду в kdo/co — поле не рендериться, лише для типу
+            targetCase: c,
+            targetNumber: "sg", // немає числа — те саме
+            comboId: id,
+            promptWord: entry.cz,
+            promptUk: entry.uk,
+            taskText: interrogativeCoreTaskText(c),
+            contextPhrase: frame,
+            correct,
+            options: shuffle([correct, distractor]),
+          };
+        },
+      });
+    }
+  }
+  return units;
+}
+
 // Уніфікована одиниця сесії: adj/pron і особові зводяться до цього інтерфейсу,
 // щоб крутитись в одному зваженому циклі (спільні ваги помилок, раунд, «не поспіль»).
 interface UnitCombo {
   id: string; // comboId (ваги)
   wordId: string; // «не те саме слово поспіль»
-  kind: "adjective" | "pronoun" | "personal"; // для балансу слотів за типом
+  kind: "adjective" | "pronoun" | "personal" | "interrogative-adj" | "interrogative-core"; // для балансу слотів за типом
   make: () => DeclQuestion | null;
 }
 
@@ -609,19 +705,26 @@ export function generateDeclensionSession(
   pool: Tested[] = buildTestedPool(),
   mistakes: MistakeStore = {}
 ): DeclQuestion[] {
-  // Один пул: прикметники + присвійні/вказівні + особові (усе крутиться разом).
+  // Один пул: прикметники + присвійні/вказівні + особові + питальні (усе крутиться разом).
   // Вибір (ваги + зарезервовані слоти помилок + «не те саме слово поспіль») —
   // спільний selectRoundCombos.
-  const combos: UnitCombo[] = [...adjPronUnits(pool), ...enumeratePersonalCombos()];
-  // Баланс за типом: гарантуємо ~5 з 12 слотів НЕ-прикметникам (звичайні +
-  // особові займенники), приблизно навпіл між ними. Прикметники (численний,
-  // відкритий клас) інакше витісняли б займенники (виміряно: 84%/15%/1.4%).
-  // Пріоритет віддачі зайвих слотів: personal → pronoun → загальний пул, тож
-  // якщо особових не вистачає, їхні слоти переходять звичайним займенникам,
-  // і лише потім прикметникам (крок 3 у selectRoundCombos).
+  const combos: UnitCombo[] = [
+    ...adjPronUnits(pool),
+    ...enumeratePersonalCombos(),
+    ...enumerateInterrogativeCoreCombos(),
+  ];
+  // Баланс за типом: гарантуємо слоти НЕ-прикметникам, щоб численний відкритий
+  // клас прикметників не витісняв малочисельні закриті групи (виміряно без
+  // floor: 84%/15%/1.4% на прикметники/займенники/особові). Питальні — теж
+  // закриті групи (interrogative-adj: 3 слова, interrogative-core: 2 слова) —
+  // той самий ризик витіснення, той самий механізм захисту.
+  // Кожен kind у minSlots набирає слоти зі СВОГО пулу незалежно (без явної
+  // передачі недобору іншому типу); якщо якогось типу не вистачає — недобір
+  // просто йде в спільний зважений пул кроку 3 (де впереміш усі combos,
+  // включно з прикметниками).
   const chosen = selectRoundCombos(combos, mistakes, count, (c) => c.wordId, undefined, {
     kindOf: (c) => (c as UnitCombo).kind,
-    minSlots: { personal: 2, pronoun: 3 },
+    minSlots: { personal: 2, pronoun: 3, "interrogative-adj": 2, "interrogative-core": 1 },
   });
   const questions: DeclQuestion[] = [];
   for (const c of chosen) {
