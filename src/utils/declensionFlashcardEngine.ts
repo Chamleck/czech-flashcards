@@ -177,7 +177,18 @@ function adjectivePartnerForm(
 // Виключаємо категорії, непридатні як носій (дні/місяці/сотні): "jeho ___ únoru"
 // граматично коректне, але семантично абсурдне.
 function nounCarrierForm(g: Gender, c: CzechCase, n: GrammaticalNumber): string {
-  const pool = NOUNS.filter((noun) => noun.gender === g && nounUsableAsPartner(noun.category));
+  // Носій має ту саму (рід×відмінок×число) форму, що й тестоване слово. Пул
+  // фільтруємо не лише за категорією-придатністю, а й за тим, що САМЕ ЦЯ
+  // клітинка існує (не "—"): pluralia tantum (ústa/kalhoty — усі sg = "—") та
+  // будь-який іменник із відсутньою формою інакше дали б декоратор-прочерк
+  // "___ —" замість слова (реальний баг зі скріна: bílý жін. Nom. sg + носій
+  // без цієї форми). Перевірка по фактичній формі, не лише за категорією.
+  const pool = NOUNS.filter(
+    (noun) =>
+      noun.gender === g &&
+      nounUsableAsPartner(noun.category) &&
+      firstForm(noun.declension[c][n]) !== "—"
+  );
   if (pool.length === 0) return "";
   const noun = pool[Math.floor(Math.random() * pool.length)];
   return firstForm(noun.declension[c][n]);
@@ -195,11 +206,23 @@ function buildContextPhrase(
 ): string {
   const noun = nounCarrierForm(g, c, n);
   if (tested.kind === "adjective") {
-    const p = PRONOUNS[Math.floor(Math.random() * PRONOUNS.length)];
-    return `${pronounPartnerForm(p, g, c, n)} ___ ${noun}`;
+    // Партнер-займенник ПЕРЕД пропуском ("jeho ___ noun"). Фільтруємо пул за
+    // наявністю форми в цій клітинці (той самий захист, що й nounCarrierForm):
+    // інакше випадковий партнер із "—" дав би "— ___ noun". Fallback — без
+    // партнера, якщо жоден не має форми (на практиці не трапляється, але код
+    // не має мовчки рендерити прочерк).
+    const pool = PRONOUNS.filter((p) => pronounPartnerForm(p, g, c, n) !== "—");
+    const p = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null;
+    return (p ? `${pronounPartnerForm(p, g, c, n)} ___ ${noun}` : `___ ${noun}`).trim();
   }
-  const a = ADJECTIVE_PARTNER_POOL[Math.floor(Math.random() * ADJECTIVE_PARTNER_POOL.length)];
-  return `___ ${adjectivePartnerForm(a, g, c, n)} ${noun}`;
+  // Партнер-прикметник ПІСЛЯ пропуску ("___ nového noun") — той самий фільтр.
+  const pool = ADJECTIVE_PARTNER_POOL.filter((a) => adjectivePartnerForm(a, g, c, n) !== "—");
+  const a = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null;
+  const phrase = (a ? `___ ${adjectivePartnerForm(a, g, c, n)} ${noun}` : `___ ${noun}`).trim();
+  // Питальні jaký/который/čí (interrogative-adj) — за визначенням питальні, тож
+  // фраза завжди питання (знак "?" наприкінці, як у рукописних фреймах kdo/co).
+  // Звичайні присвійні/вказівні (pronoun) — не питання, "?" не додаємо.
+  return tested.kind === "interrogative-adj" ? `${phrase}?` : phrase;
 }
 
 // Усі реальні форми тестованого слова (для дистракторів), крім "—".
@@ -635,9 +658,12 @@ const INTERROGATIVE_CORE_FRAMES: Partial<Record<CzechCase, { kdo: string[]; co: 
 
 function interrogativeCoreTaskText(c: CzechCase): string {
   const l = CASE_LABELS[c];
-  // Без роду/числа/регістру — на відміну від taskTextFor/ppTaskText, тут
-  // немає що дописувати після питання (немає осі, якої стосувалось би "однина"/"короткий").
-  return `Оберіть займенник: ${l.uk} (${l.cz}) — ${l.question}`;
+  // "питальний займенник" — так само, як interrogative-adj (jaký/который/čí)
+  // через taskTextFor: kdo/co ТЕЖ питальні займенники, тож формулювання має
+  // збігатися. Різниця лише в тому, що тут НЕ дописуємо рід/число — kdo/co їх
+  // не мають (немає осі, якої стосувалось би "жін."/"однина"), на відміну від
+  // interrogative-adj, де рід і число є.
+  return `Оберіть питальний займенник: ${l.uk} (${l.cz}) — ${l.question}`;
 }
 
 function enumerateInterrogativeCoreCombos(): UnitCombo[] {

@@ -211,7 +211,7 @@ function buildAspectQuestion(testVerb: VerbEntry): VerbQuestion | null {
       // інтеграції, знайдена аудитом: раніше ціле речення йшло в promptWord.
       promptWord: testVerb.uk,
       promptUk: "",
-      promptLabel: "українською 🇺🇦",
+      promptLabel: "українською 🇺🇦 — оберіть вид",
       taskText:
         testVerb.aspect === "imperfective"
           ? "Оберіть ВИД: дія повторювана / у процесі → недоконаний"

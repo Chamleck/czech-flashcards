@@ -43,7 +43,7 @@ const ROLE_TASK: Record<AdverbRole, string> = {
   orig: "Звідки? (рух ВІД місця)",
 };
 
-const PROMPT_LABEL = "українською 🇺🇦";
+const PROMPT_LABEL = "українською 🇺🇦 — оберіть прислівник";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];

@@ -921,7 +921,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             ],
           },
           {
-            term: [{ text: "mě vs mně" }],
+            term: [{ word: "mě", wordId: "pp-ja", kind: "personal" }, { text: " vs " }, { word: "mně", wordId: "pp-ja", kind: "personal" }],
             note: [{ text: "У родовому і знахідному (2. і 4.) — mě (2 літери), у давальному і місцевому (3. і 6.) — mně (3 літери). Підказка: підстав «Pepa» — Pepu → mě, Pepovi → mně." }],
           },
           {
@@ -933,7 +933,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             ],
           },
           {
-            term: [{ text: "ji vs jí (вона)" }],
+            term: [{ word: "ji", wordId: "pp-on", kind: "personal" }, { text: " vs " }, { word: "jí", wordId: "pp-on", kind: "personal" }, { text: " (вона)" }],
             note: [{ text: "Знахідний — ji (короткий i): Vidím ji. Решта відмінків (родовий/давальний/місцевий/орудний) — jí (довгий í): bez ní, s ní. Після прийменника скрізь ní." }],
           },
           {

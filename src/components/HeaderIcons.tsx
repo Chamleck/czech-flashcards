@@ -15,23 +15,26 @@ type Nav = {
   reset(state: { index: number; routes: { name: keyof RootStackParamList; params?: object }[] }): void;
 };
 
-// Екрани глибиною 3+ пуші від Home отримують цю кнопку в шапці — веде
-// СПРАВДІ на Home (popToTop очищає весь стек до кореня), на відміну від
-// іконки пошуку нижче, яка веде лише в корінь "Слів". popToTop — той самий
-// виклик, що вже безпечно працює на екранах "Готово!" в *SessionScreen;
-// тут просто той самий виклик у шапці, доступний одразу, а не лише наприкінці сесії.
+// Home і Search — дві навігаційні дії в headerRight, поруч. За принципом
+// консистентності (елементи одного рівня в одному контексті — однакове
+// трактування) обидві мають ІДЕНТИЧНИЙ вигляд: колір lilac (уже усталений
+// колір навігації в застосунку — стрілка «← Назад» скрізь lilac), однакова
+// фонова пілюля (bgElevated) для візуальної ваги й рівного touch-таргета,
+// однаковий розмір іконки. Раніше Home був голий text-колір без фону, а Search
+// — honey з пілюлею; це створювало дисонанс між двома рівноправними кнопками.
+const ICON_SIZE = 19;
+const ICON_STROKE = 2.2;
+
 export function HomeHeaderButton({ navigation }: { navigation: Nav }) {
   return (
-    <Pressable onPress={() => navigation.popToTop()} hitSlop={10} accessibilityLabel="На головну">
-      <Home size={21} color={theme.colors.text} strokeWidth={2.2} />
+    <Pressable onPress={() => navigation.popToTop()} hitSlop={10} style={styles.pill} accessibilityLabel="На головну">
+      <Home size={ICON_SIZE} color={theme.colors.lilac} strokeWidth={ICON_STROKE} />
     </Pressable>
   );
 }
 
 // Скидає стек до Home→WordsPartOfSpeech(focusSearch) — той самий виклик, що
-// раніше жив окремо в BrowseListScreen і BrowseCardScreen; тепер в одному
-// місці. Пілюля-фон навколо іконки — щоб не губилась у шапці поруч з іншими
-// елементами (сама лупа впізнавана, проблема була у видимості, не в змісті).
+// раніше жив окремо в BrowseListScreen і BrowseCardScreen; тепер в одному місці.
 export function SearchHeaderButton({ navigation }: { navigation: Nav }) {
   return (
     <Pressable
@@ -42,19 +45,19 @@ export function SearchHeaderButton({ navigation }: { navigation: Nav }) {
         })
       }
       hitSlop={10}
-      style={styles.searchPill}
+      style={styles.pill}
       accessibilityLabel="Пошук"
     >
-      <Search size={16} color={theme.colors.honey} strokeWidth={2.4} />
+      <Search size={ICON_SIZE} color={theme.colors.lilac} strokeWidth={ICON_STROKE} />
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  searchPill: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+  pill: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: theme.colors.bgElevated,
     alignItems: "center",
     justifyContent: "center",
