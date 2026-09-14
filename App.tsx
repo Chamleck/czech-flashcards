@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
@@ -6,7 +6,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { RootStackParamList } from "./src/types";
 import { theme } from "./src/utils/theme";
-import { migratePronounStores } from "./src/utils/progress";
 import { HomeScreen } from "./src/screens/HomeScreen";
 import { WordsPartOfSpeechScreen } from "./src/screens/WordsPartOfSpeechScreen";
 import { WordCategoriesScreen } from "./src/screens/WordCategoriesScreen";
@@ -21,6 +20,7 @@ import { PronounGroupsScreen } from "./src/screens/PronounGroupsScreen";
 import { PronounSelectionScreen } from "./src/screens/PronounSelectionScreen";
 import { PersonalPronounSelectionScreen } from "./src/screens/PersonalPronounSelectionScreen";
 import { InterrogativeSelectionScreen } from "./src/screens/InterrogativeSelectionScreen";
+import { InterrogativesScreen } from "./src/screens/InterrogativesScreen";
 import { NumeralsScreen } from "./src/screens/NumeralsScreen";
 import { PrepositionsScreen } from "./src/screens/PrepositionsScreen";
 import { PrepositionSessionScreen } from "./src/screens/PrepositionSessionScreen";
@@ -50,13 +50,6 @@ const navTheme = {
 };
 
 export default function App() {
-  // Одноразова консолідація сховищ розділу "Займенники" (три історичні ключі →
-  // один). Ідемпотентна: коли старих ключів уже нема — миттєвий no-op. Запуск
-  // при монтуванні кореня, до відкриття будь-якого екрана із займенниками.
-  useEffect(() => {
-    migratePronounStores();
-  }, []);
-
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
@@ -85,6 +78,7 @@ export default function App() {
           <Stack.Screen name="PronounSelection" component={PronounSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="PersonalPronounSelection" component={PersonalPronounSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="InterrogativeSelection" component={InterrogativeSelectionScreen} options={{ title: "Вибір слів" }} />
+          <Stack.Screen name="Interrogatives" component={InterrogativesScreen} options={{ title: "Питальні слова" }} />
           <Stack.Screen name="Numerals" component={NumeralsScreen} options={{ title: "Числівники" }} />
           <Stack.Screen name="Prepositions" component={PrepositionsScreen} options={{ title: "Прийменники" }} />
           <Stack.Screen name="PrepositionSession" component={PrepositionSessionScreen} options={{ title: "" }} />

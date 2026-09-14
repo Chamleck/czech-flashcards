@@ -8,6 +8,8 @@ import { theme } from "../utils/theme";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { plural } from "../utils/plural";
 import { ALL_NUMERAL_IDS } from "../utils/numeralEntries";
+import { ALL_INTERROGATIVE_IDS } from "../utils/interrogativeEntries";
+import { ALL_PRONOUN_MIXED_IDS } from "../utils/pronounEntries";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -36,9 +38,10 @@ export function HomeScreen({ navigation }: Props) {
   // іменники+дієслова (реальний баг, знайдений на тестуванні: лічильник тут
   // лишився від найранішої фази, коли інших частин мови ще не було, і його
   // забули розширити при додаванні прикметників/займенників/числівників/
-  // прийменників). Займенники — два сховища (personal+pronouns), числівники —
-  // одне спільне сховище, відфільтроване за ALL_NUMERAL_IDS (той самий принцип,
-  // що і в WordsPartOfSpeechScreen).
+  // прийменників). Займенники (pronouns) та Питальні слова (interrogatives) —
+  // окремі сховища, кожне фільтроване за своїм набором id; числівники — спільне
+  // сховище, відфільтроване за ALL_NUMERAL_IDS (той самий принцип, що і в
+  // WordsPartOfSpeechScreen — не рахуємо осиротілі записи).
   useFocusEffect(
     useCallback(() => {
       let alive = true;
@@ -47,11 +50,13 @@ export function HomeScreen({ navigation }: Props) {
         loadProgressFrom(PROGRESS_KEYS.verbs),
         loadProgressFrom(PROGRESS_KEYS.adjectives),
         loadProgressFrom(PROGRESS_KEYS.pronouns),
+        loadProgressFrom(PROGRESS_KEYS.interrogatives),
         loadProgressFrom(PROGRESS_KEYS.numerals),
         loadProgressFrom(PROGRESS_KEYS.prepositions),
         loadProgressFrom(PROGRESS_KEYS.adverbs),
       ]).then(
-        ([np, vp, ap, pp, mp, prp, advp]: [
+        ([np, vp, ap, pp, ip, mp, prp, advp]: [
+          Record<string, CardProgress>,
           Record<string, CardProgress>,
           Record<string, CardProgress>,
           Record<string, CardProgress>,
@@ -64,13 +69,21 @@ export function HomeScreen({ navigation }: Props) {
           const numeralCount = [...getMistakeIds(mp)].filter((id) =>
             ALL_NUMERAL_IDS.includes(id)
           ).length;
-          // pp = PROGRESS_KEYS.pronouns — тепер увесь розділ "Займенники"
-          // (особові+присвійні+питальні) в одному ключі, окремого personal нема.
+          // pp = PROGRESS_KEYS.pronouns (особові+присвійні+вказівні), ip =
+          // PROGRESS_KEYS.interrogatives (Питальні слова) — кожне фільтроване за
+          // своїм набором id, щоб осиротілі записи не подвоювались/не рахувались.
+          const pronCount = [...getMistakeIds(pp)].filter((id) =>
+            ALL_PRONOUN_MIXED_IDS.includes(id)
+          ).length;
+          const interrogativeCount = [...getMistakeIds(ip)].filter((id) =>
+            ALL_INTERROGATIVE_IDS.includes(id)
+          ).length;
           setWordMistakes(
             getMistakeIds(np).size +
               getMistakeIds(vp).size +
               getMistakeIds(ap).size +
-              getMistakeIds(pp).size +
+              pronCount +
+              interrogativeCount +
               numeralCount +
               getMistakeIds(prp).size +
               getMistakeIds(advp).size

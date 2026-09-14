@@ -15,6 +15,8 @@ import { ADVERBS } from "../data/adverbs";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { plural } from "../utils/plural";
 import { ALL_NUMERAL_IDS } from "../utils/numeralEntries";
+import { ALL_INTERROGATIVE_IDS } from "../utils/interrogativeEntries";
+import { ALL_PRONOUN_MIXED_IDS } from "../utils/pronounEntries";
 import { searchWords, SearchEntry } from "../utils/searchIndex";
 import {
   KIND_LABEL_NOUNS,
@@ -24,12 +26,13 @@ import {
   KIND_LABEL_NUMERALS,
   KIND_LABEL_PREPOSITIONS,
   KIND_LABEL_ADVERBS,
+  KIND_LABEL_INTERROGATIVE,
 } from "../data/groupTitles";
 
 type Props = NativeStackScreenProps<RootStackParamList, "WordsPartOfSpeech">;
 
 interface POSTile {
-  key: "nouns" | "verbs" | "adjectives" | "pronouns" | "numerals" | "prepositions" | "adverbs";
+  key: "nouns" | "verbs" | "adjectives" | "pronouns" | "interrogatives" | "numerals" | "prepositions" | "adverbs";
   emoji: string;
   title: string;
   subtitle: string;
@@ -52,6 +55,7 @@ const TILES: POSTile[] = [
   { key: "verbs", emoji: "🏃", title: KIND_LABEL_VERBS, subtitle: `${VERBS.length} слів з дієвідміною`, color: theme.colors.mint, ready: true },
   { key: "adjectives", emoji: "🎨", title: KIND_LABEL_ADJECTIVES, subtitle: `${VISIBLE_ADJS} слів з відмінюванням`, color: theme.colors.lilac, ready: true },
   { key: "pronouns", emoji: "👉", title: KIND_LABEL_PRONOUNS, subtitle: `${PRONOUNS.length} присвійних і вказівних`, color: theme.colors.coral, ready: true },
+  { key: "interrogatives", emoji: "❓", title: KIND_LABEL_INTERROGATIVE, subtitle: "як ставити запитання", color: "#d98cbf", ready: true },
   { key: "numerals", emoji: "🔢", title: KIND_LABEL_NUMERALS, subtitle: "порядкові, сотні, тисячі", color: "#e0a458", ready: true },
   { key: "prepositions", emoji: "🧭", title: KIND_LABEL_PREPOSITIONS, subtitle: `${PREPOSITIONS.length} з фіксованим відмінком`, color: "#7fb8e0", ready: true },
   { key: "adverbs", emoji: "🗺️", title: KIND_LABEL_ADVERBS, subtitle: `${ADVERBS.length} — де? куди? звідки?`, color: "#8ed081", ready: true },
@@ -63,6 +67,7 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
   const [verbMistakes, setVerbMistakes] = useState(0);
   const [adjMistakes, setAdjMistakes] = useState(0);
   const [pronMistakes, setPronMistakes] = useState(0);
+  const [interrogativeMistakes, setInterrogativeMistakes] = useState(0);
   const [numeralMistakes, setNumeralMistakes] = useState(0);
   const [prepMistakes, setPrepMistakes] = useState(0);
   const [adverbMistakes, setAdverbMistakes] = useState(0);
@@ -98,11 +103,13 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
         loadProgressFrom(PROGRESS_KEYS.verbs),
         loadProgressFrom(PROGRESS_KEYS.adjectives),
         loadProgressFrom(PROGRESS_KEYS.pronouns),
+        loadProgressFrom(PROGRESS_KEYS.interrogatives),
         loadProgressFrom(PROGRESS_KEYS.numerals),
         loadProgressFrom(PROGRESS_KEYS.prepositions),
         loadProgressFrom(PROGRESS_KEYS.adverbs),
       ]).then(
-        ([np, vp, ap, pp, mp, prp, advp]: [
+        ([np, vp, ap, pp, ip, mp, prp, advp]: [
+          Record<string, CardProgress>,
           Record<string, CardProgress>,
           Record<string, CardProgress>,
           Record<string, CardProgress>,
@@ -115,11 +122,13 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
           setNounMistakes(getMistakeIds(np).size);
           setVerbMistakes(getMistakeIds(vp).size);
           setAdjMistakes(getMistakeIds(ap).size);
-          // "Займенники" тепер одне сховище PROGRESS_KEYS.pronouns на всі три
-          // групи (особові+присвійні+питальні) — раніше було два ключі + merge,
-          // і питальні взагалі не рахувались у цьому лічильнику (existing-баг,
-          // виправлений консолідацією).
-          setPronMistakes(getMistakeIds(pp).size);
+          // "Займенники" — сховище PROGRESS_KEYS.pronouns (особові+присвійні+
+          // вказівні). Фільтр за ALL_PRONOUN_MIXED_IDS: питальні винесено в
+          // окремий розділ, тож їхні осиротілі записи в цьому ключі не мають
+          // фантомно рахуватись тут.
+          setPronMistakes([...getMistakeIds(pp)].filter((id) => ALL_PRONOUN_MIXED_IDS.includes(id)).length);
+          // "Питальні слова" — власне сховище PROGRESS_KEYS.interrogatives.
+          setInterrogativeMistakes([...getMistakeIds(ip)].filter((id) => ALL_INTERROGATIVE_IDS.includes(id)).length);
           const numeralIds = [...getMistakeIds(mp)].filter((id) => ALL_NUMERAL_IDS.includes(id));
           setNumeralMistakes(numeralIds.length);
           setPrepMistakes(getMistakeIds(prp).size);
@@ -137,6 +146,7 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
     else if (key === "verbs") navigation.navigate("VerbCategories");
     else if (key === "adjectives") navigation.navigate("AdjectiveCategories");
     else if (key === "pronouns") navigation.navigate("PronounGroups");
+    else if (key === "interrogatives") navigation.navigate("Interrogatives");
     else if (key === "numerals") navigation.navigate("Numerals");
     else if (key === "prepositions") navigation.navigate("Prepositions");
     else if (key === "adverbs") navigation.navigate("Adverbs");
@@ -147,6 +157,7 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
     if (key === "verbs") return verbMistakes;
     if (key === "adjectives") return adjMistakes;
     if (key === "pronouns") return pronMistakes;
+    if (key === "interrogatives") return interrogativeMistakes;
     if (key === "numerals") return numeralMistakes;
     if (key === "prepositions") return prepMistakes;
     if (key === "adverbs") return adverbMistakes;
@@ -219,7 +230,7 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
         )
       ) : (
         <>
-          <Text style={styles.intro}>Оберіть частину мови для вивчення</Text>
+          <Text style={styles.intro}>Оберіть розділ для вивчення</Text>
 
           <View style={styles.grid}>
             {TILES.map((t) => {

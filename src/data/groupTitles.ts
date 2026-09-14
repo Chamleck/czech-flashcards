@@ -27,3 +27,4 @@ export const KIND_LABEL_PRONOUNS = "Займенники";
 export const KIND_LABEL_NUMERALS = "Числівники";
 export const KIND_LABEL_PREPOSITIONS = "Прийменники";
 export const KIND_LABEL_ADVERBS = "Прислівники";
+export const KIND_LABEL_INTERROGATIVE = "Питальні"; // розділ "Питальні слова" — мітка тайла й рядка пошуку

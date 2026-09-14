@@ -33,6 +33,7 @@ import {
   KIND_LABEL_NUMERALS,
   KIND_LABEL_PREPOSITIONS,
   KIND_LABEL_ADVERBS,
+  KIND_LABEL_INTERROGATIVE,
 } from "../data/groupTitles";
 
 // ─────────────────────────── Індекс пошуку слів ───────────────────────────
@@ -61,7 +62,7 @@ export interface SearchEntry {
   // AdjectiveCategories). Всі ці екрани не приймають параметрів — "пуш" перед
   // BrowseList коштує майже нічого, тож "назад" відтворює СПРАВЖНЮ глибину
   // навігації, а не скорочену версію.
-  parentScreen: "WordCategories" | "VerbCategories" | "AdjectiveCategories" | "PronounGroups" | "Numerals" | "Prepositions" | "Adverbs";
+  parentScreen: "WordCategories" | "VerbCategories" | "AdjectiveCategories" | "PronounGroups" | "Interrogatives" | "Numerals" | "Prepositions" | "Adverbs";
 }
 
 // Діакритично-нечутлива нормалізація (á→a, č→c, ř→r…) — NFD-декомпозиція +
@@ -100,7 +101,7 @@ const KIND_LABEL: Record<BrowseKind, string> = {
   cardinals: KIND_LABEL_NUMERALS,
   prepositions: KIND_LABEL_PREPOSITIONS,
   adverbs: KIND_LABEL_ADVERBS,
-  interrogative: KIND_LABEL_PRONOUNS,
+  interrogative: KIND_LABEL_INTERROGATIVE,
 };
 
 function push(
@@ -182,11 +183,11 @@ function buildIndex(): SearchEntry[] {
   for (const p of PERSONAL_PRONOUNS) {
     push(out, p.id, "personal", p.cz, p.uk, [], personalIds, PERSONAL_GROUP_TITLE, "PronounGroups");
   }
-  // Питальні — третя плитка на тому самому екрані PronounGroups, змішана
-  // група (jaký/который/čí + kdo/co), суцільний список без підгруп.
+  // Питальні — окремий розділ "Питальні слова" (власний екран-хаб Interrogatives),
+  // змішана група (jaký/который/čí + kdo/co), суцільний список без підгруп.
   const interrogativeIds = INTERROGATIVE_ALL.map((p) => p.id);
   for (const p of INTERROGATIVE_ALL) {
-    push(out, p.id, "interrogative", p.cz, p.uk, [], interrogativeIds, INTERROGATIVE_GROUP_TITLE, "PronounGroups");
+    push(out, p.id, "interrogative", p.cz, p.uk, [], interrogativeIds, INTERROGATIVE_GROUP_TITLE, "Interrogatives");
   }
 
   // Числівники (кількісні) — суцільний список (той самий CARDINAL_IDS, що в NumeralsScreen).

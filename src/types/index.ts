@@ -480,6 +480,8 @@ export type RootStackParamList = {
   PronounSelection: undefined; // присвійні + вказівні
   PersonalPronounSelection: undefined; // особові
   InterrogativeSelection: undefined; // питальні (jaký/который/čí + kdo/co)
+  // Питальні слова — окремий тематичний розділ (хаб усіх питальних виразів)
+  Interrogatives: undefined;
   // Числівники (роутер: кількісні / порядкові / сотні-тисячі)
   Numerals: undefined;
   // Прийменники (роутер: групи за відмінком) + власна self-report сесія

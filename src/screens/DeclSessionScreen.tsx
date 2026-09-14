@@ -40,18 +40,16 @@ export function DeclSessionScreen({ route, navigation }: Props) {
   const isPronounMixed = kind === "pronoun-mixed";
   const isInterrogative = kind === "interrogative";
   // "ordinal"/"cardinal"/"numeral-mixed" пишуть у спільне сховище "Числівники".
-  // Увесь розділ "Займенники" (personal / pronoun / interrogative / pronoun-mixed)
-  // тепер теж пише в ОДНЕ сховище PROGRESS_KEYS.pronouns (консолідовано міграцією
-  // migratePronounStores) — тому окремих гілок сховища для них більше немає.
+  // Розділ "Займенники" (personal / pronoun / pronoun-mixed) пише в одне сховище
+  // PROGRESS_KEYS.pronouns. Питальні ("interrogative") — окремий розділ "Питальні
+  // слова" з власним сховищем PROGRESS_KEYS.interrogatives.
   const storageKey =
     kind === "adjective"
       ? PROGRESS_KEYS.adjectives
       : kind === "ordinal" || kind === "cardinal" || kind === "numeral-mixed"
       ? PROGRESS_KEYS.numerals
-      : kind === "personal"
-      ? PROGRESS_KEYS.pronouns
       : isInterrogative
-      ? PROGRESS_KEYS.pronouns
+      ? PROGRESS_KEYS.interrogatives
       : PROGRESS_KEYS.pronouns;
   // Для "numeral-mixed"/"pronoun-mixed"/"interrogative"/"personal" датасет —
   // об'єднання джерел розділу; конкретна картка вибирається ПОКАРТКОВО за id
@@ -66,7 +64,7 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       : isMixed
       ? [...CARDINALS, ...ADJECTIVES, ...NOUNS]
       : isPronounMixed
-      ? [...PRONOUNS, ...PERSONAL_PRONOUNS, ...INTERROGATIVE_ALL]
+      ? [...PRONOUNS, ...PERSONAL_PRONOUNS]
       : isInterrogative
       ? INTERROGATIVE_ALL
       : PRONOUNS;
@@ -189,15 +187,6 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       if (!r) return null;
       if (r.cardType === "personal")
         return <PersonalPronounCard entry={r.entry as (typeof PERSONAL_PRONOUNS)[number]} {...p} />;
-      if (r.cardType === "interrogative")
-        // Питальні всередині pronoun-mixed — теж змішана форма (kdo/co без
-        // роду проти jaký/который/čí адʼєктивних), той самий принцип
-        // диспетчеризації по формі запису, що й в BrowseCardScreen/CardFor.
-        return "gendered" in (r.entry as object) ? (
-          <PersonalPronounCard entry={r.entry as (typeof PERSONAL_PRONOUNS)[number]} {...p} />
-        ) : (
-          <AdjPronounCard entry={r.entry as DeclEntry} {...p} />
-        );
       return <AdjPronounCard entry={r.entry as DeclEntry} {...p} />;
     }
     if (isInterrogative) {

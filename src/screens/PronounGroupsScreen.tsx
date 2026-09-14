@@ -7,10 +7,9 @@ import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
-import { PRONOUN_GROUP_TITLE, PERSONAL_GROUP_TITLE, INTERROGATIVE_GROUP_TITLE } from "../data/groupTitles";
+import { PRONOUN_GROUP_TITLE, PERSONAL_GROUP_TITLE } from "../data/groupTitles";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { ALL_PRONOUN_MIXED_IDS } from "../utils/pronounEntries";
-import { ALL_INTERROGATIVE_IDS } from "../utils/interrogativeEntries";
 import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 
@@ -53,13 +52,6 @@ export function PronounGroupsScreen({ navigation }: Props) {
     const ids = PRONOUNS.map((p) => p.id);
     if (mode === "browse") navigation.navigate("BrowseList", { kind: "pronouns", entryIds: ids, title: PRONOUN_GROUP_TITLE });
     else navigation.navigate("DeclSession", { title: PRONOUN_GROUP_TITLE, kind: "pronoun", entryIds: ids });
-  }
-
-  function openInterrogative() {
-    if (mode === "browse")
-      navigation.navigate("BrowseList", { kind: "interrogative", entryIds: ALL_INTERROGATIVE_IDS, title: INTERROGATIVE_GROUP_TITLE });
-    else
-      navigation.navigate("DeclSession", { title: INTERROGATIVE_GROUP_TITLE, kind: "interrogative", entryIds: ALL_INTERROGATIVE_IDS });
   }
 
   function openPersonal() {
@@ -140,34 +132,6 @@ export function PronounGroupsScreen({ navigation }: Props) {
         )}
       </View>
 
-      {/* Питальні — jaký/который/čí (адʼєктивне відмінювання) + kdo/co (без
-          роду, одна форма на відмінок) в одній UI-групі, окреме сховище прогресу.
-          Колір: genderColor.masc_inan (синій) — той самий чотирьохакцентний
-          набір theme.colors уже вичерпаний (mint/lilac зайняті сусідніми
-          плитками цього екрана, coral — колір "неправильно"/dontKnow в кожній
-          сесії ЦЬОГО Ж розділу і вже зайнятий батьківською плиткою "Займенники"
-          на кореневому екрані Слова, honey — головний CTA-колір усюди). */}
-      <View style={[styles.catRow, { borderLeftColor: theme.genderColor.masc_inan }]}>
-        <Pressable style={styles.catMain} onPress={openInterrogative}>
-          <Text style={styles.catEmoji}>❓</Text>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.catTitle}>Питальні</Text>
-            <Text style={styles.catHint}>kdo, co, jaký, který, čí</Text>
-            <Text style={styles.catSub}>
-              {ALL_INTERROGATIVE_IDS.length} {plural(ALL_INTERROGATIVE_IDS.length, "слово", "слова", "слів")}
-            </Text>
-          </View>
-        </Pressable>
-        {mode === "train" && (
-          <Pressable
-            style={styles.editBtn}
-            hitSlop={8}
-            onPress={() => navigation.navigate("InterrogativeSelection")}
-          >
-            <Text style={styles.editIcon}>✏️</Text>
-          </Pressable>
-        )}
-      </View>
     </ScrollView>
   );
 }
