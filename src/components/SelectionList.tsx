@@ -12,10 +12,15 @@ export interface SelectableWord {
 interface Props<T extends SelectableWord> {
   words: T[];
   onStart: (ids: string[]) => void;
-  // Опційний рендер праворуч від слова (напр. GenderIcon для іменників) —
-  // жодна з категорій цього патчу (прийменники/прислівники/числівники/
-  // питальні прислівники) його не потребує, тому за замовчуванням немає.
+  // Опційний рендер праворуч від слова (напр. GenderIcon для іменників,
+  // бейдж док./недок. для дієслів, тег "вказівний"/"присвійний" для
+  // займенників).
   renderExtra?: (word: T) => React.ReactNode;
+  // Опційний колір cz-рядка per-item (напр. за родом для іменників, за
+  // класом дієслова — фіксований на весь екран, але виражається тим самим
+  // колбеком). За замовчуванням — theme.colors.lilac (як було в оригіналі
+  // для прикметників/займенників, де кольору за категорією нема).
+  czColor?: (word: T) => string;
 }
 
 // Спільне тіло екрана вибору слів (чекбокс-список + "Обрати всі" + кнопка
@@ -32,7 +37,15 @@ interface Props<T extends SelectableWord> {
 // (звичайний closure, не проходить через навігацію) — той самий принцип, що
 // вже є в AdjectiveSelectionScreen/VerbSelectionScreen (один файл,
 // параметризований category/verbClass).
-export function SelectionList<T extends SelectableWord>({ words, onStart, renderExtra }: Props<T>) {
+//
+// Ретрофіт (додано пізніше, друга хвиля): 6 наявних *SelectionScreen
+// (Іменники/Дієслова/Прикметники/Займенники×2/Питальні займенники) теж
+// переведені сюди — прочитано ПОВНІСТЮ перед ретрофітом (не лише start(),
+// як здавалось спершу): 4 з 6 мали власну декорацію рядка (GenderIcon +
+// колір за родом в іменників, бейдж док./недок. + колір за класом у
+// дієслів, тег підтипу в займенників) — звідси renderExtra/czColor, а не
+// "просто підключити напряму".
+export function SelectionList<T extends SelectableWord>({ words, onStart, renderExtra, czColor }: Props<T>) {
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<Set<string>>(() => new Set(words.map((w) => w.id)));
 
@@ -74,7 +87,7 @@ export function SelectionList<T extends SelectableWord>({ words, onStart, render
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.wordUk}>{w.uk}</Text>
-                <Text style={styles.wordCz}>{w.cz}</Text>
+                <Text style={[styles.wordCz, czColor && { color: czColor(w) }]}>{w.cz}</Text>
               </View>
               {renderExtra?.(w)}
             </Pressable>
