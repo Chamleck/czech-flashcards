@@ -29,3 +29,4 @@ export const KIND_LABEL_PREPOSITIONS = "Прийменники";
 export const KIND_LABEL_ADVERBS = "Прислівники";
 export const KIND_LABEL_INTERROGATIVE = "Питальні"; // розділ "Питальні слова" — мітка тайла й рядка пошуку
 export const INTERROGATIVE_ADVERBS_GROUP_TITLE = "Прислівникові (де? куди? звідки? кудою?)"; // ряд "Прислівникові" у хабі "Питальні слова"
+export const INTERROGATIVE_MISC_GROUP_TITLE = "Інші (коли? як? чому? скільки?)"; // ряд "Інші" у хабі "Питальні слова"

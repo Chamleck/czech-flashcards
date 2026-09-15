@@ -8,16 +8,18 @@ import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { ALL_INTERROGATIVE_IDS } from "../utils/interrogativeEntries";
 import { INTERROGATIVE_ADVERBS } from "../data/interrogativeAdverbs";
-import { INTERROGATIVE_GROUP_TITLE, INTERROGATIVE_ADVERBS_GROUP_TITLE } from "../data/groupTitles";
+import { INTERROGATIVE_MISC } from "../data/interrogativeMisc";
+import { INTERROGATIVE_GROUP_TITLE, INTERROGATIVE_ADVERBS_GROUP_TITLE, INTERROGATIVE_MISC_GROUP_TITLE } from "../data/groupTitles";
 import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Interrogatives">;
 
-// Локальна константа — той самий принцип, що ALL_ADVERB_IDS в AdverbsScreen
+// Локальні константи — той самий принцип, що ALL_ADVERB_IDS в AdverbsScreen
 // (суцільний список без підгруп, не потребує окремого resolver-файлу).
 const ALL_INTERROGATIVE_ADVERB_IDS: string[] = INTERROGATIVE_ADVERBS.map((w) => w.id);
+const ALL_INTERROGATIVE_MISC_IDS: string[] = INTERROGATIVE_MISC.map((w) => w.id);
 
 // Розділ "Питальні слова" — окремий тематичний хаб усіх питальних виразів
 // (tázací výrazy). На відміну від інших розділів "Слів", він НЕ по одній
@@ -31,10 +33,13 @@ const ALL_INTERROGATIVE_ADVERB_IDS: string[] = INTERROGATIVE_ADVERBS.map((w) => 
 // PROGRESS_KEYS.interrogatives — ОДНЕ на весь розділ (обидві групи разом),
 // тому й "Повторити помилки" вгорі — один спільний лічильник, не по групі.
 //
-// Прислівникова група (kde/kam/odkud/kudy) — теж має ✏️ вибір слів, як і
-// займенникова: 4 слова — не вироджений випадок (на відміну від груп РІВНО
-// з 1 словом, як lokal/instrumental у прийменників, де пікер не має сенсу).
-// kdy/jak/proč/kolik — наступний патч (лише словник+граматика, без квізу).
+// Прислівникова група (kde/kam/odkud/kudy) і "Інша" (kdy/jak/proč/kolik) —
+// теж мають ✏️ вибір слів, як і займенникова: по 4 слова кожна — не
+// вироджений випадок (на відміну від груп РІВНО з 1 словом, як
+// lokal/instrumental у прийменників, де пікер не має сенсу).
+// "Інша" — БЕЗ КВІЗУ (лише словник+граматика, узгоджено окремо): kdy/jak/proč
+// прозорі когнати, kolik керує родовим множини так само, як pět+ у
+// numeralAgreementEngine — дублювати механізм немає сенсу.
 
 export function InterrogativesScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
@@ -79,6 +84,14 @@ export function InterrogativesScreen({ navigation }: Props) {
       navigation.navigate("BrowseList", { kind: "interrogative", entryIds: ALL_INTERROGATIVE_ADVERB_IDS, title: INTERROGATIVE_ADVERBS_GROUP_TITLE });
     } else {
       navigation.navigate("DeclSession", { title: INTERROGATIVE_ADVERBS_GROUP_TITLE, kind: "interrogative", entryIds: ALL_INTERROGATIVE_ADVERB_IDS });
+    }
+  }
+
+  function openMisc() {
+    if (mode === "browse") {
+      navigation.navigate("BrowseList", { kind: "interrogative", entryIds: ALL_INTERROGATIVE_MISC_IDS, title: INTERROGATIVE_MISC_GROUP_TITLE });
+    } else {
+      navigation.navigate("DeclSession", { title: INTERROGATIVE_MISC_GROUP_TITLE, kind: "interrogative", entryIds: ALL_INTERROGATIVE_MISC_IDS });
     }
   }
 
@@ -153,6 +166,30 @@ export function InterrogativesScreen({ navigation }: Props) {
             style={styles.editBtn}
             hitSlop={8}
             onPress={() => navigation.navigate("InterrogativeAdverbSelection")}
+          >
+            <Pencil size={20} color={theme.colors.lilac} strokeWidth={2.4} />
+          </Pressable>
+        )}
+      </View>
+
+      {/* "Інша" група — kdy/jak/proč/kolik. Колір honey: третій акцент ряду
+          хаба, відрізняє від займенникового (синій) і прислівникового (mint). */}
+      <View style={[styles.row, { borderLeftColor: theme.colors.honey }]}>
+        <Pressable style={styles.rowMain} onPress={openMisc}>
+          <Text style={styles.emoji}>❔</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.title}>Інші</Text>
+            <Text style={styles.hint}>kdy, jak, proč, kolik</Text>
+            <Text style={styles.sub}>
+              {ALL_INTERROGATIVE_MISC_IDS.length} {plural(ALL_INTERROGATIVE_MISC_IDS.length, "слово", "слова", "слів")}
+            </Text>
+          </View>
+        </Pressable>
+        {mode === "train" && (
+          <Pressable
+            style={styles.editBtn}
+            hitSlop={8}
+            onPress={() => navigation.navigate("InterrogativeMiscSelection")}
           >
             <Pencil size={20} color={theme.colors.lilac} strokeWidth={2.4} />
           </Pressable>

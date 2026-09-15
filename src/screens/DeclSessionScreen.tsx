@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList, CardProgress } from "../types";
+import { RootStackParamList, CardProgress, InvariantWordEntry } from "../types";
 import { theme } from "../utils/theme";
 import { HomeHeaderButton } from "../components/HeaderIcons";
 import { AdjPronounCard, DeclEntry } from "../components/AdjPronounCard";
@@ -19,6 +19,7 @@ import { resolveNumeral } from "../utils/numeralEntries";
 import { resolvePronoun } from "../utils/pronounEntries";
 import { INTERROGATIVE_ALL } from "../data/interrogativePronouns";
 import { INTERROGATIVE_ADVERBS } from "../data/interrogativeAdverbs";
+import { INTERROGATIVE_MISC } from "../data/interrogativeMisc";
 import { resolveInterrogative } from "../utils/interrogativeEntries";
 import {
   loadProgressFrom,
@@ -68,7 +69,7 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       : isPronounMixed
       ? [...PRONOUNS, ...PERSONAL_PRONOUNS]
       : isInterrogative
-      ? [...INTERROGATIVE_ALL, ...INTERROGATIVE_ADVERBS]
+      ? [...INTERROGATIVE_ALL, ...INTERROGATIVE_ADVERBS, ...INTERROGATIVE_MISC]
       : PRONOUNS;
 
   const entries = useMemo(
@@ -197,7 +198,7 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       if (r.cardType === "core")
         return <PersonalPronounCard entry={r.entry as (typeof PERSONAL_PRONOUNS)[number]} {...p} />;
       if (r.cardType === "invariant")
-        return <SimpleWordCard entry={r.entry as (typeof INTERROGATIVE_ADVERBS)[number]} {...p} />;
+        return <SimpleWordCard entry={r.entry as InvariantWordEntry} {...p} />;
       return <AdjPronounCard entry={r.entry as DeclEntry} {...p} />;
     }
     if (isPersonal)

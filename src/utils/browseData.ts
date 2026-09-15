@@ -6,6 +6,7 @@ import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { INTERROGATIVE_ALL } from "../data/interrogativePronouns";
 import { INTERROGATIVE_ADVERBS } from "../data/interrogativeAdverbs";
+import { INTERROGATIVE_MISC } from "../data/interrogativeMisc";
 import { CARDINALS } from "../data/cardinals";
 import { PREPOSITIONS } from "../data/prepositions";
 import { ADVERBS } from "../data/adverbs";
@@ -40,12 +41,10 @@ export function browseSource(kind: BrowseKind): readonly { id: string; uk: strin
       // browseSource) втратив би senses/note, потрібні для рендеру AdverbCard.
       return ADVERBS.map((a) => ({ ...a, cz: a.senses.map((s) => s.cz).join(" / ") }));
     case "interrogative":
-      // Розділ "Питальні слова" — займенникова (INTERROGATIVE_ALL) +
-      // прислівникова (INTERROGATIVE_ADVERBS) група в ОДНОМУ пулі: entryIds,
-      // що приходять від конкретної групи/пошуку, самі звужують, які записи
-      // реально показуються — browseSource лише мусить уміти знайти будь-який
-      // id розділу за ключем (browseEntries шукає по Map<id,entry>).
-      return [...INTERROGATIVE_ALL, ...INTERROGATIVE_ADVERBS];
+      // Розділ "Питальні слова" — три групи (займенникова, прислівникова,
+      // "інша") в ОДНОМУ пулі: entryIds, що приходять від конкретної групи/
+      // пошуку, самі звужують, які записи реально показуються.
+      return [...INTERROGATIVE_ALL, ...INTERROGATIVE_ADVERBS, ...INTERROGATIVE_MISC];
     case "pronouns":
     default:
       return PRONOUNS;

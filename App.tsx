@@ -22,6 +22,7 @@ import { PersonalPronounSelectionScreen } from "./src/screens/PersonalPronounSel
 import { InterrogativeSelectionScreen } from "./src/screens/InterrogativeSelectionScreen";
 import { InterrogativesScreen } from "./src/screens/InterrogativesScreen";
 import { InterrogativeAdverbSelectionScreen } from "./src/screens/InterrogativeAdverbSelectionScreen";
+import { InterrogativeMiscSelectionScreen } from "./src/screens/InterrogativeMiscSelectionScreen";
 import { NumeralsScreen } from "./src/screens/NumeralsScreen";
 import { NumeralSelectionScreen } from "./src/screens/NumeralSelectionScreen";
 import { PrepositionsScreen } from "./src/screens/PrepositionsScreen";
@@ -84,6 +85,7 @@ export default function App() {
           <Stack.Screen name="InterrogativeSelection" component={InterrogativeSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="Interrogatives" component={InterrogativesScreen} options={{ title: "Питальні слова" }} />
           <Stack.Screen name="InterrogativeAdverbSelection" component={InterrogativeAdverbSelectionScreen} options={{ title: "Вибір слів" }} />
+          <Stack.Screen name="InterrogativeMiscSelection" component={InterrogativeMiscSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="Numerals" component={NumeralsScreen} options={{ title: "Числівники" }} />
           <Stack.Screen name="NumeralSelection" component={NumeralSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="Prepositions" component={PrepositionsScreen} options={{ title: "Прийменники" }} />

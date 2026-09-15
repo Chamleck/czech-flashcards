@@ -1612,6 +1612,121 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         type: "tip",
         text: "💡 Не плутай зі словом «vedle» з прийменників — це та сама лексема в іншій ролі: «Stůl je vedle» (прислівник, сам по собі) проти «Stůl je vedle okna» (прийменник, керує родовим). У цьому розділі vedle не повторюємо — дивись «Прийменники».",
       },
+      { type: "heading", text: "Четвертий вимір: кудою? (шлях)" },
+      {
+        type: "paragraph",
+        text: "Окрім де?/куди?/звідки?, є ще одне питання про місце — кудою? (яким шляхом). Це НЕ четверта форма кожного слова з таблиці вище: форми шляху існують лише для двох слів — «тут» і «там». Для vlevo/nahoře/venku тощо форми шляху в чеській мові просто немає.",
+      },
+      {
+        type: "rich-tip",
+        segments: [
+          { text: "💡 кудою? → " },
+          { word: "tudy", wordId: "adv-tady", kind: "adverbs" },
+          { text: " (цим шляхом, від tady) / " },
+          { word: "tamtudy", wordId: "adv-tam", kind: "adverbs" },
+          { text: " (тим шляхом, від tam). «Kudy se dostanu na nádraží? — Tudy.» (Яким шляхом мені дістатись до вокзалу? — Цим.) Саме питальне слово «kudy?» — дивись розділ «Питальні слова»." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "interrogative-words",
+    emoji: "❓",
+    title: "Питальні слова",
+    subtitle: "Як ставити запитання — уся система разом",
+    ready: true,
+    blocks: [
+      {
+        type: "paragraph",
+        text: "Чеські питальні слова — це не одна частина мови, а ціла родина \"k-слів\" (за czechency.org — zájmena tázací і zájmenná příslovce tázací), об'єднана функцією: усі вони запитують. Для того, як ставити запитання, зручніше вчити їх разом, ніж розкидати за формальними частинами мови.",
+      },
+      { type: "heading", text: "Займенникові — про особу/предмет/ознаку" },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ text: "хто? / що?" }],
+            note: [
+              { word: "kdo", wordId: "kdo-int", kind: "interrogative" },
+              { text: " / " },
+              { word: "co", wordId: "co-int", kind: "interrogative" },
+              { text: " — без роду, одна форма на відмінок (як особові займенники)." },
+            ],
+          },
+          {
+            term: [{ text: "який?" }],
+            note: [
+              { word: "jaký", wordId: "jaky-int", kind: "interrogative" },
+              { text: " — про якість/ознаку: «Jaký je ten film?» (Який цей фільм?). Відмінюється як прикметник." },
+            ],
+          },
+          {
+            term: [{ text: "котрий? (з кількох)" }],
+            note: [
+              { word: "který", wordId: "ktery-int", kind: "interrogative" },
+              { text: " — про вибір з-поміж відомих варіантів: «Který chceš?» (Котрий хочеш?). Теж адʼєктивне відмінювання." },
+            ],
+          },
+          {
+            term: [{ text: "чий?" }],
+            note: [
+              { word: "čí", wordId: "ci-int", kind: "interrogative" },
+              { text: " — про належність: «Čí je to kniha?» (Чия це книга?)." },
+            ],
+          },
+        ],
+      },
+      { type: "heading", text: "Прислівникові — про місце" },
+      {
+        type: "rich-paragraph",
+        segments: [
+          { text: "Чотири самостійні незмінювані слова (не форми одного): " },
+          { word: "kde", wordId: "int-kde", kind: "interrogative" },
+          { text: " (де?), " },
+          { word: "kam", wordId: "int-kam", kind: "interrogative" },
+          { text: " (куди?), " },
+          { word: "odkud", wordId: "int-odkud", kind: "interrogative" },
+          { text: " (звідки?), " },
+          { word: "kudy", wordId: "int-kudy", kind: "interrogative" },
+          { text: " (кудою?, яким шляхом). Детальніше про відповіді на ці питання (vlevo/tam тощо) — розділ «Прислівники місця»." },
+        ],
+      },
+      { type: "heading", text: "Інші" },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ word: "kdy", wordId: "int-kdy", kind: "interrogative" }],
+            note: [{ text: "коли? — про час: «Kdy přijedeš?» (Коли ти приїдеш?)" }],
+          },
+          {
+            term: [{ word: "jak", wordId: "int-jak", kind: "interrogative" }],
+            note: [{ text: "як? — про спосіб: «Jak to funguje?» (Як це працює?)" }],
+          },
+          {
+            term: [{ word: "proč", wordId: "int-proc", kind: "interrogative" }],
+            note: [{ text: "чому? — про причину: «Proč to děláš?» (Чому ти це робиш?)" }],
+          },
+          {
+            term: [{ word: "kolik", wordId: "int-kolik", kind: "interrogative" }],
+            note: [{ text: "скільки? — про кількість." }],
+          },
+        ],
+      },
+      {
+        type: "rich-tip",
+        segments: [
+          { text: "💡 " },
+          { word: "kolik", wordId: "int-kolik", kind: "interrogative" },
+          { text: " керує родовим відмінком множини наступного іменника — так само, як числівники " },
+          { word: "pět", wordId: "card-pet", kind: "cardinals" },
+          { text: " і більше: «Kolik jablek chceš?» (Скільки яблук ти хочеш? — jablek, родовий множини). Той самий навик, що в розділі «Числівники»." },
+        ],
+      },
+      {
+        type: "tip",
+        text: "💡 kdy/jak/proč — прозорі відповідники «коли/як/чому», тому окремого квізу для них немає: досить словника і кількох прикладів. А от kde/kam/odkud/kudy тренуються в Флеш-картках («Прислівники місця») — там треба РОЗРІЗНЯТИ, яке питання підходить до конкретного речення.",
+      },
     ],
   },
 ];
