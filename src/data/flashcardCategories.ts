@@ -64,7 +64,7 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
     id: "adverbs",
     emoji: "🗺️",
     title: "Прислівники місця",
-    subtitle: "Де? Куди? Звідки? — обрати форму за реченням",
+    subtitle: "Де? Куди? Звідки? Кудою? — форма або питання за реченням",
     color: "#8ed081",
     ready: true,
   },

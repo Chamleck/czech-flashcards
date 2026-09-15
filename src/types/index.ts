@@ -369,6 +369,21 @@ export interface SpatialAdverbEntry {
   note?: string; // пояснення винятку (tam: одна форма на де+куди; doma: нема звідки)
 }
 
+// ─────────────── НЕЗМІННІ СЛОВА БЕЗ ПАРАДИГМИ (компенсація — 4 приклади) ───────────────
+// Для слів без відмінювання/дієвідміни, де немає "сенсів" (на відміну від
+// SpatialAdverbEntry, де kde/kam/odkud/kudy — РІЗНІ слова з різних сенсів
+// одного концепту), кожне слово — окремий запис з фіксованою кількістю
+// прикладів природної мови (4), що компенсує відсутність парадигми: показує
+// слово в поширених конструкціях замість таблиці форм. Уперше — питальні
+// прислівники місця (kde/kam/odkud/kudy); той самий тип переюзається для
+// решти незмінюваних питальних слів (kdy/jak/proč/kolik).
+export interface InvariantWordEntry {
+  id: string;
+  cz: string;
+  uk: string;
+  examples: { cz: string; uk: string }[];
+}
+
 
 
 // Особи дієвідміни (однина 1/2/3 + множина 1/2/3)
@@ -480,18 +495,27 @@ export type RootStackParamList = {
   PronounSelection: undefined; // присвійні + вказівні
   PersonalPronounSelection: undefined; // особові
   InterrogativeSelection: undefined; // питальні (jaký/который/čí + kdo/co)
+  InterrogativeAdverbSelection: undefined; // прислівникова група (kde/kam/odkud/kudy)
   // Питальні слова — окремий тематичний розділ (хаб усіх питальних виразів)
   Interrogatives: undefined;
   // Числівники (роутер: кількісні / порядкові / сотні-тисячі)
   Numerals: undefined;
+  NumeralSelection: { numKind: "cardinal" | "ordinal" | "hundreds" };
   // Прийменники (роутер: групи за відмінком) + власна self-report сесія
   // (прийменник незмінний, тому не через WordSession/DeclSession).
   Prepositions: undefined;
   PrepositionSession: { title: string; entryIds: string[] };
+  // Вибір слів усередині групи прийменників — govCase для фіксованих груп,
+  // "dual" для дуальних. Груп з РІВНО 1 прийменником (lokal, instrumental)
+  // пікер НЕ отримує — вибирати підмножину з одного слова нема сенсу
+  // (toggleAll на 1 елементі має лише 2 стани, ідентичні "Тренуванню"
+  // напряму), тому маршрут не використовується для них.
+  PrepositionSelection: { govCase: CzechCase | "dual" };
   // Прислівники місця (де/куди/звідки) — та сама логіка, що прийменники:
   // незмінна частина мови, власна self-report сесія.
   Adverbs: undefined;
   AdverbSession: { title: string; entryIds: string[] };
+  AdverbSelection: undefined;
   // Спільна сесія прикметників/займенників (картка з табами роду).
   // kind "personal" → особові займенники (окрема картка PersonalPronounCard).
   // kind "ordinal" → порядкові числівники: той самий рендер/датасет, що "adjective",

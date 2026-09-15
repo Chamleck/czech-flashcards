@@ -9,6 +9,7 @@ import { AdjPronounCard, DeclEntry } from "../components/AdjPronounCard";
 import { PersonalPronounCard } from "../components/PersonalPronounCard";
 import { NumeralCard } from "../components/NumeralCard";
 import { FlashCard } from "../components/FlashCard";
+import { SimpleWordCard } from "../components/SimpleWordCard";
 import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
@@ -17,6 +18,7 @@ import { NOUNS } from "../data/nouns";
 import { resolveNumeral } from "../utils/numeralEntries";
 import { resolvePronoun } from "../utils/pronounEntries";
 import { INTERROGATIVE_ALL } from "../data/interrogativePronouns";
+import { INTERROGATIVE_ADVERBS } from "../data/interrogativeAdverbs";
 import { resolveInterrogative } from "../utils/interrogativeEntries";
 import {
   loadProgressFrom,
@@ -66,7 +68,7 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       : isPronounMixed
       ? [...PRONOUNS, ...PERSONAL_PRONOUNS]
       : isInterrogative
-      ? INTERROGATIVE_ALL
+      ? [...INTERROGATIVE_ALL, ...INTERROGATIVE_ADVERBS]
       : PRONOUNS;
 
   const entries = useMemo(
@@ -194,6 +196,8 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       if (!r) return null;
       if (r.cardType === "core")
         return <PersonalPronounCard entry={r.entry as (typeof PERSONAL_PRONOUNS)[number]} {...p} />;
+      if (r.cardType === "invariant")
+        return <SimpleWordCard entry={r.entry as (typeof INTERROGATIVE_ADVERBS)[number]} {...p} />;
       return <AdjPronounCard entry={r.entry as DeclEntry} {...p} />;
     }
     if (isPersonal)

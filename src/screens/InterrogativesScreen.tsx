@@ -7,12 +7,17 @@ import { Pencil } from "lucide-react-native";
 import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { ALL_INTERROGATIVE_IDS } from "../utils/interrogativeEntries";
-import { INTERROGATIVE_GROUP_TITLE } from "../data/groupTitles";
+import { INTERROGATIVE_ADVERBS } from "../data/interrogativeAdverbs";
+import { INTERROGATIVE_GROUP_TITLE, INTERROGATIVE_ADVERBS_GROUP_TITLE } from "../data/groupTitles";
 import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Interrogatives">;
+
+// Локальна константа — той самий принцип, що ALL_ADVERB_IDS в AdverbsScreen
+// (суцільний список без підгруп, не потребує окремого resolver-файлу).
+const ALL_INTERROGATIVE_ADVERB_IDS: string[] = INTERROGATIVE_ADVERBS.map((w) => w.id);
 
 // Розділ "Питальні слова" — окремий тематичний хаб усіх питальних виразів
 // (tázací výrazy). На відміну від інших розділів "Слів", він НЕ по одній
@@ -21,10 +26,15 @@ type Props = NativeStackScreenProps<RootStackParamList, "Interrogatives">;
 // один природний блок "як ставити запитання". Тому власний розділ, а не
 // підгрупа "Займенників" (де питальні лежали раніше — категорійно некоректно).
 //
-// Механіка (Тренування/Перегляд, "Повторити помилки", ✏️ вибір слів) — та сама,
-// що в PronounGroups, з якого групу винесено. Власне сховище прогресу
-// PROGRESS_KEYS.interrogatives (одне на весь розділ). Наразі одна група —
-// займенникові; прислівникові / інші додаються наступними патчами.
+// Механіка (Тренування/Перегляд, "Повторити помилки") — та сама, що в
+// PronounGroups, з якого займенникову групу винесено. Власне сховище прогресу
+// PROGRESS_KEYS.interrogatives — ОДНЕ на весь розділ (обидві групи разом),
+// тому й "Повторити помилки" вгорі — один спільний лічильник, не по групі.
+//
+// Прислівникова група (kde/kam/odkud/kudy) — теж має ✏️ вибір слів, як і
+// займенникова: 4 слова — не вироджений випадок (на відміну від груп РІВНО
+// з 1 словом, як lokal/instrumental у прийменників, де пікер не має сенсу).
+// kdy/jak/proč/kolik — наступний патч (лише словник+граматика, без квізу).
 
 export function InterrogativesScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
@@ -61,6 +71,14 @@ export function InterrogativesScreen({ navigation }: Props) {
       navigation.navigate("BrowseList", { kind: "interrogative", entryIds: ALL_INTERROGATIVE_IDS, title: INTERROGATIVE_GROUP_TITLE });
     } else {
       navigation.navigate("DeclSession", { title: INTERROGATIVE_GROUP_TITLE, kind: "interrogative", entryIds: ALL_INTERROGATIVE_IDS });
+    }
+  }
+
+  function openAdverbs() {
+    if (mode === "browse") {
+      navigation.navigate("BrowseList", { kind: "interrogative", entryIds: ALL_INTERROGATIVE_ADVERB_IDS, title: INTERROGATIVE_ADVERBS_GROUP_TITLE });
+    } else {
+      navigation.navigate("DeclSession", { title: INTERROGATIVE_ADVERBS_GROUP_TITLE, kind: "interrogative", entryIds: ALL_INTERROGATIVE_ADVERB_IDS });
     }
   }
 
@@ -110,6 +128,31 @@ export function InterrogativesScreen({ navigation }: Props) {
             style={styles.editBtn}
             hitSlop={8}
             onPress={() => navigation.navigate("InterrogativeSelection")}
+          >
+            <Pencil size={20} color={theme.colors.lilac} strokeWidth={2.4} />
+          </Pressable>
+        )}
+      </View>
+
+      {/* Прислівникова група — kde/kam/odkud/kudy. Колір mint: відрізняє
+          ряд від займенникового (masc_inan/синій), той самий mint, що вже
+          усталений як "знаю"/акцент прислівників-відповідей в AdverbsScreen. */}
+      <View style={[styles.row, { borderLeftColor: theme.colors.mint }]}>
+        <Pressable style={styles.rowMain} onPress={openAdverbs}>
+          <Text style={styles.emoji}>🗺️</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.title}>Прислівники</Text>
+            <Text style={styles.hint}>kde, kam, odkud, kudy</Text>
+            <Text style={styles.sub}>
+              {ALL_INTERROGATIVE_ADVERB_IDS.length} {plural(ALL_INTERROGATIVE_ADVERB_IDS.length, "слово", "слова", "слів")}
+            </Text>
+          </View>
+        </Pressable>
+        {mode === "train" && (
+          <Pressable
+            style={styles.editBtn}
+            hitSlop={8}
+            onPress={() => navigation.navigate("InterrogativeAdverbSelection")}
           >
             <Pencil size={20} color={theme.colors.lilac} strokeWidth={2.4} />
           </Pressable>

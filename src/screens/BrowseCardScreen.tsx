@@ -21,6 +21,8 @@ import { PersonalPronounCard } from "../components/PersonalPronounCard";
 import { NumeralCard } from "../components/NumeralCard";
 import { PrepositionCard } from "../components/PrepositionCard";
 import { AdverbCard } from "../components/AdverbCard";
+import { SimpleWordCard } from "../components/SimpleWordCard";
+import { interrogativeCardType } from "../utils/interrogativeEntries";
 import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
 import { HomeHeaderButton, SearchHeaderButton } from "../components/HeaderIcons";
 
@@ -44,15 +46,15 @@ function CardFor({ kind, entry }: { kind: BrowseKind; entry: any }) {
       return <PrepositionCard entry={entry} {...p} />;
     case "adverbs":
       return <AdverbCard entry={entry} {...p} />;
-    case "interrogative":
-      // Змішана група: kdo/co (PersonalPronounEntry, gendered:false) поряд з
-      // jaký/который/čí (PronounEntry) — диспетчеризація по формі запису,
-      // той самий принцип, що resolveInterrogative у interrogativeEntries.ts.
-      return "gendered" in entry ? (
-        <PersonalPronounCard entry={entry} {...p} />
-      ) : (
-        <AdjPronounCard entry={entry} {...p} />
-      );
+    case "interrogative": {
+      // Розділ "Питальні слова" — три форми запису в одному kind, диспетчер
+      // за id через interrogativeCardType (те саме, що DeclSessionScreen
+      // використовує для kind="interrogative" у Тренуванні).
+      const t = interrogativeCardType(entry.id);
+      if (t === "core") return <PersonalPronounCard entry={entry} {...p} />;
+      if (t === "invariant") return <SimpleWordCard entry={entry} {...p} />;
+      return <AdjPronounCard entry={entry} {...p} />;
+    }
     case "adjectives":
     case "pronouns":
     default:

@@ -4,6 +4,7 @@ import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { INTERROGATIVE_ALL } from "../data/interrogativePronouns";
+import { INTERROGATIVE_ADVERBS } from "../data/interrogativeAdverbs";
 import { CARDINALS } from "../data/cardinals";
 import { PREPOSITIONS } from "../data/prepositions";
 import { ADVERBS } from "../data/adverbs";
@@ -21,6 +22,7 @@ import {
   PRONOUN_GROUP_TITLE,
   PERSONAL_GROUP_TITLE,
   INTERROGATIVE_GROUP_TITLE,
+  INTERROGATIVE_ADVERBS_GROUP_TITLE,
   NUMERAL_CARDINAL_TITLE,
   NUMERAL_ORDINAL_TITLE,
   NUMERAL_HUNDREDS_TITLE,
@@ -188,6 +190,14 @@ function buildIndex(): SearchEntry[] {
   const interrogativeIds = INTERROGATIVE_ALL.map((p) => p.id);
   for (const p of INTERROGATIVE_ALL) {
     push(out, p.id, "interrogative", p.cz, p.uk, [], interrogativeIds, INTERROGATIVE_GROUP_TITLE, "Interrogatives");
+  }
+  // Прислівникова група того самого розділу — окремий sibling-набір
+  // (свайп після пошуку йде по своїх 4 словах, не змішуючись із займенниковою
+  // групою), той самий kind "interrogative" (диспетчеризація по id, не по kind).
+  const interrogativeAdverbIds = INTERROGATIVE_ADVERBS.map((p) => p.id);
+  for (const p of INTERROGATIVE_ADVERBS) {
+    const exTexts = p.examples.map((e) => e.cz);
+    push(out, p.id, "interrogative", p.cz, p.uk, exTexts, interrogativeAdverbIds, INTERROGATIVE_ADVERBS_GROUP_TITLE, "Interrogatives");
   }
 
   // Числівники (кількісні) — суцільний список (той самий CARDINAL_IDS, що в NumeralsScreen).
