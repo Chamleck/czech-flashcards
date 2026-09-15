@@ -3,6 +3,7 @@ import { Text, StyleSheet, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Pencil } from "lucide-react-native";
 import { RootStackParamList, CardProgress, CzechCase, CASE_LABELS } from "../types";
 import { theme } from "../utils/theme";
 import { PREPOSITIONS } from "../data/prepositions";
@@ -133,37 +134,59 @@ export function PrepositionsScreen({ navigation }: Props) {
       {GROUPS.map((g) => {
         const lbl = CASE_LABELS[g.gCase];
         const color = CASE_COLOR[g.gCase];
+        // ✏️ пропускаємо для груп РІВНО з 1 прийменником (lokal, instrumental
+        // зараз) — пікер над одним елементом має лише 2 стани (обраний/ні),
+        // ідентичні прямому "Тренуванню", тобто не додає жодної можливості.
+        const canPick = g.ids.length > 1;
         return (
-          <Pressable
-            key={g.gCase}
-            style={[styles.row, { borderLeftColor: color }]}
-            onPress={() => openGroup(g)}
-          >
-            <Text style={styles.emoji}>{CASE_EMOJI[g.gCase]}</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.title}>
-                {lbl.uk} ({lbl.cz})
-              </Text>
-              <Text style={styles.hint}>{lbl.question}</Text>
-              <Text style={styles.sub}>
-                {g.ids.length} {plural(g.ids.length, "прийменник", "прийменники", "прийменників")}
-              </Text>
-            </View>
-          </Pressable>
+          <View key={g.gCase} style={[styles.row, { borderLeftColor: color }]}>
+            <Pressable style={styles.rowMain} onPress={() => openGroup(g)}>
+              <Text style={styles.emoji}>{CASE_EMOJI[g.gCase]}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.title}>
+                  {lbl.uk} ({lbl.cz})
+                </Text>
+                <Text style={styles.hint}>{lbl.question}</Text>
+                <Text style={styles.sub}>
+                  {g.ids.length} {plural(g.ids.length, "прийменник", "прийменники", "прийменників")}
+                </Text>
+              </View>
+            </Pressable>
+            {mode === "train" && canPick && (
+              <Pressable
+                style={styles.editBtn}
+                hitSlop={8}
+                onPress={() => navigation.navigate("PrepositionSelection", { govCase: g.gCase })}
+              >
+                <Pencil size={20} color={theme.colors.lilac} strokeWidth={2.4} />
+              </Pressable>
+            )}
+          </View>
         );
       })}
 
       <SectionHeader label="рух і спокій" />
-      <Pressable style={[styles.row, { borderLeftColor: theme.colors.coral }]} onPress={openDual}>
-        <Text style={styles.emoji}>🧭</Text>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.title}>Дуальні прийменники</Text>
-          <Text style={styles.hint}>куди? (4.) / де? (6. або 7.)</Text>
-          <Text style={styles.sub}>
-            {DUAL_IDS.length} {plural(DUAL_IDS.length, "прийменник", "прийменники", "прийменників")}
-          </Text>
-        </View>
-      </Pressable>
+      <View style={[styles.row, { borderLeftColor: theme.colors.coral }]}>
+        <Pressable style={styles.rowMain} onPress={openDual}>
+          <Text style={styles.emoji}>🧭</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.title}>Дуальні прийменники</Text>
+            <Text style={styles.hint}>куди? (4.) / де? (6. або 7.)</Text>
+            <Text style={styles.sub}>
+              {DUAL_IDS.length} {plural(DUAL_IDS.length, "прийменник", "прийменники", "прийменників")}
+            </Text>
+          </View>
+        </Pressable>
+        {mode === "train" && (
+          <Pressable
+            style={styles.editBtn}
+            hitSlop={8}
+            onPress={() => navigation.navigate("PrepositionSelection", { govCase: "dual" })}
+          >
+            <Pencil size={20} color={theme.colors.lilac} strokeWidth={2.4} />
+          </Pressable>
+        )}
+      </View>
     </ScrollView>
   );
 }
@@ -212,12 +235,23 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.space(3),
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.lg,
     borderLeftWidth: 4,
-    padding: theme.space(4),
     marginBottom: theme.space(3),
+  },
+  rowMain: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.space(3),
+    padding: theme.space(4),
+  },
+  editBtn: {
+    paddingHorizontal: theme.space(4),
+    paddingVertical: theme.space(4),
+    alignItems: "center",
+    justifyContent: "center",
   },
   emoji: { fontSize: 32 },
   title: { color: theme.colors.text, fontSize: 17, fontWeight: "800" },

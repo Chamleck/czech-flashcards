@@ -21,10 +21,14 @@ import { PronounSelectionScreen } from "./src/screens/PronounSelectionScreen";
 import { PersonalPronounSelectionScreen } from "./src/screens/PersonalPronounSelectionScreen";
 import { InterrogativeSelectionScreen } from "./src/screens/InterrogativeSelectionScreen";
 import { InterrogativesScreen } from "./src/screens/InterrogativesScreen";
+import { InterrogativeAdverbSelectionScreen } from "./src/screens/InterrogativeAdverbSelectionScreen";
 import { NumeralsScreen } from "./src/screens/NumeralsScreen";
+import { NumeralSelectionScreen } from "./src/screens/NumeralSelectionScreen";
 import { PrepositionsScreen } from "./src/screens/PrepositionsScreen";
+import { PrepositionSelectionScreen } from "./src/screens/PrepositionSelectionScreen";
 import { PrepositionSessionScreen } from "./src/screens/PrepositionSessionScreen";
 import { AdverbsScreen } from "./src/screens/AdverbsScreen";
+import { AdverbSelectionScreen } from "./src/screens/AdverbSelectionScreen";
 import { AdverbSessionScreen } from "./src/screens/AdverbSessionScreen";
 import { DeclSessionScreen } from "./src/screens/DeclSessionScreen";
 import { BrowseListScreen } from "./src/screens/BrowseListScreen";
@@ -79,10 +83,14 @@ export default function App() {
           <Stack.Screen name="PersonalPronounSelection" component={PersonalPronounSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="InterrogativeSelection" component={InterrogativeSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="Interrogatives" component={InterrogativesScreen} options={{ title: "Питальні слова" }} />
+          <Stack.Screen name="InterrogativeAdverbSelection" component={InterrogativeAdverbSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="Numerals" component={NumeralsScreen} options={{ title: "Числівники" }} />
+          <Stack.Screen name="NumeralSelection" component={NumeralSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="Prepositions" component={PrepositionsScreen} options={{ title: "Прийменники" }} />
+          <Stack.Screen name="PrepositionSelection" component={PrepositionSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="PrepositionSession" component={PrepositionSessionScreen} options={{ title: "" }} />
           <Stack.Screen name="Adverbs" component={AdverbsScreen} options={{ title: "Прислівники" }} />
+          <Stack.Screen name="AdverbSelection" component={AdverbSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="AdverbSession" component={AdverbSessionScreen} options={{ title: "" }} />
           <Stack.Screen name="DeclSession" component={DeclSessionScreen} options={{ title: "" }} />
           <Stack.Screen name="BrowseList" component={BrowseListScreen} options={{ title: "" }} />

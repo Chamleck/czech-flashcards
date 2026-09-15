@@ -3,6 +3,7 @@ import { Text, StyleSheet, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Pencil } from "lucide-react-native";
 import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { ADVERBS } from "../data/adverbs";
@@ -79,16 +80,23 @@ export function AdverbsScreen({ navigation }: Props) {
         </Pressable>
       )}
 
-      <Pressable style={[styles.row, { borderLeftColor: theme.colors.lilac }]} onPress={openAll}>
-        <Text style={styles.emoji}>🗺️</Text>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.title}>Де? Куди? Звідки?</Text>
-          <Text style={styles.hint}>vlevo / doleva / zleva тощо</Text>
-          <Text style={styles.sub}>
-            {ALL_ADVERB_IDS.length} {plural(ALL_ADVERB_IDS.length, "прислівник", "прислівники", "прислівників")}
-          </Text>
-        </View>
-      </Pressable>
+      <View style={[styles.row, { borderLeftColor: theme.colors.lilac }]}>
+        <Pressable style={styles.rowMain} onPress={openAll}>
+          <Text style={styles.emoji}>🗺️</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.title}>Де? Куди? Звідки?</Text>
+            <Text style={styles.hint}>vlevo / doleva / zleva тощо</Text>
+            <Text style={styles.sub}>
+              {ALL_ADVERB_IDS.length} {plural(ALL_ADVERB_IDS.length, "прислівник", "прислівники", "прислівників")}
+            </Text>
+          </View>
+        </Pressable>
+        {mode === "train" && (
+          <Pressable style={styles.editBtn} hitSlop={8} onPress={() => navigation.navigate("AdverbSelection")}>
+            <Pencil size={20} color={theme.colors.lilac} strokeWidth={2.4} />
+          </Pressable>
+        )}
+      </View>
     </ScrollView>
   );
 }
@@ -126,12 +134,23 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.space(3),
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.lg,
     borderLeftWidth: 4,
-    padding: theme.space(4),
     marginBottom: theme.space(3),
+  },
+  rowMain: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.space(3),
+    padding: theme.space(4),
+  },
+  editBtn: {
+    paddingHorizontal: theme.space(4),
+    paddingVertical: theme.space(4),
+    alignItems: "center",
+    justifyContent: "center",
   },
   emoji: { fontSize: 32 },
   title: { color: theme.colors.text, fontSize: 17, fontWeight: "800" },
