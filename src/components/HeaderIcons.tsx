@@ -1,6 +1,16 @@
 import React from "react";
 import { Pressable, StyleSheet } from "react-native";
-import { HouseIcon, MagnifyingGlassIcon } from "phosphor-react-native";
+// ПОПЫТКА deep-import (в обход барреля "phosphor-react-native", 1512
+// реекспортов) ради размера бандла — ОТКАЧЕНА НАЗАД. У phosphor-react-native
+// 3.0.6 сирі TSX-файли під "./src/icons/*" самі не типчекаються проти
+// react-native-svg 15.15.4: їхній internal icon-base.tsx передає web-only
+// проп `className` у <Svg>, якого немає в RN-типах цієї версії
+// react-native-svg (peerDependencies у них "*" — без реальної фіксації).
+// Це баг самого пакета, не щось, що можна акуратно обійти тут — тому
+// імпортуємо через офіційний, скомпільований барель, як і раніше.
+// Розмір бандла: реальний фікс — прибрати lucide-react-native повністю
+// (коли GenderIcon теж переїде), а не оминати цей баррель.
+import { HouseLineIcon, MagnifyingGlassIcon } from "phosphor-react-native";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 
@@ -27,7 +37,7 @@ const ICON_SIZE = 19;
 export function HomeHeaderButton({ navigation }: { navigation: Nav }) {
   return (
     <Pressable onPress={() => navigation.popToTop()} hitSlop={10} style={styles.pill} accessibilityLabel="На головну">
-      <HouseIcon size={ICON_SIZE} color={theme.colors.lilac} weight="bold" />
+      <HouseLineIcon size={ICON_SIZE} color={theme.colors.lilac} weight="bold" />
     </Pressable>
   );
 }

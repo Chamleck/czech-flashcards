@@ -129,7 +129,7 @@ export function HomeScreen({ navigation }: Props) {
               style={[styles.tile, { borderColor: t.color }, !t.ready && styles.tileDim]}
               onPress={() => t.ready && open(t.key)}
             >
-              <TileEmoji name={t.icon} size={30} />
+              <TileEmoji name={t.icon} tint={t.color} />
               <Text style={styles.tileTitle}>{t.title}</Text>
               <Text style={[styles.tileSub, showMistakes && styles.tileSubAlert]}>{subtitle}</Text>
               {!t.ready && <Text style={styles.soon}>🔒</Text>}
