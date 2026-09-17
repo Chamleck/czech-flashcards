@@ -13,6 +13,10 @@ import { CATEGORY_BY_KEY } from "../data/categories";
 import { ADJ_CATEGORY_BY_KEY } from "../data/adjectiveCategories";
 import { VERB_CLASS_BY_KEY } from "../data/verbCategories";
 import { BrowseKind, CASE_LABELS, CzechCase } from "../types";
+// Тип-лише імпорт: icons/posEmoji.ts — самі рядки-константи, без жодного
+// react-native, тому не порушує вимогу "без RN-імпортів" для Node/esbuild
+// харнеса цього файлу.
+import type { PosEmojiName } from "../components/icons/posEmoji";
 // Заголовки груп — ІМПОРТУЄМО з чистого data-файлу (без React Native
 // залежностей), який теж імпортують самі екрани. Єдине джерело істини: якщо
 // хтось поміняє текст, і екран, і пошук підхоплять зміну автоматично.
@@ -52,7 +56,7 @@ export interface SearchEntry {
   kind: BrowseKind;
   cz: string; // headline-форма для рядка результату
   uk: string; // headline-переклад для рядка результату
-  emoji: string;
+  emoji: PosEmojiName;
   searchTextsNorm: string[]; // усі форми (у т.ч. усі сенси), вже нормалізовані
   entryIds: string[]; // сусідня група — той самий масив, що дав би тап по категорії
   title: string; // заголовок групи для BrowseList (навігаційний, може бути вузьким — "Родовий (Genitiv)")
@@ -80,16 +84,16 @@ export function normalize(s: string): string {
     .trim();
 }
 
-const KIND_EMOJI: Record<BrowseKind, string> = {
-  nouns: "🔤",
-  verbs: "🏃",
-  adjectives: "🎨",
-  pronouns: "👉",
-  personal: "🙋",
-  cardinals: "🔢",
-  prepositions: "🧭",
-  adverbs: "🗺️",
-  interrogative: "❓",
+const KIND_EMOJI: Record<BrowseKind, PosEmojiName> = {
+  nouns: "label",
+  verbs: "running",
+  adjectives: "palette",
+  pronouns: "pointing",
+  personal: "raisingHand",
+  cardinals: "numbers",
+  prepositions: "compass",
+  adverbs: "map",
+  interrogative: "question",
 };
 
 // Широка категорія за замовчуванням — та сама, що назви тайлів на корені

@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView, TextInput } from "react-native";
 import Search from "lucide-react-native/icons/search";
+import { PosEmoji } from "../components/PosEmoji";
+import { PosEmojiName } from "../components/icons/posEmoji";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -33,7 +35,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "WordsPartOfSpeech">;
 
 interface POSTile {
   key: "nouns" | "verbs" | "adjectives" | "pronouns" | "interrogatives" | "numerals" | "prepositions" | "adverbs";
-  emoji: string;
+  icon: PosEmojiName;
   title: string;
   subtitle: string;
   color: string;
@@ -51,14 +53,14 @@ const VISIBLE_NOUNS = NOUNS.filter((n) => !HIDDEN_NOUN_CATS.has(n.category)).len
 const VISIBLE_ADJS = ADJECTIVES.filter((a) => !HIDDEN_ADJ_CATS.has(a.category)).length;
 
 const TILES: POSTile[] = [
-  { key: "nouns", emoji: "🔤", title: KIND_LABEL_NOUNS, subtitle: `${VISIBLE_NOUNS} слів з відмінюванням`, color: theme.colors.honey, ready: true },
-  { key: "verbs", emoji: "🏃", title: KIND_LABEL_VERBS, subtitle: `${VERBS.length} слів з дієвідміною`, color: theme.colors.mint, ready: true },
-  { key: "adjectives", emoji: "🎨", title: KIND_LABEL_ADJECTIVES, subtitle: `${VISIBLE_ADJS} слів з відмінюванням`, color: theme.colors.lilac, ready: true },
-  { key: "pronouns", emoji: "👉", title: KIND_LABEL_PRONOUNS, subtitle: `${PRONOUNS.length} присвійних і вказівних`, color: theme.colors.coral, ready: true },
-  { key: "interrogatives", emoji: "❓", title: KIND_LABEL_INTERROGATIVE, subtitle: "як ставити запитання", color: "#d98cbf", ready: true },
-  { key: "numerals", emoji: "🔢", title: KIND_LABEL_NUMERALS, subtitle: "порядкові, сотні, тисячі", color: "#e0a458", ready: true },
-  { key: "prepositions", emoji: "🧭", title: KIND_LABEL_PREPOSITIONS, subtitle: `${PREPOSITIONS.length} з фіксованим відмінком`, color: "#7fb8e0", ready: true },
-  { key: "adverbs", emoji: "🗺️", title: KIND_LABEL_ADVERBS, subtitle: `${ADVERBS.length} — де? куди? звідки?`, color: "#8ed081", ready: true },
+  { key: "nouns", icon: "label", title: KIND_LABEL_NOUNS, subtitle: `${VISIBLE_NOUNS} слів з відмінюванням`, color: theme.colors.honey, ready: true },
+  { key: "verbs", icon: "running", title: KIND_LABEL_VERBS, subtitle: `${VERBS.length} слів з дієвідміною`, color: theme.colors.mint, ready: true },
+  { key: "adjectives", icon: "palette", title: KIND_LABEL_ADJECTIVES, subtitle: `${VISIBLE_ADJS} слів з відмінюванням`, color: theme.colors.lilac, ready: true },
+  { key: "pronouns", icon: "pointing", title: KIND_LABEL_PRONOUNS, subtitle: `${PRONOUNS.length} присвійних і вказівних`, color: theme.colors.coral, ready: true },
+  { key: "interrogatives", icon: "question", title: KIND_LABEL_INTERROGATIVE, subtitle: "як ставити запитання", color: "#d98cbf", ready: true },
+  { key: "numerals", icon: "numbers", title: KIND_LABEL_NUMERALS, subtitle: "порядкові, сотні, тисячі", color: "#e0a458", ready: true },
+  { key: "prepositions", icon: "compass", title: KIND_LABEL_PREPOSITIONS, subtitle: `${PREPOSITIONS.length} з фіксованим відмінком`, color: "#7fb8e0", ready: true },
+  { key: "adverbs", icon: "map", title: KIND_LABEL_ADVERBS, subtitle: `${ADVERBS.length} — де? куди? звідки?`, color: "#8ed081", ready: true },
 ];
 
 export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
@@ -212,7 +214,7 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
           <View style={styles.resultsList}>
             {results.map((r) => (
               <Pressable key={`${r.kind}:${r.id}`} style={styles.resultRow} onPress={() => openSearchResult(r)}>
-                <Text style={styles.resultIcon}>{r.emoji}</Text>
+                <PosEmoji name={r.emoji} size={22} />
                 <View style={{ flex: 1 }}>
                   <Text style={styles.resultCz} numberOfLines={1}>{r.cz}</Text>
                   <Text style={styles.resultUk} numberOfLines={1}>{r.uk}</Text>
@@ -243,7 +245,7 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
                   style={[styles.tile, { borderColor: t.color }, !t.ready && styles.tileDim]}
                   onPress={() => t.ready && open(t.key)}
                 >
-                  <Text style={styles.tileEmoji}>{t.emoji}</Text>
+                  <PosEmoji name={t.icon} size={34} />
                   <Text style={styles.tileTitle}>{t.title}</Text>
                   <Text style={[styles.tileSub, m > 0 && styles.tileSubAlert]}>{subtitle}</Text>
                   {!t.ready && <Text style={styles.soon}>🔒</Text>}
@@ -284,7 +286,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.space(3),
   },
-  resultIcon: { fontSize: 22 },
   resultCz: { color: theme.colors.honey, fontSize: 16, fontWeight: "800" },
   resultUk: { color: theme.colors.textDim, fontSize: 12, marginTop: 1 },
   // Ярлик категорії — ЗАВЖДИ в один рядок за шириною вмісту. flexShrink:0 не
@@ -308,7 +309,6 @@ const styles = StyleSheet.create({
     minHeight: 130,
   },
   tileDim: { opacity: 0.5 },
-  tileEmoji: { fontSize: 34 },
   tileTitle: { color: theme.colors.text, fontSize: 18, fontWeight: "800", marginTop: theme.space(2) },
   tileSub: { color: theme.colors.textDim, fontSize: 12, marginTop: 2 },
   tileSubAlert: { color: theme.colors.coral, fontWeight: "700" },
