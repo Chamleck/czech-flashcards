@@ -1,16 +1,15 @@
 import React from "react";
 import { Pressable, StyleSheet } from "react-native";
-// ПОПЫТКА deep-import (в обход барреля "phosphor-react-native", 1512
-// реекспортов) ради размера бандла — ОТКАЧЕНА НАЗАД. У phosphor-react-native
-// 3.0.6 сирі TSX-файли під "./src/icons/*" самі не типчекаються проти
-// react-native-svg 15.15.4: їхній internal icon-base.tsx передає web-only
-// проп `className` у <Svg>, якого немає в RN-типах цієї версії
-// react-native-svg (peerDependencies у них "*" — без реальної фіксації).
-// Це баг самого пакета, не щось, що можна акуратно обійти тут — тому
-// імпортуємо через офіційний, скомпільований барель, як і раніше.
-// Розмір бандла: реальний фікс — прибрати lucide-react-native повністю
-// (коли GenderIcon теж переїде), а не оминати цей баррель.
-import { HouseLineIcon, MagnifyingGlassIcon } from "phosphor-react-native";
+// phosphor-react-native прибрано повністю (+5MB barrel import, deep-import
+// escape hatch зламаний у 3.0.6 — див. learnings.md). Nav-іконки тепер
+// lucide-react-native, як і GenderIcon.tsx — один UI-icon шар на весь застосунок.
+// Deep-import (не named-import з барелю "lucide-react-native"!) — барель
+// реекспортує всі ~1755 іконок і Metro його не трясе (перевірено на
+// зібраному бандлі). "House" — канонічна назва файлу; "Home" — лише
+// alias-експорт барелю, якого немає в deep-import шляху, тож імпортуємо
+// House і локально називаємо Home.
+import Home from "lucide-react-native/icons/house";
+import Search from "lucide-react-native/icons/search";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 
@@ -37,7 +36,7 @@ const ICON_SIZE = 19;
 export function HomeHeaderButton({ navigation }: { navigation: Nav }) {
   return (
     <Pressable onPress={() => navigation.popToTop()} hitSlop={10} style={styles.pill} accessibilityLabel="На головну">
-      <HouseLineIcon size={ICON_SIZE} color={theme.colors.lilac} weight="bold" />
+      <Home size={ICON_SIZE} color={theme.colors.lilac} strokeWidth={2.5} />
     </Pressable>
   );
 }
@@ -57,7 +56,7 @@ export function SearchHeaderButton({ navigation }: { navigation: Nav }) {
       style={styles.pill}
       accessibilityLabel="Пошук"
     >
-      <MagnifyingGlassIcon size={ICON_SIZE} color={theme.colors.lilac} weight="bold" />
+      <Search size={ICON_SIZE} color={theme.colors.lilac} strokeWidth={2.5} />
     </Pressable>
   );
 }
