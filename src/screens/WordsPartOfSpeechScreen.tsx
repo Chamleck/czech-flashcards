@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView, TextInput } from "react-native";
-import { Search } from "lucide-react-native";
+import { MagnifyingGlassIcon } from "phosphor-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -188,10 +188,10 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
       keyboardShouldPersistTaps="handled"
     >
       <View style={styles.searchBar}>
-        {/* lucide Search, той самий колір/іконка, що HomeHeaderButton/SearchHeaderButton
+        {/* Phosphor MagnifyingGlass, той самий колір/іконка, що HomeHeaderButton/SearchHeaderButton
             (theme.colors.lilac) — але БЕЗ пігулки-фону: тут іконка вже сидить
             всередині власного контейнера серч-бару, ще один фон-акцент був би зайвим. */}
-        <Search size={16} color={theme.colors.lilac} strokeWidth={2.2} />
+        <MagnifyingGlassIcon size={16} color={theme.colors.lilac} weight="bold" />
         <TextInput
           ref={searchInputRef}
           value={query}

@@ -5,6 +5,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
+import { EditButton } from "../components/EditButton";
 import { NOUNS } from "../data/nouns";
 import { CATEGORIES } from "../data/categories";
 import { loadProgress, getMistakeIds } from "../utils/progress";
@@ -95,13 +96,7 @@ export function WordCategoriesScreen({ navigation }: Props) {
             </Pressable>
             {/* Кастомний підбір слів — лише в тренуванні (у перегляді завжди повний список) */}
             {mode === "train" && (
-              <Pressable
-                style={styles.editBtn}
-                hitSlop={8}
-                onPress={() => navigation.navigate("WordSelection", { category: c.key })}
-              >
-                <Text style={styles.editIcon}>✏️</Text>
-              </Pressable>
+                              <EditButton onPress={() => navigation.navigate("WordSelection", { category: c.key })} />
             )}
           </View>
         );
@@ -168,13 +163,4 @@ const styles = StyleSheet.create({
   catEmoji: { fontSize: 26 },
   catTitle: { color: theme.colors.text, fontSize: 16, fontWeight: "700" },
   catSub: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
-  editBtn: {
-    paddingHorizontal: theme.space(4),
-    paddingVertical: theme.space(4),
-    alignSelf: "stretch",
-    justifyContent: "center",
-    borderLeftWidth: 1,
-    borderLeftColor: "rgba(255,255,255,0.06)",
-  },
-  editIcon: { fontSize: 18 },
 });

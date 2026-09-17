@@ -5,6 +5,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
+import { EditButton } from "../components/EditButton";
 import { ADJECTIVES } from "../data/adjectives";
 import { ADJ_CATEGORIES } from "../data/adjectiveCategories";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
@@ -91,13 +92,7 @@ export function AdjectiveCategoriesScreen({ navigation }: Props) {
               </View>
             </Pressable>
             {mode === "train" && (
-              <Pressable
-                style={styles.editBtn}
-                hitSlop={8}
-                onPress={() => navigation.navigate("AdjectiveSelection", { category: c.key })}
-              >
-                <Text style={styles.editIcon}>✏️</Text>
-              </Pressable>
+                              <EditButton onPress={() => navigation.navigate("AdjectiveSelection", { category: c.key })} />
             )}
           </View>
         );
@@ -164,13 +159,4 @@ const styles = StyleSheet.create({
   catTitle: { color: theme.colors.text, fontSize: 16, fontWeight: "700" },
   catHint: { color: theme.colors.textFaint, fontSize: 12, marginTop: 1 },
   catSub: { color: theme.colors.textDim, fontSize: 13, marginTop: 3 },
-  editBtn: {
-    paddingHorizontal: theme.space(4),
-    paddingVertical: theme.space(4),
-    alignSelf: "stretch",
-    justifyContent: "center",
-    borderLeftWidth: 1,
-    borderLeftColor: "rgba(255,255,255,0.06)",
-  },
-  editIcon: { fontSize: 18 },
 });

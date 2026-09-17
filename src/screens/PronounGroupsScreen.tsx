@@ -5,6 +5,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
+import { EditButton } from "../components/EditButton";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { PRONOUN_GROUP_TITLE, PERSONAL_GROUP_TITLE } from "../data/groupTitles";
@@ -101,13 +102,7 @@ export function PronounGroupsScreen({ navigation }: Props) {
           </View>
         </Pressable>
         {mode === "train" && (
-          <Pressable
-            style={styles.editBtn}
-            hitSlop={8}
-            onPress={() => navigation.navigate("PersonalPronounSelection")}
-          >
-            <Text style={styles.editIcon}>✏️</Text>
-          </Pressable>
+                      <EditButton onPress={() => navigation.navigate("PersonalPronounSelection")} />
         )}
       </View>
 
@@ -122,13 +117,7 @@ export function PronounGroupsScreen({ navigation }: Props) {
           </View>
         </Pressable>
         {mode === "train" && (
-          <Pressable
-            style={styles.editBtn}
-            hitSlop={8}
-            onPress={() => navigation.navigate("PronounSelection")}
-          >
-            <Text style={styles.editIcon}>✏️</Text>
-          </Pressable>
+                      <EditButton onPress={() => navigation.navigate("PronounSelection")} />
         )}
       </View>
 
@@ -196,13 +185,4 @@ const styles = StyleSheet.create({
   catHint: { color: theme.colors.textFaint, fontSize: 12, marginTop: 1 },
   catSub: { color: theme.colors.textDim, fontSize: 13, marginTop: 3 },
   lock: { fontSize: 16, paddingHorizontal: theme.space(4) },
-  editBtn: {
-    paddingHorizontal: theme.space(4),
-    paddingVertical: theme.space(4),
-    alignSelf: "stretch",
-    justifyContent: "center",
-    borderLeftWidth: 1,
-    borderLeftColor: "rgba(255,255,255,0.06)",
-  },
-  editIcon: { fontSize: 18 },
 });

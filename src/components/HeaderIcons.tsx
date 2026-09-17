@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, StyleSheet } from "react-native";
-import { Home, Search } from "lucide-react-native";
+import { HouseIcon, MagnifyingGlassIcon } from "phosphor-react-native";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 
@@ -23,12 +23,11 @@ type Nav = {
 // однаковий розмір іконки. Раніше Home був голий text-колір без фону, а Search
 // — honey з пілюлею; це створювало дисонанс між двома рівноправними кнопками.
 const ICON_SIZE = 19;
-const ICON_STROKE = 2.2;
 
 export function HomeHeaderButton({ navigation }: { navigation: Nav }) {
   return (
     <Pressable onPress={() => navigation.popToTop()} hitSlop={10} style={styles.pill} accessibilityLabel="На головну">
-      <Home size={ICON_SIZE} color={theme.colors.lilac} strokeWidth={ICON_STROKE} />
+      <HouseIcon size={ICON_SIZE} color={theme.colors.lilac} weight="bold" />
     </Pressable>
   );
 }
@@ -48,7 +47,7 @@ export function SearchHeaderButton({ navigation }: { navigation: Nav }) {
       style={styles.pill}
       accessibilityLabel="Пошук"
     >
-      <Search size={ICON_SIZE} color={theme.colors.lilac} strokeWidth={ICON_STROKE} />
+      <MagnifyingGlassIcon size={ICON_SIZE} color={theme.colors.lilac} weight="bold" />
     </Pressable>
   );
 }

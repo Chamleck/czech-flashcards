@@ -10,12 +10,19 @@ import { plural } from "../utils/plural";
 import { ALL_NUMERAL_IDS } from "../utils/numeralEntries";
 import { ALL_INTERROGATIVE_IDS } from "../utils/interrogativeEntries";
 import { ALL_PRONOUN_MIXED_IDS } from "../utils/pronounEntries";
+import { TileEmoji } from "../components/TileEmoji";
+import { TileEmojiName } from "../components/icons/tileEmoji";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 interface Tile {
+  // "flashcards" лишається внутрішнім ключем (маршрут FlashcardsCategories/
+  // FlashcardsQuizScreen перейменування не потребує — це технічний
+  // ідентифікатор, а не текст, який бачить користувач); змінився лише
+  // видимий title нижче: "Вікторина" замість "Флеш-картки", бо режим — це
+  // вибір правильної форми з варіантів, а не переворот карток.
   key: "words" | "grammar" | "flashcards" | "phrases" | "sentences";
-  emoji: string;
+  icon: TileEmojiName;
   title: string;
   subtitle: string;
   color: string;
@@ -23,11 +30,11 @@ interface Tile {
 }
 
 const TILES: Tile[] = [
-  { key: "words", emoji: "🔤", title: "Слова", subtitle: "Іменники, дієслова та більше", color: theme.colors.honey, ready: true },
-  { key: "flashcards", emoji: "🎴", title: "Флеш-картки", subtitle: "Обери правильну форму", color: theme.colors.mint, ready: true },
-  { key: "grammar", emoji: "📚", title: "Граматика", subtitle: "Відмінки, роди та зразки", color: theme.colors.lilac, ready: true },
-  { key: "phrases", emoji: "💬", title: "Фрази", subtitle: "Скоро", color: "#8ed081", ready: false },
-  { key: "sentences", emoji: "✍️", title: "Речення з пропусками", subtitle: "Скоро", color: theme.colors.coral, ready: false },
+  { key: "words", icon: "openBook", title: "Слова", subtitle: "Іменники, дієслова та більше", color: theme.colors.honey, ready: true },
+  { key: "flashcards", icon: "bullseye", title: "Вікторина", subtitle: "Обери правильну форму", color: theme.colors.mint, ready: true },
+  { key: "grammar", icon: "graduationCap", title: "Граматика", subtitle: "Відмінки, роди та зразки", color: theme.colors.lilac, ready: true },
+  { key: "phrases", icon: "speechBalloon", title: "Фрази", subtitle: "Скоро", color: "#8ed081", ready: false },
+  { key: "sentences", icon: "writingHand", title: "Речення з пропусками", subtitle: "Скоро", color: theme.colors.coral, ready: false },
 ];
 
 export function HomeScreen({ navigation }: Props) {
@@ -122,7 +129,7 @@ export function HomeScreen({ navigation }: Props) {
               style={[styles.tile, { borderColor: t.color }, !t.ready && styles.tileDim]}
               onPress={() => t.ready && open(t.key)}
             >
-              <Text style={styles.tileEmoji}>{t.emoji}</Text>
+              <TileEmoji name={t.icon} size={30} />
               <Text style={styles.tileTitle}>{t.title}</Text>
               <Text style={[styles.tileSub, showMistakes && styles.tileSubAlert]}>{subtitle}</Text>
               {!t.ready && <Text style={styles.soon}>🔒</Text>}
@@ -156,7 +163,6 @@ const styles = StyleSheet.create({
     minHeight: 130,
   },
   tileDim: { opacity: 0.5 },
-  tileEmoji: { fontSize: 34 },
   tileTitle: { color: theme.colors.text, fontSize: 18, fontWeight: "800", marginTop: theme.space(2) },
   tileSub: { color: theme.colors.textDim, fontSize: 12, marginTop: 2 },
   tileSubAlert: { color: theme.colors.coral, fontWeight: "700" },

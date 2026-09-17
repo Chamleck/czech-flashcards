@@ -3,9 +3,9 @@ import { Text, StyleSheet, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Pencil } from "lucide-react-native";
 import { RootStackParamList, CardProgress, CzechCase, CASE_LABELS } from "../types";
 import { theme } from "../utils/theme";
+import { EditButton } from "../components/EditButton";
 import { PREPOSITIONS } from "../data/prepositions";
 import { PREP_DUAL_TITLE } from "../data/groupTitles";
 import { plural } from "../utils/plural";
@@ -153,13 +153,7 @@ export function PrepositionsScreen({ navigation }: Props) {
               </View>
             </Pressable>
             {mode === "train" && canPick && (
-              <Pressable
-                style={styles.editBtn}
-                hitSlop={8}
-                onPress={() => navigation.navigate("PrepositionSelection", { govCase: g.gCase })}
-              >
-                <Pencil size={20} color={theme.colors.lilac} strokeWidth={2.4} />
-              </Pressable>
+              <EditButton onPress={() => navigation.navigate("PrepositionSelection", { govCase: g.gCase })} />
             )}
           </View>
         );
@@ -178,13 +172,7 @@ export function PrepositionsScreen({ navigation }: Props) {
           </View>
         </Pressable>
         {mode === "train" && (
-          <Pressable
-            style={styles.editBtn}
-            hitSlop={8}
-            onPress={() => navigation.navigate("PrepositionSelection", { govCase: "dual" })}
-          >
-            <Pencil size={20} color={theme.colors.lilac} strokeWidth={2.4} />
-          </Pressable>
+          <EditButton onPress={() => navigation.navigate("PrepositionSelection", { govCase: "dual" })} />
         )}
       </View>
     </ScrollView>
@@ -246,12 +234,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: theme.space(3),
     padding: theme.space(4),
-  },
-  editBtn: {
-    paddingHorizontal: theme.space(4),
-    paddingVertical: theme.space(4),
-    alignItems: "center",
-    justifyContent: "center",
   },
   emoji: { fontSize: 32 },
   title: { color: theme.colors.text, fontSize: 17, fontWeight: "800" },
