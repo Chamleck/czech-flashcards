@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CASE_ORDER, CASE_LABELS, BrowseKind } from "../types";
 import { theme } from "../utils/theme";
+import { PosEmoji } from "../components/PosEmoji";
 import { GRAMMAR_BY_ID, GrammarBlock, ParagraphSegment, PatternGroup } from "../data/grammar";
 import { findSearchEntry } from "../utils/searchIndex";
 
@@ -36,9 +37,10 @@ function PatternsBlock({ groups, navigation }: { groups: PatternGroup[]; navigat
     <>
       {groups.map((grp) => (
         <View key={grp.title} style={styles.grpBox}>
-          <Text style={styles.grpTitle}>
-            {grp.emoji} {grp.title}
-          </Text>
+          <View style={styles.grpTitleRow}>
+            <PosEmoji name={grp.icon} size={20} />
+            <Text style={styles.grpTitle}>{grp.title}</Text>
+          </View>
           {grp.items.map((it) => (
             <View key={it.name} style={styles.patRow}>
               <Text style={styles.patName}>
@@ -251,7 +253,13 @@ const styles = StyleSheet.create({
     padding: theme.space(3.5),
     marginBottom: theme.space(3),
   },
-  grpTitle: { color: theme.colors.text, fontSize: 16, fontWeight: "800", marginBottom: theme.space(2) },
+  grpTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.space(2),
+    marginBottom: theme.space(2),
+  },
+  grpTitle: { color: theme.colors.text, fontSize: 16, fontWeight: "800" },
   patRow: { marginBottom: theme.space(2) },
   patName: { color: theme.colors.mint, fontSize: 15, fontWeight: "800" },
   patNote: { color: theme.colors.textDim, fontSize: 13, lineHeight: 18 },

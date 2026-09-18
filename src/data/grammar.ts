@@ -3,6 +3,7 @@
 // Блоки типізовані — легко додавати нові теми без зміни коду екрана.
 
 import { BrowseKind } from "../types";
+import { PosEmojiName } from "../components/icons/posEmoji";
 
 // Сегмент "багатого" тексту — звичайний фрагмент або клікабельне слово, що
 // відкриває картку слова в словнику (BrowseCard) через ту саму навігаційну
@@ -24,7 +25,7 @@ export interface PatternExample {
   note: ParagraphSegment[];
 }
 export interface PatternGroup {
-  emoji: string;
+  icon: PosEmojiName;
   title: string;
   items: PatternExample[];
 }
@@ -42,7 +43,7 @@ export type GrammarBlock =
 
 export interface GrammarTopic {
   id: string;
-  emoji: string;
+  icon: PosEmojiName;
   title: string; // українською
   subtitle: string;
   ready: boolean; // false → тема ще в розробці (позначка 🔒)
@@ -52,7 +53,7 @@ export interface GrammarTopic {
 export const GRAMMAR_TOPICS: GrammarTopic[] = [
   {
     id: "gender-number",
-    emoji: "⚥",
+    icon: "womanAndManHoldingHands",
     title: "Рід і число",
     subtitle: "4 роди, однина й множина",
     ready: true,
@@ -134,7 +135,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   },
   {
     id: "seven-cases",
-    emoji: "📚",
+    icon: "bullseye",
     title: "Сім відмінків",
     subtitle: "Контрольні питання до кожного",
     ready: true,
@@ -157,7 +158,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   },
   {
     id: "patterns",
-    emoji: "🗂️",
+    icon: "cardIndexDividers",
     title: "Зразки відмінювання",
     subtitle: "11 базових взорів",
     ready: true,
@@ -171,7 +172,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         type: "patterns",
         groups: [
           {
-            emoji: "🧑",
+            icon: "bustInSilhouette",
             title: "Чол. рід — істоти",
             items: [
               {
@@ -203,7 +204,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             ],
           },
           {
-            emoji: "📦",
+            icon: "package",
             title: "Чол. рід — неістоти",
             items: [
               {
@@ -233,7 +234,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             ],
           },
           {
-            emoji: "🌷",
+            icon: "tulip",
             title: "Жін. рід",
             items: [
               {
@@ -268,7 +269,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             ],
           },
           {
-            emoji: "⚪",
+            icon: "whiteCircle",
             title: "Сер. рід",
             items: [
               {
@@ -325,7 +326,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   },
   {
     id: "adjectives",
-    emoji: "🎨",
+    icon: "palette",
     title: "Прикметники",
     subtitle: "Два зразки: mladý і jarní",
     ready: true,
@@ -447,7 +448,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   },
   {
     id: "verbs",
-    emoji: "🏃",
+    icon: "running",
     title: "Дієслова",
     subtitle: "Вид, класи та часи",
     ready: true,
@@ -739,7 +740,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   },
   {
     id: "pronouns",
-    emoji: "👤",
+    icon: "pointing",
     title: "Займенники",
     subtitle: "Особові, присвійні та вказівні",
     ready: true,
@@ -962,7 +963,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   },
   {
     id: "numbers-dates",
-    emoji: "🔢",
+    icon: "numbers",
     title: "Числівники й дати",
     subtitle: "Числа, дні, місяці",
     ready: true,
@@ -1148,7 +1149,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   },
   {
     id: "date-time",
-    emoji: "🕐",
+    icon: "clock",
     title: "Дати й час",
     subtitle: "Число місяця та як казати години",
     ready: true,
@@ -1250,7 +1251,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   },
   {
     id: "prepositions-fixed",
-    emoji: "🧭",
+    icon: "compass",
     title: "Прийменники (фіксований відмінок)",
     subtitle: "Який відмінок вимагає кожен прийменник",
     ready: true,
@@ -1396,7 +1397,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   },
   {
     id: "prepositions-dual",
-    emoji: "🧭",
+    icon: "compass",
     title: "Прийменники руху й спокою",
     subtitle: "Один прийменник — два відмінки (куди? / де?)",
     ready: true,
@@ -1492,7 +1493,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   },
   {
     id: "adverbs-place",
-    emoji: "🗺️",
+    icon: "map",
     title: "Прислівники місця",
     subtitle: "Де? Куди? Звідки?",
     ready: true,
@@ -1631,7 +1632,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   },
   {
     id: "interrogative-words",
-    emoji: "❓",
+    icon: "question",
     title: "Питальні слова",
     subtitle: "Як ставити запитання — уся система разом",
     ready: true,

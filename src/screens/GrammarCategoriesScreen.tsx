@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
+import { PosEmoji } from "../components/PosEmoji";
 import { GRAMMAR_TOPICS } from "../data/grammar";
 
 type Props = NativeStackScreenProps<RootStackParamList, "GrammarCategories">;
@@ -27,7 +28,7 @@ export function GrammarCategoriesScreen({ navigation }: Props) {
           style={[styles.row, !t.ready && styles.rowDim]}
           onPress={() => t.ready && navigation.navigate("GrammarTopic", { topicId: t.id })}
         >
-          <Text style={styles.emoji}>{t.emoji}</Text>
+          <PosEmoji name={t.icon} size={26} />
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>{t.title}</Text>
             <Text style={styles.sub}>{t.subtitle}</Text>
@@ -53,7 +54,6 @@ const styles = StyleSheet.create({
     marginBottom: theme.space(3),
   },
   rowDim: { opacity: 0.45 },
-  emoji: { fontSize: 26, width: 32, textAlign: "center" },
   title: { color: theme.colors.text, fontSize: 16, fontWeight: "700" },
   sub: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
   chevron: { color: theme.colors.textFaint, fontSize: 24, fontWeight: "300" },
