@@ -1,10 +1,11 @@
 import { theme } from "../utils/theme";
+import { PosEmojiName } from "../components/icons/posEmoji";
 
 // Категорії режиму "Флеш-картки" відповідають розділам граматики,
 // для яких формат "обери правильну форму" логічно доречний.
 export interface FlashcardCategory {
   id: string;
-  emoji: string;
+  icon: PosEmojiName;
   title: string;
   subtitle: string;
   color: string;
@@ -14,7 +15,7 @@ export interface FlashcardCategory {
 export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
   {
     id: "cases",
-    emoji: "🎯",
+    icon: "bullseye",
     title: "Відмінки",
     subtitle: "Однина / множина, усі 7 відмінків",
     color: theme.colors.honey,
@@ -22,7 +23,7 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
   },
   {
     id: "verbs",
-    emoji: "🏃",
+    icon: "running",
     title: "Дієслова",
     subtitle: "Часи: теперішній, минулий, майбутній",
     color: theme.colors.mint,
@@ -30,7 +31,7 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
   },
   {
     id: "adj-pron",
-    emoji: "🎨",
+    icon: "palette",
     title: "Прикметники та займенники",
     subtitle: "Рід, відмінок, число та ступінь порівняння",
     color: theme.colors.lilac,
@@ -38,7 +39,7 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
   },
   {
     id: "numerals",
-    emoji: "🔢",
+    icon: "numbers",
     title: "Числівники",
     subtitle: "Узгодження з іменником (1, 2-4, 5+)",
     color: theme.colors.honey,
@@ -46,7 +47,7 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
   },
   {
     id: "datetime",
-    emoji: "🕐",
+    icon: "clock",
     title: "Час і дата",
     subtitle: "Дати (родовий), час і дні тижня (v/ve)",
     color: theme.colors.lilac,
@@ -54,7 +55,7 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
   },
   {
     id: "prepositions",
-    emoji: "🧭",
+    icon: "compass",
     title: "Прийменники",
     subtitle: "Відмінок після прийменника, рух / спокій",
     color: "#7fb8e0",
@@ -62,7 +63,7 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
   },
   {
     id: "adverbs",
-    emoji: "🗺️",
+    icon: "map",
     title: "Прислівники місця",
     subtitle: "Де? Куди? Звідки? Кудою? — форма або питання за реченням",
     color: "#8ed081",

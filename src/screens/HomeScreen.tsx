@@ -31,7 +31,7 @@ interface Tile {
 
 const TILES: Tile[] = [
   { key: "words", icon: "openBook", title: "Слова", subtitle: "Іменники, дієслова та більше", color: theme.colors.honey, ready: true },
-  { key: "flashcards", icon: "bullseye", title: "Вікторина", subtitle: "Обери правильну форму", color: theme.colors.mint, ready: true },
+  { key: "flashcards", icon: "brain", title: "Вікторина", subtitle: "Обери правильну форму", color: theme.colors.mint, ready: true },
   { key: "grammar", icon: "scroll", title: "Граматика", subtitle: "Відмінки, роди та зразки", color: theme.colors.lilac, ready: true },
   { key: "phrases", icon: "speechBalloon", title: "Фрази", subtitle: "Скоро", color: "#8ed081", ready: false },
   { key: "sentences", icon: "writingHand", title: "Речення з пропусками", subtitle: "Скоро", color: theme.colors.coral, ready: false },

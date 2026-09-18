@@ -1,11 +1,13 @@
 // Vendored decorative icons for the "Слова" part-of-speech tiles
-// (WordsPartOfSpeechScreen) and search-result rows (searchIndex.ts's
-// KIND_EMOJI). Same approach as tileEmoji.ts (Home tiles): Twemoji
-// (jdecked/twemoji fork, graphics CC-BY 4.0, code MIT), raw SVG strings,
-// no npm dependency — only these 9 glyphs exist in the bundle, nothing
-// else from the library. Covered by the same README/About attribution
-// line as tileEmoji.ts (one CC-BY credit for all Twemoji use in the app,
-// not per-file).
+// (WordsPartOfSpeechScreen), search-result rows (searchIndex.ts's
+// KIND_EMOJI), and category tiles inside other Category screens
+// (FlashcardsCategoriesScreen, more to follow — adjectiveCategories.ts,
+// categories.ts, grammar.ts). Same approach as tileEmoji.ts (Home tiles):
+// Twemoji (jdecked/twemoji fork, graphics CC-BY 4.0, code MIT), raw SVG
+// strings, no npm dependency — only these glyphs exist in the bundle,
+// nothing else from the library. Covered by the same README/About
+// attribution line as tileEmoji.ts (one CC-BY credit for all Twemoji use
+// in the app, not per-file).
 //
 // Contrast checked against bgCard (#2f1d38) for every glyph, same
 // standard as the Home tiles:
@@ -19,6 +21,13 @@
 // - compass, map: dominant fills are bright (orange/gold/near-white ring,
 //   or blue/green paper); each has one small dark/mid accent (needle
 //   half, sea deep-blue) too small an area to blend.
+// - bullseye: bright red/white/orange rings, no dark tone at all —
+//   duplicated on purpose from tileEmoji.ts's former Home-tile glyph
+//   (that tile moved to "brain" once bullseye also became the "Відмінки"
+//   category here — same icon in two places at once read as if the Home
+//   tile pointed at just that one category, not the whole quiz mode).
+// - clock: grey ring + near-white face, dark hands as thin lines only —
+//   same "thin accent" pattern as compass's needle.
 //
 // Never hand-edit path geometry — only re-fetch the same glyph from the
 // official repo if the pin needs updating.
@@ -50,6 +59,13 @@ export const POS_EMOJI = {
 
   // Особові займенники (search-kind "personal", підмножина Займенників)
   raisingHand: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path fill="#FA743E" d="M27 27H10v9h21v-5c0-2.209-1.791-4-4-4z"/><path fill="#FFDC5D" d="M15 22v6c0 1.657 1.343 3 3 3s3-1.343 3-3v-6h-6z"/><path fill="#DD551F" d="M26 32h1v4h-1z"/><path fill="#FFAC33" d="M21.906 1.262c-2.02-.654-6.772-.475-7.96 1.069-3.089.059-6.713 2.851-7.188 6.535-.47 3.645.578 5.338.951 8.079.422 3.106 2.168 4.099 3.564 4.515C13.281 24.114 15.415 24 19 24c7 0 10.334-4.684 10.629-12.639.178-4.812-2.645-8.456-7.723-10.099z"/><path fill="#FFDC5D" d="M25.909 11.701c-.677-.938-1.545-1.693-3.446-1.96.713.327 1.396 1.455 1.485 2.079.089.624.178 1.129-.386.505-2.26-2.499-4.722-1.515-7.162-3.041-1.704-1.066-2.223-2.246-2.223-2.246s-.208 1.574-2.792 3.178c-.749.465-1.643 1.5-2.139 3.03C8.889 14.345 9 15.325 9 17c0 4.889 4.029 9 9 9s9-4.147 9-9c0-3.041-.319-4.229-1.091-5.299z"/><path fill="#C1694F" d="M22 22h-8s1 2 4 2 4-2 4-2zm-3-2.5h-2c-.276 0-.5-.224-.5-.5s.224-.5.5-.5h2c.276 0 .5.224.5.5s-.224.5-.5.5z"/><path fill="#662113" d="M14 16c-.552 0-1-.448-1-1v-1c0-.552.448-1 1-1s1 .448 1 1v1c0 .552-.448 1-1 1zm8 0c-.552 0-1-.448-1-1v-1c0-.552.448-1 1-1s1 .448 1 1v1c0 .552-.448 1-1 1z"/><path fill="#FFDC5D" d="M12.421 2.935c-.591-.389-1.387-.224-1.776.367L10 4.284V2c0-1.105-.896-2-2-2H4C2.896 0 2 .896 2 2v8s0 1 1 1h6l1-1V8.957l2.789-4.246c.389-.592.225-1.387-.368-1.776z"/><path fill="#EF9645" d="M4 0h1v5H4zm3 0h1v5H7z"/><path fill="#FA743E" d="M9 27h3l-2 9c-8 0-8-9-8-9V10h8L9 27z"/></svg>`,
+
+  // "Відмінки" (flashcardCategories.ts) — дубльовано з колишньої Home-іконки
+  // Вікторини навмисно, див. коментар вище
+  bullseye: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><circle fill="#DD2E44" cx="18" cy="18" r="18"/><circle fill="#FFF" cx="18" cy="18" r="13.5"/><circle fill="#DD2E44" cx="18" cy="18" r="10"/><circle fill="#FFF" cx="18" cy="18" r="6"/><circle fill="#DD2E44" cx="18" cy="18" r="3"/><path opacity=".2" d="M18.24 18.282l13.144 11.754s-2.647 3.376-7.89 5.109L17.579 18.42l.661-.138z"/><path fill="#FFAC33" d="M18.294 19c-.255 0-.509-.097-.704-.292-.389-.389-.389-1.018 0-1.407l.563-.563c.389-.389 1.018-.389 1.408 0 .388.389.388 1.018 0 1.407l-.564.563c-.194.195-.448.292-.703.292z"/><path fill="#55ACEE" d="M24.016 6.981c-.403 2.079 0 4.691 0 4.691l7.054-7.388c.291-1.454-.528-3.932-1.718-4.238-1.19-.306-4.079.803-5.336 6.935zm5.003 5.003c-2.079.403-4.691 0-4.691 0l7.388-7.054c1.454-.291 3.932.528 4.238 1.718.306 1.19-.803 4.079-6.935 5.336z"/><path fill="#3A87C2" d="M32.798 4.485L21.176 17.587c-.362.362-1.673.882-2.51.046-.836-.836-.419-2.08-.057-2.443L31.815 3.501s.676-.635 1.159-.152-.176 1.136-.176 1.136z"/></svg>`,
+
+  // "Час і дата" (flashcardCategories.ts)
+  clock: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><circle fill="#99AAB5" cx="18" cy="18" r="18"/><circle fill="#E1E8ED" cx="18" cy="18" r="14"/><path fill="#66757F" d="M19 18c0 .553-.447 1-1 1-.552 0-1-.447-1-1V7c0-.552.448-1 1-1 .553 0 1 .448 1 1v11z"/><path fill="#66757F" d="M23.25 9.237c.479.276.643.888.367 1.366l-4.5 7.795c-.276.478-.889.642-1.367.365-.478-.276-.642-.888-.365-1.365l4.5-7.795c.276-.478.887-.642 1.365-.366z"/></svg>`,
 } as const;
 
 export type PosEmojiName = keyof typeof POS_EMOJI;

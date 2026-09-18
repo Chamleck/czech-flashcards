@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { FLASHCARD_CATEGORIES } from "../data/flashcardCategories";
+import { PosEmoji } from "../components/PosEmoji";
 import { loadFlashcardStats, FlashcardStats } from "../utils/flashcardStats";
 import { consumeRoundFinished } from "../utils/quizRoundFlag";
 
@@ -82,7 +83,9 @@ export function FlashcardsCategoriesScreen({ navigation }: Props) {
           style={[styles.row, { borderLeftColor: c.color }, !c.ready && styles.rowDim]}
           onPress={() => c.ready && navigation.navigate("FlashcardsQuiz", { categoryId: c.id, title: c.title })}
         >
-          <Text style={styles.emoji}>{c.emoji}</Text>
+          <View style={styles.emoji}>
+            <PosEmoji name={c.icon} size={26} />
+          </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>{c.title}</Text>
             <Text style={styles.sub}>{c.subtitle}</Text>
@@ -216,7 +219,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.space(3),
   },
   rowDim: { opacity: 0.45 },
-  emoji: { fontSize: 26, width: 32, textAlign: "center" },
+  emoji: { width: 32, alignItems: "center", justifyContent: "center" },
   title: { color: theme.colors.text, fontSize: 16, fontWeight: "700" },
   sub: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
   chevron: { color: theme.colors.textFaint, fontSize: 24, fontWeight: "300" },
