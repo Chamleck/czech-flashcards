@@ -7,9 +7,9 @@
 // напряму з екранів): searchIndex.ts має лишатись чистим — тестованим у
 // Node/esbuild без RN-рантайму. Імпорт констант напряму з *Screen.tsx файлів
 // підтягнув би React Native транзитивно і зламав би це.
-export const PRONOUN_GROUP_TITLE = "👉 Присвійні та вказівні";
-export const PERSONAL_GROUP_TITLE = "🙋 Особові";
-export const INTERROGATIVE_GROUP_TITLE = "❓ Питальні";
+export const PRONOUN_GROUP_TITLE = "Присвійні та вказівні";
+export const PERSONAL_GROUP_TITLE = "Особові";
+export const INTERROGATIVE_GROUP_TITLE = "Займенникові (хто? що? який?)"; // конкретна назва підгрупи, узгоджена зі стилем сусідів (ADVERBS/MISC нижче), а не родова назва хаба "Питальні слова"
 export const NUMERAL_CARDINAL_TITLE = "Кількісні";
 export const NUMERAL_ORDINAL_TITLE = "Порядкові";
 export const NUMERAL_HUNDREDS_TITLE = "Сотні, тисячі, мільйони";

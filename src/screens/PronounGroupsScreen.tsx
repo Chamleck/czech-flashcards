@@ -57,7 +57,7 @@ export function PronounGroupsScreen({ navigation }: Props) {
 
   function openPersonal() {
     const ids = PERSONAL_PRONOUNS.map((p) => p.id);
-    if (mode === "browse") navigation.navigate("BrowseList", { kind: "personal", entryIds: ids, title: PERSONAL_GROUP_TITLE });
+    if (mode === "browse") navigation.navigate("BrowseList", { kind: "pronouns", entryIds: ids, title: PERSONAL_GROUP_TITLE });
     else navigation.navigate("DeclSession", { title: PERSONAL_GROUP_TITLE, kind: "personal", entryIds: ids });
   }
 

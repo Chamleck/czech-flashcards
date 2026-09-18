@@ -4,6 +4,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
+import { PERSONAL_GROUP_TITLE } from "../data/groupTitles";
 import { HomeHeaderButton } from "../components/HeaderIcons";
 import { SelectionList } from "../components/SelectionList";
 
@@ -12,7 +13,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "PersonalPronounSelectio
 export function PersonalPronounSelectionScreen({ navigation }: Props) {
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: "🙋 Особові",
+      title: PERSONAL_GROUP_TITLE,
       headerRight: () => <HomeHeaderButton navigation={navigation} />,
     });
   }, [navigation]);
@@ -22,7 +23,7 @@ export function PersonalPronounSelectionScreen({ navigation }: Props) {
       words={PERSONAL_PRONOUNS}
       renderExtra={(w) => <Text style={styles.subtypeTag}>{w.gendered ? "за родом" : "особовий"}</Text>}
       onStart={(ids) =>
-        navigation.navigate("DeclSession", { title: "🙋 Особові", kind: "personal", entryIds: ids })
+        navigation.navigate("DeclSession", { title: PERSONAL_GROUP_TITLE, kind: "personal", entryIds: ids })
       }
     />
   );

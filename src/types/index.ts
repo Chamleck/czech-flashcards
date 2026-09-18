@@ -471,7 +471,10 @@ export interface VerbEntry {
 
 // Параметри навігації (React Navigation, native stack)
 // Частина мови для режиму перегляду. Визначає джерело даних і компонент картки.
-export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "personal" | "cardinals" | "prepositions" | "adverbs" | "interrogative";
+// "pronouns" покриває і присвійні/вказівні, і особові — розрізнення всередині
+// за id через pronounCardType (той самий патерн, що "interrogative" з
+// interrogativeCardType: один kind, кілька структур даних, диспетчер по id).
+export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "cardinals" | "prepositions" | "adverbs" | "interrogative";
 
 export type RootStackParamList = {
   Home: undefined;

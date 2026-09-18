@@ -89,7 +89,6 @@ const KIND_EMOJI: Record<BrowseKind, PosEmojiName> = {
   verbs: "running",
   adjectives: "palette",
   pronouns: "pointing",
-  personal: "raisingHand",
   cardinals: "numbers",
   prepositions: "compass",
   adverbs: "map",
@@ -105,7 +104,6 @@ const KIND_LABEL: Record<BrowseKind, string> = {
   verbs: KIND_LABEL_VERBS,
   adjectives: KIND_LABEL_ADJECTIVES,
   pronouns: KIND_LABEL_PRONOUNS,
-  personal: KIND_LABEL_PRONOUNS,
   cardinals: KIND_LABEL_NUMERALS,
   prepositions: KIND_LABEL_PREPOSITIONS,
   adverbs: KIND_LABEL_ADVERBS,
@@ -189,7 +187,7 @@ function buildIndex(): SearchEntry[] {
   }
   const personalIds = PERSONAL_PRONOUNS.map((p) => p.id);
   for (const p of PERSONAL_PRONOUNS) {
-    push(out, p.id, "personal", p.cz, p.uk, [], personalIds, PERSONAL_GROUP_TITLE, "PronounGroups");
+    push(out, p.id, "pronouns", p.cz, p.uk, [], personalIds, PERSONAL_GROUP_TITLE, "PronounGroups");
   }
   // Питальні — окремий розділ "Питальні слова" (власний екран-хаб Interrogatives),
   // змішана група (jaký/который/čí + kdo/co), суцільний список без підгруп.
@@ -272,10 +270,17 @@ export function findSearchEntry(id: string, kind: BrowseKind): SearchEntry | und
   return INDEX.find((e) => e.id === id && e.kind === kind);
 }
 
-// Мінімум 2 символи — інакше 1 літера дає забагато шуму.
+// Мінімум 2 символи для часткового (prefix/substring) збігу — інакше 1 літера
+// дає забагато шуму. Але рівно 1 символ — легальне ЦІЛЕ слово для кількох
+// записів (чеські прийменники k/o/s/u/v/z, українське "я") і раніше було
+// непошуковим. Для довжини 1 дозволяємо лише ТОЧНИЙ збіг (без substring) —
+// шум, якого уникала первісна перевірка, так і не з'являється.
 export function searchWords(query: string): SearchEntry[] {
   const q = normalize(query);
-  if (q.length < 2) return [];
+  if (q.length === 0) return [];
+  if (q.length === 1) {
+    return INDEX.filter((e) => e.searchTextsNorm.includes(q));
+  }
   // Обчислюємо ранг ОДИН раз на запис (map), а не багато разів усередині
   // компаратора sort. Точний збіг і початок слова — угорі, збіг усередині —
   // нижче. Без сортування точний збіг тонув унизу серед часткових (напр.

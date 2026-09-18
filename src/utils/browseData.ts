@@ -28,8 +28,6 @@ export function browseSource(kind: BrowseKind): readonly { id: string; uk: strin
       return VERBS;
     case "adjectives":
       return ADJECTIVES;
-    case "personal":
-      return PERSONAL_PRONOUNS;
     case "cardinals":
       return CARDINALS;
     case "prepositions":
@@ -46,6 +44,10 @@ export function browseSource(kind: BrowseKind): readonly { id: string; uk: strin
       // пошуку, самі звужують, які записи реально показуються.
       return [...INTERROGATIVE_ALL, ...INTERROGATIVE_ADVERBS, ...INTERROGATIVE_MISC];
     case "pronouns":
+      // Присвійні/вказівні + особові в одному пулі (той самий принцип, що
+      // "interrogative" вище) — entryIds, що приходять від конкретної
+      // групи/пошуку, самі звужують, які записи реально показуються.
+      return [...PRONOUNS, ...PERSONAL_PRONOUNS];
     default:
       return PRONOUNS;
   }

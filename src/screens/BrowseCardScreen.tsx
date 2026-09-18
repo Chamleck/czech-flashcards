@@ -23,6 +23,7 @@ import { PrepositionCard } from "../components/PrepositionCard";
 import { AdverbCard } from "../components/AdverbCard";
 import { SimpleWordCard } from "../components/SimpleWordCard";
 import { interrogativeCardType } from "../utils/interrogativeEntries";
+import { pronounCardType } from "../utils/pronounEntries";
 import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
 import { HomeHeaderButton, SearchHeaderButton } from "../components/HeaderIcons";
 
@@ -38,8 +39,6 @@ function CardFor({ kind, entry }: { kind: BrowseKind; entry: any }) {
       return <FlashCard entry={entry} {...p} />;
     case "verbs":
       return <VerbCard entry={entry} {...p} />;
-    case "personal":
-      return <PersonalPronounCard entry={entry} {...p} />;
     case "cardinals":
       return <NumeralCard entry={entry} {...p} />;
     case "prepositions":
@@ -55,8 +54,15 @@ function CardFor({ kind, entry }: { kind: BrowseKind; entry: any }) {
       if (t === "invariant") return <SimpleWordCard entry={entry} {...p} />;
       return <AdjPronounCard entry={entry} {...p} />;
     }
+    case "pronouns": {
+      // Присвійні/вказівні vs особові — той самий принцип, що interrogative
+      // вище: один kind, диспетчер картки по id через pronounCardType
+      // (pronounEntries.ts), а не окремий BrowseKind.
+      const t = pronounCardType(entry.id);
+      if (t === "personal") return <PersonalPronounCard entry={entry} {...p} />;
+      return <AdjPronounCard entry={entry} {...p} />;
+    }
     case "adjectives":
-    case "pronouns":
     default:
       return <AdjPronounCard entry={entry} {...p} />;
   }
