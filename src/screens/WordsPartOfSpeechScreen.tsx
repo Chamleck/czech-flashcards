@@ -94,7 +94,10 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
       return unsubscribe;
     }
   }, [route.params?.focusSearch, navigation]);
-  const results = query.trim().length >= 2 ? searchWords(query) : [];
+  // Мінімум 1 символ (не 2) — searchWords сама обмежує довжину-1 лише точним
+  // збігом (без шуму), тому короткі легальні слова (k/o/s/u/v/z, "я") мають
+  // дійти до неї, а не відсіюватись тут раніше.
+  const results = query.trim().length >= 1 ? searchWords(query) : [];
 
   // Рахуємо помилки по всіх колодах при кожному фокусі екрана.
   useFocusEffect(

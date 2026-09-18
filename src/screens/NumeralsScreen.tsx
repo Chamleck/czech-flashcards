@@ -104,21 +104,21 @@ export function NumeralsScreen({ navigation }: Props) {
 
   function open(item: Item) {
     if (item.key === "cardinal") {
-      const title = "🔢 Кількісні";
+      const title = NUMERAL_CARDINAL_TITLE;
       if (mode === "browse") {
         navigation.navigate("BrowseList", { kind: "cardinals", entryIds: CARDINAL_IDS, title });
       } else {
         navigation.navigate("DeclSession", { title, kind: "cardinal", entryIds: CARDINAL_IDS });
       }
     } else if (item.key === "ordinal") {
-      const title = "🥇 Порядкові";
+      const title = NUMERAL_ORDINAL_TITLE;
       if (mode === "browse") {
         navigation.navigate("BrowseList", { kind: "adjectives", entryIds: ORDINAL_IDS, title });
       } else {
         navigation.navigate("DeclSession", { title, kind: "ordinal", entryIds: ORDINAL_IDS });
       }
     } else if (item.key === "hundreds") {
-      const title = "💯 Сотні, тисячі, мільйони";
+      const title = NUMERAL_HUNDREDS_TITLE;
       if (mode === "browse") {
         navigation.navigate("BrowseList", { kind: "nouns", entryIds: NUMBER_IDS, title });
       } else {
