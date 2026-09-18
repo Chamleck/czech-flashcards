@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
 import { EditButton } from "../components/EditButton";
+import { PosEmoji } from "../components/PosEmoji";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { PRONOUN_GROUP_TITLE, PERSONAL_GROUP_TITLE } from "../data/groupTitles";
@@ -92,7 +93,7 @@ export function PronounGroupsScreen({ navigation }: Props) {
       {/* Особові — активна група */}
       <View style={[styles.catRow, { borderLeftColor: theme.colors.mint }]}>
         <Pressable style={styles.catMain} onPress={openPersonal}>
-          <Text style={styles.catEmoji}>🙋</Text>
+          <PosEmoji name="raisingHand" size={26} />
           <View style={{ flex: 1 }}>
             <Text style={styles.catTitle}>Особові</Text>
             <Text style={styles.catHint}>já, ty, on, ona, my, vy, oni, se — довгі/короткі форми</Text>
@@ -109,7 +110,7 @@ export function PronounGroupsScreen({ navigation }: Props) {
       {/* Присвійні та вказівні — активна група */}
       <View style={[styles.catRow, { borderLeftColor: theme.colors.lilac }]}>
         <Pressable style={styles.catMain} onPress={openAll}>
-          <Text style={styles.catEmoji}>👉</Text>
+          <PosEmoji name="pointing" size={26} />
           <View style={{ flex: 1 }}>
             <Text style={styles.catTitle}>Присвійні та вказівні</Text>
             <Text style={styles.catHint}>můj, tvůj, náš, její, jeho, ten…</Text>
@@ -180,7 +181,6 @@ const styles = StyleSheet.create({
     gap: theme.space(3),
     padding: theme.space(4),
   },
-  catEmoji: { fontSize: 26 },
   catTitle: { color: theme.colors.text, fontSize: 16, fontWeight: "700" },
   catHint: { color: theme.colors.textFaint, fontSize: 12, marginTop: 1 },
   catSub: { color: theme.colors.textDim, fontSize: 13, marginTop: 3 },

@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { EditButton } from "../components/EditButton";
+import { PosEmoji } from "../components/PosEmoji";
 import { ALL_INTERROGATIVE_IDS } from "../utils/interrogativeEntries";
 import { INTERROGATIVE_ADVERBS } from "../data/interrogativeAdverbs";
 import { INTERROGATIVE_MISC } from "../data/interrogativeMisc";
@@ -127,7 +128,7 @@ export function InterrogativesScreen({ navigation }: Props) {
           Займенниках. */}
       <View style={[styles.row, { borderLeftColor: theme.genderColor.masc_inan }]}>
         <Pressable style={styles.rowMain} onPress={openPronouns}>
-          <Text style={styles.emoji}>❓</Text>
+          <PosEmoji name="question" size={32} />
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>Займенники</Text>
             <Text style={styles.hint}>kdo, co, jaký, který, čí</Text>
@@ -146,7 +147,7 @@ export function InterrogativesScreen({ navigation }: Props) {
           усталений як "знаю"/акцент прислівників-відповідей в AdverbsScreen. */}
       <View style={[styles.row, { borderLeftColor: theme.colors.mint }]}>
         <Pressable style={styles.rowMain} onPress={openAdverbs}>
-          <Text style={styles.emoji}>🗺️</Text>
+          <PosEmoji name="map" size={32} />
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>Прислівники</Text>
             <Text style={styles.hint}>kde, kam, odkud, kudy</Text>
@@ -164,7 +165,7 @@ export function InterrogativesScreen({ navigation }: Props) {
           хаба, відрізняє від займенникового (синій) і прислівникового (mint). */}
       <View style={[styles.row, { borderLeftColor: theme.colors.honey }]}>
         <Pressable style={styles.rowMain} onPress={openMisc}>
-          <Text style={styles.emoji}>❔</Text>
+          <PosEmoji name="question" size={32} />
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>Інші</Text>
             <Text style={styles.hint}>kdy, jak, proč, kolik</Text>
@@ -226,7 +227,6 @@ const styles = StyleSheet.create({
     gap: theme.space(3),
     padding: theme.space(4),
   },
-  emoji: { fontSize: 32 },
   title: { color: theme.colors.text, fontSize: 17, fontWeight: "800" },
   hint: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
   sub: { color: theme.colors.textFaint, fontSize: 12, marginTop: 4 },

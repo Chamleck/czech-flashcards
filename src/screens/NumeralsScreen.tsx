@@ -6,6 +6,8 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { EditButton } from "../components/EditButton";
+import { PosEmoji } from "../components/PosEmoji";
+import { PosEmojiName } from "../components/icons/posEmoji";
 import { NOUNS } from "../data/nouns";
 import { ADJECTIVES } from "../data/adjectives";
 import { CARDINALS } from "../data/cardinals";
@@ -33,7 +35,7 @@ const CARDINAL_IDS = CARDINALS.map((c) => c.id);
 
 interface Item {
   key: "cardinal" | "ordinal" | "hundreds";
-  emoji: string;
+  icon: PosEmojiName;
   title: string;
   hint: string;
   count: number;
@@ -43,7 +45,7 @@ interface Item {
 const ITEMS: Item[] = [
   {
     key: "cardinal",
-    emoji: "🔢",
+    icon: "numbers",
     title: NUMERAL_CARDINAL_TITLE,
     hint: "jeden, dva, pět… (окреме відмінювання)",
     count: CARDINAL_IDS.length,
@@ -51,7 +53,7 @@ const ITEMS: Item[] = [
   },
   {
     key: "ordinal",
-    emoji: "🥇",
+    icon: "firstPlaceMedal",
     title: NUMERAL_ORDINAL_TITLE,
     hint: "перший, другий… (зразок mladý/jarní)",
     count: ORDINAL_IDS.length,
@@ -59,7 +61,7 @@ const ITEMS: Item[] = [
   },
   {
     key: "hundreds",
-    emoji: "💯",
+    icon: "hundredPoints",
     title: NUMERAL_HUNDREDS_TITLE,
     hint: "sto, tisíc, milion, miliarda (звичайні іменники)",
     count: NUMBER_IDS.length,
@@ -160,7 +162,7 @@ export function NumeralsScreen({ navigation }: Props) {
       {ITEMS.map((item) => (
         <View key={item.key} style={[styles.row, { borderLeftColor: item.color }]}>
           <Pressable style={styles.rowMain} onPress={() => open(item)}>
-            <Text style={styles.emoji}>{item.emoji}</Text>
+            <PosEmoji name={item.icon} size={32} />
             <View style={{ flex: 1 }}>
               <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.hint}>{item.hint}</Text>
@@ -223,7 +225,6 @@ const styles = StyleSheet.create({
     gap: theme.space(3),
     padding: theme.space(4),
   },
-  emoji: { fontSize: 32 },
   title: { color: theme.colors.text, fontSize: 17, fontWeight: "800" },
   hint: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
   sub: { color: theme.colors.textFaint, fontSize: 12, marginTop: 4 },

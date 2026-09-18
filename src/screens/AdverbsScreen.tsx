@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { EditButton } from "../components/EditButton";
+import { PosEmoji } from "../components/PosEmoji";
 import { ADVERBS } from "../data/adverbs";
 import { ADVERBS_GROUP_TITLE } from "../data/groupTitles";
 import { plural } from "../utils/plural";
@@ -82,7 +83,7 @@ export function AdverbsScreen({ navigation }: Props) {
 
       <View style={[styles.row, { borderLeftColor: theme.colors.lilac }]}>
         <Pressable style={styles.rowMain} onPress={openAll}>
-          <Text style={styles.emoji}>🗺️</Text>
+          <PosEmoji name="map" size={32} />
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>Де? Куди? Звідки?</Text>
             <Text style={styles.hint}>vlevo / doleva / zleva тощо</Text>
@@ -144,7 +145,6 @@ const styles = StyleSheet.create({
     gap: theme.space(3),
     padding: theme.space(4),
   },
-  emoji: { fontSize: 32 },
   title: { color: theme.colors.text, fontSize: 17, fontWeight: "800" },
   hint: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
   sub: { color: theme.colors.textFaint, fontSize: 12, marginTop: 4 },

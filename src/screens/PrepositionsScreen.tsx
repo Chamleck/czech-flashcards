@@ -6,6 +6,8 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress, CzechCase, CASE_LABELS } from "../types";
 import { theme } from "../utils/theme";
 import { EditButton } from "../components/EditButton";
+import { PosEmoji } from "../components/PosEmoji";
+import { PosEmojiName } from "../components/icons/posEmoji";
 import { PREPOSITIONS } from "../data/prepositions";
 import { PREP_DUAL_TITLE } from "../data/groupTitles";
 import { plural } from "../utils/plural";
@@ -49,14 +51,14 @@ const CASE_COLOR: Record<CzechCase, string> = {
 
 // Іконка групи — номер відмінка (той самий "число." з CASE_LABELS), а не
 // довільна картинка: одразу видно, який відмінок, а не просто "щось спільне".
-const CASE_EMOJI: Record<CzechCase, string> = {
-  nominativ: "1️⃣",
-  genitiv: "2️⃣",
-  dativ: "3️⃣",
-  akuzativ: "4️⃣",
-  vokativ: "5️⃣",
-  lokal: "6️⃣",
-  instrumental: "7️⃣",
+const CASE_ICON: Record<CzechCase, PosEmojiName> = {
+  nominativ: "keycapOne",
+  genitiv: "keycapTwo",
+  dativ: "keycapThree",
+  akuzativ: "keycapFour",
+  vokativ: "keycapFive",
+  lokal: "keycapSix",
+  instrumental: "keycapSeven",
 };
 
 export function PrepositionsScreen({ navigation }: Props) {
@@ -141,7 +143,7 @@ export function PrepositionsScreen({ navigation }: Props) {
         return (
           <View key={g.gCase} style={[styles.row, { borderLeftColor: color }]}>
             <Pressable style={styles.rowMain} onPress={() => openGroup(g)}>
-              <Text style={styles.emoji}>{CASE_EMOJI[g.gCase]}</Text>
+              <PosEmoji name={CASE_ICON[g.gCase]} size={32} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.title}>
                   {lbl.uk} ({lbl.cz})
@@ -162,7 +164,7 @@ export function PrepositionsScreen({ navigation }: Props) {
       <SectionHeader label="рух і спокій" />
       <View style={[styles.row, { borderLeftColor: theme.colors.coral }]}>
         <Pressable style={styles.rowMain} onPress={openDual}>
-          <Text style={styles.emoji}>🧭</Text>
+          <PosEmoji name="compass" size={32} />
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>Дуальні прийменники</Text>
             <Text style={styles.hint}>куди? (4.) / де? (6. або 7.)</Text>
@@ -235,7 +237,6 @@ const styles = StyleSheet.create({
     gap: theme.space(3),
     padding: theme.space(4),
   },
-  emoji: { fontSize: 32 },
   title: { color: theme.colors.text, fontSize: 17, fontWeight: "800" },
   hint: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
   sub: { color: theme.colors.textFaint, fontSize: 12, marginTop: 4 },
