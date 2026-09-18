@@ -212,7 +212,7 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
         )}
       </View>
 
-      {query.trim().length >= 2 ? (
+      {query.trim().length >= 1 ? (
         results.length > 0 ? (
           <View style={styles.resultsList}>
             {results.map((r) => (

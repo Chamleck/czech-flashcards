@@ -97,10 +97,14 @@ export interface NounEntry {
 
 export interface CardProgress {
   entryId: string;
-  correctStreak: number;
   incorrectCount: number;
+  // true — останню відповідь було "Знаю", false — "Ще повторити".
+  // Єдине, що визначає, чи слово зараз у колоді "Повторити помилки"
+  // (див. isMistake у progress.ts) — жодного інтервального відкладання
+  // немає: тренування завжди проходить весь обраний список, порядок і
+  // включення не залежать від часу останньої відповіді.
+  knewLastTime: boolean;
   lastSeenAt: number; // timestamp
-  dueAt: number; // timestamp, для інтервального повторення
 }
 
 // ────────────────────── ПРИКМЕТНИКИ / ЗАЙМЕННИКИ ──────────────────────
