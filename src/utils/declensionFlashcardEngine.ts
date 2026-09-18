@@ -137,7 +137,7 @@ function buildTestedPool(): Tested[] {
     uk: p.uk,
     decl: (p as Extract<PronounEntry, { declinable: true }>).declension,
   }));
-  // Питальні адʼєктивного типу (jaký/который/čí) — структурно ідентичні до
+  // Питальні адʼєктивного типу (jaký/který/čí) — структурно ідентичні до
   // PRONOUNS вище (та сама FullDeclension), але СВІЙ kind — окремий floor у
   // generateDeclensionSession, щоб не розбавляти наявні присвійні/вказівні
   // (і не вигадувати новий contextPhrase: гілка buildContextPhrase уже working
@@ -220,7 +220,7 @@ function buildContextPhrase(
   const pool = ADJECTIVE_PARTNER_POOL.filter((a) => adjectivePartnerForm(a, g, c, n) !== "—");
   const a = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null;
   const phrase = (a ? `___ ${adjectivePartnerForm(a, g, c, n)} ${noun}` : `___ ${noun}`).trim();
-  // Питальні jaký/который/čí (interrogative-adj) — за визначенням питальні, тож
+  // Питальні jaký/který/čí (interrogative-adj) — за визначенням питальні, тож
   // фраза завжди питання (знак "?" наприкінці, як у рукописних фреймах kdo/co).
   // Звичайні присвійні/вказівні (pronoun) — не питання, "?" не додаємо.
   return tested.kind === "interrogative-adj" ? `${phrase}?` : phrase;
@@ -668,7 +668,7 @@ const INTERROGATIVE_CORE_FRAMES: Partial<Record<CzechCase, { kdo: string[]; co: 
 
 function interrogativeCoreTaskText(c: CzechCase): string {
   const l = CASE_LABELS[c];
-  // "питальний займенник" — так само, як interrogative-adj (jaký/который/čí)
+  // "питальний займенник" — так само, як interrogative-adj (jaký/který/čí)
   // через taskTextFor: kdo/co ТЕЖ питальні займенники, тож формулювання має
   // збігатися. Різниця лише в тому, що тут НЕ дописуємо рід/число — kdo/co їх
   // не мають (немає осі, якої стосувалось би "жін."/"однина"), на відміну від

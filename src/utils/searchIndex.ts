@@ -190,7 +190,7 @@ function buildIndex(): SearchEntry[] {
     push(out, p.id, "pronouns", p.cz, p.uk, [], personalIds, PERSONAL_GROUP_TITLE, "PronounGroups");
   }
   // Питальні — окремий розділ "Питальні слова" (власний екран-хаб Interrogatives),
-  // змішана група (jaký/который/čí + kdo/co), суцільний список без підгруп.
+  // змішана група (jaký/který/čí + kdo/co), суцільний список без підгруп.
   const interrogativeIds = INTERROGATIVE_ALL.map((p) => p.id);
   for (const p of INTERROGATIVE_ALL) {
     push(out, p.id, "interrogative", p.cz, p.uk, [], interrogativeIds, INTERROGATIVE_GROUP_TITLE, "Interrogatives");

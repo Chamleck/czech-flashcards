@@ -497,7 +497,7 @@ export type RootStackParamList = {
   PronounGroups: undefined;
   PronounSelection: undefined; // присвійні + вказівні
   PersonalPronounSelection: undefined; // особові
-  InterrogativeSelection: undefined; // питальні (jaký/который/čí + kdo/co)
+  InterrogativeSelection: undefined; // питальні (jaký/který/čí + kdo/co)
   InterrogativeAdverbSelection: undefined; // прислівникова група (kde/kam/odkud/kudy)
   InterrogativeMiscSelection: undefined; // інша група (kdy/jak/proč/kolik)
   // Питальні слова — окремий тематичний розділ (хаб усіх питальних виразів)
