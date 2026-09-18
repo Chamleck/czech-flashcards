@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { EditButton } from "../components/EditButton";
+import { PosEmoji } from "../components/PosEmoji";
 import { ADJECTIVES } from "../data/adjectives";
 import { ADJ_CATEGORIES } from "../data/adjectiveCategories";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
@@ -84,7 +85,7 @@ export function AdjectiveCategoriesScreen({ navigation }: Props) {
         return (
           <View key={c.key} style={[styles.catRow, { borderLeftColor: c.color }]}>
             <Pressable style={styles.catMain} onPress={() => onCategory(c.key, title)}>
-              <Text style={styles.catEmoji}>{c.emoji}</Text>
+              <PosEmoji name={c.icon} size={26} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.catTitle}>{c.title}</Text>
                 <Text style={styles.catHint}>{c.hint}</Text>
@@ -155,7 +156,6 @@ const styles = StyleSheet.create({
     gap: theme.space(3),
     padding: theme.space(4),
   },
-  catEmoji: { fontSize: 26 },
   catTitle: { color: theme.colors.text, fontSize: 16, fontWeight: "700" },
   catHint: { color: theme.colors.textFaint, fontSize: 12, marginTop: 1 },
   catSub: { color: theme.colors.textDim, fontSize: 13, marginTop: 3 },
