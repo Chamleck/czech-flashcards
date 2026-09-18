@@ -26,7 +26,7 @@ export const CATEGORIES: CategoryMeta[] = [
   { key: "city", icon: "officeBuilding", title: "Місто", color: theme.colors.lilac },
   { key: "transport", icon: "automobile", title: "Транспорт", color: "#5a9fd4" },
   { key: "nature", icon: "deciduousTree", title: "Природа", color: "#8ed081" },
-  { key: "animals", icon: "pawPrints", title: "Тварини", color: "#e0a458" },
+  { key: "animals", icon: "dog", title: "Тварини", color: "#e0a458" },
   { key: "days", icon: "calendar", title: "Дні тижня", color: "#7fb8e0", unsuitableAsPartner: true },
   { key: "months", icon: "crescentMoon", title: "Місяці", color: "#c98ed0", unsuitableAsPartner: true },
   { key: "numbers", icon: "abacus", title: "Сотні і тисячі", color: "#e0a458", hiddenFromPartOfSpeech: true },
