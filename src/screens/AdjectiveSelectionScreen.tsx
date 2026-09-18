@@ -15,7 +15,7 @@ export function AdjectiveSelectionScreen({ route, navigation }: Props) {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: `${meta.emoji} ${meta.title}`,
+      title: meta.title,
       headerRight: () => <HomeHeaderButton navigation={navigation} />,
     });
   }, [navigation, meta]);
@@ -24,7 +24,7 @@ export function AdjectiveSelectionScreen({ route, navigation }: Props) {
     <SelectionList
       words={words}
       onStart={(ids) =>
-        navigation.navigate("DeclSession", { title: `${meta.emoji} ${meta.title}`, kind: "adjective", entryIds: ids })
+        navigation.navigate("DeclSession", { title: meta.title, kind: "adjective", entryIds: ids })
       }
     />
   );

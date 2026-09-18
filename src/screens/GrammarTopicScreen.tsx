@@ -183,7 +183,7 @@ export function GrammarTopicScreen({ route, navigation }: Props) {
   const topic = GRAMMAR_BY_ID[route.params.topicId];
 
   useLayoutEffect(() => {
-    navigation.setOptions({ title: topic ? `${topic.emoji} ${topic.title}` : "Граматика" });
+    navigation.setOptions({ title: topic ? topic.title : "Граматика" });
   }, [navigation, topic]);
 
   if (!topic) {

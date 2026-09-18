@@ -17,7 +17,7 @@ export function WordSelectionScreen({ route, navigation }: Props) {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: `${meta.emoji} ${meta.title}`,
+      title: meta.title,
       headerRight: () => <HomeHeaderButton navigation={navigation} />,
     });
   }, [navigation, meta]);
@@ -28,7 +28,7 @@ export function WordSelectionScreen({ route, navigation }: Props) {
       czColor={(w) => theme.genderColor[w.gender]}
       renderExtra={(w) => <GenderIcon gender={w.gender} size={20} />}
       onStart={(ids) =>
-        navigation.navigate("WordSession", { title: `${meta.emoji} ${meta.title}`, entryIds: ids })
+        navigation.navigate("WordSession", { title: meta.title, entryIds: ids })
       }
     />
   );

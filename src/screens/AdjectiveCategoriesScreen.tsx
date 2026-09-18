@@ -81,7 +81,7 @@ export function AdjectiveCategoriesScreen({ navigation }: Props) {
 
       {ADJ_CATEGORIES.filter((c) => !c.hiddenFromPartOfSpeech).map((c) => {
         const count = countInCategory(c.key);
-        const title = `${c.emoji} ${c.title}`;
+        const title = c.title;
         return (
           <View key={c.key} style={[styles.catRow, { borderLeftColor: c.color }]}>
             <Pressable style={styles.catMain} onPress={() => onCategory(c.key, title)}>
