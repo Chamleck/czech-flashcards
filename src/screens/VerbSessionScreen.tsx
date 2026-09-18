@@ -11,7 +11,6 @@ import {
   loadProgressFrom,
   saveProgressTo,
   updateCard,
-  buildQueue,
   PROGRESS_KEYS,
 } from "../utils/progress";
 import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
@@ -41,12 +40,9 @@ export function VerbSessionScreen({ route, navigation }: Props) {
     });
   }, []);
 
-  const queue = useMemo<VerbEntry[]>(
-    () => (loaded ? buildQueue(entries, progress) : []),
-    // фіксуємо чергу лише при завантаженні
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loaded]
-  );
+  // Раунд тренування = точно те, що обрано в пікері (entries). Без
+  // відкладання/фільтрації за прогресом — див. WordSessionScreen.tsx.
+  const queue: VerbEntry[] = loaded ? entries : [];
 
   const finished = idx >= queue.length;
 

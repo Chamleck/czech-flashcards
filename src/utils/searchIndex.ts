@@ -110,19 +110,27 @@ const KIND_LABEL: Record<BrowseKind, string> = {
   interrogative: KIND_LABEL_INTERROGATIVE,
 };
 
+// ІНВАРІАНТ (єдина точка входу для ВСІХ категорій): altForms — лише
+// альтернативні форми ТОГО САМОГО слова (напр. vlevo/doleva/zleva —
+// прислівникові сенси, що ведуть до однієї картки). НІКОЛИ не передавати
+// сюди приклади-речення чи будь-який довільний текст — довга фраза дає
+// випадкові підрядкові збіги для коротких запитів (реальний кейс: "fi"
+// знаходив "kdy" лише тому, що в одному з прикладів "kdy" було слово
+// "film"). Якщо колись знадобиться пошук по прикладах — це має бути
+// окрема, явно нижчого рангу гілка тут-таки, а не extraTexts.
 function push(
   arr: SearchEntry[],
   id: string,
   kind: BrowseKind,
   cz: string,
   uk: string,
-  extraTexts: string[],
+  altForms: string[],
   entryIds: string[],
   title: string,
   parentScreen: SearchEntry["parentScreen"],
   kindLabelOverride?: string
 ) {
-  const texts = [cz, uk, ...extraTexts].map(normalize);
+  const texts = [cz, uk, ...altForms].map(normalize);
   arr.push({
     id,
     kind,
@@ -198,15 +206,15 @@ function buildIndex(): SearchEntry[] {
   // Прислівникова група того самого розділу — окремий sibling-набір
   // (свайп після пошуку йде по своїх 4 словах, не змішуючись із займенниковою
   // групою), той самий kind "interrogative" (диспетчеризація по id, не по kind).
+  // Приклади-речення (p.examples) свідомо НЕ йдуть у пошук — див. інваріант
+  // над push(): це довільний текст, не альтернативна форма слова.
   const interrogativeAdverbIds = INTERROGATIVE_ADVERBS.map((p) => p.id);
   for (const p of INTERROGATIVE_ADVERBS) {
-    const exTexts = p.examples.map((e) => e.cz);
-    push(out, p.id, "interrogative", p.cz, p.uk, exTexts, interrogativeAdverbIds, INTERROGATIVE_ADVERBS_GROUP_TITLE, "Interrogatives");
+    push(out, p.id, "interrogative", p.cz, p.uk, [], interrogativeAdverbIds, INTERROGATIVE_ADVERBS_GROUP_TITLE, "Interrogatives");
   }
   const interrogativeMiscIds = INTERROGATIVE_MISC.map((p) => p.id);
   for (const p of INTERROGATIVE_MISC) {
-    const exTexts = p.examples.map((e) => e.cz);
-    push(out, p.id, "interrogative", p.cz, p.uk, exTexts, interrogativeMiscIds, INTERROGATIVE_MISC_GROUP_TITLE, "Interrogatives");
+    push(out, p.id, "interrogative", p.cz, p.uk, [], interrogativeMiscIds, INTERROGATIVE_MISC_GROUP_TITLE, "Interrogatives");
   }
 
   // Числівники (кількісні) — суцільний список (той самий CARDINAL_IDS, що в NumeralsScreen).

@@ -25,7 +25,6 @@ import {
   loadProgressFrom,
   saveProgressTo,
   updateCard,
-  buildQueue,
   PROGRESS_KEYS,
 } from "../utils/progress";
 import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
@@ -93,12 +92,9 @@ export function DeclSessionScreen({ route, navigation }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storageKey]);
 
-  const queue = useMemo<{ id: string }[]>(
-    () => (loaded ? buildQueue(entries, progress) : []),
-    // фіксуємо чергу лише при завантаженні, щоб картки не перестрибували
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loaded]
-  );
+  // Раунд тренування = точно те, що обрано в пікері (entries). Без
+  // відкладання/фільтрації за прогресом — див. WordSessionScreen.tsx.
+  const queue: { id: string }[] = loaded ? entries : [];
 
   const finished = idx >= queue.length;
 

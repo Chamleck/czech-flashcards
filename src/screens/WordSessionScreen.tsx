@@ -7,7 +7,7 @@ import { theme } from "../utils/theme";
 import { HomeHeaderButton } from "../components/HeaderIcons";
 import { FlashCard } from "../components/FlashCard";
 import { NOUNS } from "../data/nouns";
-import { loadProgressFrom, saveProgressTo, updateCard, buildQueue, PROGRESS_KEYS } from "../utils/progress";
+import { loadProgressFrom, saveProgressTo, updateCard, PROGRESS_KEYS } from "../utils/progress";
 import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
 
 type Props = NativeStackScreenProps<RootStackParamList, "WordSession">;
@@ -39,12 +39,11 @@ export function WordSessionScreen({ route, navigation }: Props) {
     });
   }, [storageKey]);
 
-  const queue = useMemo<NounEntry[]>(
-    () => (loaded ? buildQueue(entries, progress) : []),
-    // фіксуємо чергу лише при завантаженні, щоб картки не перестрибували
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loaded]
-  );
+  // Раунд тренування = точно те, що обрано в пікері (entries), у тому ж
+  // порядку. Жодного відкладання/фільтрації за прогресом — усі слова завжди
+  // проходяться повністю (див. progress.ts: isMistake — єдине, що керує
+  // колодою "Повторити помилки", і воно не впливає на цю чергу).
+  const queue: NounEntry[] = loaded ? entries : [];
 
   const finished = idx >= queue.length;
 

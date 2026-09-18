@@ -7,7 +7,7 @@ import { theme } from "../utils/theme";
 import { HomeHeaderButton } from "../components/HeaderIcons";
 import { AdverbCard } from "../components/AdverbCard";
 import { ADVERBS } from "../data/adverbs";
-import { loadProgressFrom, saveProgressTo, updateCard, buildQueue, PROGRESS_KEYS } from "../utils/progress";
+import { loadProgressFrom, saveProgressTo, updateCard, PROGRESS_KEYS } from "../utils/progress";
 import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AdverbSession">;
@@ -38,11 +38,9 @@ export function AdverbSessionScreen({ route, navigation }: Props) {
     });
   }, []);
 
-  const queue = useMemo<SpatialAdverbEntry[]>(
-    () => (loaded ? buildQueue(entries, progress) : []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loaded]
-  );
+  // Раунд тренування = точно те, що обрано в пікері (entries). Без
+  // відкладання/фільтрації за прогресом — див. WordSessionScreen.tsx.
+  const queue: SpatialAdverbEntry[] = loaded ? entries : [];
 
   const finished = idx >= queue.length;
 
