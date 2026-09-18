@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { EditButton } from "../components/EditButton";
+import { PosEmoji } from "../components/PosEmoji";
 import { NOUNS } from "../data/nouns";
 import { CATEGORIES } from "../data/categories";
 import { loadProgress, getMistakeIds } from "../utils/progress";
@@ -88,7 +89,7 @@ export function WordCategoriesScreen({ navigation }: Props) {
         return (
           <View key={c.key} style={[styles.catRow, { borderLeftColor: c.color }]}>
             <Pressable style={styles.catMain} onPress={() => onCategory(c.key, title)}>
-              <Text style={styles.catEmoji}>{c.emoji}</Text>
+              <PosEmoji name={c.icon} size={26} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.catTitle}>{c.title}</Text>
                 <Text style={styles.catSub}>{count} {plural(count, "слово", "слова", "слів")}</Text>
@@ -160,7 +161,6 @@ const styles = StyleSheet.create({
     gap: theme.space(3),
     padding: theme.space(4),
   },
-  catEmoji: { fontSize: 26 },
   catTitle: { color: theme.colors.text, fontSize: 16, fontWeight: "700" },
   catSub: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
 });

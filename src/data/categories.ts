@@ -1,9 +1,10 @@
 import { WordCategory } from "../types";
 import { theme } from "../utils/theme";
+import { PosEmojiName } from "../components/icons/posEmoji";
 
 export interface CategoryMeta {
   key: WordCategory;
-  emoji: string;
+  icon: PosEmojiName;
   title: string; // українською
   color: string;
   // true → категорія НЕ показується як плитка на екрані "Іменники" (загальний
@@ -19,19 +20,19 @@ export interface CategoryMeta {
 
 // Порядок відображення категорій на екрані вибору
 export const CATEGORIES: CategoryMeta[] = [
-  { key: "people", emoji: "🧑", title: "Люди", color: theme.colors.mint },
-  { key: "home", emoji: "🏠", title: "Дім і побут", color: theme.colors.honey },
-  { key: "food", emoji: "🍽️", title: "Їжа та напої", color: theme.colors.coral },
-  { key: "city", emoji: "🏙️", title: "Місто", color: theme.colors.lilac },
-  { key: "transport", emoji: "🚗", title: "Транспорт", color: "#5a9fd4" },
-  { key: "nature", emoji: "🌿", title: "Природа", color: "#8ed081" },
-  { key: "animals", emoji: "🐾", title: "Тварини", color: "#e0a458" },
-  { key: "days", emoji: "📅", title: "Дні тижня", color: "#7fb8e0", unsuitableAsPartner: true },
-  { key: "months", emoji: "🗓️", title: "Місяці", color: "#c98ed0", unsuitableAsPartner: true },
-  { key: "numbers", emoji: "💯", title: "Сотні і тисячі", color: "#e0a458", hiddenFromPartOfSpeech: true },
-  { key: "time", emoji: "⏳", title: "Час", color: "#7fb8e0" },
-  { key: "body", emoji: "🫀", title: "Тіло", color: "#e0847a" },
-  { key: "work", emoji: "💼", title: "Робота", color: "#8a94a6" },
+  { key: "people", icon: "womanAndManHoldingHands", title: "Люди", color: theme.colors.mint },
+  { key: "home", icon: "house", title: "Дім і побут", color: theme.colors.honey },
+  { key: "food", icon: "forkKnifeWithPlate", title: "Їжа та напої", color: theme.colors.coral },
+  { key: "city", icon: "officeBuilding", title: "Місто", color: theme.colors.lilac },
+  { key: "transport", icon: "automobile", title: "Транспорт", color: "#5a9fd4" },
+  { key: "nature", icon: "deciduousTree", title: "Природа", color: "#8ed081" },
+  { key: "animals", icon: "pawPrints", title: "Тварини", color: "#e0a458" },
+  { key: "days", icon: "calendar", title: "Дні тижня", color: "#7fb8e0", unsuitableAsPartner: true },
+  { key: "months", icon: "crescentMoon", title: "Місяці", color: "#c98ed0", unsuitableAsPartner: true },
+  { key: "numbers", icon: "abacus", title: "Сотні і тисячі", color: "#e0a458", hiddenFromPartOfSpeech: true },
+  { key: "time", icon: "hourglassNotDone", title: "Час", color: "#7fb8e0" },
+  { key: "body", icon: "flexedBiceps", title: "Тіло", color: "#e0847a" },
+  { key: "work", icon: "briefcase", title: "Робота", color: "#8a94a6" },
 ];
 
 export const CATEGORY_BY_KEY: Record<WordCategory, CategoryMeta> = CATEGORIES.reduce(
