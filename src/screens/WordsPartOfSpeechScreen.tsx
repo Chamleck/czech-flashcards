@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   },
   tileDim: { opacity: 0.5 },
   tileTitle: { color: theme.colors.text, fontSize: 18, fontWeight: "800", marginTop: theme.space(2) },
-  tileSub: { color: theme.colors.textDim, fontSize: 12, marginTop: 2 },
+  tileSub: { color: theme.colors.textDim, fontSize: 12, marginTop: 2, flexShrink: 1 },
   tileSubAlert: { color: theme.colors.coral, fontWeight: "700" },
   tileSubRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
   soon: { position: "absolute", top: theme.space(3), right: theme.space(3) },

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { VerbEntry, PERSON_ORDER, PERSON_LABELS } from "../types";
 import { theme } from "../utils/theme";
-import { PosEmoji } from "./PosEmoji";
+import Info from "lucide-react-native/icons/info";
 import { TileEmoji } from "./TileEmoji";
 import { Speakable } from "./Speakable";
 import {
@@ -134,7 +134,10 @@ export function VerbConjugation({ entry }: { entry: VerbEntry }) {
       {/* Банер для доконаних — видно завжди, незалежно від табу */}
       {isPerfective && (
         <View style={styles.perfNote}>
-          <PosEmoji name="infoIcon" size={14} />
+          <View style={styles.perfNoteLabelRow}>
+            <Info size={13} color={theme.colors.honey} strokeWidth={2.5} />
+            <Text style={styles.perfNoteLabelText}>Важливо</Text>
+          </View>
           <Text style={styles.perfNoteText}>
             Доконаний вид не має теперішнього часу. Його «теперішня» дієвідміна за
             значенням є майбутньою.
@@ -162,7 +165,10 @@ export function VerbConjugation({ entry }: { entry: VerbEntry }) {
       {/* Банер наказового способу — лише під табом "Наказовий" */}
       {mode === "imperative" && (
         <View style={styles.imperativeNote}>
-          <PosEmoji name="infoIcon" size={14} />
+          <View style={styles.imperativeNoteLabelRow}>
+            <Info size={13} color={theme.colors.honey} strokeWidth={2.5} />
+            <Text style={styles.imperativeNoteLabelText}>Важливо</Text>
+          </View>
           <Text style={styles.imperativeNoteText}>
             Наказовий спосіб має лише 3 форми: ty (ти), vy (ви) і my (закличне «зробімо»).
             Для «він/вона» використовують конструкцію «ať to udělá» (нехай зробить).
@@ -250,11 +256,10 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.space(3),
     marginBottom: theme.space(3),
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 6,
   },
-  imperativeNoteText: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19, flex: 1 },
+  imperativeNoteLabelRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: theme.space(1) },
+  imperativeNoteLabelText: { color: theme.colors.honey, fontSize: 12, fontWeight: "600" },
+  imperativeNoteText: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19 },
   table: {
     borderRadius: theme.radius.md,
     overflow: "hidden",
@@ -277,11 +282,10 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.space(3),
     marginBottom: theme.space(3),
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 6,
   },
-  perfNoteText: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19, flex: 1 },
+  perfNoteLabelRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: theme.space(1) },
+  perfNoteLabelText: { color: theme.colors.honey, fontSize: 12, fontWeight: "600" },
+  perfNoteText: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19 },
   participleBox: { marginTop: theme.space(2), paddingHorizontal: theme.space(1) },
   participleLabel: { color: theme.colors.textDim, fontSize: 12, fontWeight: "700", marginBottom: 2 },
   participleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline" },

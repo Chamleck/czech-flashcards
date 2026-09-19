@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { SpatialAdverbEntry, AdverbSense } from "../types";
 import { theme } from "../utils/theme";
 import { PosEmoji } from "./PosEmoji";
+import Lightbulb from "lucide-react-native/icons/lightbulb";
 import { TileEmoji } from "./TileEmoji";
 import { Speakable } from "./Speakable";
 
@@ -87,7 +88,10 @@ export function AdverbCard({ entry, revealed, onReveal }: Props) {
 
           {entry.note && (
             <View style={styles.noteBox}>
-              <PosEmoji name="lightBulb" size={14} />
+              <View style={styles.noteLabelRow}>
+                <Lightbulb size={13} color={theme.colors.honey} strokeWidth={2.5} />
+                <Text style={styles.noteLabelText}>Порада</Text>
+              </View>
               <Text style={styles.noteText}>{entry.note}</Text>
             </View>
           )}
@@ -140,9 +144,8 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.space(3.5),
     marginTop: theme.space(1),
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 6,
   },
-  noteText: { color: theme.colors.text, fontSize: 13, lineHeight: 19, flex: 1 },
+  noteLabelRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: theme.space(1) },
+  noteLabelText: { color: theme.colors.honey, fontSize: 12, fontWeight: "600" },
+  noteText: { color: theme.colors.text, fontSize: 13, lineHeight: 19 },
 });

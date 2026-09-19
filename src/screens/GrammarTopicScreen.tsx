@@ -5,6 +5,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CASE_ORDER, CASE_LABELS, BrowseKind } from "../types";
 import { theme } from "../utils/theme";
 import { PosEmoji } from "../components/PosEmoji";
+import Lightbulb from "lucide-react-native/icons/lightbulb";
 import { GRAMMAR_BY_ID, GrammarBlock, ParagraphSegment, PatternGroup } from "../data/grammar";
 import { findSearchEntry } from "../utils/searchIndex";
 
@@ -129,14 +130,20 @@ function Block({ block, navigation }: { block: GrammarBlock; navigation: Grammar
     case "tip":
       return (
         <View style={styles.tip}>
-          <PosEmoji name="lightBulb" size={16} />
+          <View style={styles.tipLabelRow}>
+            <Lightbulb size={14} color={theme.colors.honey} strokeWidth={2.5} />
+            <Text style={styles.tipLabelText}>Порада</Text>
+          </View>
           <Text style={styles.tipText}>{block.text}</Text>
         </View>
       );
     case "rich-tip":
       return (
         <View style={styles.tip}>
-          <PosEmoji name="lightBulb" size={16} />
+          <View style={styles.tipLabelRow}>
+            <Lightbulb size={14} color={theme.colors.honey} strokeWidth={2.5} />
+            <Text style={styles.tipLabelText}>Порада</Text>
+          </View>
           <Text style={styles.tipText}>
             <Segments segments={block.segments} navigation={navigation} />
           </Text>
@@ -229,11 +236,10 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.space(4),
     marginBottom: theme.space(3),
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 8,
   },
-  tipText: { color: theme.colors.text, fontSize: 14, lineHeight: 21, flex: 1 },
+  tipLabelRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: theme.space(1.5) },
+  tipLabelText: { color: theme.colors.honey, fontSize: 12, fontWeight: "600" },
+  tipText: { color: theme.colors.text, fontSize: 14, lineHeight: 21 },
   listBox: { marginBottom: theme.space(3) },
   listItem: {
     backgroundColor: theme.colors.bgCard,
