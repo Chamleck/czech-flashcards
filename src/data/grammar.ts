@@ -39,7 +39,7 @@ export type GrammarBlock =
   | { type: "tip"; text: string }
   | { type: "rich-tip"; segments: ParagraphSegment[] } // tip із клікабельними словами
   | { type: "list"; items: { term: string; note: string }[] }
-  | { type: "rich-list"; items: { term: ParagraphSegment[]; note: ParagraphSegment[] }[] }; // список, де term і note клікабельні
+  | { type: "rich-list"; items: { term: ParagraphSegment[]; note: ParagraphSegment[]; icon?: PosEmojiName }[] }; // список, де term і note клікабельні; icon — опційна декоративна іконка перед term (напр. рід)
 
 export interface GrammarTopic {
   id: string;
@@ -67,7 +67,8 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         type: "rich-list",
         items: [
           {
-            term: [{ text: "🧑 Чоловічий істот." }],
+            term: [{ text: "Чоловічий істот." }],
+            icon: "bustInSilhouette",
             note: [
               { text: "напр. " },
               { word: "student", wordId: "student", kind: "nouns" },
@@ -77,7 +78,8 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             ],
           },
           {
-            term: [{ text: "📦 Чоловічий неістот." }],
+            term: [{ text: "Чоловічий неістот." }],
+            icon: "package",
             note: [
               { text: "напр. " },
               { word: "hrad", wordId: "hrad", kind: "nouns" },
@@ -87,7 +89,8 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             ],
           },
           {
-            term: [{ text: "🌷 Жіночий" }],
+            term: [{ text: "Жіночий" }],
+            icon: "tulip",
             note: [
               { text: "напр. " },
               { word: "žena", wordId: "zena", kind: "nouns" },
@@ -99,7 +102,8 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             ],
           },
           {
-            term: [{ text: "⚪ Середній" }],
+            term: [{ text: "Середній" }],
+            icon: "whiteCircle",
             note: [
               { text: "напр. " },
               { word: "město", wordId: "mesto", kind: "nouns" },
@@ -126,7 +130,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 Щоб визначити рід незнайомого слова — дивись на закінчення називного відмінка й перевіряй за словником. Рід у чеській та українській часто збігається, але не завжди (напр. чеське 'to " },
+          { text: "Щоб визначити рід незнайомого слова — дивись на закінчення називного відмінка й перевіряй за словником. Рід у чеській та українській часто збігається, але не завжди (напр. чеське 'to " },
           { word: "auto", wordId: "auto", kind: "nouns" },
           { text: "' — середній рід)." },
         ],
@@ -149,7 +153,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 Кличний відмінок (5.) в українській теж є (мамо, Петре) — використовується при звертанні. У чеській він активний у щоденному мовленні: '" },
+          { text: "Кличний відмінок (5.) в українській теж є (мамо, Петре) — використовується при звертанні. У чеській він активний у щоденному мовленні: '" },
           { word: "Pane", wordId: "muz-pan", kind: "nouns" },
           { text: "!', 'Petře!'." },
         ],
@@ -316,11 +320,11 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 У чол. роду істот той самий принцип чергування, що й у прикметників: перед закінченням -i у називному множини кінцевий приголосний основи часто змінюється — k→c (kluk→kluci, žák→žáci), r→ř (bratr→bratři), h→z, ch→š. Стосується лише називного множини цього роду — решта форм основу не чіпають.",
+        text: "У чол. роду істот той самий принцип чергування, що й у прикметників: перед закінченням -i у називному множини кінцевий приголосний основи часто змінюється — k→c (kluk→kluci, žák→žáci), r→ř (bratr→bratři), h→z, ch→š. Стосується лише називного множини цього роду — решта форм основу не чіпають.",
       },
       {
         type: "tip",
-        text: "💡 Порада: спочатку визнач рід і чи слово тверде/м'яке. Це одразу звужує зразок до 1–2 варіантів, і далі легко підставити закінчення.",
+        text: "Порада: спочатку визнач рід і чи слово тверде/м'яке. Це одразу звужує зразок до 1–2 варіантів, і далі легко підставити закінчення.",
       },
     ],
   },
@@ -377,7 +381,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 В усіх інших родах (жіночому, середньому) і в множині такого розрізнення немає — воно стосується лише чоловічого роду однини. У множині й жіночому/середньому роді знахідний завжди має свою окрему форму, однакову для істот і неістот.",
+        text: "В усіх інших родах (жіночому, середньому) і в множині такого розрізнення немає — воно стосується лише чоловічого роду однини. У множині й жіночому/середньому роді знахідний завжди має свою окрему форму, однакову для істот і неістот.",
       },
       { type: "heading", text: "Чергування приголосного" },
       {
@@ -403,7 +407,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "rich-tip",
-        segments: [{ text: "💡 Щоб визначити зразок — постав прикметник у чол. рід однини: закінчення -ý/-á/-é за родами → твердий (" }, { word: "mladý", wordId: "mlady", kind: "adjectives" }, { text: "); суцільне -í в усіх родах → м'який (" }, { word: "jarní", wordId: "jarni", kind: "adjectives" }, { text: ")." }],
+        segments: [{ text: "Щоб визначити зразок — постав прикметник у чол. рід однини: закінчення -ý/-á/-é за родами → твердий (" }, { word: "mladý", wordId: "mlady", kind: "adjectives" }, { text: "); суцільне -í в усіх родах → м'який (" }, { word: "jarní", wordId: "jarni", kind: "adjectives" }, { text: ")." }],
       },
       { type: "heading", text: "Ступені порівняння" },
       {
@@ -434,15 +438,15 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 Порівняння з ніж передається сполучником než: «Praha je větší než Brno» (Прага більша, ніж Брно). Найвищий часто йде з прийменником z/ze: «nejlepší z nás» (найкращий з нас).",
+        text: "Порівняння з ніж передається сполучником než: «Praha je větší než Brno» (Прага більша, ніж Брно). Найвищий часто йде з прийменником z/ze: «nejlepší z nás» (найкращий з нас).",
       },
       {
         type: "rich-tip",
-        segments: [{ text: "💡 Перед суфіксом -ší (і рідше -ější) кінцевий приголосний основи часто чергується — той самий принцип, що й у називному множини чол. істот. (див. вище): k→č (" }, { word: "hezký", wordId: "hezky", kind: "adjectives" }, { text: "→hezčí, " }, { word: "měkký", wordId: "mekky", kind: "adjectives" }, { text: "→měkčí), h→ž (" }, { word: "drahý", wordId: "drahy", kind: "adjectives" }, { text: "→dražší, " }, { word: "ubohý", wordId: "ubohy", kind: "adjectives" }, { text: "→ubožejší), ch→š (" }, { word: "tichý", wordId: "tichy", kind: "adjectives" }, { text: "→tišší). Якщо основа закінчується на -tý/-dý/-ný — приголосний зазвичай не чергується (" }, { word: "mladý", wordId: "mlady", kind: "adjectives" }, { text: "→mladší)." }],
+        segments: [{ text: "Перед суфіксом -ší (і рідше -ější) кінцевий приголосний основи часто чергується — той самий принцип, що й у називному множини чол. істот. (див. вище): k→č (" }, { word: "hezký", wordId: "hezky", kind: "adjectives" }, { text: "→hezčí, " }, { word: "měkký", wordId: "mekky", kind: "adjectives" }, { text: "→měkčí), h→ž (" }, { word: "drahý", wordId: "drahy", kind: "adjectives" }, { text: "→dražší, " }, { word: "ubohý", wordId: "ubohy", kind: "adjectives" }, { text: "→ubožejší), ch→š (" }, { word: "tichý", wordId: "tichy", kind: "adjectives" }, { text: "→tišší). Якщо основа закінчується на -tý/-dý/-ný — приголосний зазвичай не чергується (" }, { word: "mladý", wordId: "mlady", kind: "adjectives" }, { text: "→mladší)." }],
       },
       {
         type: "tip",
-        text: "💡 Форми вищого й найвищого ступенів самі відмінюються за родами й відмінками (novější → novějšího → novějšímu…) — як звичайний м'який прикметник. Тут ми відпрацьовуємо відмінювання у звичайному ступені; картки на відмінювання ступенів порівняння додамо згодом окремо.",
+        text: "Форми вищого й найвищого ступенів самі відмінюються за родами й відмінками (novější → novějšího → novějšímu…) — як звичайний м'який прикметник. Тут ми відпрацьовуємо відмінювання у звичайному ступені; картки на відмінювання ступенів порівняння додамо згодом окремо.",
       },
     ],
   },
@@ -470,7 +474,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 Головне для практики: недоконані дієслова мають усі три часи, а доконані НЕ мають теперішнього — їхня «теперішня» форма за значенням є майбутньою (udělám = «зроблю», а не «роблю»). Тому в картках доконані показують лише минулий і майбутній час.",
+        text: "Головне для практики: недоконані дієслова мають усі три часи, а доконані НЕ мають теперішнього — їхня «теперішня» форма за значенням є майбутньою (udělám = «зроблю», а не «роблю»). Тому в картках доконані показують лише минулий і майбутній час.",
       },
       { type: "heading", text: "П'ять класів дієвідміни" },
       {
@@ -659,7 +663,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 У більшості дієслів se/si вже стало частиною самого слова — без нього дієслово або не вживається в цьому значенні, або означає геть інше: " },
+          { text: "У більшості дієслів se/si вже стало частиною самого слова — без нього дієслово або не вживається в цьому значенні, або означає геть інше: " },
           { word: "mýt", wordId: "myt", kind: "verbs" },
           { text: " (мити щось) → mýt se (митися, себе). А " },
           { word: "jmenovat se", wordId: "jmenovat-se", kind: "verbs" },
@@ -681,7 +685,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 Виняток для «ty» (2 особи однини): «jsi» + se/si стягується в ОДНЕ слово — ses/sis. «učil ses» (" },
+          { text: "Виняток для «ty» (2 особи однини): «jsi» + se/si стягується в ОДНЕ слово — ses/sis. «učil ses» (" },
           { word: "učit se", wordId: "ucit-se", kind: "verbs" },
           { text: "), «vzpomínal sis» (" },
           { word: "vzpomínat si", wordId: "vzpominat-si", kind: "verbs" },
@@ -730,11 +734,11 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 Майбутній час теж може звучати як наказ: Uděláš to hned! (Зробиш це негайно!) — це та сама форма майбутнього часу, лише вжита з наказовою інтонацією, а не окремий наказовий спосіб.",
+        text: "Майбутній час теж може звучати як наказ: Uděláš to hned! (Зробиш це негайно!) — це та сама форма майбутнього часу, лише вжита з наказовою інтонацією, а не окремий наказовий спосіб.",
       },
       {
         type: "tip",
-        text: "💡 Порада: щоб визначити клас незнайомого дієслова — постав його в 3-тю особу однини (він ___) і подивись на закінчення: -e/-ě → I, -ne → II, -uje/-je → III, -í → IV, -á → V.",
+        text: "Порада: щоб визначити клас незнайомого дієслова — постав його в 3-тю особу однини (він ___) і подивись на закінчення: -e/-ě → I, -ne → II, -uje/-je → III, -í → IV, -á → V.",
       },
     ],
   },
@@ -873,7 +877,6 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 " },
           { word: "svůj", wordId: "svuj", kind: "pronouns" },
           { text: " (свій) вживають, коли присвійність стосується підмета речення: «Mám rád svůj pokoj» = люблю свою (власну) кімнату. Якщо сказати «můj pokoj», акцент просто на приналежності, без зв'язку з підметом — тому в багатьох реченнях природніше svůj." },
         ],
@@ -881,7 +884,6 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 " },
           { word: "váš", wordId: "vas", kind: "pronouns" },
           { text: " / " },
           { word: "vy", wordId: "pp-vy", kind: "pronouns" },
@@ -954,7 +956,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 s " },
+          { text: "s " },
           { word: "sebou", wordId: "pp-se", kind: "pronouns" },
           { text: " vs sebou: «vezmi to s sebou» (візьми з собою) — з прийменником s; але «hodil sebou» (кинувся) — без прийменника. У сучасній мові часто плутають, орієнтуйся на зміст: якщо «разом зі мною/тобою» — пиши s sebou." },
         ],
@@ -1001,7 +1003,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 Це правило діє лише в називному й знахідному. У непрямих відмінках (давальний, орудний, місцевий) і числівник, і іменник стоять в одному відмінку: «se pěti muži» (з п'ятьма чоловіками), не в родовому.",
+        text: "Це правило діє лише в називному й знахідному. У непрямих відмінках (давальний, орудний, місцевий) і числівник, і іменник стоять в одному відмінку: «se pěti muži» (з п'ятьма чоловіками), не в родовому.",
       },
       { type: "heading", text: "Рід у числівниках 1, 2 і oba" },
       {
@@ -1036,7 +1038,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 «dvě stě» — це залишок старої форми двоїни (колись рахували «один, два, багато»). Тому 200 має окрему форму «stě», а від 300 уже звичайне «sta».",
+        text: "«dvě stě» — це залишок старої форми двоїни (колись рахували «один, два, багато»). Тому 200 має окрему форму «stě», а від 300 уже звичайне «sta».",
       },
       { type: "heading", text: "Сотні/тисячі з іменником" },
       {
@@ -1055,7 +1057,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 У непрямих відмінках зі sto є й варіант з повним узгодженням (ke stu korunám), обидва нормативні. Базовий, найуживаніший спосіб — родовий іменника (ke stu korun); у сумніві обирайте його — він працює завжди.",
+        text: "У непрямих відмінках зі sto є й варіант з повним узгодженням (ke stu korunám), обидва нормативні. Базовий, найуживаніший спосіб — родовий іменника (ke stu korun); у сумніві обирайте його — він працює завжди.",
       },
       { type: "heading", text: "Мільйони і мільярди" },
       {
@@ -1086,7 +1088,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 У непрямих відмінках чисел на …5–…9 відмінюються ОБИДВІ частини: «bez čtyřiceti sedmi oken» (47), «o šedesáti osmi lidech» (68). А от для чисел на …1–…4 непрямі відмінки в реальній мові хиткі — носії часто лишають число незмінним. Тому тут досить знати називний і знахідний, а в непрямих орієнтуйся на …5+ як надійний зразок.",
+        text: "У непрямих відмінках чисел на …5–…9 відмінюються ОБИДВІ частини: «bez čtyřiceti sedmi oken» (47), «o šedesáti osmi lidech» (68). А от для чисел на …1–…4 непрямі відмінки в реальній мові хиткі — носії часто лишають число незмінним. Тому тут досить знати називний і знахідний, а в непрямих орієнтуйся на …5+ як надійний зразок.",
       },
       { type: "heading", text: "Як складаються великі числа" },
       {
@@ -1105,7 +1107,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 Кожен шматок (тисячі → сотні → десятки-одиниці) просто йде по черзі своєю формою — не треба узгоджувати їх між собою. Складне лише саме число сотень/тисяч перед іменником, який рахують (див. вище).",
+        text: "Кожен шматок (тисячі → сотні → десятки-одиниці) просто йде по черзі своєю формою — не треба узгоджувати їх між собою. Складне лише саме число сотень/тисяч перед іменником, який рахують (див. вище).",
       },
       { type: "heading", text: "Дні тижня і місяці: v / ve" },
       {
@@ -1143,7 +1145,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 Форма ve (замість v) з'являється перед збігом приголосних для милозвучності: ve středu, ve čtvrtek, ve třech.",
+        text: "Форма ve (замість v) з'являється перед збігом приголосних для милозвучності: ve středu, ve čtvrtek, ve třech.",
       },
     ],
   },
@@ -1169,7 +1171,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 Крапка після цифри в даті — це не крапка речення, а позначка порядкового числівника: «5. května» читається «pátého května», не «pět». Тому день завжди пишуть з крапкою.",
+        text: "Крапка після цифри в даті — це не крапка речення, а позначка порядкового числівника: «5. května» читається «pátého května», не «pět». Тому день завжди пишуть з крапкою.",
       },
       { type: "heading", text: "Складені числа 13–31" },
       {
@@ -1191,11 +1193,11 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 Відчуй різницю: «prvního ledna se slaví Nový rok» (першого січня — коли, родовий) проти «první leden je svátek» (перше січня — сам предмет розмови, називний).",
+        text: "Відчуй різницю: «prvního ledna se slaví Nový rok» (першого січня — коли, родовий) проти «první leden je svátek» (перше січня — сам предмет розмови, називний).",
       },
       {
         type: "rich-tip",
-        segments: [{ text: "💡 Коли місяць названий СЛОВОМ — обидва в родовому: «čtrnáctého " }, { word: "února", wordId: "unor", kind: "nouns" }, { text: "». Але якщо місяць позначений числом, усталена практика (за рекомендацією Інституту чеської мови): день у родовому, а місяць-число в називному — «čtrnáctého druhý» — щоб уникнути плутанини двох однакових закінчень." }],
+        segments: [{ text: "Коли місяць названий СЛОВОМ — обидва в родовому: «čtrnáctého " }, { word: "února", wordId: "unor", kind: "nouns" }, { text: "». Але якщо місяць позначений числом, усталена практика (за рекомендацією Інституту чеської мови): день у родовому, а місяць-число в називному — «čtrnáctého druhý» — щоб уникнути плутанини двох однакових закінчень." }],
       },
       { type: "heading", text: "Котра година: офіційно" },
       {
@@ -1217,7 +1219,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 Увага на два різні числівники: після čtvrt na / tři čtvrtě na йде КІЛЬКІСНЕ у знахідному (na jednu, na dvě), а після půl — ПОРЯДКОВЕ у родовому (druhé, třetí). І виняток: 12:30 = «půl jedné», не «půl první».",
+        text: "Увага на два різні числівники: після čtvrt na / tři čtvrtě na йде КІЛЬКІСНЕ у знахідному (na jednu, na dvě), а після půl — ПОРЯДКОВЕ у родовому (druhé, třetí). І виняток: 12:30 = «půl jedné», не «půl první».",
       },
       {
         type: "paragraph",
@@ -1245,7 +1247,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "rich-tip",
-        segments: [{ text: "💡 Межі цих слів у чеській дещо розмиті (навіть мовознавці це визнають) — приблизно: " }, { word: "ráno", wordId: "rano", kind: "nouns" }, { text: " 6–9, " }, { word: "dopoledne", wordId: "dopoledne", kind: "nouns" }, { text: " 9–12, " }, { word: "odpoledne", wordId: "odpoledne", kind: "nouns" }, { text: " 12–18, " }, { word: "večer", wordId: "vecer", kind: "nouns" }, { text: " 18–22, v " }, { word: "noci", wordId: "noc", kind: "nouns" }, { text: " 22–6. Не намагайся визначити межу з точністю до хвилини — носії теж не завжди погоджуються." }],
+        segments: [{ text: "Межі цих слів у чеській дещо розмиті (навіть мовознавці це визнають) — приблизно: " }, { word: "ráno", wordId: "rano", kind: "nouns" }, { text: " 6–9, " }, { word: "dopoledne", wordId: "dopoledne", kind: "nouns" }, { text: " 9–12, " }, { word: "odpoledne", wordId: "odpoledne", kind: "nouns" }, { text: " 12–18, " }, { word: "večer", wordId: "vecer", kind: "nouns" }, { text: " 18–22, v " }, { word: "noci", wordId: "noc", kind: "nouns" }, { text: " 22–6. Не намагайся визначити межу з точністю до хвилини — носії теж не завжди погоджуються." }],
       },
     ],
   },
@@ -1374,7 +1376,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 Вокалізація: короткі прийменники " },
+          { text: "Вокалізація: короткі прийменники " },
           { word: "k", wordId: "prep-k", kind: "prepositions" },
           { text: "/" },
           { word: "s", wordId: "prep-s", kind: "prepositions" },
@@ -1388,7 +1390,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 Не плутай: деякі слова бувають і прийменником, і прислівником. «Stál " },
+          { text: "Не плутай: деякі слова бувають і прийменником, і прислівником. «Stál " },
           { word: "vedle", wordId: "prep-vedle", kind: "prepositions" },
           { text: " mě» (прийменник + іменник) проти «stál vedle» (прислівник, сам по собі). Прийменник завжди тягне за собою слово в потрібному відмінку." },
         ],
@@ -1453,7 +1455,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 Порівняй пару: «Kočka leze POD STŮL» (куди? — знахідний, рух) проти «Kočka spí POD STOLEM» (де? — орудний, спокій / дія без напрямку). Той самий прийменник " },
+          { text: "Порівняй пару: «Kočka leze POD STŮL» (куди? — знахідний, рух) проти «Kočka spí POD STOLEM» (де? — орудний, спокій / дія без напрямку). Той самий прийменник " },
           { word: "pod", wordId: "prep-pod", kind: "prepositions" },
           { text: ", але різні відмінки." },
         ],
@@ -1461,7 +1463,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 «" },
+          { text: "«" },
           { word: "o", wordId: "prep-o", kind: "prepositions" },
           { text: "» має ще й непросторове значення «про» (тема розмови) — і там воно ЗАВЖДИ місцевий, без пари «куди»: «Mluvíme o práci» (говоримо про роботу). Просторова пара «куди/де» діє лише для фізичного значення o (напр. opřít se o zeď — знахідний, спертися об щось)." },
         ],
@@ -1478,7 +1480,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 Вокалізація " },
+          { text: "Вокалізація " },
           { word: "v", wordId: "prep-v", kind: "prepositions" },
           { text: " → ve перед збігом приголосних: ve škole, ve třídě, ve městě — так само, як " },
           { word: "k", wordId: "prep-k", kind: "prepositions" },
@@ -1547,7 +1549,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 Помічник (не правило без винятків!): БІЛЬШІСТЬ «куди?»-форм починаються на до- (" },
+          { text: "Помічник (не правило без винятків!): БІЛЬШІСТЬ «куди?»-форм починаються на до- (" },
           { word: "doleva", wordId: "adv-vlevo", kind: "adverbs" },
           { text: ", " },
           { word: "dolů", wordId: "adv-dole", kind: "adverbs" },
@@ -1586,7 +1588,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 «" },
+          { text: "«" },
           { word: "tam", wordId: "adv-tam", kind: "adverbs" },
           { text: "» (там) — ОДНЕ слово одразу і для «де?», і для «куди?»: «Jsem tam» (я там) і «Jdu tam» (я йду туди) звучать однаково. А от «звідки?» — усе ж окреме слово: " },
           { word: "odtamtud", wordId: "adv-tam", kind: "adverbs" },
@@ -1602,7 +1604,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 «" },
+          { text: "«" },
           { word: "doma", wordId: "adv-doma", kind: "adverbs" },
           { text: "» (вдома) / «" },
           { word: "domů", wordId: "adv-doma", kind: "adverbs" },
@@ -1611,7 +1613,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 Не плутай зі словом «vedle» з прийменників — це та сама лексема в іншій ролі: «Stůl je vedle» (прислівник, сам по собі) проти «Stůl je vedle okna» (прийменник, керує родовим). У цьому розділі vedle не повторюємо — дивись «Прийменники».",
+        text: "Не плутай зі словом «vedle» з прийменників — це та сама лексема в іншій ролі: «Stůl je vedle» (прислівник, сам по собі) проти «Stůl je vedle okna» (прийменник, керує родовим). У цьому розділі vedle не повторюємо — дивись «Прийменники».",
       },
       { type: "heading", text: "Четвертий вимір: кудою? (шлях)" },
       {
@@ -1621,7 +1623,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 кудою? → " },
+          { text: "кудою? → " },
           { word: "tudy", wordId: "adv-tady", kind: "adverbs" },
           { text: " (цим шляхом, від tady) / " },
           { word: "tamtudy", wordId: "adv-tam", kind: "adverbs" },
@@ -1717,7 +1719,6 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "💡 " },
           { word: "kolik", wordId: "int-kolik", kind: "interrogative" },
           { text: " керує родовим відмінком множини наступного іменника — так само, як числівники " },
           { word: "pět", wordId: "card-pet", kind: "cardinals" },
@@ -1726,7 +1727,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "💡 kdy/jak/proč — прозорі відповідники «коли/як/чому», тому окремого квізу для них немає: досить словника і кількох прикладів. А от kde/kam/odkud/kudy тренуються в Флеш-картках («Прислівники місця») — там треба РОЗРІЗНЯТИ, яке питання підходить до конкретного речення.",
+        text: "kdy/jak/proč — прозорі відповідники «коли/як/чому», тому окремого квізу для них немає: досить словника і кількох прикладів. А от kde/kam/odkud/kudy тренуються в Флеш-картках («Прислівники місця») — там треба РОЗРІЗНЯТИ, яке питання підходить до конкретного речення.",
       },
     ],
   },

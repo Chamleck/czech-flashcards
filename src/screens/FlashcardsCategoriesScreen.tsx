@@ -90,7 +90,11 @@ export function FlashcardsCategoriesScreen({ navigation }: Props) {
             <Text style={styles.title}>{c.title}</Text>
             <Text style={styles.sub}>{c.subtitle}</Text>
           </View>
-          <Text style={styles.chevron}>{c.ready ? "›" : "🔒"}</Text>
+          {c.ready ? (
+            <Text style={styles.chevron}>›</Text>
+          ) : (
+            <PosEmoji name="lock" size={16} />
+          )}
         </Pressable>
       ))}
     </ScrollView>
@@ -130,16 +134,22 @@ function StatTriple({
 function renderRound(stats: FlashcardStats | null) {
   const r = stats?.lastRound ?? null;
   if (!r) {
-    return <Text style={styles.placeholder}>Зіграй раунд, щоб побачити результат 🎯</Text>;
+    return (
+      <View style={styles.placeholderRow}>
+        <PosEmoji name="bullseye" size={16} />
+        <Text style={styles.placeholder}>Зіграй раунд, щоб побачити результат</Text>
+      </View>
+    );
   }
   const best = stats?.bestRound ?? null;
   return (
     <>
       <StatTriple accuracy={pctOf(r.correct, r.answered)} answered={r.answered} streak={r.bestStreak} />
       {best && (
-        <Text style={styles.recordRow}>
-          🏆 Твій найкращий раунд: {best.correct}/{best.answered}
-        </Text>
+        <View style={styles.recordRowContainer}>
+          <PosEmoji name="trophy" size={14} />
+          <Text style={styles.recordRow}>Твій найкращий раунд: {best.correct}/{best.answered}</Text>
+        </View>
       )}
     </>
   );
@@ -148,7 +158,12 @@ function renderRound(stats: FlashcardStats | null) {
 // "Загалом" — накопичено за весь час.
 function renderTotal(stats: FlashcardStats | null, hasAnyData: boolean) {
   if (!stats || !hasAnyData) {
-    return <Text style={styles.placeholder}>Зіграй раунд, щоб побачити результат 🎯</Text>;
+    return (
+      <View style={styles.placeholderRow}>
+        <PosEmoji name="bullseye" size={16} />
+        <Text style={styles.placeholder}>Зіграй раунд, щоб побачити результат</Text>
+      </View>
+    );
   }
   return (
     <StatTriple
@@ -194,14 +209,24 @@ const styles = StyleSheet.create({
     color: theme.colors.textDim,
     fontSize: 14,
     fontWeight: "600",
-    textAlign: "center",
+  },
+  placeholderRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 6,
     paddingHorizontal: theme.space(4),
   },
   recordRow: {
     color: theme.colors.text,
     fontSize: 14,
     fontWeight: "700",
-    textAlign: "center",
+  },
+  recordRowContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 6,
     marginTop: theme.space(3),
     paddingTop: theme.space(3),
     borderTopWidth: 1,

@@ -5,6 +5,8 @@ import { playCorrect, playWrong } from "../utils/soundCache";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { theme } from "../utils/theme";
+import { PosEmoji } from "../components/PosEmoji";
+import RotateCcw from "lucide-react-native/icons/rotate-ccw";
 import { generateSession, Question } from "../utils/flashcardEngine";
 import { generateVerbSession, VerbQuestion } from "../utils/verbFlashcardEngine";
 import { generateDeclensionSession, DeclQuestion } from "../utils/declensionFlashcardEngine";
@@ -167,14 +169,17 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
     return (
       <View style={styles.safe}>
         <View style={styles.doneWrap}>
-          <Text style={styles.doneEmoji}>{pct >= 80 ? "🎉" : pct >= 50 ? "👍" : "💪"}</Text>
+          <PosEmoji name={pct >= 80 ? "partyPopper" : pct >= 50 ? "thumbsUp" : "flexedBiceps"} size={64} />
           <Text style={styles.doneTitle}>Сесію завершено!</Text>
           <Text style={styles.doneScore}>{stats.correct} / {stats.answered}</Text>
           <Text style={styles.doneText}>
             Точність: {pct}%{"\n"}Найкраща серія: {stats.best}
           </Text>
           {newRecord && (
-            <Text style={styles.recordBanner}>🏆 Новий рекорд раунду!</Text>
+            <View style={styles.recordRow}>
+              <PosEmoji name="trophy" size={18} />
+              <Text style={styles.recordBanner}>Новий рекорд раунду!</Text>
+            </View>
           )}
           <Pressable
             style={styles.againBtn}
@@ -187,7 +192,10 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
               setNewRecord(false);
             }}
           >
-            <Text style={styles.againText}>Ще сесія 🔁</Text>
+            <View style={styles.btnRow}>
+              <RotateCcw size={16} color="#3a1f00" strokeWidth={2.5} />
+              <Text style={styles.againText}>Ще сесія</Text>
+            </View>
           </Pressable>
           <Pressable
             style={styles.backBtn}
@@ -211,7 +219,12 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.top}>
-          {stats.streak >= 2 && <Text style={styles.streak}>🔥 Серія: {stats.streak}</Text>}
+          {stats.streak >= 2 && (
+            <View style={styles.streakRow}>
+              <PosEmoji name="fire" size={16} />
+              <Text style={styles.streak}>Серія: {stats.streak}</Text>
+            </View>
+          )}
           <View style={styles.promptCard}>
             <Text style={styles.promptLabel}>{current.promptLabel}</Text>
             <Text style={styles.promptWord}>{current.promptWord}</Text>
@@ -274,7 +287,8 @@ const styles = StyleSheet.create({
   loading: { color: theme.colors.textDim, textAlign: "center", marginTop: 40 },
   counter: { color: theme.colors.textDim, fontSize: 15, fontWeight: "700" },
   top: { flex: 1, justifyContent: "center" },
-  streak: { color: theme.colors.honey, fontSize: 15, fontWeight: "800", textAlign: "center", marginBottom: theme.space(3) },
+  streak: { color: theme.colors.honey, fontSize: 15, fontWeight: "800" },
+  streakRow: { flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 6, marginBottom: theme.space(3) },
   promptCard: {
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.lg,
@@ -334,7 +348,6 @@ const styles = StyleSheet.create({
   optionTextLong: { fontSize: 17, lineHeight: 22 },
   mark: { fontSize: 20, fontWeight: "900", color: theme.colors.text, flexShrink: 0 },
   doneWrap: { flex: 1, justifyContent: "center", alignItems: "center", padding: theme.space(4) },
-  doneEmoji: { fontSize: 64 },
   doneTitle: { color: theme.colors.text, fontSize: 24, fontWeight: "800", marginTop: 8 },
   doneScore: { color: theme.colors.honey, fontSize: 40, fontWeight: "900", marginTop: theme.space(3) },
   doneText: { color: theme.colors.textDim, fontSize: 16, textAlign: "center", marginTop: theme.space(2), lineHeight: 24 },
@@ -342,9 +355,9 @@ const styles = StyleSheet.create({
     color: theme.colors.honey,
     fontSize: 18,
     fontWeight: "900",
-    textAlign: "center",
-    marginTop: theme.space(4),
   },
+  recordRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: theme.space(4) },
+  btnRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   againBtn: {
     marginTop: theme.space(6),
     backgroundColor: theme.colors.honey,

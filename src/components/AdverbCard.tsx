@@ -2,6 +2,8 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { SpatialAdverbEntry, AdverbSense } from "../types";
 import { theme } from "../utils/theme";
+import { PosEmoji } from "./PosEmoji";
+import { TileEmoji } from "./TileEmoji";
 import { Speakable } from "./Speakable";
 
 interface Props {
@@ -31,7 +33,7 @@ function ExampleRow({ id, cz, uk, accent }: { id: string; cz: string; uk: string
   return (
     <View style={[styles.example, { borderLeftColor: accent }]}>
       <View style={styles.exampleRow}>
-        <Text style={styles.exampleCz}>💬 </Text>
+        <TileEmoji name="speechBalloon" size={15} />
         <Speakable id={id} text={cz} style={styles.exampleCz} />
       </View>
       <Text style={styles.exampleUk}>{uk}</Text>
@@ -59,13 +61,19 @@ export function AdverbCard({ entry, revealed, onReveal }: Props) {
   return (
     <View style={styles.card}>
       <View>
-        <Text style={styles.promptLabel}>українською 🇺🇦</Text>
+        <View style={styles.promptLabelRow}>
+          <Text style={styles.promptLabel}>українською</Text>
+          <PosEmoji name="flagUkraine" size={13} />
+        </View>
         <Text style={styles.promptWord}>{entry.uk}</Text>
       </View>
 
       {!revealed ? (
         <Pressable style={styles.revealBtn} onPress={onReveal}>
-          <Text style={styles.revealBtnText}>Показати відповідь 👀</Text>
+          <View style={styles.revealBtnRow}>
+            <Text style={styles.revealBtnText}>Показати відповідь</Text>
+            <PosEmoji name="eyes" size={16} />
+          </View>
         </Pressable>
       ) : (
         <ScrollView
@@ -79,7 +87,8 @@ export function AdverbCard({ entry, revealed, onReveal }: Props) {
 
           {entry.note && (
             <View style={styles.noteBox}>
-              <Text style={styles.noteText}>💡 {entry.note}</Text>
+              <PosEmoji name="lightBulb" size={14} />
+              <Text style={styles.noteText}>{entry.note}</Text>
             </View>
           )}
         </ScrollView>
@@ -96,6 +105,7 @@ const styles = StyleSheet.create({
     padding: theme.space(5),
   },
   promptLabel: { color: theme.colors.textDim, fontSize: 13, marginBottom: 4 },
+  promptLabelRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 4 },
   promptWord: { color: theme.colors.text, fontSize: 30, fontWeight: "800" },
   revealBtn: {
     marginTop: theme.space(8),
@@ -105,6 +115,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   revealBtnText: { color: "#3a1f00", fontWeight: "800", fontSize: 16 },
+  revealBtnRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   answerScroll: { marginTop: theme.space(4) },
   senseBlock: {
     borderLeftWidth: 4,
@@ -129,6 +140,9 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.space(3.5),
     marginTop: theme.space(1),
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 6,
   },
-  noteText: { color: theme.colors.text, fontSize: 13, lineHeight: 19 },
+  noteText: { color: theme.colors.text, fontSize: 13, lineHeight: 19, flex: 1 },
 });

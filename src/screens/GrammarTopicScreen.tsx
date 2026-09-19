@@ -129,12 +129,14 @@ function Block({ block, navigation }: { block: GrammarBlock; navigation: Grammar
     case "tip":
       return (
         <View style={styles.tip}>
+          <PosEmoji name="lightBulb" size={16} />
           <Text style={styles.tipText}>{block.text}</Text>
         </View>
       );
     case "rich-tip":
       return (
         <View style={styles.tip}>
+          <PosEmoji name="lightBulb" size={16} />
           <Text style={styles.tipText}>
             <Segments segments={block.segments} navigation={navigation} />
           </Text>
@@ -156,9 +158,12 @@ function Block({ block, navigation }: { block: GrammarBlock; navigation: Grammar
         <View style={styles.listBox}>
           {block.items.map((it, i) => (
             <View key={i} style={styles.listItem}>
-              <Text style={styles.listTerm}>
-                <Segments segments={it.term} navigation={navigation} />
-              </Text>
+              <View style={styles.listTermRow}>
+                {it.icon && <PosEmoji name={it.icon} size={16} />}
+                <Text style={styles.listTerm}>
+                  <Segments segments={it.term} navigation={navigation} />
+                </Text>
+              </View>
               <Text style={styles.listNote}>
                 <Segments segments={it.note} navigation={navigation} />
               </Text>
@@ -224,8 +229,11 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.space(4),
     marginBottom: theme.space(3),
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
   },
-  tipText: { color: theme.colors.text, fontSize: 14, lineHeight: 21 },
+  tipText: { color: theme.colors.text, fontSize: 14, lineHeight: 21, flex: 1 },
   listBox: { marginBottom: theme.space(3) },
   listItem: {
     backgroundColor: theme.colors.bgCard,
@@ -234,6 +242,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.space(2),
   },
   listTerm: { color: theme.colors.text, fontSize: 15, fontWeight: "700" },
+  listTermRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   listNote: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19, marginTop: 3 },
   clickableWord: { color: theme.colors.lilac, fontWeight: "700" },
   caseBox: {

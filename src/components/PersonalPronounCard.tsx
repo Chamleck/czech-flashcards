@@ -10,6 +10,8 @@ import {
   CASE_ORDER,
 } from "../types";
 import { theme } from "../utils/theme";
+import { PosEmoji } from "./PosEmoji";
+import { TileEmoji } from "./TileEmoji";
 import { DeclensionTable } from "./DeclensionTable";
 import { GenderIcon } from "./GenderIcon";
 import { SegmentTabs } from "./SegmentTabs";
@@ -48,13 +50,19 @@ export function PersonalPronounCard({ entry, revealed, onReveal }: Props) {
   return (
     <View style={styles.card}>
       <View>
-        <Text style={styles.promptLabel}>українською 🇺🇦</Text>
+        <View style={styles.promptLabelRow}>
+          <Text style={styles.promptLabel}>українською</Text>
+          <PosEmoji name="flagUkraine" size={13} />
+        </View>
         <Text style={styles.promptWord}>{entry.uk}</Text>
       </View>
 
       {!revealed ? (
         <Pressable style={styles.revealBtn} onPress={onReveal}>
-          <Text style={styles.revealBtnText}>Показати відповідь 👀</Text>
+          <View style={styles.revealBtnRow}>
+            <Text style={styles.revealBtnText}>Показати відповідь</Text>
+            <PosEmoji name="eyes" size={16} />
+          </View>
         </Pressable>
       ) : (
         <ScrollView
@@ -64,7 +72,10 @@ export function PersonalPronounCard({ entry, revealed, onReveal }: Props) {
         >
           <>
             <View style={[styles.answerHead, { borderColor: accent }]}>
-              <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
+              <View style={styles.answerLabelRow}>
+              <Text style={styles.answerLabel}>чеською</Text>
+              <PosEmoji name="flagCzechia" size={13} />
+            </View>
               <Speakable
                 id={`${entry.id}:headline`}
                 text={entry.cz}
@@ -100,7 +111,7 @@ export function PersonalPronounCard({ entry, revealed, onReveal }: Props) {
                 ]}
               >
                 <View style={styles.exampleRow}>
-                  <Text style={styles.exampleCz}>💬 </Text>
+                  <TileEmoji name="speechBalloon" size={15} />
                   <Speakable id={exampleId} text={example.cz} style={styles.exampleCz} />
                 </View>
                 <Text style={styles.exampleUk}>{example.uk}</Text>
@@ -121,6 +132,7 @@ const styles = StyleSheet.create({
     padding: theme.space(5),
   },
   promptLabel: { color: theme.colors.textDim, fontSize: 13, marginBottom: 4 },
+  promptLabelRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 4 },
   promptWord: { color: theme.colors.text, fontSize: 30, fontWeight: "800" },
   revealBtn: {
     marginTop: theme.space(8),
@@ -130,6 +142,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   revealBtnText: { color: "#3a1f00", fontWeight: "800", fontSize: 16 },
+  revealBtnRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   answerScroll: { marginTop: theme.space(4) },
   answerHead: {
     borderLeftWidth: 4,
@@ -137,6 +150,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.space(4),
   },
   answerLabel: { color: theme.colors.textDim, fontSize: 13 },
+  answerLabelRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   answerWord: { fontSize: 28, fontWeight: "800", marginVertical: 2 },
   patternText: { color: theme.colors.textFaint, fontSize: 12, fontWeight: "600" },
   example: {

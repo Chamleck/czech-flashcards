@@ -7,6 +7,7 @@ import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { EditButton } from "../components/EditButton";
 import { PosEmoji } from "../components/PosEmoji";
+import RotateCcw from "lucide-react-native/icons/rotate-ccw";
 import { PosEmojiName } from "../components/icons/posEmoji";
 import { NOUNS } from "../data/nouns";
 import { ADJECTIVES } from "../data/adjectives";
@@ -146,7 +147,7 @@ export function NumeralsScreen({ navigation }: Props) {
           onPress={startMistakes}
           disabled={mistakeCount === 0}
         >
-          <Text style={styles.mistakeEmoji}>🔁</Text>
+          <RotateCcw size={26} color={theme.colors.coral} strokeWidth={2.5} />
           <View style={{ flex: 1 }}>
             <Text style={styles.mistakeTitle}>Повторити помилки</Text>
             <Text style={styles.mistakeSub}>
@@ -195,7 +196,6 @@ const styles = StyleSheet.create({
     marginBottom: theme.space(3),
   },
   mistakeCardEmpty: { opacity: 0.5, borderColor: theme.colors.textFaint },
-  mistakeEmoji: { fontSize: 28 },
   mistakeTitle: { color: theme.colors.text, fontSize: 17, fontWeight: "800" },
   mistakeSub: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
   mistakeBadge: {

@@ -5,6 +5,10 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress, InvariantWordEntry } from "../types";
 import { theme } from "../utils/theme";
 import { HomeHeaderButton } from "../components/HeaderIcons";
+import { PosEmoji } from "../components/PosEmoji";
+import HomeIcon from "lucide-react-native/icons/house";
+import RotateCcw from "lucide-react-native/icons/rotate-ccw";
+import CheckIcon from "lucide-react-native/icons/check";
 import { AdjPronounCard, DeclEntry } from "../components/AdjPronounCard";
 import { PersonalPronounCard } from "../components/PersonalPronounCard";
 import { NumeralCard } from "../components/NumeralCard";
@@ -144,7 +148,7 @@ export function DeclSessionScreen({ route, navigation }: Props) {
     return (
       <View style={styles.safe}>
         <View style={styles.doneWrap}>
-          <Text style={styles.doneEmoji}>🎉</Text>
+          <PosEmoji name="partyPopper" size={64} />
           <Text style={styles.doneTitle}>Готово!</Text>
           <Text style={styles.doneText}>
             Пройдено карток: {stats.done}{"\n"}
@@ -157,10 +161,14 @@ export function DeclSessionScreen({ route, navigation }: Props) {
               setStats({ done: 0, known: 0 });
             }}
           >
-            <Text style={styles.againText}>Ще раз 🔁</Text>
+            <View style={styles.btnRow}>
+            <RotateCcw size={16} color="#3a1f00" strokeWidth={2.5} />
+            <Text style={styles.againText}>Ще раз</Text>
+          </View>
           </Pressable>
-          <Pressable style={styles.backHome} onPress={() => navigation.popToTop()}>
-            <Text style={styles.backHomeText}>На головну 🏠</Text>
+          <Pressable style={[styles.backHome, styles.btnRow]} onPress={() => navigation.popToTop()}>
+            <HomeIcon size={15} color={theme.colors.lilac} strokeWidth={2.5} />
+            <Text style={styles.backHomeText}>На головну</Text>
           </Pressable>
         </View>
       </View>
@@ -210,10 +218,16 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       {revealed && (
         <View style={[styles.actions, { paddingBottom: insets.bottom + theme.space(4) }]}>
           <Pressable style={[styles.actionBtn, styles.dontKnow]} onPress={() => answer(false)}>
-            <Text style={styles.actionText}>Ще повторити 🔁</Text>
+            <View style={styles.btnRow}>
+              <RotateCcw size={16} color="#1a1020" strokeWidth={2.5} />
+              <Text style={styles.actionText}>Ще повторити</Text>
+            </View>
           </Pressable>
           <Pressable style={[styles.actionBtn, styles.know]} onPress={() => answer(true)}>
-            <Text style={styles.actionText}>Знаю ✅</Text>
+            <View style={styles.btnRow}>
+              <CheckIcon size={16} color="#1a1020" strokeWidth={2.5} />
+              <Text style={styles.actionText}>Знаю</Text>
+            </View>
           </Pressable>
         </View>
       )}
@@ -228,11 +242,11 @@ const styles = StyleSheet.create({
   cardArea: { flex: 1, paddingHorizontal: theme.space(4), paddingTop: theme.space(2) },
   actions: { flexDirection: "row", gap: theme.space(3), padding: theme.space(4) },
   actionBtn: { flex: 1, paddingVertical: theme.space(4), borderRadius: theme.radius.md, alignItems: "center" },
+  btnRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   dontKnow: { backgroundColor: theme.colors.coral },
   know: { backgroundColor: theme.colors.mint },
   actionText: { color: "#1a1020", fontWeight: "800", fontSize: 15 },
   doneWrap: { flex: 1, justifyContent: "center", alignItems: "center", padding: theme.space(6) },
-  doneEmoji: { fontSize: 64 },
   doneTitle: { color: theme.colors.text, fontSize: 26, fontWeight: "800", marginTop: 8 },
   doneText: { color: theme.colors.textDim, fontSize: 16, textAlign: "center", marginTop: 12, lineHeight: 24 },
   againBtn: {

@@ -12,6 +12,7 @@ import { ALL_INTERROGATIVE_IDS } from "../utils/interrogativeEntries";
 import { ALL_PRONOUN_MIXED_IDS } from "../utils/pronounEntries";
 import { TileEmoji } from "../components/TileEmoji";
 import { TileEmojiName } from "../components/icons/tileEmoji";
+import { PosEmoji } from "../components/PosEmoji";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -114,14 +115,17 @@ export function HomeScreen({ navigation }: Props) {
       style={styles.safe}
       contentContainerStyle={[styles.content, { paddingTop: insets.top + theme.space(4), paddingBottom: insets.bottom + theme.space(6) }]}
     >
-      <Text style={styles.hi}>Ahoj! 👋</Text>
+      <View style={styles.hiRow}>
+        <Text style={styles.hi}>Ahoj!</Text>
+        <PosEmoji name="wavingHand" size={30} />
+      </View>
       <Text style={styles.subtitle}>Вчимо чеську через картки</Text>
 
       <View style={styles.grid}>
         {TILES.map((t) => {
           const showMistakes = t.key === "words" && wordMistakes > 0;
           const subtitle = showMistakes
-            ? `🔁 ${wordMistakes} ${plural(wordMistakes, "слово", "слова", "слів")} на повторення`
+            ? `${wordMistakes} ${plural(wordMistakes, "слово", "слова", "слів")} на повторення`
             : t.subtitle;
           return (
             <Pressable
@@ -131,8 +135,19 @@ export function HomeScreen({ navigation }: Props) {
             >
               <TileEmoji name={t.icon} />
               <Text style={styles.tileTitle}>{t.title}</Text>
-              <Text style={[styles.tileSub, showMistakes && styles.tileSubAlert]}>{subtitle}</Text>
-              {!t.ready && <Text style={styles.soon}>🔒</Text>}
+              {showMistakes ? (
+                <View style={styles.tileSubRow}>
+                  <PosEmoji name="repeat" size={13} />
+                  <Text style={[styles.tileSub, styles.tileSubAlert]}>{subtitle}</Text>
+                </View>
+              ) : (
+                <Text style={styles.tileSub}>{subtitle}</Text>
+              )}
+              {!t.ready && (
+                <View style={styles.soon}>
+                  <PosEmoji name="lock" size={14} />
+                </View>
+              )}
             </Pressable>
           );
         })}
@@ -152,6 +167,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: theme.colors.bg },
   content: { padding: theme.space(5) },
   hi: { color: theme.colors.text, fontSize: 34, fontWeight: "900" },
+  hiRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   subtitle: { color: theme.colors.textDim, fontSize: 16, marginTop: 4, marginBottom: theme.space(6) },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: theme.space(3) },
   tile: {
@@ -166,7 +182,8 @@ const styles = StyleSheet.create({
   tileTitle: { color: theme.colors.text, fontSize: 18, fontWeight: "800", marginTop: theme.space(2) },
   tileSub: { color: theme.colors.textDim, fontSize: 12, marginTop: 2 },
   tileSubAlert: { color: theme.colors.coral, fontWeight: "700" },
-  soon: { position: "absolute", top: theme.space(3), right: theme.space(3), fontSize: 16 },
+  tileSubRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
+  soon: { position: "absolute", top: theme.space(3), right: theme.space(3) },
   note: { marginTop: theme.space(6), backgroundColor: theme.colors.bgElevated, borderRadius: theme.radius.md, padding: theme.space(4) },
   noteText: { color: theme.colors.textDim, fontSize: 13, lineHeight: 20 },
 });

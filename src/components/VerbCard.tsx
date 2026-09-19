@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { VerbEntry, VERB_ASPECT_LABEL } from "../types";
 import { theme } from "../utils/theme";
+import { PosEmoji } from "./PosEmoji";
 import { VERB_CLASS_BY_KEY } from "../data/verbCategories";
 import { VerbConjugation } from "./VerbConjugation";
 import { Speakable } from "./Speakable";
@@ -21,13 +22,19 @@ export function VerbCard({ entry, revealed, onReveal }: Props) {
     <View style={styles.card}>
       {/* Питання: українське слово */}
       <View>
-        <Text style={styles.promptLabel}>українською 🇺🇦</Text>
+        <View style={styles.promptLabelRow}>
+          <Text style={styles.promptLabel}>українською</Text>
+          <PosEmoji name="flagUkraine" size={13} />
+        </View>
         <Text style={styles.promptWord}>{entry.uk}</Text>
       </View>
 
       {!revealed ? (
         <Pressable style={styles.revealBtn} onPress={onReveal}>
-          <Text style={styles.revealBtnText}>Показати відповідь 👀</Text>
+          <View style={styles.revealBtnRow}>
+            <Text style={styles.revealBtnText}>Показати відповідь</Text>
+            <PosEmoji name="eyes" size={16} />
+          </View>
         </Pressable>
       ) : (
         <ScrollView
@@ -37,7 +44,10 @@ export function VerbCard({ entry, revealed, onReveal }: Props) {
         >
           <>
             <View style={[styles.answerHead, { borderColor: accent }]}>
-              <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
+              <View style={styles.answerLabelRow}>
+              <Text style={styles.answerLabel}>чеською</Text>
+              <PosEmoji name="flagCzechia" size={13} />
+            </View>
               <Speakable
                 id={`${entry.id}:headline`}
                 text={infinitive}
@@ -53,7 +63,8 @@ export function VerbCard({ entry, revealed, onReveal }: Props) {
 
             {entry.aspectPairNote && (
               <View style={styles.pairNote}>
-                <Text style={styles.pairNoteText}>💡 {entry.aspectPairNote}</Text>
+                <PosEmoji name="lightBulb" size={14} />
+                <Text style={styles.pairNoteText}>{entry.aspectPairNote}</Text>
               </View>
             )}
           </>
@@ -71,6 +82,7 @@ const styles = StyleSheet.create({
     padding: theme.space(5),
   },
   promptLabel: { color: theme.colors.textDim, fontSize: 13, marginBottom: 4 },
+  promptLabelRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 4 },
   promptWord: { color: theme.colors.text, fontSize: 30, fontWeight: "800" },
   revealBtn: {
     marginTop: theme.space(8),
@@ -80,6 +92,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   revealBtnText: { color: "#3a1f00", fontWeight: "800", fontSize: 16 },
+  revealBtnRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   answerScroll: { marginTop: theme.space(4) },
   answerHead: {
     borderLeftWidth: 4,
@@ -87,6 +100,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.space(4),
   },
   answerLabel: { color: theme.colors.textDim, fontSize: 13 },
+  answerLabelRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   answerWord: { fontSize: 28, fontWeight: "800", marginVertical: 2 },
   tags: { flexDirection: "row", alignItems: "center", flexWrap: "wrap" },
   tag: { fontSize: 13, fontWeight: "700" },
@@ -96,6 +110,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgElevated,
     borderRadius: theme.radius.md,
     padding: theme.space(3),
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 6,
   },
-  pairNoteText: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19 },
+  pairNoteText: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19, flex: 1 },
 });

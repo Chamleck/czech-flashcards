@@ -228,7 +228,9 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
           </View>
         ) : (
           <View style={styles.noResults}>
-            <Text style={styles.noResultsIcon}>🔍</Text>
+            <View style={styles.noResultsIcon}>
+              <PosEmoji name="magnifyingGlassTiltedLeft" size={32} />
+            </View>
             <Text style={styles.noResultsTitle}>Нічого не знайдено за «{query.trim()}»</Text>
             <Text style={styles.noResultsHint}>Спробуй іншою мовою або перевір написання</Text>
           </View>
@@ -241,7 +243,7 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
             {TILES.map((t) => {
               const m = mistakesFor(t.key);
               const subtitle =
-                m > 0 ? `🔁 ${m} ${plural(m, "слово", "слова", "слів")} на повторення` : t.subtitle;
+                m > 0 ? `${m} ${plural(m, "слово", "слова", "слів")} на повторення` : t.subtitle;
               return (
                 <Pressable
                   key={t.key}
@@ -250,8 +252,19 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
                 >
                   <PosEmoji name={t.icon} size={34} />
                   <Text style={styles.tileTitle}>{t.title}</Text>
-                  <Text style={[styles.tileSub, m > 0 && styles.tileSubAlert]}>{subtitle}</Text>
-                  {!t.ready && <Text style={styles.soon}>🔒</Text>}
+                  {m > 0 ? (
+                    <View style={styles.tileSubRow}>
+                      <PosEmoji name="repeat" size={13} />
+                      <Text style={[styles.tileSub, styles.tileSubAlert]}>{subtitle}</Text>
+                    </View>
+                  ) : (
+                    <Text style={styles.tileSub}>{subtitle}</Text>
+                  )}
+                  {!t.ready && (
+                    <View style={styles.soon}>
+                      <PosEmoji name="lock" size={14} />
+                    </View>
+                  )}
                 </Pressable>
               );
             })}
@@ -299,7 +312,7 @@ const styles = StyleSheet.create({
   // адаптивно для будь-якої довжини ярлика й ширини екрана, без магічних чисел.
   resultKind: { color: theme.colors.textFaint, fontSize: 10, textTransform: "uppercase", flexShrink: 0, textAlign: "right" },
   noResults: { alignItems: "center", paddingVertical: theme.space(8) },
-  noResultsIcon: { fontSize: 32, opacity: 0.4 },
+  noResultsIcon: { opacity: 0.4 },
   noResultsTitle: { color: theme.colors.text, fontSize: 15, fontWeight: "700", marginTop: theme.space(2), textAlign: "center" },
   noResultsHint: { color: theme.colors.textFaint, fontSize: 12, marginTop: 4 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: theme.space(3) },
@@ -315,5 +328,6 @@ const styles = StyleSheet.create({
   tileTitle: { color: theme.colors.text, fontSize: 18, fontWeight: "800", marginTop: theme.space(2) },
   tileSub: { color: theme.colors.textDim, fontSize: 12, marginTop: 2 },
   tileSubAlert: { color: theme.colors.coral, fontWeight: "700" },
-  soon: { position: "absolute", top: theme.space(3), right: theme.space(3), fontSize: 16 },
+  tileSubRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
+  soon: { position: "absolute", top: theme.space(3), right: theme.space(3) },
 });

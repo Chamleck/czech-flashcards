@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { theme } from "../utils/theme";
+import Play from "lucide-react-native/icons/play";
 
 export interface SelectableWord {
   id: string;
@@ -101,9 +102,14 @@ export function SelectionList<T extends SelectableWord>({ words, onStart, render
           onPress={start}
           disabled={selected.size === 0}
         >
-          <Text style={[styles.startText, selected.size === 0 && styles.startTextDisabled]}>
-            {selected.size === 0 ? "Оберіть слова" : `Почати (${selected.size}) ▶️`}
-          </Text>
+          {selected.size === 0 ? (
+            <Text style={[styles.startText, styles.startTextDisabled]}>Оберіть слова</Text>
+          ) : (
+            <View style={styles.btnRow}>
+              <Text style={styles.startText}>Почати ({selected.size})</Text>
+              <Play size={16} color="#3a1f00" strokeWidth={2.5} fill="#3a1f00" />
+            </View>
+          )}
         </Pressable>
       </View>
     </View>
@@ -160,4 +166,5 @@ const styles = StyleSheet.create({
   startBtnDisabled: { backgroundColor: theme.colors.bgElevated },
   startText: { color: "#3a1f00", fontWeight: "800", fontSize: 16 },
   startTextDisabled: { color: theme.colors.textFaint },
+  btnRow: { flexDirection: "row", alignItems: "center", gap: 6 },
 });

@@ -4,6 +4,8 @@ import { PrepositionEntry, PrepositionSense, CASE_LABELS } from "../types";
 import { theme } from "../utils/theme";
 import { Speakable } from "./Speakable";
 import { SegmentTabs } from "./SegmentTabs";
+import { PosEmoji } from "./PosEmoji";
+import { TileEmoji } from "./TileEmoji";
 
 interface Props {
   entry: PrepositionEntry;
@@ -17,7 +19,7 @@ function ExampleRow({ id, cz, uk, accent }: { id: string; cz: string; uk: string
   return (
     <View style={[styles.example, { borderLeftColor: accent }]}>
       <View style={styles.exampleRow}>
-        <Text style={styles.exampleCz}>💬 </Text>
+        <TileEmoji name="speechBalloon" size={15} />
         <Speakable id={id} text={cz} style={styles.exampleCz} />
       </View>
       <Text style={styles.exampleUk}>{uk}</Text>
@@ -63,13 +65,19 @@ export function PrepositionCard({ entry, revealed, onReveal }: Props) {
   return (
     <View style={styles.card}>
       <View>
-        <Text style={styles.promptLabel}>українською 🇺🇦</Text>
+        <View style={styles.promptLabelRow}>
+          <Text style={styles.promptLabel}>українською</Text>
+          <PosEmoji name="flagUkraine" size={13} />
+        </View>
         <Text style={styles.promptWord}>{entry.uk}</Text>
       </View>
 
       {!revealed ? (
         <Pressable style={styles.revealBtn} onPress={onReveal}>
-          <Text style={styles.revealBtnText}>Показати відповідь 👀</Text>
+          <View style={styles.revealBtnRow}>
+            <Text style={styles.revealBtnText}>Показати відповідь</Text>
+            <PosEmoji name="eyes" size={16} />
+          </View>
         </Pressable>
       ) : (
         <ScrollView
@@ -78,7 +86,10 @@ export function PrepositionCard({ entry, revealed, onReveal }: Props) {
           showsVerticalScrollIndicator={false}
         >
           <View style={[styles.answerHead, { borderColor: accent }]}>
-            <Text style={styles.answerLabel}>чеською 🇨🇿</Text>
+            <View style={styles.answerLabelRow}>
+              <Text style={styles.answerLabel}>чеською</Text>
+              <PosEmoji name="flagCzechia" size={13} />
+            </View>
             <Speakable id={`${entry.id}:headline`} text={entry.cz} style={[styles.answerWord, { color: accent }]} />
             {entry.vocalized && (
               <Text style={styles.vocalForm}>
@@ -89,7 +100,8 @@ export function PrepositionCard({ entry, revealed, onReveal }: Props) {
 
           {entry.vocalNote && (
             <View style={styles.noteBox}>
-              <Text style={styles.noteText}>💡 {entry.vocalNote}</Text>
+              <PosEmoji name="lightBulb" size={14} />
+              <Text style={styles.noteText}>{entry.vocalNote}</Text>
             </View>
           )}
 
@@ -121,7 +133,7 @@ export function PrepositionCard({ entry, revealed, onReveal }: Props) {
                   onSelect={setZaTab}
                   colorFor={() => accent}
                   labelFor={(v) => (v === "space" ? "простір" : "обмін / ціна")}
-                  iconFor={(v) => <Text style={styles.tabIcon}>{v === "space" ? "📍" : "💰"}</Text>}
+                  iconFor={(v) => <PosEmoji name={v === "space" ? "roundPushpin" : "moneyBag"} size={15} />}
                   minWidth={120}
                   flexBasis="46%"
                   style={{ marginBottom: theme.space(3) }}
@@ -169,6 +181,7 @@ const styles = StyleSheet.create({
     padding: theme.space(5),
   },
   promptLabel: { color: theme.colors.textDim, fontSize: 13, marginBottom: 4 },
+  promptLabelRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 4 },
   promptWord: { color: theme.colors.text, fontSize: 30, fontWeight: "800" },
   revealBtn: {
     marginTop: theme.space(8),
@@ -178,6 +191,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   revealBtnText: { color: "#3a1f00", fontWeight: "800", fontSize: 16 },
+  revealBtnRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   answerScroll: { marginTop: theme.space(4) },
   answerHead: {
     borderLeftWidth: 4,
@@ -185,6 +199,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.space(4),
   },
   answerLabel: { color: theme.colors.textDim, fontSize: 13 },
+  answerLabelRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   answerWord: { fontSize: 28, fontWeight: "800", marginVertical: 2 },
   vocalForm: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
   caseBox: {
@@ -201,8 +216,11 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.space(3.5),
     marginBottom: theme.space(3),
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 6,
   },
-  noteText: { color: theme.colors.text, fontSize: 13, lineHeight: 19 },
+  noteText: { color: theme.colors.text, fontSize: 13, lineHeight: 19, flex: 1 },
   dualHint: {
     backgroundColor: theme.colors.bgElevated,
     borderRadius: theme.radius.md,
@@ -215,7 +233,6 @@ const styles = StyleSheet.create({
   },
   senseHeading: { fontSize: 16, fontWeight: "800", marginBottom: 2 },
   senseCase: { color: theme.colors.textFaint, fontSize: 13, marginBottom: theme.space(2) },
-  tabIcon: { fontSize: 15, marginRight: 4 },
   example: {
     marginTop: theme.space(2),
     marginBottom: theme.space(1),

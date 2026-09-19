@@ -1,7 +1,8 @@
 import React from "react";
-import { Text } from "react-native";
 import { theme } from "../utils/theme";
 import { SegmentTabs } from "./SegmentTabs";
+import { PosEmoji } from "./PosEmoji";
+import { PosEmojiName } from "./icons/posEmoji";
 
 // Перемикач режиму на екранах категорій: Тренування ↔ Перегляд.
 // "browse" веде тап по категорії в режим перегляду (список без чекбоксів → картки
@@ -19,9 +20,9 @@ const LABELS: Record<BrowseMode, string> = {
 // решти табів (кнопка з ОДНИМ Text-дитям замість icon+Text) виявилась причиною
 // бага на Samsung Galaxy S21 Ultra: підпис активного табу зникав. Підтверджено
 // емпірично — інші SegmentTabs з iconFor на тому ж пристрої не мали проблеми.
-const ICON: Record<BrowseMode, string> = {
-  train: "🎯",
-  browse: "📖",
+const ICON: Record<BrowseMode, PosEmojiName> = {
+  train: "bullseye",
+  browse: "bookOpen",
 };
 
 export function ModeToggle({
@@ -38,7 +39,7 @@ export function ModeToggle({
       onSelect={onChange}
       colorFor={() => theme.colors.lilac}
       labelFor={(m) => LABELS[m]}
-      iconFor={(m) => <Text>{ICON[m]}</Text>}
+      iconFor={(m) => <PosEmoji name={ICON[m]} size={14} />}
       minWidth={130}
       flexBasis="48%"
     />

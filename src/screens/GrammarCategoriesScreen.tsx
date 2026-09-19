@@ -33,7 +33,11 @@ export function GrammarCategoriesScreen({ navigation }: Props) {
             <Text style={styles.title}>{t.title}</Text>
             <Text style={styles.sub}>{t.subtitle}</Text>
           </View>
-          <Text style={styles.chevron}>{t.ready ? "›" : "🔒"}</Text>
+          {t.ready ? (
+            <Text style={styles.chevron}>›</Text>
+          ) : (
+            <PosEmoji name="lock" size={16} />
+          )}
         </Pressable>
       ))}
     </ScrollView>
