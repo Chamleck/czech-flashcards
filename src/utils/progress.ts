@@ -12,9 +12,6 @@ const PREPOSITIONS_KEY = "czech_prepositions_progress_v1"; // прийменни
 const ADVERBS_KEY = "czech_adverbs_progress_v1"; // прислівники місця (де/куди/звідки)
 const INTERROGATIVES_KEY = "czech_interrogatives_progress_v1"; // питальні слова — окремий розділ (займенники kdo/co/jaký/… + прислівники kde/kam/… + kolik)
 
-// За замовчуванням працюємо з колодою іменників (зворотна сумісність).
-const KEY = NOUN_KEY;
-
 export const PROGRESS_KEYS = {
   nouns: NOUN_KEY,
   verbs: VERB_KEY,
@@ -47,15 +44,6 @@ export async function saveProgressTo(
   } catch {
     // тихо ігноруємо — прогрес не критичний для роботи
   }
-}
-
-// Зворотно-сумісні обгортки для іменників (працюють зі старим ключем).
-export function loadProgress(): Promise<Record<string, CardProgress>> {
-  return loadProgressFrom(KEY);
-}
-
-export function saveProgress(all: Record<string, CardProgress>): Promise<void> {
-  return saveProgressTo(KEY, all);
 }
 
 export function updateCard(

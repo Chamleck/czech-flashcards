@@ -46,12 +46,3 @@ export function resolveNumeral(id: string): ResolvedNumeral | null {
   if (!entry) return null;
   return { id, cardType, entry };
 }
-
-export function resolveNumerals(ids: string[]): ResolvedNumeral[] {
-  const out: ResolvedNumeral[] = [];
-  for (const id of ids) {
-    const r = resolveNumeral(id);
-    if (r) out.push(r);
-  }
-  return out;
-}

@@ -358,5 +358,14 @@ export function generateVerbSession(
     const q = makeQuestion(c);
     if (q) questions.push(q);
   }
+  // Добір, якщо якісь makeQuestion() повернули null (дистрактор збігся) —
+  // інакше зарезервоване під помилку комбо може мовчки випасти без заміни.
+  if (questions.length < count) {
+    for (const c of shuffle(combos)) {
+      if (questions.length >= count) break;
+      const q = makeQuestion(c);
+      if (q && !questions.some((x) => x.comboId === q.comboId)) questions.push(q);
+    }
+  }
   return questions;
 }

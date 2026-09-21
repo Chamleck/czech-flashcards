@@ -768,5 +768,14 @@ export function generateDeclensionSession(
     const q = c.make();
     if (q) questions.push(q);
   }
+  // Добір, якщо якісь make() повернули null (дистрактор збігся) — інакше
+  // зарезервоване під помилку комбо може мовчки випасти без заміни.
+  if (questions.length < count) {
+    for (const c of shuffle(combos)) {
+      if (questions.length >= count) break;
+      const q = c.make();
+      if (q && !questions.some((x) => x.comboId === q.comboId)) questions.push(q);
+    }
+  }
   return questions;
 }

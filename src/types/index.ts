@@ -46,20 +46,6 @@ export type DeclensionPattern =
   | "kure" // neut soft irregular (kuře)
   | "stavani"; // neut soft -í (stavení)
 
-export const PATTERN_LABELS: Record<DeclensionPattern, string> = {
-  pan: "pán (чол. істот., твердий)",
-  muz: "muž (чол. істот., м'який)",
-  hrad: "hrad (чол. неістот., твердий)",
-  stroj: "stroj (чол. неістот., м'який)",
-  zena: "žena (жін., твердий)",
-  ruze: "růže (жін., м'який)",
-  kost: "kost (жін., приголосний/i-відміна)",
-  mesto: "město (сер., твердий)",
-  more: "moře (сер., м'який)",
-  kure: "kuře (сер., нерегулярний -ete)",
-  stavani: "stavení (сер., -í незмінний)",
-};
-
 // Тематичні категорії слів
 export type WordCategory =
   | "people"
@@ -257,7 +243,6 @@ export interface GenderedNumeral {
 
 // 2) dva — дві колонки за родом: masc vs fem/neut. Одна форма на відмінок.
 //    (oba/obě відмінюється ідентично — окремий запис із тією ж структурою.)
-export type NumeralTwoFormCol = "masc" | "femNeut";
 export interface TwoFormNumeral {
   id: string;
   uk: string;

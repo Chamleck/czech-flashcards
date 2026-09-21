@@ -6,7 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress } from "../types";
 import { theme } from "../utils/theme";
 import { EditButton } from "../components/EditButton";
-import RotateCcw from "lucide-react-native/icons/rotate-ccw";
+import { MistakeDeckCard } from "../components/MistakeDeckCard";
 import { VERBS } from "../data/verbs";
 import { VERB_CLASSES } from "../data/verbCategories";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
@@ -62,22 +62,7 @@ export function VerbCategoriesScreen({ navigation }: Props) {
 
       {/* Колода помилок — лише в режимі тренування */}
       {mode === "train" && (
-        <Pressable
-          style={[styles.mistakeCard, mistakeCount === 0 && styles.mistakeCardEmpty]}
-          onPress={startMistakes}
-          disabled={mistakeCount === 0}
-        >
-          <RotateCcw size={26} color={theme.colors.coral} strokeWidth={2.5} />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.mistakeTitle}>Повторити помилки</Text>
-            <Text style={styles.mistakeSub}>
-              {mistakeCount === 0
-                ? "Поки що немає дієслів на повторення"
-                : `${mistakeCount} ${plural(mistakeCount, "дієслово", "дієслова", "дієслів")} чекає`}
-            </Text>
-          </View>
-          {mistakeCount > 0 && <Text style={styles.mistakeBadge}>{mistakeCount}</Text>}
-        </Pressable>
+        <MistakeDeckCard count={mistakeCount} wordForms={["дієслово", "дієслова", "дієслів"]} onPress={startMistakes} />
       )}
 
       <Text style={styles.sectionLabel}>Класи дієвідміни</Text>
@@ -108,31 +93,6 @@ export function VerbCategoriesScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: theme.colors.bg },
   content: { padding: theme.space(4) },
-  mistakeCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.space(3),
-    backgroundColor: theme.colors.bgCard,
-    borderRadius: theme.radius.lg,
-    borderWidth: 1.5,
-    borderColor: theme.colors.coral,
-    padding: theme.space(4),
-  },
-  mistakeCardEmpty: { opacity: 0.5, borderColor: theme.colors.textFaint },
-  mistakeTitle: { color: theme.colors.text, fontSize: 17, fontWeight: "800" },
-  mistakeSub: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
-  mistakeBadge: {
-    color: "#1a1020",
-    backgroundColor: theme.colors.coral,
-    fontWeight: "800",
-    fontSize: 15,
-    minWidth: 30,
-    textAlign: "center",
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 999,
-    overflow: "hidden",
-  },
   sectionLabel: {
     color: theme.colors.textDim,
     fontSize: 13,
