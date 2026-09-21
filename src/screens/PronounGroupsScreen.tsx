@@ -133,7 +133,6 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     marginBottom: theme.space(3),
   },
-  catRowDim: { opacity: 0.5 },
   catMain: {
     flex: 1,
     flexDirection: "row",
@@ -144,5 +143,4 @@ const styles = StyleSheet.create({
   catTitle: { color: theme.colors.text, fontSize: 16, fontWeight: "700" },
   catHint: { color: theme.colors.textFaint, fontSize: 12, marginTop: 1 },
   catSub: { color: theme.colors.textDim, fontSize: 13, marginTop: 3 },
-  lock: { fontSize: 16, paddingHorizontal: theme.space(4) },
 });
