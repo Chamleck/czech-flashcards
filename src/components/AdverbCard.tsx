@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     padding: theme.space(3.5),
   },
-  exampleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline" },
+  exampleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline", gap: 5 },
   exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600" },
   exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
   noteBox: {

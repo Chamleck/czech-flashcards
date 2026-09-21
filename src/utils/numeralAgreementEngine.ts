@@ -60,7 +60,7 @@ function collapseVowelLength(s: string): string {
 }
 
 function isUsable(correct: string, d: string | null | undefined): d is string {
-  return !!d && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
+  return !!d && d !== "—" && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
 }
 
 // Прийменники по відмінку. Родовий/місцевий БЕЗ вокалізації (bez не має єдиного

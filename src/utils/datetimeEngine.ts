@@ -56,7 +56,7 @@ function collapseVowelLength(s: string): string {
 }
 
 function usable(correct: string, d: string | null | undefined): d is string {
-  return !!d && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
+  return !!d && d !== "—" && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
 }
 
 // ─────────────── Підкатегорія «Дати» ───────────────

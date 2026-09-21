@@ -50,7 +50,7 @@ function collapseVowelLength(s: string): string {
 }
 
 function isUsable(correct: string, d: string | null | undefined): d is string {
-  return !!d && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
+  return !!d && d !== "—" && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
 }
 
 // Вокалізація прийменника перед словом-партнером (лише безвиняткові випадки).
