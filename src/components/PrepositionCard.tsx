@@ -103,7 +103,7 @@ export function PrepositionCard({ entry, revealed, onReveal }: Props) {
             <View style={styles.noteBox}>
               <View style={styles.noteLabelRow}>
                 <Lightbulb size={13} color={theme.colors.honey} strokeWidth={2.5} />
-                <Text style={styles.noteLabelText}>Порада</Text>
+                <Text style={styles.noteLabelText}>Зверніть увагу</Text>
               </View>
               <Text style={styles.noteText}>{entry.vocalNote}</Text>
             </View>
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     padding: theme.space(3.5),
   },
-  exampleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline", gap: 5 },
+  exampleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5 },
   exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600" },
   exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
 });

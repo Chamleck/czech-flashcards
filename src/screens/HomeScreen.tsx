@@ -13,6 +13,7 @@ import { ALL_PRONOUN_MIXED_IDS } from "../utils/pronounEntries";
 import { TileEmoji } from "../components/TileEmoji";
 import { TileEmojiName } from "../components/icons/tileEmoji";
 import { PosEmoji } from "../components/PosEmoji";
+import RotateCcw from "lucide-react-native/icons/rotate-ccw";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -137,7 +138,7 @@ export function HomeScreen({ navigation }: Props) {
               <Text style={styles.tileTitle}>{t.title}</Text>
               {showMistakes ? (
                 <View style={styles.tileSubRow}>
-                  <PosEmoji name="repeat" size={13} />
+                  <RotateCcw size={13} color="#e08a8a" strokeWidth={2.5} />
                   <Text style={[styles.tileSub, styles.tileSubAlert]}>{subtitle}</Text>
                 </View>
               ) : (
@@ -181,7 +182,10 @@ const styles = StyleSheet.create({
   tileDim: { opacity: 0.5 },
   tileTitle: { color: theme.colors.text, fontSize: 18, fontWeight: "800", marginTop: theme.space(2) },
   tileSub: { color: theme.colors.textDim, fontSize: 12, marginTop: 2, flexShrink: 1 },
-  tileSubAlert: { color: theme.colors.coral, fontWeight: "700" },
+  // Не theme.colors.coral — той занадто яскравий/"токсичний" для дрібного
+  // підпису-приписки на тайлі (лишається для кнопок/плашок, де acid-контраст
+  // доречний). Той самий приглушений відтінок і в WordsPartOfSpeechScreen.
+  tileSubAlert: { color: "#e08a8a", fontWeight: "700" },
   tileSubRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
   soon: { position: "absolute", top: theme.space(3), right: theme.space(3) },
   note: { marginTop: theme.space(6), backgroundColor: theme.colors.bgElevated, borderRadius: theme.radius.md, padding: theme.space(4) },

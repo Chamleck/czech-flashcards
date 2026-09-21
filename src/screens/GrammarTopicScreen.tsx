@@ -132,7 +132,7 @@ function Block({ block, navigation }: { block: GrammarBlock; navigation: Grammar
         <View style={styles.tip}>
           <View style={styles.tipLabelRow}>
             <Lightbulb size={14} color={theme.colors.honey} strokeWidth={2.5} />
-            <Text style={styles.tipLabelText}>Порада</Text>
+            <Text style={styles.tipLabelText}>Зверніть увагу</Text>
           </View>
           <Text style={styles.tipText}>{block.text}</Text>
         </View>
@@ -142,7 +142,7 @@ function Block({ block, navigation }: { block: GrammarBlock; navigation: Grammar
         <View style={styles.tip}>
           <View style={styles.tipLabelRow}>
             <Lightbulb size={14} color={theme.colors.honey} strokeWidth={2.5} />
-            <Text style={styles.tipLabelText}>Порада</Text>
+            <Text style={styles.tipLabelText}>Зверніть увагу</Text>
           </View>
           <Text style={styles.tipText}>
             <Segments segments={block.segments} navigation={navigation} />

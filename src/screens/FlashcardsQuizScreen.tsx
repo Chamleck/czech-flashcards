@@ -170,7 +170,7 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
       <View style={styles.safe}>
         <View style={styles.doneWrap}>
           <PosEmoji name={pct >= 80 ? "partyPopper" : pct >= 50 ? "thumbsUp" : "flexedBiceps"} size={64} />
-          <Text style={styles.doneTitle}>Сесію завершено!</Text>
+          <Text style={styles.doneTitle}>Готово!</Text>
           <Text style={styles.doneScore}>{stats.correct} / {stats.answered}</Text>
           <Text style={styles.doneText}>
             Точність: {pct}%{"\n"}Найкраща серія: {stats.best}
@@ -194,7 +194,7 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
           >
             <View style={styles.btnRow}>
               <RotateCcw size={16} color="#3a1f00" strokeWidth={2.5} />
-              <Text style={styles.againText}>Ще сесія</Text>
+              <Text style={styles.againText}>Ще раз</Text>
             </View>
           </Pressable>
           <Pressable
@@ -204,7 +204,7 @@ export function FlashcardsQuizScreen({ route, navigation }: Props) {
               navigation.goBack();
             }}
           >
-            <Text style={styles.backText}>До категорій</Text>
+            <Text style={styles.backText}>Назад</Text>
           </Pressable>
         </View>
       </View>

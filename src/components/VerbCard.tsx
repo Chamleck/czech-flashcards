@@ -66,7 +66,7 @@ export function VerbCard({ entry, revealed, onReveal }: Props) {
               <View style={styles.pairNote}>
                 <View style={styles.pairNoteLabelRow}>
                   <Lightbulb size={13} color={theme.colors.honey} strokeWidth={2.5} />
-                  <Text style={styles.pairNoteLabelText}>Порада</Text>
+                  <Text style={styles.pairNoteLabelText}>Зверніть увагу</Text>
                 </View>
                 <Text style={styles.pairNoteText}>{entry.aspectPairNote}</Text>
               </View>

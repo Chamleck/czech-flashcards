@@ -6,7 +6,6 @@ import { RootStackParamList, CardProgress, PrepositionEntry } from "../types";
 import { theme } from "../utils/theme";
 import { HomeHeaderButton } from "../components/HeaderIcons";
 import { PosEmoji } from "../components/PosEmoji";
-import HomeIcon from "lucide-react-native/icons/house";
 import RotateCcw from "lucide-react-native/icons/rotate-ccw";
 import CheckIcon from "lucide-react-native/icons/check";
 import { PrepositionCard } from "../components/PrepositionCard";
@@ -111,9 +110,8 @@ export function PrepositionSessionScreen({ route, navigation }: Props) {
             <Text style={styles.againText}>Ще раз</Text>
           </View>
           </Pressable>
-          <Pressable style={[styles.backHome, styles.btnRow]} onPress={() => navigation.popToTop()}>
-            <HomeIcon size={15} color={theme.colors.lilac} strokeWidth={2.5} />
-            <Text style={styles.backHomeText}>На головну</Text>
+          <Pressable style={styles.backHome} onPress={() => navigation.navigate("WordsPartOfSpeech")}>
+            <Text style={styles.backHomeText}>Назад</Text>
           </Pressable>
         </View>
       </View>

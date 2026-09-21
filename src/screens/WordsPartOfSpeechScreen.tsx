@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView, TextInput } from "react-native";
 import Search from "lucide-react-native/icons/search";
 import { PosEmoji } from "../components/PosEmoji";
+import RotateCcw from "lucide-react-native/icons/rotate-ccw";
 import { PosEmojiName } from "../components/icons/posEmoji";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
@@ -254,7 +255,7 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
                   <Text style={styles.tileTitle}>{t.title}</Text>
                   {m > 0 ? (
                     <View style={styles.tileSubRow}>
-                      <PosEmoji name="repeat" size={13} />
+                      <RotateCcw size={13} color="#e08a8a" strokeWidth={2.5} />
                       <Text style={[styles.tileSub, styles.tileSubAlert]}>{subtitle}</Text>
                     </View>
                   ) : (
@@ -327,7 +328,8 @@ const styles = StyleSheet.create({
   tileDim: { opacity: 0.5 },
   tileTitle: { color: theme.colors.text, fontSize: 18, fontWeight: "800", marginTop: theme.space(2) },
   tileSub: { color: theme.colors.textDim, fontSize: 12, marginTop: 2, flexShrink: 1 },
-  tileSubAlert: { color: theme.colors.coral, fontWeight: "700" },
+  // Приглушений відтінок замість theme.colors.coral — див. коментар у HomeScreen.tsx.
+  tileSubAlert: { color: "#e08a8a", fontWeight: "700" },
   tileSubRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
   soon: { position: "absolute", top: theme.space(3), right: theme.space(3) },
 });
