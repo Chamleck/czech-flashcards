@@ -7,6 +7,7 @@ import { RootStackParamList, CardProgress, CzechCase, CASE_LABELS } from "../typ
 import { theme } from "../utils/theme";
 import { EditButton } from "../components/EditButton";
 import { MistakeDeckCard } from "../components/MistakeDeckCard";
+import { SectionHeader } from "../components/SectionHeader";
 import { PosEmoji } from "../components/PosEmoji";
 import { PosEmojiName } from "../components/icons/posEmoji";
 import { PREPOSITIONS } from "../data/prepositions";
@@ -39,16 +40,6 @@ const GROUPS: Group[] = GROUP_CASES.map((c) => ({
 
 // Дуальні — одна група (розбивати за відмінком немає сенсу, у кожного їх два).
 const DUAL_IDS = PREPOSITIONS.filter((p) => p.type === "dual").map((p) => p.id);
-
-const CASE_COLOR: Record<CzechCase, string> = {
-  nominativ: theme.colors.honey,
-  genitiv: theme.colors.mint,
-  dativ: theme.colors.lilac,
-  akuzativ: theme.colors.coral,
-  vokativ: theme.colors.honey,
-  lokal: "#7fb8e0",
-  instrumental: "#e0a458",
-};
 
 // Іконка групи — номер відмінка (той самий "число." з CASE_LABELS), а не
 // довільна картинка: одразу видно, який відмінок, а не просто "щось спільне".
@@ -118,16 +109,14 @@ export function PrepositionsScreen({ navigation }: Props) {
         <MistakeDeckCard count={mistakeCount} wordForms={["слово", "слова", "слів"]} onPress={startMistakes} />
       )}
 
-      <SectionHeader label="за відмінком" />
       {GROUPS.map((g) => {
         const lbl = CASE_LABELS[g.gCase];
-        const color = CASE_COLOR[g.gCase];
         // ✏️ пропускаємо для груп РІВНО з 1 прийменником (lokal, instrumental
         // зараз) — пікер над одним елементом має лише 2 стани (обраний/ні),
         // ідентичні прямому "Тренуванню", тобто не додає жодної можливості.
         const canPick = g.ids.length > 1;
         return (
-          <View key={g.gCase} style={[styles.row, { borderLeftColor: color }]}>
+          <View key={g.gCase} style={styles.row}>
             <Pressable style={styles.rowMain} onPress={() => openGroup(g)}>
               <PosEmoji name={CASE_ICON[g.gCase]} size={32} />
               <View style={{ flex: 1 }}>
@@ -148,7 +137,7 @@ export function PrepositionsScreen({ navigation }: Props) {
       })}
 
       <SectionHeader label="рух і спокій" />
-      <View style={[styles.row, { borderLeftColor: theme.colors.coral }]}>
+      <View style={styles.row}>
         <Pressable style={styles.rowMain} onPress={openDual}>
           <PosEmoji name="compass" size={32} />
           <View style={{ flex: 1 }}>
@@ -167,17 +156,6 @@ export function PrepositionsScreen({ navigation }: Props) {
   );
 }
 
-// Заголовок секції (варіант B): текст між двома тонкими лініями.
-function SectionHeader({ label }: { label: string }) {
-  return (
-    <View style={styles.sectionHeader}>
-      <View style={styles.sectionLine} />
-      <Text style={styles.sectionText}>{label}</Text>
-      <View style={styles.sectionLine} />
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: theme.colors.bg },
   content: { padding: theme.space(4) },
@@ -186,7 +164,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.lg,
-    borderLeftWidth: 4,
     marginBottom: theme.space(3),
   },
   rowMain: {
@@ -199,19 +176,4 @@ const styles = StyleSheet.create({
   title: { color: theme.colors.text, fontSize: 17, fontWeight: "800" },
   hint: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
   sub: { color: theme.colors.textFaint, fontSize: 12, marginTop: 4 },
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.space(3),
-    marginTop: theme.space(2),
-    marginBottom: theme.space(3),
-  },
-  sectionLine: { flex: 1, height: 1, backgroundColor: theme.colors.bgElevated },
-  sectionText: {
-    color: theme.colors.textFaint,
-    fontSize: 11,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-  },
 });

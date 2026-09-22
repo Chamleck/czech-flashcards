@@ -11,7 +11,7 @@ import { PosEmoji } from "../components/PosEmoji";
 import { ALL_INTERROGATIVE_IDS } from "../utils/interrogativeEntries";
 import { INTERROGATIVE_ADVERBS } from "../data/interrogativeAdverbs";
 import { INTERROGATIVE_MISC } from "../data/interrogativeMisc";
-import { INTERROGATIVE_GROUP_TITLE, INTERROGATIVE_ADVERBS_GROUP_TITLE, INTERROGATIVE_MISC_GROUP_TITLE } from "../data/groupTitles";
+import { INTERROGATIVE_PRONOUNS_TITLE, INTERROGATIVE_ADVERBS_TITLE, INTERROGATIVE_MISC_TITLE } from "../data/groupTitles";
 import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
@@ -75,25 +75,25 @@ export function InterrogativesScreen({ navigation }: Props) {
 
   function openPronouns() {
     if (mode === "browse") {
-      navigation.navigate("BrowseList", { kind: "interrogative", entryIds: ALL_INTERROGATIVE_IDS, title: INTERROGATIVE_GROUP_TITLE });
+      navigation.navigate("BrowseList", { kind: "interrogative", entryIds: ALL_INTERROGATIVE_IDS, title: INTERROGATIVE_PRONOUNS_TITLE });
     } else {
-      navigation.navigate("DeclSession", { title: INTERROGATIVE_GROUP_TITLE, kind: "interrogative", entryIds: ALL_INTERROGATIVE_IDS });
+      navigation.navigate("DeclSession", { title: INTERROGATIVE_PRONOUNS_TITLE, kind: "interrogative", entryIds: ALL_INTERROGATIVE_IDS });
     }
   }
 
   function openAdverbs() {
     if (mode === "browse") {
-      navigation.navigate("BrowseList", { kind: "interrogative", entryIds: ALL_INTERROGATIVE_ADVERB_IDS, title: INTERROGATIVE_ADVERBS_GROUP_TITLE });
+      navigation.navigate("BrowseList", { kind: "interrogative", entryIds: ALL_INTERROGATIVE_ADVERB_IDS, title: INTERROGATIVE_ADVERBS_TITLE });
     } else {
-      navigation.navigate("DeclSession", { title: INTERROGATIVE_ADVERBS_GROUP_TITLE, kind: "interrogative", entryIds: ALL_INTERROGATIVE_ADVERB_IDS });
+      navigation.navigate("DeclSession", { title: INTERROGATIVE_ADVERBS_TITLE, kind: "interrogative", entryIds: ALL_INTERROGATIVE_ADVERB_IDS });
     }
   }
 
   function openMisc() {
     if (mode === "browse") {
-      navigation.navigate("BrowseList", { kind: "interrogative", entryIds: ALL_INTERROGATIVE_MISC_IDS, title: INTERROGATIVE_MISC_GROUP_TITLE });
+      navigation.navigate("BrowseList", { kind: "interrogative", entryIds: ALL_INTERROGATIVE_MISC_IDS, title: INTERROGATIVE_MISC_TITLE });
     } else {
-      navigation.navigate("DeclSession", { title: INTERROGATIVE_MISC_GROUP_TITLE, kind: "interrogative", entryIds: ALL_INTERROGATIVE_MISC_IDS });
+      navigation.navigate("DeclSession", { title: INTERROGATIVE_MISC_TITLE, kind: "interrogative", entryIds: ALL_INTERROGATIVE_MISC_IDS });
     }
   }
 
@@ -112,11 +112,11 @@ export function InterrogativesScreen({ navigation }: Props) {
           kdo/co (без роду, одна форма на відмінок). Колір genderColor.masc_inan
           (синій) — усталений "колір питальних" ще з часів, коли група жила в
           Займенниках. */}
-      <View style={[styles.row, { borderLeftColor: theme.genderColor.masc_inan }]}>
+      <View style={styles.row}>
         <Pressable style={styles.rowMain} onPress={openPronouns}>
           <PosEmoji name="question" size={32} />
           <View style={{ flex: 1 }}>
-            <Text style={styles.title}>Займенники</Text>
+            <Text style={styles.title}>{INTERROGATIVE_PRONOUNS_TITLE}</Text>
             <Text style={styles.hint}>kdo, co, jaký, který, čí</Text>
             <Text style={styles.sub}>
               {ALL_INTERROGATIVE_IDS.length} {plural(ALL_INTERROGATIVE_IDS.length, "слово", "слова", "слів")}
@@ -131,11 +131,11 @@ export function InterrogativesScreen({ navigation }: Props) {
       {/* Прислівникова група — kde/kam/odkud/kudy. Колір mint: відрізняє
           ряд від займенникового (masc_inan/синій), той самий mint, що вже
           усталений як "знаю"/акцент прислівників-відповідей в AdverbsScreen. */}
-      <View style={[styles.row, { borderLeftColor: theme.colors.mint }]}>
+      <View style={styles.row}>
         <Pressable style={styles.rowMain} onPress={openAdverbs}>
           <PosEmoji name="map" size={32} />
           <View style={{ flex: 1 }}>
-            <Text style={styles.title}>Прислівники</Text>
+            <Text style={styles.title}>{INTERROGATIVE_ADVERBS_TITLE}</Text>
             <Text style={styles.hint}>kde, kam, odkud, kudy</Text>
             <Text style={styles.sub}>
               {ALL_INTERROGATIVE_ADVERB_IDS.length} {plural(ALL_INTERROGATIVE_ADVERB_IDS.length, "слово", "слова", "слів")}
@@ -149,11 +149,11 @@ export function InterrogativesScreen({ navigation }: Props) {
 
       {/* "Інша" група — kdy/jak/proč/kolik. Колір honey: третій акцент ряду
           хаба, відрізняє від займенникового (синій) і прислівникового (mint). */}
-      <View style={[styles.row, { borderLeftColor: theme.colors.honey }]}>
+      <View style={styles.row}>
         <Pressable style={styles.rowMain} onPress={openMisc}>
           <PosEmoji name="question" size={32} />
           <View style={{ flex: 1 }}>
-            <Text style={styles.title}>Інші</Text>
+            <Text style={styles.title}>{INTERROGATIVE_MISC_TITLE}</Text>
             <Text style={styles.hint}>kdy, jak, proč, kolik</Text>
             <Text style={styles.sub}>
               {ALL_INTERROGATIVE_MISC_IDS.length} {plural(ALL_INTERROGATIVE_MISC_IDS.length, "слово", "слова", "слів")}
@@ -176,7 +176,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.lg,
-    borderLeftWidth: 4,
     marginBottom: theme.space(3),
   },
   rowMain: {

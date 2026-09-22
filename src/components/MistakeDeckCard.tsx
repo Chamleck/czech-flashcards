@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: theme.colors.coral,
     padding: theme.space(4),
+    marginBottom: theme.space(3),
   },
   cardEmpty: { opacity: 0.5, borderColor: theme.colors.textFaint },
   title: { color: theme.colors.text, fontSize: 17, fontWeight: "800" },

@@ -62,15 +62,13 @@ export function VerbCategoriesScreen({ navigation }: Props) {
 
       {/* Колода помилок — лише в режимі тренування */}
       {mode === "train" && (
-        <MistakeDeckCard count={mistakeCount} wordForms={["дієслово", "дієслова", "дієслів"]} onPress={startMistakes} />
+        <MistakeDeckCard count={mistakeCount} wordForms={["слово", "слова", "слів"]} onPress={startMistakes} />
       )}
-
-      <Text style={styles.sectionLabel}>Класи дієвідміни</Text>
 
       {VERB_CLASSES.map((c) => {
         const count = countInClass(c.key);
         return (
-          <View key={c.key} style={[styles.catRow, { borderLeftColor: c.color }]}>
+          <View key={c.key} style={styles.catRow}>
             <Pressable style={styles.catMain} onPress={() => onClass(c.key, c.title)}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.catTitle}>{c.title}</Text>
@@ -89,26 +87,14 @@ export function VerbCategoriesScreen({ navigation }: Props) {
   );
 }
 
-
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: theme.colors.bg },
   content: { padding: theme.space(4) },
-  sectionLabel: {
-    color: theme.colors.textDim,
-    fontSize: 13,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginTop: theme.space(6),
-    marginBottom: theme.space(3),
-    marginLeft: theme.space(1),
-  },
   catRow: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.md,
-    borderLeftWidth: 4,
     marginBottom: theme.space(3),
   },
   catMain: {

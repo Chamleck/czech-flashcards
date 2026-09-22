@@ -74,10 +74,8 @@ export function PronounGroupsScreen({ navigation }: Props) {
         <MistakeDeckCard count={mistakeCount} wordForms={["слово", "слова", "слів"]} onPress={startMistakes} />
       )}
 
-      <Text style={styles.sectionLabel}>Групи</Text>
-
       {/* Особові — активна група */}
-      <View style={[styles.catRow, { borderLeftColor: theme.colors.mint }]}>
+      <View style={styles.catRow}>
         <Pressable style={styles.catMain} onPress={openPersonal}>
           <PosEmoji name="raisingHand" size={26} />
           <View style={{ flex: 1 }}>
@@ -94,7 +92,7 @@ export function PronounGroupsScreen({ navigation }: Props) {
       </View>
 
       {/* Присвійні та вказівні — активна група */}
-      <View style={[styles.catRow, { borderLeftColor: theme.colors.lilac }]}>
+      <View style={styles.catRow}>
         <Pressable style={styles.catMain} onPress={openAll}>
           <PosEmoji name="pointing" size={26} />
           <View style={{ flex: 1 }}>
@@ -115,22 +113,11 @@ export function PronounGroupsScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: theme.colors.bg },
   content: { padding: theme.space(4) },
-  sectionLabel: {
-    color: theme.colors.textDim,
-    fontSize: 13,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginTop: theme.space(6),
-    marginBottom: theme.space(3),
-    marginLeft: theme.space(1),
-  },
   catRow: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.md,
-    borderLeftWidth: 4,
     marginBottom: theme.space(3),
   },
   catMain: {

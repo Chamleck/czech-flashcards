@@ -39,7 +39,6 @@ interface POSTile {
   icon: PosEmojiName;
   title: string;
   subtitle: string;
-  color: string;
   ready: boolean;
 }
 
@@ -54,14 +53,14 @@ const VISIBLE_NOUNS = NOUNS.filter((n) => !HIDDEN_NOUN_CATS.has(n.category)).len
 const VISIBLE_ADJS = ADJECTIVES.filter((a) => !HIDDEN_ADJ_CATS.has(a.category)).length;
 
 const TILES: POSTile[] = [
-  { key: "nouns", icon: "label", title: KIND_LABEL_NOUNS, subtitle: `${VISIBLE_NOUNS} слів з відмінюванням`, color: theme.colors.honey, ready: true },
-  { key: "verbs", icon: "running", title: KIND_LABEL_VERBS, subtitle: `${VERBS.length} слів з дієвідміною`, color: theme.colors.mint, ready: true },
-  { key: "adjectives", icon: "palette", title: KIND_LABEL_ADJECTIVES, subtitle: `${VISIBLE_ADJS} слів з відмінюванням`, color: theme.colors.lilac, ready: true },
-  { key: "pronouns", icon: "pointing", title: KIND_LABEL_PRONOUNS, subtitle: `${PRONOUNS.length} присвійних і вказівних`, color: theme.colors.coral, ready: true },
-  { key: "interrogatives", icon: "question", title: KIND_LABEL_INTERROGATIVE, subtitle: "як ставити запитання", color: "#d98cbf", ready: true },
-  { key: "numerals", icon: "numbers", title: KIND_LABEL_NUMERALS, subtitle: "порядкові, сотні, тисячі", color: "#e0a458", ready: true },
-  { key: "prepositions", icon: "compass", title: KIND_LABEL_PREPOSITIONS, subtitle: `${PREPOSITIONS.length} з фіксованим відмінком`, color: "#7fb8e0", ready: true },
-  { key: "adverbs", icon: "map", title: KIND_LABEL_ADVERBS, subtitle: `${ADVERBS.length} — де? куди? звідки?`, color: "#8ed081", ready: true },
+  { key: "nouns", icon: "label", title: KIND_LABEL_NOUNS, subtitle: `${VISIBLE_NOUNS} слів з відмінюванням`, ready: true },
+  { key: "verbs", icon: "running", title: KIND_LABEL_VERBS, subtitle: `${VERBS.length} слів з дієвідміною`, ready: true },
+  { key: "adjectives", icon: "palette", title: KIND_LABEL_ADJECTIVES, subtitle: `${VISIBLE_ADJS} слів з відмінюванням`, ready: true },
+  { key: "pronouns", icon: "pointing", title: KIND_LABEL_PRONOUNS, subtitle: `${PRONOUNS.length} присвійних і вказівних`, ready: true },
+  { key: "interrogatives", icon: "question", title: KIND_LABEL_INTERROGATIVE, subtitle: "як ставити запитання", ready: true },
+  { key: "numerals", icon: "numbers", title: KIND_LABEL_NUMERALS, subtitle: "порядкові, сотні, тисячі", ready: true },
+  { key: "prepositions", icon: "compass", title: KIND_LABEL_PREPOSITIONS, subtitle: `${PREPOSITIONS.length} з фіксованим відмінком`, ready: true },
+  { key: "adverbs", icon: "map", title: KIND_LABEL_ADVERBS, subtitle: `${ADVERBS.length} — де? куди? звідки?`, ready: true },
 ];
 
 export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
@@ -248,7 +247,7 @@ export function WordsPartOfSpeechScreen({ navigation, route }: Props) {
               return (
                 <Pressable
                   key={t.key}
-                  style={[styles.tile, { borderColor: t.color }, !t.ready && styles.tileDim]}
+                  style={[styles.tile, !t.ready && styles.tileDim]}
                   onPress={() => t.ready && open(t.key)}
                 >
                   <PosEmoji name={t.icon} size={34} />
@@ -321,7 +320,6 @@ const styles = StyleSheet.create({
     width: "47%",
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.lg,
-    borderLeftWidth: 4,
     padding: theme.space(4),
     minHeight: 130,
   },

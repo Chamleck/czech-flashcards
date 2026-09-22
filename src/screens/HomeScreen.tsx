@@ -27,16 +27,15 @@ interface Tile {
   icon: TileEmojiName;
   title: string;
   subtitle: string;
-  color: string;
   ready: boolean;
 }
 
 const TILES: Tile[] = [
-  { key: "words", icon: "openBook", title: "Слова", subtitle: "Іменники, дієслова та більше", color: theme.colors.honey, ready: true },
-  { key: "flashcards", icon: "brain", title: "Вікторина", subtitle: "Обери правильну форму", color: theme.colors.mint, ready: true },
-  { key: "grammar", icon: "scroll", title: "Граматика", subtitle: "Відмінки, роди та зразки", color: theme.colors.lilac, ready: true },
-  { key: "phrases", icon: "speechBalloon", title: "Фрази", subtitle: "Скоро", color: "#8ed081", ready: false },
-  { key: "sentences", icon: "writingHand", title: "Речення з пропусками", subtitle: "Скоро", color: theme.colors.coral, ready: false },
+  { key: "words", icon: "openBook", title: "Слова", subtitle: "Іменники, дієслова та більше", ready: true },
+  { key: "flashcards", icon: "brain", title: "Вікторина", subtitle: "Обери правильну форму", ready: true },
+  { key: "grammar", icon: "scroll", title: "Граматика", subtitle: "Відмінки, роди та зразки", ready: true },
+  { key: "phrases", icon: "speechBalloon", title: "Фрази", subtitle: "Скоро", ready: false },
+  { key: "sentences", icon: "writingHand", title: "Речення з пропусками", subtitle: "Скоро", ready: false },
 ];
 
 export function HomeScreen({ navigation }: Props) {
@@ -131,7 +130,7 @@ export function HomeScreen({ navigation }: Props) {
           return (
             <Pressable
               key={t.key}
-              style={[styles.tile, { borderColor: t.color }, !t.ready && styles.tileDim]}
+              style={[styles.tile, !t.ready && styles.tileDim]}
               onPress={() => t.ready && open(t.key)}
             >
               <TileEmoji name={t.icon} />
@@ -175,7 +174,6 @@ const styles = StyleSheet.create({
     width: "47%",
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.lg,
-    borderLeftWidth: 4,
     padding: theme.space(4),
     minHeight: 130,
   },

@@ -67,7 +67,7 @@ export function AdverbsScreen({ navigation }: Props) {
         <MistakeDeckCard count={mistakeCount} wordForms={["слово", "слова", "слів"]} onPress={startMistakes} />
       )}
 
-      <View style={[styles.row, { borderLeftColor: theme.colors.lilac }]}>
+      <View style={styles.row}>
         <Pressable style={styles.rowMain} onPress={openAll}>
           <PosEmoji name="map" size={32} />
           <View style={{ flex: 1 }}>
@@ -94,7 +94,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.lg,
-    borderLeftWidth: 4,
     marginBottom: theme.space(3),
   },
   rowMain: {

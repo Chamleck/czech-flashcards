@@ -80,7 +80,7 @@ export function FlashcardsCategoriesScreen({ navigation }: Props) {
       {FLASHCARD_CATEGORIES.map((c) => (
         <Pressable
           key={c.id}
-          style={[styles.row, { borderLeftColor: c.color }, !c.ready && styles.rowDim]}
+          style={[styles.row, !c.ready && styles.rowDim]}
           onPress={() => c.ready && navigation.navigate("FlashcardsQuiz", { categoryId: c.id, title: c.title })}
         >
           <View style={styles.emoji}>
@@ -239,7 +239,6 @@ const styles = StyleSheet.create({
     gap: theme.space(3),
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.md,
-    borderLeftWidth: 4,
     padding: theme.space(4),
     marginBottom: theme.space(3),
   },

@@ -40,7 +40,6 @@ interface Item {
   title: string;
   hint: string;
   count: number;
-  color: string;
 }
 
 const ITEMS: Item[] = [
@@ -50,7 +49,6 @@ const ITEMS: Item[] = [
     title: NUMERAL_CARDINAL_TITLE,
     hint: "jeden, dva, pět… (окреме відмінювання)",
     count: CARDINAL_IDS.length,
-    color: theme.colors.honey,
   },
   {
     key: "ordinal",
@@ -58,7 +56,6 @@ const ITEMS: Item[] = [
     title: NUMERAL_ORDINAL_TITLE,
     hint: "перший, другий… (зразок mladý/jarní)",
     count: ORDINAL_IDS.length,
-    color: theme.colors.lilac,
   },
   {
     key: "hundreds",
@@ -66,7 +63,6 @@ const ITEMS: Item[] = [
     title: NUMERAL_HUNDREDS_TITLE,
     hint: "sto, tisíc, milion, miliarda (звичайні іменники)",
     count: NUMBER_IDS.length,
-    color: theme.colors.mint,
   },
 ];
 
@@ -146,7 +142,7 @@ export function NumeralsScreen({ navigation }: Props) {
       )}
 
       {ITEMS.map((item) => (
-        <View key={item.key} style={[styles.row, { borderLeftColor: item.color }]}>
+        <View key={item.key} style={styles.row}>
           <Pressable style={styles.rowMain} onPress={() => open(item)}>
             <PosEmoji name={item.icon} size={32} />
             <View style={{ flex: 1 }}>
@@ -174,7 +170,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.lg,
-    borderLeftWidth: 4,
     marginBottom: theme.space(3),
   },
   rowMain: {
