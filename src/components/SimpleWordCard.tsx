@@ -112,8 +112,6 @@ const styles = StyleSheet.create({
     marginBottom: theme.space(1),
     backgroundColor: theme.colors.bgElevated,
     borderRadius: theme.radius.md,
-    borderLeftWidth: 3,
-    borderLeftColor: ACCENT,
     padding: theme.space(3.5),
   },
   exampleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5 },

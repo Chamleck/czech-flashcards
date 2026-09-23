@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { SpatialAdverbEntry, AdverbSense } from "../types";
 import { theme } from "../utils/theme";
 import { PosEmoji } from "./PosEmoji";
-import Lightbulb from "lucide-react-native/icons/lightbulb";
 import { TileEmoji } from "./TileEmoji";
 import { Speakable } from "./Speakable";
+import { InfoBanner } from "./InfoBanner";
 
 interface Props {
   entry: SpatialAdverbEntry;
@@ -30,9 +30,9 @@ function accentForLabel(label: string): string {
 
 // Один приклад-рядок з озвученням. Speakable — сиблінг у View (не в <Text>),
 // той самий патерн, що в PrepositionCard/FlashCard.
-function ExampleRow({ id, cz, uk, accent }: { id: string; cz: string; uk: string; accent: string }) {
+function ExampleRow({ id, cz, uk }: { id: string; cz: string; uk: string }) {
   return (
-    <View style={[styles.example, { borderLeftColor: accent }]}>
+    <View style={styles.example}>
       <View style={styles.exampleRow}>
         <TileEmoji name="speechBalloon" size={15} />
         <Speakable id={id} text={cz} style={styles.exampleCz} />
@@ -48,11 +48,11 @@ function ExampleRow({ id, cz, uk, accent }: { id: string; cz: string; uk: string
 // заголовка над усіма блоками — кожен блок сам собі голова.
 function SenseBlock({ idPrefix, sense, accent }: { idPrefix: string; sense: AdverbSense; accent: string }) {
   return (
-    <View style={[styles.senseBlock, { borderLeftColor: accent }]}>
+    <View style={styles.senseBlock}>
       <Text style={[styles.senseHeading, { color: accent }]}>{sense.label}</Text>
       <Speakable id={`${idPrefix}:word`} text={sense.cz} style={[styles.senseWord, { color: accent }]} />
       {sense.examples.map((ex, i) => (
-        <ExampleRow key={i} id={`${idPrefix}:ex${i}`} cz={ex.cz} uk={ex.uk} accent={accent} />
+        <ExampleRow key={i} id={`${idPrefix}:ex${i}`} cz={ex.cz} uk={ex.uk} />
       ))}
     </View>
   );
@@ -82,19 +82,11 @@ export function AdverbCard({ entry, revealed, onReveal }: Props) {
           contentContainerStyle={{ paddingBottom: 8 }}
           showsVerticalScrollIndicator={false}
         >
+          {entry.note && <InfoBanner paragraphs={[entry.note]} />}
+
           {entry.senses.map((sense, i) => (
             <SenseBlock key={i} idPrefix={`${entry.id}:${i}`} sense={sense} accent={accentForLabel(sense.label)} />
           ))}
-
-          {entry.note && (
-            <View style={styles.noteBox}>
-              <View style={styles.noteLabelRow}>
-                <Lightbulb size={13} color={theme.colors.honey} strokeWidth={2.5} />
-                <Text style={styles.noteLabelText}>Зверніть увагу</Text>
-              </View>
-              <Text style={styles.noteText}>{entry.note}</Text>
-            </View>
-          )}
         </ScrollView>
       )}
     </View>
@@ -122,8 +114,6 @@ const styles = StyleSheet.create({
   revealBtnRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   answerScroll: { marginTop: theme.space(4) },
   senseBlock: {
-    borderLeftWidth: 4,
-    paddingLeft: theme.space(3),
     marginBottom: theme.space(4),
   },
   senseHeading: { fontSize: 14, fontWeight: "700" },
@@ -133,19 +123,9 @@ const styles = StyleSheet.create({
     marginBottom: theme.space(1),
     backgroundColor: theme.colors.bgElevated,
     borderRadius: theme.radius.md,
-    borderLeftWidth: 3,
     padding: theme.space(3.5),
   },
   exampleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5 },
   exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600" },
   exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
-  noteBox: {
-    backgroundColor: theme.colors.bgElevated,
-    borderRadius: theme.radius.md,
-    padding: theme.space(3.5),
-    marginTop: theme.space(1),
-  },
-  noteLabelRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: theme.space(1) },
-  noteLabelText: { color: theme.colors.honey, fontSize: 12, fontWeight: "600" },
-  noteText: { color: theme.colors.text, fontSize: 13, lineHeight: 19 },
 });

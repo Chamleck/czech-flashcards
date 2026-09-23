@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { VerbEntry, VERB_ASPECT_LABEL } from "../types";
 import { theme } from "../utils/theme";
 import { PosEmoji } from "./PosEmoji";
-import Lightbulb from "lucide-react-native/icons/lightbulb";
 import { VERB_CLASS_BY_KEY } from "../data/verbCategories";
 import { VerbConjugation } from "./VerbConjugation";
 import { Speakable } from "./Speakable";
@@ -61,16 +60,6 @@ export function VerbCard({ entry, revealed, onReveal }: Props) {
             </View>
 
             <VerbConjugation entry={entry} />
-
-            {entry.aspectPairNote && (
-              <View style={styles.pairNote}>
-                <View style={styles.pairNoteLabelRow}>
-                  <Lightbulb size={13} color={theme.colors.honey} strokeWidth={2.5} />
-                  <Text style={styles.pairNoteLabelText}>Зверніть увагу</Text>
-                </View>
-                <Text style={styles.pairNoteText}>{entry.aspectPairNote}</Text>
-              </View>
-            )}
           </>
         </ScrollView>
       )}
@@ -109,13 +98,4 @@ const styles = StyleSheet.create({
   tags: { flexDirection: "row", alignItems: "center", flexWrap: "wrap" },
   tag: { fontSize: 13, fontWeight: "700" },
   tagDim: { color: theme.colors.textDim, fontSize: 13, marginLeft: 4 },
-  pairNote: {
-    marginTop: theme.space(1),
-    backgroundColor: theme.colors.bgElevated,
-    borderRadius: theme.radius.md,
-    padding: theme.space(3),
-  },
-  pairNoteLabelRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: theme.space(1) },
-  pairNoteLabelText: { color: theme.colors.honey, fontSize: 12, fontWeight: "600" },
-  pairNoteText: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19 },
 });

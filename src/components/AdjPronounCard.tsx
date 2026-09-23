@@ -169,7 +169,7 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
                 (() => {
                   const ex = (entry as any).examples[gender];
                   return (
-                    <View style={[styles.example, { borderLeftColor: theme.genderColor[gender] }]}>
+                    <View style={styles.example}>
                       <View style={styles.exampleRow}>
                         <TileEmoji name="speechBalloon" size={15} />
                         <Speakable

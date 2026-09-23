@@ -5,8 +5,8 @@ import { theme } from "../utils/theme";
 import { Speakable } from "./Speakable";
 import { SegmentTabs } from "./SegmentTabs";
 import { PosEmoji } from "./PosEmoji";
-import Lightbulb from "lucide-react-native/icons/lightbulb";
 import { TileEmoji } from "./TileEmoji";
+import { InfoBanner } from "./InfoBanner";
 
 interface Props {
   entry: PrepositionEntry;
@@ -16,9 +16,9 @@ interface Props {
 
 // Один приклад-рядок з озвученням. Speakable — СИБЛІНГ у View row (ніколи не
 // вкладений у <Text>), згідно з правилом проєкту про незалежну opacity.
-function ExampleRow({ id, cz, uk, accent }: { id: string; cz: string; uk: string; accent: string }) {
+function ExampleRow({ id, cz, uk }: { id: string; cz: string; uk: string }) {
   return (
-    <View style={[styles.example, { borderLeftColor: accent }]}>
+    <View style={styles.example}>
       <View style={styles.exampleRow}>
         <TileEmoji name="speechBalloon" size={15} />
         <Speakable id={id} text={cz} style={styles.exampleCz} />
@@ -48,7 +48,7 @@ function SenseBlock({
         {lbl.uk} ({lbl.cz}) — {lbl.question}
       </Text>
       {sense.examples.map((ex, i) => (
-        <ExampleRow key={i} id={`${idPrefix}:ex${i}`} cz={ex.cz} uk={ex.uk} accent={accent} />
+        <ExampleRow key={i} id={`${idPrefix}:ex${i}`} cz={ex.cz} uk={ex.uk} />
       ))}
     </View>
   );
@@ -99,15 +99,7 @@ export function PrepositionCard({ entry, revealed, onReveal }: Props) {
             )}
           </View>
 
-          {entry.vocalNote && (
-            <View style={styles.noteBox}>
-              <View style={styles.noteLabelRow}>
-                <Lightbulb size={13} color={theme.colors.honey} strokeWidth={2.5} />
-                <Text style={styles.noteLabelText}>Зверніть увагу</Text>
-              </View>
-              <Text style={styles.noteText}>{entry.vocalNote}</Text>
-            </View>
-          )}
+          {entry.vocalNote && <InfoBanner paragraphs={[entry.vocalNote]} />}
 
           {!isDual ? (
             <>
@@ -119,7 +111,7 @@ export function PrepositionCard({ entry, revealed, onReveal }: Props) {
                 <Text style={styles.caseBoxQ}>{CASE_LABELS[entry.govCase].question}</Text>
               </View>
               {entry.examples.map((ex, i) => (
-                <ExampleRow key={i} id={`${entry.id}:ex${i}`} cz={ex.cz} uk={ex.uk} accent={accent} />
+                <ExampleRow key={i} id={`${entry.id}:ex${i}`} cz={ex.cz} uk={ex.uk} />
               ))}
             </>
           ) : (
@@ -215,15 +207,6 @@ const styles = StyleSheet.create({
   caseBoxLabel: { color: theme.colors.textDim, fontSize: 12 },
   caseBoxCase: { color: theme.colors.text, fontSize: 18, fontWeight: "800", marginTop: 2 },
   caseBoxQ: { color: theme.colors.textFaint, fontSize: 13, marginTop: 2 },
-  noteBox: {
-    backgroundColor: theme.colors.bgElevated,
-    borderRadius: theme.radius.md,
-    padding: theme.space(3.5),
-    marginBottom: theme.space(3),
-  },
-  noteLabelRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: theme.space(1) },
-  noteLabelText: { color: theme.colors.honey, fontSize: 12, fontWeight: "600" },
-  noteText: { color: theme.colors.text, fontSize: 13, lineHeight: 19 },
   dualHint: {
     backgroundColor: theme.colors.bgElevated,
     borderRadius: theme.radius.md,
@@ -241,7 +224,6 @@ const styles = StyleSheet.create({
     marginBottom: theme.space(1),
     backgroundColor: theme.colors.bgElevated,
     borderRadius: theme.radius.md,
-    borderLeftWidth: 3,
     padding: theme.space(3.5),
   },
   exampleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5 },

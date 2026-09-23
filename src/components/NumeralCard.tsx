@@ -195,7 +195,7 @@ export function NumeralCard({ entry, revealed, onReveal }: Props) {
 
           {/* Приклад(и) речення */}
           {(entry.kind === "gendered" || entry.kind === "twoForm") && (
-            <View style={[styles.example, { borderLeftColor: theme.genderColor[gender] }]}>
+            <View style={styles.example}>
               {(() => {
                 const ex = entry.examples[gender];
                 return (
@@ -298,8 +298,6 @@ const styles = StyleSheet.create({
   example: {
     marginTop: theme.space(4),
     backgroundColor: theme.colors.bgElevated,
-    borderLeftWidth: 3,
-    borderColor: theme.colors.honey,
     borderRadius: theme.radius.md,
     padding: theme.space(3.5),
   },

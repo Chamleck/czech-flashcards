@@ -104,12 +104,7 @@ export function PersonalPronounCard({ entry, revealed, onReveal }: Props) {
             />
 
             {example && (
-              <View
-                style={[
-                  styles.example,
-                  { borderLeftColor: entry.gendered ? theme.genderColor[gender] : accent },
-                ]}
-              >
+              <View style={styles.example}>
                 <View style={styles.exampleRow}>
                   <TileEmoji name="speechBalloon" size={15} />
                   <Speakable id={exampleId} text={example.cz} style={styles.exampleCz} />
@@ -156,7 +151,6 @@ const styles = StyleSheet.create({
   example: {
     marginTop: theme.space(4),
     backgroundColor: theme.colors.bgElevated,
-    borderLeftWidth: 3,
     borderRadius: theme.radius.md,
     padding: theme.space(3.5),
   },
