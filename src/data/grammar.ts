@@ -1394,25 +1394,28 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         ],
       },
       {
-        type: "rich-tip",
-        segments: [
-          { text: "Вокалізація: короткі прийменники " },
-          { word: "k", wordId: "prep-k", kind: "prepositions" },
-          { text: "/" },
-          { word: "s", wordId: "prep-s", kind: "prepositions" },
-          { text: "/" },
-          { word: "z", wordId: "prep-z", kind: "prepositions" },
-          { text: "/" },
-          { word: "v", wordId: "prep-v", kind: "prepositions" },
-          { text: " отримують -e перед збігом приголосних або тим самим звуком: ke stolu, se sestrou, ze zahrady. Це для милозвучності — значення не змінюється." },
-        ],
-      },
-      {
-        type: "rich-tip",
-        segments: [
-          { text: "Не плутай: деякі слова бувають і прийменником, і прислівником. «Stál " },
-          { word: "vedle", wordId: "prep-vedle", kind: "prepositions" },
-          { text: " mě» (прийменник + іменник) проти «stál vedle» (прислівник, сам по собі). Прийменник завжди тягне за собою слово в потрібному відмінку." },
+        type: "tip-group",
+        items: [
+          {
+            segments: [
+              { text: "Вокалізація: короткі прийменники " },
+              { word: "k", wordId: "prep-k", kind: "prepositions" },
+              { text: "/" },
+              { word: "s", wordId: "prep-s", kind: "prepositions" },
+              { text: "/" },
+              { word: "z", wordId: "prep-z", kind: "prepositions" },
+              { text: "/" },
+              { word: "v", wordId: "prep-v", kind: "prepositions" },
+              { text: " отримують -e перед збігом приголосних або тим самим звуком: ke stolu, se sestrou, ze zahrady. Це для милозвучності — значення не змінюється." },
+            ],
+          },
+          {
+            segments: [
+              { text: "Не плутай: деякі слова бувають і прийменником, і прислівником. «Stál " },
+              { word: "vedle", wordId: "prep-vedle", kind: "prepositions" },
+              { text: " mě» (прийменник + іменник) проти «stál vedle» (прислівник, сам по собі). Прийменник завжди тягне за собою слово в потрібному відмінку." },
+            ],
+          },
         ],
       },
     ],
@@ -1473,19 +1476,22 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         ],
       },
       {
-        type: "rich-tip",
-        segments: [
-          { text: "Порівняй пару: «Kočka leze POD STŮL» (куди? — знахідний, рух) проти «Kočka spí POD STOLEM» (де? — орудний, спокій / дія без напрямку). Той самий прийменник " },
-          { word: "pod", wordId: "prep-pod", kind: "prepositions" },
-          { text: ", але різні відмінки." },
-        ],
-      },
-      {
-        type: "rich-tip",
-        segments: [
-          { text: "«" },
-          { word: "o", wordId: "prep-o", kind: "prepositions" },
-          { text: "» має ще й непросторове значення «про» (тема розмови) — і там воно ЗАВЖДИ місцевий, без пари «куди»: «Mluvíme o práci» (говоримо про роботу). Просторова пара «куди/де» діє лише для фізичного значення o (напр. opřít se o zeď — знахідний, спертися об щось)." },
+        type: "tip-group",
+        items: [
+          {
+            segments: [
+              { text: "Порівняй пару: «Kočka leze POD STŮL» (куди? — знахідний, рух) проти «Kočka spí POD STOLEM» (де? — орудний, спокій / дія без напрямку). Той самий прийменник " },
+              { word: "pod", wordId: "prep-pod", kind: "prepositions" },
+              { text: ", але різні відмінки." },
+            ],
+          },
+          {
+            segments: [
+              { text: "«" },
+              { word: "o", wordId: "prep-o", kind: "prepositions" },
+              { text: "» має ще й непросторове значення «про» (тема розмови) — і там воно ЗАВЖДИ місцевий, без пари «куди»: «Mluvíme o práci» (говоримо про роботу). Просторова пара «куди/де» діє лише для фізичного значення o (напр. opřít se o zeď — знахідний, спертися об щось)." },
+            ],
+          },
         ],
       },
       { type: "heading", text: "Особливий випадок: za" },
@@ -1606,34 +1612,36 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         text: "Не всі слова мають повну трійку — два поширені слова випадають із загального правила:",
       },
       {
-        type: "rich-tip",
-        segments: [
-          { text: "«" },
-          { word: "tam", wordId: "adv-tam", kind: "adverbs" },
-          { text: "» (там) — ОДНЕ слово одразу і для «де?», і для «куди?»: «Jsem tam» (я там) і «Jdu tam» (я йду туди) звучать однаково. А от «звідки?» — усе ж окреме слово: " },
-          { word: "odtamtud", wordId: "adv-tam", kind: "adverbs" },
-          { text: ". Для порівняння «тут» має повну трійку: " },
-          { word: "tady", wordId: "adv-tady", kind: "adverbs" },
-          { text: " / " },
-          { word: "sem", wordId: "adv-tady", kind: "adverbs" },
-          { text: " / " },
-          { word: "odtud", wordId: "adv-tady", kind: "adverbs" },
-          { text: " — там, де tam зливає дві форми в одну, tady їх розрізняє." },
+        type: "tip-group",
+        items: [
+          {
+            segments: [
+              { text: "«" },
+              { word: "tam", wordId: "adv-tam", kind: "adverbs" },
+              { text: "» (там) — ОДНЕ слово одразу і для «де?», і для «куди?»: «Jsem tam» (я там) і «Jdu tam» (я йду туди) звучать однаково. А от «звідки?» — усе ж окреме слово: " },
+              { word: "odtamtud", wordId: "adv-tam", kind: "adverbs" },
+              { text: ". Для порівняння «тут» має повну трійку: " },
+              { word: "tady", wordId: "adv-tady", kind: "adverbs" },
+              { text: " / " },
+              { word: "sem", wordId: "adv-tady", kind: "adverbs" },
+              { text: " / " },
+              { word: "odtud", wordId: "adv-tady", kind: "adverbs" },
+              { text: " — там, де tam зливає дві форми в одну, tady їх розрізняє." },
+            ],
+          },
+          {
+            segments: [
+              { text: "«" },
+              { word: "doma", wordId: "adv-doma", kind: "adverbs" },
+              { text: "» (вдома) / «" },
+              { word: "domů", wordId: "adv-doma", kind: "adverbs" },
+              { text: "» (додому) — пара де/куди звичайна, а от форми «звідки?» одним словом немає: вживається прийменникова конструкція «z domova» (родовий відмінок іменника domov: Přišel z domova), не самостійний прислівник." },
+            ],
+          },
+          {
+            text: "Не плутай зі словом «vedle» з прийменників — це та сама лексема в іншій ролі: «Stůl je vedle» (прислівник, сам по собі) проти «Stůl je vedle okna» (прийменник, керує родовим). У цьому розділі vedle не повторюємо — дивись «Прийменники».",
+          },
         ],
-      },
-      {
-        type: "rich-tip",
-        segments: [
-          { text: "«" },
-          { word: "doma", wordId: "adv-doma", kind: "adverbs" },
-          { text: "» (вдома) / «" },
-          { word: "domů", wordId: "adv-doma", kind: "adverbs" },
-          { text: "» (додому) — пара де/куди звичайна, а от форми «звідки?» одним словом немає: вживається прийменникова конструкція «z domova» (родовий відмінок іменника domov: Přišel z domova), не самостійний прислівник." },
-        ],
-      },
-      {
-        type: "tip",
-        text: "Не плутай зі словом «vedle» з прийменників — це та сама лексема в іншій ролі: «Stůl je vedle» (прислівник, сам по собі) проти «Stůl je vedle okna» (прийменник, керує родовим). У цьому розділі vedle не повторюємо — дивись «Прийменники».",
       },
       { type: "heading", text: "Четвертий вимір: кудою? (шлях)" },
       {
@@ -1737,26 +1745,21 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         ],
       },
       {
-        type: "rich-tip",
-        segments: [
-          { word: "kolik", wordId: "int-kolik", kind: "interrogative" },
-          { text: " керує родовим відмінком множини наступного іменника — так само, як числівники " },
-          { word: "pět", wordId: "card-pet", kind: "cardinals" },
-          { text: " і більше: «Kolik jablek chceš?» (Скільки яблук ти хочеш? — jablek, родовий множини). Той самий навик, що в розділі «Числівники»." },
+        type: "tip-group",
+        items: [
+          {
+            segments: [
+              { word: "kolik", wordId: "int-kolik", kind: "interrogative" },
+              { text: " керує родовим відмінком множини наступного іменника — так само, як числівники " },
+              { word: "pět", wordId: "card-pet", kind: "cardinals" },
+              { text: " і більше: «Kolik jablek chceš?» (Скільки яблук ти хочеш? — jablek, родовий множини). Той самий навик, що в розділі «Числівники»." },
+            ],
+          },
+          {
+            text: "kdy/jak/proč — прозорі відповідники «коли/як/чому», тому окремого квізу для них немає: досить словника і кількох прикладів. А от kde/kam/odkud/kudy тренуються в Флеш-картках («Прислівники місця») — там треба РОЗРІЗНЯТИ, яке питання підходить до конкретного речення.",
+          },
         ],
-      },
-      {
-        type: "tip",
-        text: "kdy/jak/proč — прозорі відповідники «коли/як/чому», тому окремого квізу для них немає: досить словника і кількох прикладів. А от kde/kam/odkud/kudy тренуються в Флеш-картках («Прислівники місця») — там треба РОЗРІЗНЯТИ, яке питання підходить до конкретного речення.",
       },
     ],
   },
 ];
-
-export const GRAMMAR_BY_ID: Record<string, GrammarTopic> = GRAMMAR_TOPICS.reduce(
-  (acc, t) => {
-    acc[t.id] = t;
-    return acc;
-  },
-  {} as Record<string, GrammarTopic>
-);

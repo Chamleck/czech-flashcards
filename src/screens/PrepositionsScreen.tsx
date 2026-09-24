@@ -77,7 +77,7 @@ export function PrepositionsScreen({ navigation }: Props) {
   function startMistakes() {
     const ids = ALL_PREP_IDS.filter((id) => mistakeIds.has(id));
     if (ids.length === 0) return;
-    navigation.navigate("PrepositionSession", { title: "Повторити помилки", entryIds: ids });
+    navigation.navigate("PrepositionSession", { title: "Повторити помилки", entryIds: ids, isMistakeRepeat: true });
   }
 
   function openGroup(g: Group) {

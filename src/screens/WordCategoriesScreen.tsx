@@ -41,7 +41,7 @@ export function WordCategoriesScreen({ navigation }: Props) {
   function startMistakes() {
     const ids = NOUNS.filter((n) => mistakeIds.has(n.id)).map((n) => n.id);
     if (ids.length === 0) return;
-    navigation.navigate("WordSession", { title: "Повторити помилки", entryIds: ids });
+    navigation.navigate("WordSession", { title: "Повторити помилки", entryIds: ids, isMistakeRepeat: true });
   }
 
   // Тап по категорії: тренування — сесія зі всіма словами; перегляд — список слів.

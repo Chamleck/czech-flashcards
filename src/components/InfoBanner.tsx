@@ -15,6 +15,12 @@ interface Props {
 }
 
 export function InfoBanner({ paragraphs, textStyle }: Props) {
+  // Захист на майбутнє: жоден із поточних 8 викликів не передає порожній
+  // масив (усі або обгорнуті умовою, або завжди мають хоча б 1 елемент), але
+  // якщо колись новий виклик забуде guard — краще нічого не намалювати, ніж
+  // порожня рамка "Важливо" без жодного тексту під нею.
+  if (paragraphs.length === 0) return null;
+
   return (
     <View style={styles.box}>
       <View style={styles.labelRow}>

@@ -47,7 +47,7 @@ export function PronounGroupsScreen({ navigation }: Props) {
   function startMistakes() {
     const ids = ALL_PRONOUN_MIXED_IDS.filter((id) => mistakeIds.has(id));
     if (ids.length === 0) return;
-    navigation.navigate("DeclSession", { title: "Повторити помилки", kind: "pronoun-mixed", entryIds: ids });
+    navigation.navigate("DeclSession", { title: "Повторити помилки", kind: "pronoun-mixed", entryIds: ids, isMistakeRepeat: true });
   }
 
   // Тап по групі: тренування — сесія; перегляд — список слів групи.

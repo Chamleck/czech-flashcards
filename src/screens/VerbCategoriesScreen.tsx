@@ -39,7 +39,7 @@ export function VerbCategoriesScreen({ navigation }: Props) {
   function startMistakes() {
     const ids = VERBS.filter((v) => mistakeIds.has(v.id)).map((v) => v.id);
     if (ids.length === 0) return;
-    navigation.navigate("VerbSession", { title: "Повторити помилки", entryIds: ids });
+    navigation.navigate("VerbSession", { title: "Повторити помилки", entryIds: ids, isMistakeRepeat: true });
   }
 
   // Тап по класу: тренування — сесія; перегляд — список дієслів класу.

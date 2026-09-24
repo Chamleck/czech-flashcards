@@ -20,7 +20,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "AdverbSession">;
 // відповідь → «Знаю»/«Ще повторити», прогрес у PROGRESS_KEYS.adverbs.
 export function AdverbSessionScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const { title, entryIds } = route.params;
+  const { title, entryIds, isMistakeRepeat } = route.params;
   useStopSpeechOnUnmount();
 
   const entries = useMemo(
@@ -95,7 +95,7 @@ export function AdverbSessionScreen({ route, navigation }: Props) {
           <Text style={styles.doneTitle}>Готово!</Text>
           <Text style={styles.doneText}>
             Пройдено карток: {stats.done}{"\n"}
-            Знав одразу: {stats.known}
+            {isMistakeRepeat ? "Запам'ятав" : "Знав одразу"}: {stats.known}
           </Text>
           <Pressable
             style={styles.againBtn}

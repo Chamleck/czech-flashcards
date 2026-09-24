@@ -6,14 +6,19 @@ import { PosEmoji } from "./PosEmoji";
 import { VERB_CLASS_BY_KEY } from "../data/verbCategories";
 import { VerbConjugation } from "./VerbConjugation";
 import { Speakable } from "./Speakable";
+import { AppNav } from "./ClickableWord";
 
 interface Props {
   entry: VerbEntry;
   revealed: boolean;
   onReveal: () => void;
+  // Опційні — без них VerbConjugation просто не робить видового партнера
+  // клікабельним (fallback на звичайний текст), нічого не ламається.
+  navigation?: AppNav;
+  linkMode?: "push" | "replace";
 }
 
-export function VerbCard({ entry, revealed, onReveal }: Props) {
+export function VerbCard({ entry, revealed, onReveal, navigation, linkMode }: Props) {
   const classMeta = VERB_CLASS_BY_KEY[entry.verbClass];
   const accent = classMeta.color;
   const infinitive = entry.reflexive ? `${entry.cz} ${entry.reflexive}` : entry.cz;
@@ -59,7 +64,7 @@ export function VerbCard({ entry, revealed, onReveal }: Props) {
               </View>
             </View>
 
-            <VerbConjugation entry={entry} />
+            <VerbConjugation entry={entry} navigation={navigation} linkMode={linkMode} />
           </>
         </ScrollView>
       )}

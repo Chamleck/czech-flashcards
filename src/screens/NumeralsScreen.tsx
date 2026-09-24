@@ -98,6 +98,7 @@ export function NumeralsScreen({ navigation }: Props) {
       title: "Повторити помилки",
       kind: "numeral-mixed",
       entryIds: ids,
+      isMistakeRepeat: true,
     });
   }
 

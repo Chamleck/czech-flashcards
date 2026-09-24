@@ -474,11 +474,11 @@ export type RootStackParamList = {
   // Іменники
   WordCategories: undefined;
   WordSelection: { category: WordCategory };
-  WordSession: { title: string; entryIds: string[]; storageKey?: string };
+  WordSession: { title: string; entryIds: string[]; storageKey?: string; isMistakeRepeat?: boolean };
   // Дієслова
   VerbCategories: undefined;
   VerbSelection: { verbClass: VerbClass };
-  VerbSession: { title: string; entryIds: string[] };
+  VerbSession: { title: string; entryIds: string[]; isMistakeRepeat?: boolean };
   // Прикметники
   AdjectiveCategories: undefined;
   AdjectiveSelection: { category: AdjectiveCategory };
@@ -497,7 +497,7 @@ export type RootStackParamList = {
   // Прийменники (роутер: групи за відмінком) + власна self-report сесія
   // (прийменник незмінний, тому не через WordSession/DeclSession).
   Prepositions: undefined;
-  PrepositionSession: { title: string; entryIds: string[] };
+  PrepositionSession: { title: string; entryIds: string[]; isMistakeRepeat?: boolean };
   // Вибір слів усередині групи прийменників — govCase для фіксованих груп,
   // "dual" для дуальних. Груп з РІВНО 1 прийменником (lokal, instrumental)
   // пікер НЕ отримує — вибирати підмножину з одного слова нема сенсу
@@ -507,7 +507,7 @@ export type RootStackParamList = {
   // Прислівники місця (де/куди/звідки) — та сама логіка, що прийменники:
   // незмінна частина мови, власна self-report сесія.
   Adverbs: undefined;
-  AdverbSession: { title: string; entryIds: string[] };
+  AdverbSession: { title: string; entryIds: string[]; isMistakeRepeat?: boolean };
   AdverbSelection: undefined;
   // Спільна сесія прикметників/займенників (картка з табами роду).
   // kind "personal" → особові займенники (окрема картка PersonalPronounCard).
@@ -519,6 +519,7 @@ export type RootStackParamList = {
     title: string;
     kind: "adjective" | "pronoun" | "personal" | "ordinal" | "cardinal" | "numeral-mixed" | "pronoun-mixed" | "interrogative";
     entryIds: string[];
+    isMistakeRepeat?: boolean;
   };
   // Режим ПЕРЕГЛЯДУ слів (не тренування): список без чекбоксів → картка з горизонтальним
   // свайпом між сусідніми словами. Спільний для всіх частин мови через BrowseKind:

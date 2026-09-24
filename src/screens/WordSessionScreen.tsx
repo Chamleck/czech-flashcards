@@ -20,7 +20,7 @@ export function WordSessionScreen({ route, navigation }: Props) {
   // storageKey опційний: за замовчуванням загальна колода іменників (як завжди
   // було), але "Сотні і тисячі" передають PROGRESS_KEYS.numerals — окреме
   // сховище розділу "Числівники", не змішується зі звичайними іменниками.
-  const { title, entryIds, storageKey = PROGRESS_KEYS.nouns } = route.params;
+  const { title, entryIds, storageKey = PROGRESS_KEYS.nouns, isMistakeRepeat } = route.params;
   useStopSpeechOnUnmount(); // не тягнемо звук за екран при виході
 
   // Обрані слова цієї сесії (у порядку, як у базі)
@@ -98,7 +98,7 @@ export function WordSessionScreen({ route, navigation }: Props) {
           <Text style={styles.doneTitle}>Готово!</Text>
           <Text style={styles.doneText}>
             Пройдено карток: {stats.done}{"\n"}
-            Знав одразу: {stats.known}
+            {isMistakeRepeat ? "Запам'ятав" : "Знав одразу"}: {stats.known}
           </Text>
           <Pressable
             style={styles.againBtn}

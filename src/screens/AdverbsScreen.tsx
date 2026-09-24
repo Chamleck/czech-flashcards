@@ -45,7 +45,7 @@ export function AdverbsScreen({ navigation }: Props) {
   function startMistakes() {
     const ids = ALL_ADVERB_IDS.filter((id) => mistakeIds.has(id));
     if (ids.length === 0) return;
-    navigation.navigate("AdverbSession", { title: "Повторити помилки", entryIds: ids });
+    navigation.navigate("AdverbSession", { title: "Повторити помилки", entryIds: ids, isMistakeRepeat: true });
   }
 
   function openAll() {

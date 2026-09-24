@@ -32,13 +32,16 @@ type Props = NativeStackScreenProps<RootStackParamList, "BrowseCard">;
 // Рендер потрібної картки за частиною мови. Картки НЕ змінюються — просто завжди
 // розкриті (revealed=true), тож кнопка "Показати відповідь" не з'являється, а
 // onReveal — заглушка. Нова частина мови → одна нова гілка тут.
-function CardFor({ kind, entry }: { kind: BrowseKind; entry: any }) {
+function CardFor({ kind, entry, navigation }: { kind: BrowseKind; entry: any; navigation: Props["navigation"] }) {
   const p = { revealed: true, onReveal: () => {} };
   switch (kind) {
     case "nouns":
       return <FlashCard entry={entry} {...p} />;
     case "verbs":
-      return <VerbCard entry={entry} {...p} />;
+      // replace, не push: тут уже картка слова, і видові партнери можуть
+      // посилатись один на одного — push нескінченно роздував би стек при
+      // тапах туди-сюди, replace тримає глибину стека постійною.
+      return <VerbCard entry={entry} {...p} navigation={navigation} linkMode="replace" />;
     case "cardinals":
       return <NumeralCard entry={entry} {...p} />;
     case "prepositions":
@@ -115,7 +118,7 @@ export function BrowseCardScreen({ route, navigation }: Props) {
     return (
       <View style={{ width, height: areaH }}>
         <View style={styles.page}>
-          <CardFor kind={kind} entry={item} />
+          <CardFor kind={kind} entry={item} navigation={navigation} />
         </View>
       </View>
     );

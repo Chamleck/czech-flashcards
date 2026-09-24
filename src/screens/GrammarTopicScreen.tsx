@@ -1,16 +1,28 @@
-import React, { useLayoutEffect } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import React, { useLayoutEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  FlatList,
+  useWindowDimensions,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+  LayoutChangeEvent,
+  ListRenderItemInfo,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList, CASE_ORDER, CASE_LABELS, BrowseKind } from "../types";
+import { RootStackParamList, CASE_ORDER, CASE_LABELS } from "../types";
 import { theme } from "../utils/theme";
 import { PosEmoji } from "../components/PosEmoji";
 import { InfoBanner } from "../components/InfoBanner";
-import { GRAMMAR_BY_ID, GrammarBlock, ParagraphSegment, PatternGroup } from "../data/grammar";
-import { findSearchEntry } from "../utils/searchIndex";
+import { GRAMMAR_TOPICS, GrammarBlock, GrammarTopic, PatternGroup } from "../data/grammar";
+import { ClickableWord, Segments, AppNav } from "../components/ClickableWord";
+import { HomeHeaderButton } from "../components/HeaderIcons";
 
 type Props = NativeStackScreenProps<RootStackParamList, "GrammarTopic">;
-type GrammarNav = Props["navigation"];
+type GrammarNav = AppNav;
 
 function CasesBlock() {
   return (
@@ -58,59 +70,6 @@ function PatternsBlock({ groups, navigation }: { groups: PatternGroup[]; navigat
           ))}
         </View>
       ))}
-    </>
-  );
-}
-
-// Клікабельне слово всередині речення — відкриває картку слова в словнику
-// (BrowseCard). Стиль СВІДОМО відрізняється від Speakable (озвучення): колір
-// lilac (уже зарезервований у темі під "інформацію"), БЕЗ підкреслення й БЕЗ
-// анімації — щоб два різні жести (почути / відкрити картку) не виглядали
-// однаково. Nested-Text-з-onPress — той самий безпечний патерн, що вже working
-// у caseCz (кольоровий Text всередині Text) і в Speakable (Text з onPress).
-function ClickableWord({
-  word,
-  wordId,
-  kind,
-  navigation,
-}: {
-  word: string;
-  wordId: string;
-  kind: BrowseKind;
-  navigation: GrammarNav;
-}) {
-  function onPress() {
-    const entry = findSearchEntry(wordId, kind);
-    if (!entry) return; // wordId не знайдено в словнику — тихо ігноруємо тап
-    const initialIndex = Math.max(0, entry.entryIds.indexOf(entry.id));
-    // ОДИН push картки на поточний стек (а НЕ ланцюжок parentScreen→BrowseList,
-    // як для результатів пошуку) — тут інша логіка: "назад" має вести прямо в
-    // граматику, звідки тапнули, а не крізь проміжні екрани вибору категорії.
-    navigation.push("BrowseCard", {
-      kind: entry.kind,
-      entryIds: entry.entryIds,
-      initialIndex,
-      title: entry.title,
-    });
-  }
-
-  return (
-    <Text style={styles.clickableWord} onPress={onPress} suppressHighlighting>
-      {word}
-    </Text>
-  );
-}
-
-function Segments({ segments, navigation }: { segments: ParagraphSegment[]; navigation: GrammarNav }) {
-  return (
-    <>
-      {segments.map((seg, i) =>
-        "word" in seg ? (
-          <ClickableWord key={i} word={seg.word} wordId={seg.wordId} kind={seg.kind} navigation={navigation} />
-        ) : (
-          <Text key={i}>{seg.text}</Text>
-        )
-      )}
     </>
   );
 }
@@ -188,26 +147,17 @@ function Block({ block, navigation }: { block: GrammarBlock; navigation: Grammar
   }
 }
 
-export function GrammarTopicScreen({ route, navigation }: Props) {
+// Одна тема — той самий рендер, що й раніше був єдиним тілом екрана. Винесено
+// окремо, бо тепер його рендерить і одиночний випадок (тема не знайдена —
+// немає, technically завжди рендериться через FlatList нижче), і кожна
+// "сторінка" горизонтального пейджера.
+function GrammarTopicPage({ topic, navigation }: { topic: GrammarTopic; navigation: GrammarNav }) {
   const insets = useSafeAreaInsets();
-  const topic = GRAMMAR_BY_ID[route.params.topicId];
-
-  useLayoutEffect(() => {
-    navigation.setOptions({ title: topic ? topic.title : "Граматика" });
-  }, [navigation, topic]);
-
-  if (!topic) {
-    return (
-      <View style={styles.safe}>
-        <Text style={styles.p}>Тему не знайдено.</Text>
-      </View>
-    );
-  }
-
   return (
     <ScrollView
       style={styles.safe}
       contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + theme.space(8) }]}
+      showsVerticalScrollIndicator={false}
     >
       {topic.blocks.map((b, i) => (
         <Block key={i} block={b} navigation={navigation} />
@@ -216,9 +166,94 @@ export function GrammarTopicScreen({ route, navigation }: Props) {
   );
 }
 
+// Лише "готові" теми беруть участь у свайпі — те саме правило, за яким
+// GrammarCategoriesScreen вирішує, які теми взагалі клікабельні. Заблокована
+// тема (наразі таких нема) просто випадає з набору, без спецкоду під неї.
+const READY_TOPICS = GRAMMAR_TOPICS.filter((t) => t.ready);
+
+export function GrammarTopicScreen({ route, navigation }: Props) {
+  const { width } = useWindowDimensions();
+
+  const startIndex = Math.max(
+    0,
+    READY_TOPICS.findIndex((t) => t.id === route.params.topicId)
+  );
+  const [idx, setIdx] = useState(startIndex);
+  const [areaH, setAreaH] = useState(0);
+  const current = READY_TOPICS[idx];
+
+  // На відміну від BrowseCardScreen (де заголовок — стала назва категорії
+  // для всіх карток), тут кожна тема має власну змістовну назву — тому
+  // заголовок оновлюється при кожному свайпі, а не лишається статичним.
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: current ? current.title : "Граматика",
+      headerRight: () => (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+          {READY_TOPICS.length > 0 && (
+            <Text style={styles.counter}>
+              {idx + 1} / {READY_TOPICS.length}
+            </Text>
+          )}
+          <HomeHeaderButton navigation={navigation} />
+        </View>
+      ),
+    });
+  }, [navigation, current, idx]);
+
+  function onArea(e: LayoutChangeEvent) {
+    const h = e.nativeEvent.layout.height;
+    if (h !== areaH) setAreaH(h);
+  }
+
+  function onMomentumEnd(e: NativeSyntheticEvent<NativeScrollEvent>) {
+    const i = Math.round(e.nativeEvent.contentOffset.x / width);
+    if (i !== idx) setIdx(i);
+  }
+
+  function renderItem({ item }: ListRenderItemInfo<GrammarTopic>) {
+    return (
+      <View style={{ width, height: areaH }}>
+        <GrammarTopicPage topic={item} navigation={navigation} />
+      </View>
+    );
+  }
+
+  if (READY_TOPICS.length === 0) {
+    return (
+      <View style={styles.safe}>
+        <Text style={styles.p}>Тему не знайдено.</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ flex: 1, backgroundColor: theme.colors.bg }} onLayout={onArea}>
+      {areaH > 0 && (
+        <FlatList
+          data={READY_TOPICS}
+          keyExtractor={(t) => t.id}
+          renderItem={renderItem}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          initialScrollIndex={startIndex}
+          getItemLayout={(_, index) => ({ length: width, offset: width * index, index })}
+          onMomentumScrollEnd={onMomentumEnd}
+          initialNumToRender={1}
+          maxToRenderPerBatch={2}
+          windowSize={3}
+          removeClippedSubviews
+        />
+      )}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: theme.colors.bg },
   content: { padding: theme.space(4) },
+  counter: { color: theme.colors.textDim, fontSize: 15, fontWeight: "700" },
   p: { color: theme.colors.textDim, fontSize: 15, lineHeight: 22, marginBottom: theme.space(3) },
   h2: {
     color: theme.colors.honey,
@@ -238,7 +273,6 @@ const styles = StyleSheet.create({
   listTerm: { color: theme.colors.text, fontSize: 15, fontWeight: "700" },
   listTermRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   listNote: { color: theme.colors.textDim, fontSize: 13, lineHeight: 19, marginTop: 3 },
-  clickableWord: { color: theme.colors.lilac, fontWeight: "700" },
   caseBox: {
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.radius.md,

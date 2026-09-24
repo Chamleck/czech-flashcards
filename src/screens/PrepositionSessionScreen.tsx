@@ -21,7 +21,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "PrepositionSession">;
 // PROGRESS_KEYS.prepositions.
 export function PrepositionSessionScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const { title, entryIds } = route.params;
+  const { title, entryIds, isMistakeRepeat } = route.params;
   useStopSpeechOnUnmount();
 
   const entries = useMemo(
@@ -96,7 +96,7 @@ export function PrepositionSessionScreen({ route, navigation }: Props) {
           <Text style={styles.doneTitle}>Готово!</Text>
           <Text style={styles.doneText}>
             Пройдено карток: {stats.done}{"\n"}
-            Знав одразу: {stats.known}
+            {isMistakeRepeat ? "Запам'ятав" : "Знав одразу"}: {stats.known}
           </Text>
           <Pressable
             style={styles.againBtn}

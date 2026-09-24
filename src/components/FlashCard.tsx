@@ -35,7 +35,11 @@ export function FlashCard({ entry, revealed, onReveal }: Props) {
           </View>
         </Pressable>
       ) : (
-        <ScrollView style={styles.answerScroll} contentContainerStyle={{ paddingBottom: 8 }}>
+        <ScrollView
+          style={styles.answerScroll}
+          contentContainerStyle={{ paddingBottom: 8 }}
+          showsVerticalScrollIndicator={false}
+        >
           <>
             <View style={[styles.answerHead, { borderColor: gColor }]}>
               <View style={styles.answerLabelRow}>

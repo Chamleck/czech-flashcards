@@ -22,7 +22,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "VerbSession">;
 
 export function VerbSessionScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const { title, entryIds } = route.params;
+  const { title, entryIds, isMistakeRepeat } = route.params;
   useStopSpeechOnUnmount();
 
   const entries = useMemo(
@@ -97,7 +97,7 @@ export function VerbSessionScreen({ route, navigation }: Props) {
           <Text style={styles.doneTitle}>Готово!</Text>
           <Text style={styles.doneText}>
             Пройдено карток: {stats.done}{"\n"}
-            Знав одразу: {stats.known}
+            {isMistakeRepeat ? "Запам'ятав" : "Знав одразу"}: {stats.known}
           </Text>
           <Pressable
             style={styles.againBtn}
@@ -122,7 +122,7 @@ export function VerbSessionScreen({ route, navigation }: Props) {
   return (
     <View style={styles.safe}>
       <View style={styles.cardArea}>
-        <VerbCard entry={current} revealed={revealed} onReveal={() => setRevealed(true)} />
+        <VerbCard entry={current} revealed={revealed} onReveal={() => setRevealed(true)} navigation={navigation} />
       </View>
 
       {revealed && (

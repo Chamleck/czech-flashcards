@@ -5,6 +5,7 @@ import { theme } from "../utils/theme";
 import { TileEmoji } from "./TileEmoji";
 import { Speakable } from "./Speakable";
 import { InfoBanner } from "./InfoBanner";
+import { ClickableWord, AppNav } from "./ClickableWord";
 import {
   presentForm,
   futureForm,
@@ -93,7 +94,17 @@ const PERSON_ROW_LABELS = PERSON_ORDER.map((p) => PERSON_LABELS[p]);
 // Підписи 3 осіб наказового способу.
 const IMPERATIVE_ROW_LABELS = IMPERATIVE_ORDER.map((p) => IMPERATIVE_LABELS[p]);
 
-export function VerbConjugation({ entry }: { entry: VerbEntry }) {
+export function VerbConjugation({
+  entry,
+  navigation,
+  linkMode = "push",
+}: {
+  entry: VerbEntry;
+  // Опційні: без них видовий партнер лишається звичайним текстом (fallback,
+  // не крашиться) — потрібні лише щоб зробити партнера клікабельним.
+  navigation?: AppNav;
+  linkMode?: "push" | "replace";
+}) {
   const isPerfective = entry.aspect === "perfective";
   const hasImperative = !!entry.imperative;
 
@@ -128,17 +139,58 @@ export function VerbConjugation({ entry }: { entry: VerbEntry }) {
       ? entry.examples.future
       : entry.examples.imperative;
 
+  // Робимо видового партнера клікабельним, лише якщо текст примітки почина-
+  // ється з надійного, передбачуваного шаблону "(не)доконаний партнер: X" —
+  // а не намагаючись розпарсити довільний текст (32 з 158 приміток мають
+  // геть іншу форму: "нерегулярне; ...", "самостійне (без пари)" тощо — для
+  // них parseAspectPairNote поверне null, і примітка лишиться звичайним
+  // текстом, як і була). Ціль кліку — ЗАВЖДИ entry.aspectPairId (структурне
+  // поле, перевірене на 100% взаємність окремим скриптом), НІКОЛИ не текст,
+  // що витягнули регуляркою, — regex лише вирішує ДЕ в реченні розрізати на
+  // клікабельне слово, не ЩО насправді відкриється.
+  function parseAspectPairNote(note: string): { prefix: string; word: string; suffix: string } | null {
+    // Без прив'язки до початку рядка (^) — 2 записи (vzit, stat-se) мають
+    // префікс перед шаблоном ("нерегулярне доконане; недоконаний партнер:
+    // ..."), і заякорений варіант їх пропускав. Безпечно: незалежно від ТОГО,
+    // ДЕ в тексті знайдеться фраза, увесь текст до неї включно йде в prefix
+    // (без втрати змісту), а ціль кліку — завжди entry.aspectPairId, ніколи
+    // не сам знайдений текст.
+    const labelMatch = note.match(/(недоконаний партнер|доконаний партнер): /);
+    if (!labelMatch || labelMatch.index === undefined) return null;
+    const prefix = note.slice(0, labelMatch.index + labelMatch[0].length);
+    const afterLabel = note.slice(prefix.length);
+    const wordMatch = afterLabel.match(/^[^\s(]+/);
+    if (!wordMatch) return null;
+    return { prefix, word: wordMatch[0], suffix: afterLabel.slice(wordMatch[0].length) };
+  }
+
+  function renderAspectPairNote(note: string): React.ReactNode {
+    if (navigation && entry.aspectPairId) {
+      const parsed = parseAspectPairNote(note);
+      if (parsed) {
+        return (
+          <>
+            {parsed.prefix}
+            <ClickableWord word={parsed.word} wordId={entry.aspectPairId} kind="verbs" navigation={navigation} mode={linkMode} />
+            {parsed.suffix}
+          </>
+        );
+      }
+    }
+    return note; // без navigation/aspectPairId або нерозпізнаний формат — як і раніше, простий текст
+  }
+
   // Обидва факти нижче — глобальні для слова (не залежать від обраного табу),
   // тому рендеряться в ОДНОМУ банері "Важливо" одразу над табами, а не як два
   // окремі банери поспіль (colnote1: відсутність теп. часу; colnote2: видова
   // пара) — раніше видова пара була окремим банером у самому кінці картки
   // (VerbCard.tsx), що виглядало як дубль-за-змістом банер під "Зверніть
   // увагу" відразу під прикладом речення поточного табу.
-  const globalNoteParagraphs: string[] = [
+  const globalNoteParagraphs: React.ReactNode[] = [
     ...(isPerfective
       ? ["Доконаний вид не має теперішнього часу. Його «теперішня» дієвідміна за значенням є майбутньою."]
       : []),
-    ...(entry.aspectPairNote ? [entry.aspectPairNote] : []),
+    ...(entry.aspectPairNote ? [renderAspectPairNote(entry.aspectPairNote)] : []),
   ];
 
   return (

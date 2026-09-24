@@ -70,7 +70,7 @@ export function InterrogativesScreen({ navigation }: Props) {
   function startMistakes() {
     const ids = ALL_INTERROGATIVE_IDS.filter((id) => mistakeIds.has(id));
     if (ids.length === 0) return;
-    navigation.navigate("DeclSession", { title: "Повторити помилки", kind: "interrogative", entryIds: ids });
+    navigation.navigate("DeclSession", { title: "Повторити помилки", kind: "interrogative", entryIds: ids, isMistakeRepeat: true });
   }
 
   function openPronouns() {

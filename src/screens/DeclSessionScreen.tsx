@@ -36,7 +36,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "DeclSession">;
 
 export function DeclSessionScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const { title, kind, entryIds } = route.params;
+  const { title, kind, entryIds, isMistakeRepeat } = route.params;
   useStopSpeechOnUnmount();
 
   const isPersonal = kind === "personal";
@@ -151,7 +151,7 @@ export function DeclSessionScreen({ route, navigation }: Props) {
           <Text style={styles.doneTitle}>Готово!</Text>
           <Text style={styles.doneText}>
             Пройдено карток: {stats.done}{"\n"}
-            Знав одразу: {stats.known}
+            {isMistakeRepeat ? "Запам'ятав" : "Знав одразу"}: {stats.known}
           </Text>
           <Pressable
             style={styles.againBtn}

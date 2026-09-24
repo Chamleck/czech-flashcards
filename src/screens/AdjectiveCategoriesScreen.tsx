@@ -39,7 +39,7 @@ export function AdjectiveCategoriesScreen({ navigation }: Props) {
   function startMistakes() {
     const ids = ADJECTIVES.filter((a) => mistakeIds.has(a.id)).map((a) => a.id);
     if (ids.length === 0) return;
-    navigation.navigate("DeclSession", { title: "Повторити помилки", kind: "adjective", entryIds: ids });
+    navigation.navigate("DeclSession", { title: "Повторити помилки", kind: "adjective", entryIds: ids, isMistakeRepeat: true });
   }
 
   function onCategory(key: string, title: string) {
