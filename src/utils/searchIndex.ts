@@ -128,7 +128,8 @@ function push(
   entryIds: string[],
   title: string,
   parentScreen: SearchEntry["parentScreen"],
-  kindLabelOverride?: string
+  kindLabelOverride?: string,
+  emojiOverride?: PosEmojiName
 ) {
   const texts = [cz, uk, ...altForms].map(normalize);
   arr.push({
@@ -136,7 +137,7 @@ function push(
     kind,
     cz,
     uk,
-    emoji: KIND_EMOJI[kind],
+    emoji: emojiOverride ?? KIND_EMOJI[kind],
     searchTextsNorm: texts,
     entryIds,
     title,
@@ -155,7 +156,7 @@ function buildIndex(): SearchEntry[] {
   const numberIds = NOUNS.filter((n) => n.category === "numbers").map((n) => n.id);
   for (const n of NOUNS) {
     if (n.category === "numbers") {
-      push(out, n.id, "nouns", n.cz, n.uk, [], numberIds, NUMERAL_HUNDREDS_TITLE, "Numerals", KIND_LABEL.cardinals);
+      push(out, n.id, "nouns", n.cz, n.uk, [], numberIds, NUMERAL_HUNDREDS_TITLE, "Numerals", KIND_LABEL.cardinals, KIND_EMOJI.cardinals);
       continue;
     }
     const meta = CATEGORY_BY_KEY[n.category];
@@ -168,7 +169,7 @@ function buildIndex(): SearchEntry[] {
   const ordinalIds = ADJECTIVES.filter((a) => a.category === "ordinal").map((a) => a.id);
   for (const a of ADJECTIVES) {
     if (a.category === "ordinal") {
-      push(out, a.id, "adjectives", a.cz, a.uk, [], ordinalIds, NUMERAL_ORDINAL_TITLE, "Numerals", KIND_LABEL.cardinals);
+      push(out, a.id, "adjectives", a.cz, a.uk, [], ordinalIds, NUMERAL_ORDINAL_TITLE, "Numerals", KIND_LABEL.cardinals, KIND_EMOJI.cardinals);
       continue;
     }
     const meta = ADJ_CATEGORY_BY_KEY[a.category];
