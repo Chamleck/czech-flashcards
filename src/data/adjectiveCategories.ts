@@ -17,7 +17,7 @@ export interface AdjCategoryMeta {
 export const ADJ_CATEGORIES: AdjCategoryMeta[] = [
   { key: "size", icon: "ruler", title: "Розмір", hint: "твердий зразок mladý" },
   { key: "quality", icon: "star", title: "Якість і вік", hint: "твердий зразок mladý" },
-  { key: "measure", icon: "thermometer", title: "Ціна, темп, температура", hint: "твердий зразок mladý" },
+  { key: "measure", icon: "thermometer", title: "Ціна, вага, темп, температура", hint: "твердий зразок mladý" },
   { key: "colors", icon: "palette", title: "Кольори", hint: "твердий зразок mladý" },
   { key: "soft", icon: "seedling", title: "М'які (на -í)", hint: "м'який зразок jarní" },
   { key: "ordinal", icon: "numbers", title: "Порядкові числівники", hint: "перший, другий… (зразок mladý/jarní)", hiddenFromPartOfSpeech: true },

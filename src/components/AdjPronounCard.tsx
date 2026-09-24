@@ -53,6 +53,36 @@ function patternLabel(e: DeclEntry, degree: Degree): string {
   return "незмінний";
 }
 
+// Блок одного прикладу-речення (сз+ук), з необов'язковою міткою сенсу зверху.
+// Компонент рівня модуля (не всередині рендеру картки) — щоб ідентичність
+// компонента не мінялась при кожній зміні табу роду: Speakable тримає власний
+// useRef/useEffect (підсвітка/анімація), і локально-перевизначений компонент
+// на кожен рендер спричинив би його розмонтування-монтування щоразу.
+function ExampleBlock({
+  cz,
+  uk,
+  label,
+  speakId,
+  style,
+}: {
+  cz: string;
+  uk: string;
+  label?: string;
+  speakId: string;
+  style?: object;
+}) {
+  return (
+    <View style={[styles.example, style]}>
+      {label && <Text style={styles.senseLabel}>{label}</Text>}
+      <View style={styles.exampleRow}>
+        <TileEmoji name="speechBalloon" size={15} />
+        <Speakable id={speakId} text={cz} style={styles.exampleCz} />
+      </View>
+      <Text style={styles.exampleUk}>{uk}</Text>
+    </View>
+  );
+}
+
 export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
   const [gender, setGender] = useState<Gender>("masc_anim");
   const [degree, setDegree] = useState<Degree>("positive");
@@ -167,19 +197,29 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
                 )
               : degree === "positive" &&
                 (() => {
+                  const senseLabel = (entry as any).senseLabel as string | undefined;
+                  const secondSense = (entry as any).secondSense as
+                    | { label: string; examples: any }
+                    | undefined;
                   const ex = (entry as any).examples[gender];
                   return (
-                    <View style={styles.example}>
-                      <View style={styles.exampleRow}>
-                        <TileEmoji name="speechBalloon" size={15} />
-                        <Speakable
-                          id={`${entry.id}:${gender}:example`}
-                          text={ex.cz}
-                          style={styles.exampleCz}
+                    <>
+                      <ExampleBlock
+                        cz={ex.cz}
+                        uk={ex.uk}
+                        label={senseLabel}
+                        speakId={`${entry.id}:${gender}:example`}
+                      />
+                      {secondSense && (
+                        <ExampleBlock
+                          cz={secondSense.examples[gender].cz}
+                          uk={secondSense.examples[gender].uk}
+                          label={secondSense.label}
+                          speakId={`${entry.id}:${gender}:example2`}
+                          style={styles.exampleSecond}
                         />
-                      </View>
-                      <Text style={styles.exampleUk}>{ex.uk}</Text>
-                    </View>
+                      )}
+                    </>
                   );
                 })()}
           </>
@@ -237,6 +277,19 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgElevated,
     borderRadius: theme.radius.md,
     padding: theme.space(3.5),
+  },
+  // Другий приклад (secondSense) — той самий міжблоковий відступ, що вже
+  // перевірений на стеку прикладів SimpleWordCard (питальні слова).
+  exampleSecond: {
+    marginTop: theme.space(2),
+    marginBottom: theme.space(1),
+  },
+  senseLabel: {
+    color: theme.colors.textFaint,
+    fontSize: 11,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    marginBottom: theme.space(1),
   },
   exampleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5 },
   exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600" },
