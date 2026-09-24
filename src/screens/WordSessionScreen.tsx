@@ -98,7 +98,7 @@ export function WordSessionScreen({ route, navigation }: Props) {
           <Text style={styles.doneTitle}>Готово!</Text>
           <Text style={styles.doneText}>
             Пройдено карток: {stats.done}{"\n"}
-            {isMistakeRepeat ? "Запам'ятав" : "Знав одразу"}: {stats.known}
+            {isMistakeRepeat ? "Вивчено" : "Знав одразу"}: {stats.known}
           </Text>
           <Pressable
             style={styles.againBtn}
@@ -112,7 +112,7 @@ export function WordSessionScreen({ route, navigation }: Props) {
             <Text style={styles.againText}>Ще раз</Text>
           </View>
           </Pressable>
-          <Pressable style={styles.backHome} onPress={() => navigation.navigate("WordsPartOfSpeech")}>
+          <Pressable style={styles.backHome} onPress={() => navigation.goBack()}>
             <Text style={styles.backHomeText}>Назад</Text>
           </Pressable>
         </View>
