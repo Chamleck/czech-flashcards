@@ -5,6 +5,7 @@ import { theme } from "../utils/theme";
 import { PosEmoji } from "./PosEmoji";
 import { TileEmoji } from "./TileEmoji";
 import { Speakable } from "./Speakable";
+import { InfoBanner } from "./InfoBanner";
 
 interface Props {
   entry: InvariantWordEntry;
@@ -68,6 +69,8 @@ export function SimpleWordCard({ entry, revealed, onReveal }: Props) {
             </View>
             <Speakable id={`${entry.id}:headline`} text={entry.cz} style={styles.answerWord} />
           </View>
+
+          {entry.note && <InfoBanner paragraphs={[entry.note]} />}
 
           {entry.examples.map((ex, i) => (
             <ExampleRow key={i} id={`${entry.id}:ex${i}`} cz={ex.cz} uk={ex.uk} />

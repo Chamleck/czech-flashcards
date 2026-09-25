@@ -377,6 +377,10 @@ export interface InvariantWordEntry {
   cz: string;
   uk: string;
   examples: { cz: string; uk: string }[];
+  // Банер "Важливо" — лише для реального ризику помилки (напр. когда/kdyz
+  // проти вже наявного питального kdy), не для стилістичних нюансів. Той
+  // самий патерн, що PrepositionEntry.vocalNote.
+  note?: string;
 }
 
 
