@@ -11,6 +11,7 @@ const NUMERALS_KEY = "czech_numerals_progress_v1"; // кількісні + по�
 const PREPOSITIONS_KEY = "czech_prepositions_progress_v1"; // прийменники (фіксовані + дуальні — один спільний розділ)
 const ADVERBS_KEY = "czech_adverbs_progress_v1"; // прислівники місця (де/куди/звідки)
 const INTERROGATIVES_KEY = "czech_interrogatives_progress_v1"; // питальні слова — окремий розділ (займенники kdo/co/jaký/… + прислівники kde/kam/… + kolik)
+const SERVICE_WORDS_KEY = "czech_service_words_progress_v1"; // службові слова — окремий розділ (сполучники + загальні прислівники)
 
 export const PROGRESS_KEYS = {
   nouns: NOUN_KEY,
@@ -21,6 +22,7 @@ export const PROGRESS_KEYS = {
   prepositions: PREPOSITIONS_KEY,
   adverbs: ADVERBS_KEY,
   interrogatives: INTERROGATIVES_KEY, // розділ "Питальні слова" — усі питальні вирази разом
+  serviceWords: SERVICE_WORDS_KEY, // розділ "Службові слова" — сполучники + загальні прислівники разом
 };
 
 // Базові варіанти з явним ключем сховища.

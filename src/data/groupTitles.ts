@@ -28,8 +28,11 @@ export const KIND_LABEL_NUMERALS = "Числівники";
 export const KIND_LABEL_PREPOSITIONS = "Прийменники";
 export const KIND_LABEL_ADVERBS = "Прислівники";
 export const KIND_LABEL_INTERROGATIVE = "Питальні"; // розділ "Питальні слова" — мітка тайла й рядка пошуку
+export const KIND_LABEL_SERVICE_WORDS = "Службові"; // розділ "Службові слова" — мітка тайла й рядка пошуку
 export const INTERROGATIVE_ADVERBS_GROUP_TITLE = "Прислівникові (де? куди? звідки? кудою?)"; // ряд "Прислівникові" у хабі "Питальні слова" — ЛИШЕ для searchIndex.ts; заголовок бере INTERROGATIVE_ADVERBS_TITLE нижче
 export const INTERROGATIVE_MISC_GROUP_TITLE = "Інші (коли? як? чому? скільки?)"; // ряд "Інші" у хабі "Питальні слова" — ЛИШЕ для searchIndex.ts; заголовок бере INTERROGATIVE_MISC_TITLE нижче
+export const CONJUNCTIONS_GROUP_TITLE = "Сполучники (a, ale, protože…)"; // ряд "Сполучники" у хабі "Службові слова" — ЛИШЕ для searchIndex.ts; заголовок бере CONJUNCTIONS_TITLE нижче
+export const SERVICE_ADVERBS_GROUP_TITLE = "Загальні прислівники (opravdu, vlastně…)"; // ряд "Загальні прислівники" у хабі "Службові слова" — ЛИШЕ для searchIndex.ts; заголовок бере SERVICE_ADVERBS_TITLE нижче
 
 // Короткі назви (без перекладу питальних слів у дужках) — те, що реально
 // показує сам рядок на InterrogativesScreen (styles.title), і те, що має
@@ -38,3 +41,5 @@ export const INTERROGATIVE_MISC_GROUP_TITLE = "Інші (коли? як? чом�
 export const INTERROGATIVE_PRONOUNS_TITLE = "Займенники";
 export const INTERROGATIVE_ADVERBS_TITLE = "Прислівники";
 export const INTERROGATIVE_MISC_TITLE = "Інші";
+export const CONJUNCTIONS_TITLE = "Сполучники";
+export const SERVICE_ADVERBS_TITLE = "Загальні прислівники";

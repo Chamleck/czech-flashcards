@@ -10,6 +10,8 @@ import { INTERROGATIVE_MISC } from "../data/interrogativeMisc";
 import { CARDINALS } from "../data/cardinals";
 import { PREPOSITIONS } from "../data/prepositions";
 import { ADVERBS } from "../data/adverbs";
+import { CONJUNCTIONS } from "../data/conjunctions";
+import { SERVICE_ADVERBS } from "../data/serviceAdverbs";
 
 // Мінімальний спільний тип запису для СПИСКУ перегляду (усі датасети його мають).
 export interface BrowseListItem {
@@ -43,6 +45,12 @@ export function browseSource(kind: BrowseKind): readonly { id: string; uk: strin
       // "інша") в ОДНОМУ пулі: entryIds, що приходять від конкретної групи/
       // пошуку, самі звужують, які записи реально показуються.
       return [...INTERROGATIVE_ALL, ...INTERROGATIVE_ADVERBS, ...INTERROGATIVE_MISC];
+    case "service-word":
+      // Розділ "Службові слова" — дві групи (сполучники, прислівники) в
+      // ОДНОМУ пулі, той самий принцип, що "interrogative" вище. На відміну
+      // від interrogative тут не потрібен резолвер картки за id — обидві
+      // групи однієї форми (InvariantWordEntry), завжди SimpleWordCard.
+      return [...CONJUNCTIONS, ...SERVICE_ADVERBS];
     case "pronouns":
       // Присвійні/вказівні + особові в одному пулі (той самий принцип, що
       // "interrogative" вище) — entryIds, що приходять від конкретної

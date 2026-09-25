@@ -24,6 +24,8 @@ import { INTERROGATIVE_ALL } from "../data/interrogativePronouns";
 import { INTERROGATIVE_ADVERBS } from "../data/interrogativeAdverbs";
 import { INTERROGATIVE_MISC } from "../data/interrogativeMisc";
 import { resolveInterrogative } from "../utils/interrogativeEntries";
+import { CONJUNCTIONS } from "../data/conjunctions";
+import { SERVICE_ADVERBS } from "../data/serviceAdverbs";
 import {
   loadProgressFrom,
   saveProgressTo,
@@ -44,10 +46,12 @@ export function DeclSessionScreen({ route, navigation }: Props) {
   const isMixed = kind === "numeral-mixed";
   const isPronounMixed = kind === "pronoun-mixed";
   const isInterrogative = kind === "interrogative";
+  const isServiceWord = kind === "service-word";
   // "ordinal"/"cardinal"/"numeral-mixed" пишуть у спільне сховище "Числівники".
   // Розділ "Займенники" (personal / pronoun / pronoun-mixed) пише в одне сховище
   // PROGRESS_KEYS.pronouns. Питальні ("interrogative") — окремий розділ "Питальні
-  // слова" з власним сховищем PROGRESS_KEYS.interrogatives.
+  // слова" з власним сховищем PROGRESS_KEYS.interrogatives. Службові слова
+  // ("service-word") — так само окремий розділ, PROGRESS_KEYS.serviceWords.
   const storageKey =
     kind === "adjective"
       ? PROGRESS_KEYS.adjectives
@@ -55,10 +59,14 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       ? PROGRESS_KEYS.numerals
       : isInterrogative
       ? PROGRESS_KEYS.interrogatives
+      : isServiceWord
+      ? PROGRESS_KEYS.serviceWords
       : PROGRESS_KEYS.pronouns;
   // Для "numeral-mixed"/"pronoun-mixed"/"interrogative"/"personal" датасет —
   // об'єднання джерел розділу; конкретна картка вибирається ПОКАРТКОВО за id
-  // (див. renderCard нижче через resolveNumeral/resolvePronoun).
+  // (див. renderCard нижче через resolveNumeral/resolvePronoun). "service-word"
+  // теж об'єднання (сполучники+прислівники), але БЕЗ резолвера — обидві групи
+  // однієї форми (InvariantWordEntry), завжди SimpleWordCard.
   const dataset: { id: string }[] =
     kind === "adjective" || kind === "ordinal"
       ? ADJECTIVES
@@ -72,6 +80,8 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       ? [...PRONOUNS, ...PERSONAL_PRONOUNS]
       : isInterrogative
       ? [...INTERROGATIVE_ALL, ...INTERROGATIVE_ADVERBS, ...INTERROGATIVE_MISC]
+      : isServiceWord
+      ? [...CONJUNCTIONS, ...SERVICE_ADVERBS]
       : PRONOUNS;
 
   const entries = useMemo(
@@ -203,6 +213,8 @@ export function DeclSessionScreen({ route, navigation }: Props) {
         return <SimpleWordCard entry={r.entry as InvariantWordEntry} {...p} />;
       return <AdjPronounCard entry={r.entry as DeclEntry} {...p} />;
     }
+    if (isServiceWord)
+      return <SimpleWordCard entry={current as InvariantWordEntry} {...p} />;
     if (isPersonal)
       return <PersonalPronounCard entry={current as (typeof PERSONAL_PRONOUNS)[number]} {...p} />;
     if (isCardinal) return <NumeralCard entry={current as (typeof CARDINALS)[number]} {...p} />;

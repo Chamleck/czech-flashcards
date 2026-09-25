@@ -469,7 +469,7 @@ export interface VerbEntry {
 // "pronouns" покриває і присвійні/вказівні, і особові — розрізнення всередині
 // за id через pronounCardType (той самий патерн, що "interrogative" з
 // interrogativeCardType: один kind, кілька структур даних, диспетчер по id).
-export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "cardinals" | "prepositions" | "adverbs" | "interrogative";
+export type BrowseKind = "nouns" | "verbs" | "adjectives" | "pronouns" | "cardinals" | "prepositions" | "adverbs" | "interrogative" | "service-word";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -497,6 +497,12 @@ export type RootStackParamList = {
   InterrogativeMiscSelection: undefined; // інша група (kdy/jak/proč/kolik)
   // Питальні слова — окремий тематичний розділ (хаб усіх питальних виразів)
   Interrogatives: undefined;
+  // Службові слова — окремий тематичний розділ (хаб: сполучники + загальні
+  // прислівники). Та сама модель, що "Питальні слова", але простіша: усі
+  // записи обох груп — InvariantWordEntry (без резолвера змішаних форм).
+  ServiceWords: undefined;
+  ConjunctionSelection: undefined; // сполучники (a/ale/nebo/protože/že/když/pokud/jestli/aby/takže)
+  ServiceAdverbSelection: undefined; // загальні прислівники (opravdu/vlastně/prostě/už/tehdy/pak/raději/víceméně/nicméně/přesto)
   // Числівники (роутер: кількісні / порядкові / сотні-тисячі)
   Numerals: undefined;
   NumeralSelection: { numKind: "cardinal" | "ordinal" | "hundreds" };
@@ -523,7 +529,7 @@ export type RootStackParamList = {
   // датасет CARDINALS), теж пише в PROGRESS_KEYS.numerals.
   DeclSession: {
     title: string;
-    kind: "adjective" | "pronoun" | "personal" | "ordinal" | "cardinal" | "numeral-mixed" | "pronoun-mixed" | "interrogative";
+    kind: "adjective" | "pronoun" | "personal" | "ordinal" | "cardinal" | "numeral-mixed" | "pronoun-mixed" | "interrogative" | "service-word";
     entryIds: string[];
     isMistakeRepeat?: boolean;
   };

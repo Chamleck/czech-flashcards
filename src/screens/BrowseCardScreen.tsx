@@ -57,6 +57,10 @@ function CardFor({ kind, entry, navigation }: { kind: BrowseKind; entry: any; na
       if (t === "invariant") return <SimpleWordCard entry={entry} {...p} />;
       return <AdjPronounCard entry={entry} {...p} />;
     }
+    case "service-word":
+      // Розділ "Службові слова" — на відміну від interrogative, тут завжди
+      // одна форма (InvariantWordEntry), резолвер за id не потрібен.
+      return <SimpleWordCard entry={entry} {...p} />;
     case "pronouns": {
       // Присвійні/вказівні vs особові — той самий принцип, що interrogative
       // вище: один kind, диспетчер картки по id через pronounCardType

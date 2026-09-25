@@ -6,6 +6,8 @@ import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { INTERROGATIVE_ALL } from "../data/interrogativePronouns";
 import { INTERROGATIVE_ADVERBS } from "../data/interrogativeAdverbs";
 import { INTERROGATIVE_MISC } from "../data/interrogativeMisc";
+import { CONJUNCTIONS } from "../data/conjunctions";
+import { SERVICE_ADVERBS } from "../data/serviceAdverbs";
 import { CARDINALS } from "../data/cardinals";
 import { PREPOSITIONS } from "../data/prepositions";
 import { ADVERBS } from "../data/adverbs";
@@ -29,6 +31,8 @@ import {
   INTERROGATIVE_GROUP_TITLE,
   INTERROGATIVE_ADVERBS_GROUP_TITLE,
   INTERROGATIVE_MISC_GROUP_TITLE,
+  CONJUNCTIONS_GROUP_TITLE,
+  SERVICE_ADVERBS_GROUP_TITLE,
   NUMERAL_CARDINAL_TITLE,
   NUMERAL_ORDINAL_TITLE,
   NUMERAL_HUNDREDS_TITLE,
@@ -42,6 +46,7 @@ import {
   KIND_LABEL_PREPOSITIONS,
   KIND_LABEL_ADVERBS,
   KIND_LABEL_INTERROGATIVE,
+  KIND_LABEL_SERVICE_WORDS,
 } from "../data/groupTitles";
 
 // ─────────────────────────── Індекс пошуку слів ───────────────────────────
@@ -70,7 +75,7 @@ export interface SearchEntry {
   // AdjectiveCategories). Всі ці екрани не приймають параметрів — "пуш" перед
   // BrowseList коштує майже нічого, тож "назад" відтворює СПРАВЖНЮ глибину
   // навігації, а не скорочену версію.
-  parentScreen: "WordCategories" | "VerbCategories" | "AdjectiveCategories" | "PronounGroups" | "Interrogatives" | "Numerals" | "Prepositions" | "Adverbs";
+  parentScreen: "WordCategories" | "VerbCategories" | "AdjectiveCategories" | "PronounGroups" | "Interrogatives" | "ServiceWords" | "Numerals" | "Prepositions" | "Adverbs";
 }
 
 // Діакритично-нечутлива нормалізація (á→a, č→c, ř→r…) — NFD-декомпозиція +
@@ -93,6 +98,7 @@ const KIND_EMOJI: Record<BrowseKind, PosEmojiName> = {
   prepositions: "compass",
   adverbs: "map",
   interrogative: "question",
+  "service-word": "link",
 };
 
 // Широка категорія за замовчуванням — та сама, що назви тайлів на корені
@@ -108,6 +114,7 @@ const KIND_LABEL: Record<BrowseKind, string> = {
   prepositions: KIND_LABEL_PREPOSITIONS,
   adverbs: KIND_LABEL_ADVERBS,
   interrogative: KIND_LABEL_INTERROGATIVE,
+  "service-word": KIND_LABEL_SERVICE_WORDS,
 };
 
 // ІНВАРІАНТ (єдина точка входу для ВСІХ категорій): altForms — лише
@@ -216,6 +223,17 @@ function buildIndex(): SearchEntry[] {
   const interrogativeMiscIds = INTERROGATIVE_MISC.map((p) => p.id);
   for (const p of INTERROGATIVE_MISC) {
     push(out, p.id, "interrogative", p.cz, p.uk, [], interrogativeMiscIds, INTERROGATIVE_MISC_GROUP_TITLE, "Interrogatives");
+  }
+
+  // Службові слова — дві групи (сполучники, прислівники) в одному розділі,
+  // той самий принцип, що три групи "Питальних слів" вище.
+  const conjunctionIds = CONJUNCTIONS.map((p) => p.id);
+  for (const p of CONJUNCTIONS) {
+    push(out, p.id, "service-word", p.cz, p.uk, [], conjunctionIds, CONJUNCTIONS_GROUP_TITLE, "ServiceWords");
+  }
+  const serviceAdverbIds = SERVICE_ADVERBS.map((p) => p.id);
+  for (const p of SERVICE_ADVERBS) {
+    push(out, p.id, "service-word", p.cz, p.uk, [], serviceAdverbIds, SERVICE_ADVERBS_GROUP_TITLE, "ServiceWords");
   }
 
   // Числівники (кількісні) — суцільний список (той самий CARDINAL_IDS, що в NumeralsScreen).
