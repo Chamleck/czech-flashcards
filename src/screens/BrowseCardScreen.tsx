@@ -24,6 +24,8 @@ import { AdverbCard } from "../components/AdverbCard";
 import { SimpleWordCard } from "../components/SimpleWordCard";
 import { interrogativeCardType } from "../utils/interrogativeEntries";
 import { pronounCardType } from "../utils/pronounEntries";
+import { serviceWordCardType } from "../utils/serviceWordEntries";
+import { ConditionalParticleCard } from "../components/ConditionalParticleCard";
 import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
 import { HomeHeaderButton, SearchHeaderButton } from "../components/HeaderIcons";
 
@@ -57,10 +59,14 @@ function CardFor({ kind, entry, navigation }: { kind: BrowseKind; entry: any; na
       if (t === "invariant") return <SimpleWordCard entry={entry} {...p} />;
       return <AdjPronounCard entry={entry} {...p} />;
     }
-    case "service-word":
-      // Розділ "Службові слова" — на відміну від interrogative, тут завжди
-      // одна форма (InvariantWordEntry), резолвер за id не потрібен.
+    case "service-word": {
+      // Розділ "Службові слова" — той самий принцип, що interrogative вище:
+      // aby/kdyby мають парадигму (ConditionalConjunctionEntry), решта —
+      // InvariantWordEntry, диспетчер за id через serviceWordCardType.
+      const t = serviceWordCardType(entry.id);
+      if (t === "conditional") return <ConditionalParticleCard entry={entry} {...p} />;
       return <SimpleWordCard entry={entry} {...p} />;
+    }
     case "pronouns": {
       // Присвійні/вказівні vs особові — той самий принцип, що interrogative
       // вище: один kind, диспетчер картки по id через pronounCardType

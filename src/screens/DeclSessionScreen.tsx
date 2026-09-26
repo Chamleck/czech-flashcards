@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList, CardProgress, InvariantWordEntry } from "../types";
+import { RootStackParamList, CardProgress, InvariantWordEntry, ConditionalConjunctionEntry } from "../types";
 import { theme } from "../utils/theme";
 import { HomeHeaderButton } from "../components/HeaderIcons";
 import { PosEmoji } from "../components/PosEmoji";
@@ -13,6 +13,7 @@ import { PersonalPronounCard } from "../components/PersonalPronounCard";
 import { NumeralCard } from "../components/NumeralCard";
 import { FlashCard } from "../components/FlashCard";
 import { SimpleWordCard } from "../components/SimpleWordCard";
+import { ConditionalParticleCard } from "../components/ConditionalParticleCard";
 import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
@@ -26,6 +27,7 @@ import { INTERROGATIVE_MISC } from "../data/interrogativeMisc";
 import { resolveInterrogative } from "../utils/interrogativeEntries";
 import { CONJUNCTIONS } from "../data/conjunctions";
 import { SERVICE_ADVERBS } from "../data/serviceAdverbs";
+import { resolveServiceWord } from "../utils/serviceWordEntries";
 import {
   loadProgressFrom,
   saveProgressTo,
@@ -62,11 +64,12 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       : isServiceWord
       ? PROGRESS_KEYS.serviceWords
       : PROGRESS_KEYS.pronouns;
-  // Для "numeral-mixed"/"pronoun-mixed"/"interrogative"/"personal" датасет —
-  // об'єднання джерел розділу; конкретна картка вибирається ПОКАРТКОВО за id
-  // (див. renderCard нижче через resolveNumeral/resolvePronoun). "service-word"
-  // теж об'єднання (сполучники+прислівники), але БЕЗ резолвера — обидві групи
-  // однієї форми (InvariantWordEntry), завжди SimpleWordCard.
+  // Для "numeral-mixed"/"pronoun-mixed"/"interrogative"/"personal"/"service-word"
+  // датасет — об'єднання джерел розділу; конкретна картка вибирається ПОКАРТКОВО
+  // за id (див. renderCard нижче через resolveNumeral/resolvePronoun/
+  // resolveServiceWord). "service-word" теж об'єднання (сполучники+прислівники),
+  // і, як interrogative, тепер ДВІ форми запису за id — aby/kdyby мають
+  // парадигму (ConditionalConjunctionEntry), решта — InvariantWordEntry.
   const dataset: { id: string }[] =
     kind === "adjective" || kind === "ordinal"
       ? ADJECTIVES
@@ -213,8 +216,13 @@ export function DeclSessionScreen({ route, navigation }: Props) {
         return <SimpleWordCard entry={r.entry as InvariantWordEntry} {...p} />;
       return <AdjPronounCard entry={r.entry as DeclEntry} {...p} />;
     }
-    if (isServiceWord)
-      return <SimpleWordCard entry={current as InvariantWordEntry} {...p} />;
+    if (isServiceWord) {
+      const r = resolveServiceWord(current.id);
+      if (!r) return null;
+      if (r.cardType === "conditional")
+        return <ConditionalParticleCard entry={r.entry as ConditionalConjunctionEntry} {...p} />;
+      return <SimpleWordCard entry={r.entry as InvariantWordEntry} {...p} />;
+    }
     if (isPersonal)
       return <PersonalPronounCard entry={current as (typeof PERSONAL_PRONOUNS)[number]} {...p} />;
     if (isCardinal) return <NumeralCard entry={current as (typeof CARDINALS)[number]} {...p} />;

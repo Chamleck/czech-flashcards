@@ -403,6 +403,26 @@ export const PERSON_LABELS: Record<VerbPerson, { cz: string; uk: string }> = {
 // Форми дієслова для однієї особи (усі 6 осіб)
 export type PersonForms = Record<VerbPerson, string>;
 
+// ─────────────── СПОЛУЧНИКИ З ОСОБОВОЮ ПАРАДИГМОЮ (aby, kdyby) ───────────────
+// aby/kdyby історично зрослися зі особовими закінченнями кондиціоналу (a+by,
+// kdy+by) — тому мають РЕАЛЬНУ парадигму з 6 форм (abych/abys/aby/abychom/
+// abyste/aby), а не є незмінними. Це НЕ InvariantWordEntry (та компенсує
+// ВІДСУТНІСТЬ парадигми 4 прикладами — тут парадигма Є), тому за принципом
+// "повна парадигма → 1 приклад" (як NounEntry/AdjectiveEntry) — окремий,
+// легкий тип. paradigm перевикористовує вже наявний PersonForms (той самий
+// шейп, що VerbEntry.present/future) — рендериться тим самим PersonFormsTable,
+// що дієвідміна дієслів.
+export interface ConditionalConjunctionEntry {
+  id: string;
+  cz: string; // "aby" / "kdyby" — базова (3-тя особа) форма, як у словнику
+  uk: string;
+  paradigm: PersonForms;
+  examples: { cz: string; uk: string }[];
+  // Той самий банер-принцип, що InvariantWordEntry.note — тут: ризик плутанини
+  // aby↔kdyby (однакова сітка закінчень, різне значення мета/умова).
+  note?: string;
+}
+
 // Вид дієслова
 export type VerbAspect = "imperfective" | "perfective";
 

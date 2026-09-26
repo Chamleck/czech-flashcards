@@ -6,6 +6,7 @@ import { TileEmoji } from "./TileEmoji";
 import { Speakable } from "./Speakable";
 import { InfoBanner } from "./InfoBanner";
 import { ClickableWord, AppNav } from "./ClickableWord";
+import { PersonFormsTable } from "./PersonFormsTable";
 import {
   presentForm,
   futureForm,
@@ -16,42 +17,6 @@ import {
 } from "../utils/verbForms";
 
 type Mode = "present" | "past" | "future" | "imperative";
-
-// Таблиця з довільними підписами рядків (особа/підмет → форма).
-// speakIdBase: якщо переданий, кожна форма озвучувана з id `${speakIdBase}:{i}`.
-function FormTable({
-  labels,
-  forms,
-  accent,
-  speakIdBase,
-}: {
-  labels: { cz: string; uk: string }[];
-  forms: { cz: string }[];
-  accent: string;
-  speakIdBase?: string;
-}) {
-  return (
-    <View style={styles.table}>
-      {labels.map((lbl, i) => (
-        <View key={i} style={[styles.row, i % 2 === 0 && styles.rowAlt]}>
-          <View style={styles.personCell}>
-            <Text style={styles.personCz}>{lbl.cz}</Text>
-            <Text style={styles.personUk}>{lbl.uk}</Text>
-          </View>
-          {speakIdBase && forms[i].cz ? (
-            <Speakable
-              id={`${speakIdBase}:${i}`}
-              text={forms[i].cz}
-              style={[styles.formText, { color: accent }]}
-            />
-          ) : (
-            <Text style={[styles.formText, { color: accent }]}>{forms[i].cz}</Text>
-          )}
-        </View>
-      ))}
-    </View>
-  );
-}
 
 // Рядки таблиці для теперішнього часу (6 стандартних осіб).
 function presentRows(v: VerbEntry) {
@@ -226,7 +191,7 @@ export function VerbConjugation({
 
       {/* Таблиця форм поточного режиму */}
       <View style={styles.section}>
-        <FormTable
+        <PersonFormsTable
           labels={rowLabels}
           forms={rows}
           accent={theme.colors.text}
@@ -299,23 +264,6 @@ const styles = StyleSheet.create({
   },
   segText: { color: theme.colors.textDim, fontSize: 13, fontWeight: "700" },
   segTextActive: { color: "#1a1020" },
-  table: {
-    borderRadius: theme.radius.md,
-    overflow: "hidden",
-    backgroundColor: theme.colors.bgElevated,
-  },
-  row: { flexDirection: "row", alignItems: "center" },
-  rowAlt: { backgroundColor: "rgba(255,255,255,0.03)" },
-  personCell: { flex: 1.3, paddingVertical: theme.space(2), paddingHorizontal: theme.space(2.5) },
-  personCz: { color: theme.colors.text, fontSize: 13, fontWeight: "700" },
-  personUk: { color: theme.colors.textFaint, fontSize: 11 },
-  formText: {
-    flex: 1.7,
-    paddingVertical: theme.space(2),
-    paddingHorizontal: theme.space(2.5),
-    fontSize: 15,
-    fontWeight: "600",
-  },
   participleBox: { marginTop: theme.space(2), paddingHorizontal: theme.space(1) },
   participleLabel: { color: theme.colors.textDim, fontSize: 12, fontWeight: "700", marginBottom: 2 },
   participleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline" },

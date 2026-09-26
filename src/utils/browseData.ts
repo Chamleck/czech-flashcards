@@ -47,9 +47,11 @@ export function browseSource(kind: BrowseKind): readonly { id: string; uk: strin
       return [...INTERROGATIVE_ALL, ...INTERROGATIVE_ADVERBS, ...INTERROGATIVE_MISC];
     case "service-word":
       // Розділ "Службові слова" — дві групи (сполучники, прислівники) в
-      // ОДНОМУ пулі, той самий принцип, що "interrogative" вище. На відміну
-      // від interrogative тут не потрібен резолвер картки за id — обидві
-      // групи однієї форми (InvariantWordEntry), завжди SimpleWordCard.
+      // ОДНОМУ пулі, той самий принцип, що "interrogative" вище. НА ВІДМІНУ
+      // від попередньої версії: aby/kdyby тепер ConditionalConjunctionEntry
+      // (парадигма), решта — InvariantWordEntry, тому картка вибирається
+      // резолвером serviceWordCardType (BrowseCardScreen/DeclSessionScreen),
+      // не завжди SimpleWordCard.
       return [...CONJUNCTIONS, ...SERVICE_ADVERBS];
     case "pronouns":
       // Присвійні/вказівні + особові в одному пулі (той самий принцип, що

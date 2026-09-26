@@ -124,4 +124,87 @@ export const SERVICE_ADVERBS: InvariantWordEntry[] = [
       { cz: "Přesto ti děkuji.", uk: "І все ж дякую тобі." },
     ],
   },
+  {
+    id: "adv-jeste",
+    cz: "ještě",
+    uk: "ще",
+    examples: [
+      { cz: "Mám ještě čas.", uk: "У мене ще є час." },
+      { cz: "Chceš ještě kávu?", uk: "Хочеш ще кави?" },
+      { cz: "Ještě nejsem hotový.", uk: "Я ще не готовий." },
+      { cz: "Zůstaň ještě chvíli.", uk: "Залишись ще трохи." },
+    ],
+  },
+  {
+    // Дублет — taky/také не різні слова, а розмовний/нейтральний варіант
+    // ОДНОГО слова, тому одна картка через "/" (той самий принцип, що
+    // conj-ackoli в CONJUNCTIONS).
+    id: "adv-take",
+    cz: "také / taky",
+    uk: "також",
+    note: "Обидві форми вживаються однаково — taky розмовніше, také нейтральне/писемне, взаємозамінні.",
+    examples: [
+      { cz: "Mám to také.", uk: "У мене це теж є." },
+      { cz: "Chci taky jet.", uk: "Я теж хочу поїхати." },
+      { cz: "On je také učitel.", uk: "Він теж вчитель." },
+      { cz: "Přijdu taky.", uk: "Я теж прийду." },
+    ],
+  },
+  {
+    // Дублет — jen/jenom так само один варіант одного слова.
+    id: "adv-jen",
+    cz: "jen / jenom",
+    uk: "тільки / лише",
+    note: "Обидві форми вживаються однаково — jenom трохи емфатичніше/розмовніше за jen, взаємозамінні.",
+    examples: [
+      { cz: "Mám jen pět korun.", uk: "У мене лише п'ять крон." },
+      { cz: "Chci jenom čaj.", uk: "Я хочу тільки чай." },
+      { cz: "Je jen unavený.", uk: "Він просто втомлений." },
+      { cz: "Zbylo jenom trochu.", uk: "Залишилось лише трохи." },
+    ],
+  },
+  {
+    id: "adv-asi",
+    cz: "asi",
+    uk: "напевно / мабуть",
+    examples: [
+      { cz: "Bude asi pršet.", uk: "Напевно, буде дощ." },
+      { cz: "Je mu asi třicet let.", uk: "Йому, напевно, років тридцять." },
+      { cz: "Asi máš pravdu.", uk: "Мабуть, ти маєш рацію." },
+      { cz: "Přijde asi pozdě.", uk: "Він, напевно, прийде пізно." },
+    ],
+  },
+  {
+    id: "adv-mozna",
+    cz: "možná",
+    uk: "можливо",
+    examples: [
+      { cz: "Možná přijdu později.", uk: "Можливо, я прийду пізніше." },
+      { cz: "To je možná pravda.", uk: "Можливо, це правда." },
+      { cz: "Možná bude sněžit.", uk: "Можливо, буде сніг." },
+      { cz: "Udělám to možná zítra.", uk: "Можливо, я зроблю це завтра." },
+    ],
+  },
+  {
+    id: "adv-urcite",
+    cz: "určitě",
+    uk: "напевно / точно",
+    examples: [
+      { cz: "Určitě přijdu.", uk: "Я точно прийду." },
+      { cz: "To je určitě dobrý nápad.", uk: "Це точно гарна ідея." },
+      { cz: "Určitě to zvládneš.", uk: "Ти точно впораєшся." },
+      { cz: "On to určitě ví.", uk: "Він це точно знає." },
+    ],
+  },
+  {
+    id: "adv-bohuzel",
+    cz: "bohužel",
+    uk: "на жаль",
+    examples: [
+      { cz: "Bohužel nemůžu přijít.", uk: "На жаль, я не можу прийти." },
+      { cz: "Bohužel to není pravda.", uk: "На жаль, це неправда." },
+      { cz: "Lístky jsou bohužel vyprodané.", uk: "Квитки, на жаль, розпродані." },
+      { cz: "Bohužel jsem to nestihl.", uk: "На жаль, я не встиг це зробити." },
+    ],
+  },
 ];

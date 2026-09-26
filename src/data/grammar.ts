@@ -1762,4 +1762,106 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
     ],
   },
+  {
+    id: "service-words",
+    icon: "link",
+    title: "Службові слова",
+    subtitle: "pokud/jestli, nicméně/přesto, aby+kondicionál",
+    ready: true,
+    blocks: [
+      {
+        type: "paragraph",
+        text: "Кілька службових слів виглядають як прості синоніми, але мають свій нюанс вживання — розберемо найважливіші пари.",
+      },
+      { type: "heading", text: "pokud і jestli — «якщо»" },
+      {
+        type: "rich-paragraph",
+        segments: [
+          { word: "pokud", wordId: "conj-pokud", kind: "service-word" },
+          {
+            text: " — нейтральний, універсальний вибір «якщо»: працює і в мові, і на письмі, а ще має ДОДАТКОВЕ значення «оскільки, за умови, що» («Budeš zdravá, pokud budeš sportovat»), якого в ",
+          },
+          { word: "jestli", wordId: "conj-jestli", kind: "service-word" },
+          { text: " немає." },
+        ],
+      },
+      {
+        type: "rich-paragraph",
+        segments: [
+          { word: "jestli", wordId: "conj-jestli", kind: "service-word" },
+          {
+            text: " — розмовніший варіант, і єдиний із двох годиться для непрямого питання «чи»: «Řekni mi, jestli přijdeš» (Скажи, чи прийдеш). У звичайному значенні «якщо» обидва слова взаємозамінні.",
+          },
+        ],
+      },
+      {
+        type: "tip",
+        text: "Порада: якщо не впевнений, який вибрати — бери pokud, це безпечний дефолт для «якщо» в будь-якому реченні.",
+      },
+      { type: "heading", text: "nicméně, přesto, ačkoli/přestože — «проте / хоча»" },
+      {
+        type: "rich-paragraph",
+        segments: [
+          { word: "nicméně", wordId: "adv-nicmene", kind: "service-word" },
+          { text: " і " },
+          { word: "přesto", wordId: "adv-presto", kind: "service-word" },
+          {
+            text: " — справжні синоніми («проте, однак»): nicméně трохи книжніше/писемне, přesto — нейтральне, однаково природне і в мові, і на письмі. Обидва зазвичай стоять після коми: «Pršelo, přesto jsme šli ven».",
+          },
+        ],
+      },
+      {
+        type: "rich-paragraph",
+        segments: [
+          { word: "ačkoli", wordId: "conj-ackoli", kind: "service-word" },
+          { text: " і " },
+          { word: "přestože", wordId: "conj-prestoze", kind: "service-word" },
+          {
+            text: " («хоча») — теж дуже близькі синоніми: за корпусними даними в ~98% випадків виконують ту саму функцію, чіткої стилістичної різниці немає. Практична порада: ačkoli — безпечний нейтральний вибір завжди; головне — не плутати přestože з ",
+          },
+          { word: "přesto", wordId: "adv-presto", kind: "service-word" },
+          {
+            text: " (той самий корінь, різна роль: přestože вводить підрядне речення «хоча...», а přesto — самостійне слово в головному реченні).",
+          },
+        ],
+      },
+      { type: "heading", text: "aby і kdyby — частка + кондиціонал" },
+      {
+        type: "rich-paragraph",
+        segments: [
+          { word: "aby", wordId: "conj-aby", kind: "service-word" },
+          { text: " і " },
+          { word: "kdyby", wordId: "conj-kdyby", kind: "service-word" },
+          {
+            text: " історично зрослися з особовими закінченнями кондиціоналу (a+by, kdy+by) — тому мають 6 форм за особами (abych/abys/aby/abychom/abyste/aby — повну таблицю дивись на картці самого слова), а не одну незмінну форму.",
+          },
+        ],
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ word: "aby", wordId: "conj-aby", kind: "service-word" }],
+            note: [
+              {
+                text: "мета/бажання («щоб»): «Přišel jsem, abych ti pomohl» (Я прийшов, щоб тобі допомогти).",
+              },
+            ],
+          },
+          {
+            term: [{ word: "kdyby", wordId: "conj-kdyby", kind: "service-word" }],
+            note: [
+              {
+                text: "гіпотетична умова («якби»): «Kdybych měl čas, pomohl bych ti» (Якби я мав час, я б тобі допоміг).",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "tip",
+        text: "Після aby/kdyby-форми дієслово стоїть у формі на -l (як у звичайному кондиціоналі): abych pomohl, kdybych měl тощо. Якщо підмет обох частин речення той самий — простіше вжити інфінітив: «Přišel jsem pomoct» замість «abych pomohl».",
+      },
+    ],
+  },
 ];
