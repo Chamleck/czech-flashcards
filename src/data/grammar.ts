@@ -1860,7 +1860,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "Після aby/kdyby-форми дієслово стоїть у формі на -l (як у звичайному кондиціоналі): abych pomohl, kdybych měl тощо. Якщо підмет обох частин речення той самий — простіше вжити інфінітив: «Přišel jsem pomoct» замість «abych pomohl».",
+        text: "Після aby/kdyby-форми дієслово стоїть у дієприкметниковій формі на -l (те саме дієслово, що й у звичайному минулому часі/кондиціоналі, напр. dělal, pomohl, měl): abych pomohl, kdybych měl тощо. Якщо підмет обох частин речення той самий — простіше вжити інфінітив: «Přišel jsem pomoct» замість «abych pomohl».",
       },
     ],
   },
