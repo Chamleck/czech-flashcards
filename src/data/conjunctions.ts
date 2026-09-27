@@ -70,7 +70,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     id: "conj-kdyz",
     cz: "když",
     uk: "коли / якщо",
-    note: "Не плутати з питальним словом kdy («коли?»). Když — сполучник умови/часу в стверджувальному реченні, не запитання.",
+    note: "Не плутати з питальним kdy («коли?») — když це сполучник умови/часу, не запитання.",
     noteLinks: [{ word: "kdy", wordId: "int-kdy", kind: "interrogative" }],
     examples: [
       { cz: "Když prší, zůstávám doma.", uk: "Коли йде дощ, я залишаюсь удома." },
@@ -115,8 +115,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     cz: "aby",
     uk: "щоб",
     paradigm: { ja: "abych", ty: "abys", on: "aby", my: "abychom", vy: "abyste", oni: "aby" },
-    note:
-      "Не плутати з kdyby — та сама сітка особових закінчень (aby-/kdyby-), але aby виражає МЕТУ/бажання («щоб»), а kdyby — гіпотетичну УМОВУ («якби»).",
+    note: "Не плутати з kdyby — aby виражає мету («щоб»), kdyby — умову («якби»).",
     noteLinks: [{ word: "kdyby", wordId: "conj-kdyby", kind: "service-word" }],
     examples: [{ cz: "Přišel jsem, abych ti pomohl.", uk: "Я прийшов, щоб тобі допомогти." }],
   },
@@ -127,8 +126,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     cz: "kdyby",
     uk: "якби",
     paradigm: { ja: "kdybych", ty: "kdybys", on: "kdyby", my: "kdybychom", vy: "kdybyste", oni: "kdyby" },
-    note:
-      "Не плутати з aby — та сама сітка особових закінчень (kdyby-/aby-), але kdyby виражає гіпотетичну УМОВУ («якби»), а aby — МЕТУ/бажання («щоб»).",
+    note: "Не плутати з aby — kdyby виражає умову («якби»), aby — мету («щоб»).",
     noteLinks: [{ word: "aby", wordId: "conj-aby", kind: "service-word" }],
     examples: [{ cz: "Kdybych měl čas, pomohl bych ti.", uk: "Якби я мав час, я б тобі допоміг." }],
   },
@@ -136,8 +134,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     id: "conj-prestoze",
     cz: "přestože",
     uk: "хоча",
-    note:
-      "Не плутати з přesto («проте», прислівник у головному реченні) — přestože вводить ПІДРЯДНЕ речення («хоча...»).",
+    note: "Не плутати з přesto — přestože вводить підрядне речення («хоча»), přesto самостійне слово в головному.",
     noteLinks: [{ word: "přesto", wordId: "adv-presto", kind: "service-word" }],
     examples: [
       { cz: "Přestože pršelo, šli jsme na procházku.", uk: "Хоча падав дощ, ми пішли на прогулянку." },
@@ -152,7 +149,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     id: "conj-ackoli",
     cz: "ačkoli / ačkoliv",
     uk: "хоча",
-    note: "Обидві форми вживаються однаково — це просто орфографічні варіанти одного слова, взаємозамінні.",
+    note: "Орфографічні варіанти одного слова, вживаються однаково.",
     examples: [
       { cz: "Ačkoli pršelo, šli jsme ven.", uk: "Хоча йшов дощ, ми пішли на вулицю." },
       { cz: "Ačkoliv byl unavený, pracoval dál.", uk: "Хоча він був втомлений, продовжував працювати." },
@@ -164,7 +161,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     id: "conj-vsak",
     cz: "však",
     uk: "проте / однак",
-    note: "На відміну від avšak, však НІКОЛИ не стоїть першим словом речення — завжди після першого наголошеного слова: «On však má pravdu», не «Však on má pravdu».",
+    note: "На відміну від avšak, však ніколи не стоїть першим словом речення: «On však má pravdu», не «Však on má pravdu».",
     noteLinks: [{ word: "avšak", wordId: "conj-avsak", kind: "service-word" }],
     examples: [
       { cz: "Chtěl jsem to koupit, neměl jsem však peníze.", uk: "Я хотів це купити, проте не мав грошей." },
@@ -177,7 +174,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     id: "conj-avsak",
     cz: "avšak",
     uk: "однак / проте",
-    note: "На відміну від však, avšak МОЖНА вільно ставити на початку речення (як ale): «Avšak nesmíme zapomenout...».",
+    note: "На відміну від však, avšak можна ставити на початку речення (як ale).",
     noteLinks: [{ word: "však", wordId: "conj-vsak", kind: "service-word" }],
     examples: [
       { cz: "Chtěl jsem pomoci, avšak neměl jsem čas.", uk: "Я хотів допомогти, однак не мав часу." },
@@ -223,7 +220,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     id: "conj-nez",
     cz: "než",
     uk: "ніж / перш ніж",
-    note: "Два різні вживання: порівняльне «ніж» (приклади 1-2, після вищого ступеня прикметника) і часове «перш ніж» (приклади 3-4, перед підрядним реченням) — не плутати одне з іншим.",
+    note: "Два вживання: порівняльне «ніж» і часове «перш ніж» — не плутати.",
     examples: [
       { cz: "Je vyšší než já.", uk: "Він вищий за мене." },
       { cz: "Radši čaj než kávu.", uk: "Краще чай, ніж каву." },
@@ -235,7 +232,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     id: "conj-proto",
     cz: "proto",
     uk: "тому / тому-то",
-    note: "Не плутати з protože — proto вказує на НАСЛІДОК («тому», результат): «Nemám peníze, proto nemůžu jet». protože вказує на ПРИЧИНУ («тому що»): «Nemůžu jet, protože nemám peníze».",
+    note: "Не плутати з protože — proto це наслідок («тому»), protože причина («тому що»).",
     noteLinks: [{ word: "protože", wordId: "conj-protoze", kind: "service-word" }],
     examples: [
       { cz: "Bylo pozdě, proto jsem šel domů.", uk: "Було пізно, тому я пішов додому." },
@@ -270,7 +267,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     id: "conj-totiz",
     cz: "totiž",
     uk: "річ у тім що / бо",
-    note: "Як і však, totiž зазвичай стоїть не першим словом речення, а після дієслова чи першого наголошеного елемента: «Nepřijdu, jsem totiž nemocný», не «Totiž nepřijdu...».",
+    note: "Як і však, стоїть не першим словом речення, а після дієслова: «Nepřijdu, jsem totiž nemocný».",
     noteLinks: [{ word: "však", wordId: "conj-vsak", kind: "service-word" }],
     examples: [
       { cz: "Nepřijdu, jsem totiž nemocný.", uk: "Я не прийду, річ у тім що я хворий." },
@@ -283,7 +280,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     id: "conj-tudiz",
     cz: "tudíž",
     uk: "отже / таким чином",
-    note: "Книжний синонім proto/takže — та сама наслідкова функція, стилістично офіційніше (частіше на письмі).",
+    note: "Книжний синонім proto/takže, та сама наслідкова функція.",
     noteLinks: [
       { word: "proto", wordId: "conj-proto", kind: "service-word" },
       { word: "takže", wordId: "conj-takze", kind: "service-word" },
@@ -299,7 +296,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     id: "conj-ani",
     cz: "ani",
     uk: "навіть не / ні...ні",
-    note: "Два вживання: одиничне «навіть не» (приклади 1, 3) і парне «ani...ani» = «ні...ні» (приклади 2, 4).",
+    note: "Одиничне «навіть не» або парне «ani...ani» = «ні...ні».",
     examples: [
       { cz: "Nemám ani korunu.", uk: "У мене нема навіть жодної крони." },
       { cz: "Nemám ani čas, ani peníze.", uk: "У мене нема ні часу, ні грошей." },

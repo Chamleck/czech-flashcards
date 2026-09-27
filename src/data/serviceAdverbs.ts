@@ -56,7 +56,7 @@ export const SERVICE_ADVERBS: InvariantWordEntry[] = [
     id: "adv-tehdy",
     cz: "tehdy",
     uk: "тоді",
-    note: "Не плутати з pak — tehdy вказує на вже ЗГАДАНИЙ момент часу (переважно минулого): «Tehdy jsem byl mladý». pak означає наступну дію в послідовності («потім») або розмовне «тоді, в такому разі», не прив'язане до конкретного моменту.",
+    note: "Не плутати з pak — tehdy це вже згаданий момент часу (переважно минулого), а pak наступна дія або розмовне «тоді, в такому разі».",
     noteLinks: [{ word: "pak", wordId: "adv-pak", kind: "service-word" }],
     examples: [
       { cz: "Tehdy jsem byl mladý.", uk: "Тоді я був молодим." },
@@ -69,7 +69,7 @@ export const SERVICE_ADVERBS: InvariantWordEntry[] = [
     id: "adv-pak",
     cz: "pak",
     uk: "потім / тоді",
-    note: "Два значення: 1) наступна дія в послідовності («потім») — приклади 1 і 4; 2) розмовне «тоді, в такому разі» після умови («якщо X, pak Y») — приклади 2 і 3. Не плутати з tehdy — те вказує на конкретний вже згаданий момент минулого, а не на висновок з умови.",
+    note: "Два значення: наступна дія («потім») або розмовне «тоді» після умови. Не плутати з tehdy — те про вже згаданий момент минулого.",
     noteLinks: [{ word: "tehdy", wordId: "adv-tehdy", kind: "service-word" }],
     examples: [
       { cz: "Nejdřív se najíme, pak půjdeme.", uk: "Спочатку поїмо, потім підемо." },
@@ -146,7 +146,7 @@ export const SERVICE_ADVERBS: InvariantWordEntry[] = [
     id: "adv-take",
     cz: "také / taky",
     uk: "також",
-    note: "Обидві форми вживаються однаково — taky розмовніше, také нейтральне/писемне, взаємозамінні.",
+    note: "Розмовний/нейтральний варіант одного слова, вживаються однаково.",
     examples: [
       { cz: "Mám to také.", uk: "У мене це теж є." },
       { cz: "Chci taky jet.", uk: "Я теж хочу поїхати." },
@@ -159,7 +159,7 @@ export const SERVICE_ADVERBS: InvariantWordEntry[] = [
     id: "adv-jen",
     cz: "jen / jenom",
     uk: "тільки / лише",
-    note: "jen і jenom — взаємозамінні розмовні варіанти (jenom трохи емфатичніше); pouze — книжний/офіційний відповідник тих самих двох, стилістично формальніший (частіше в написах, документах).",
+    note: "Розмовні варіанти (jenom трохи емфатичніше); pouze — книжний відповідник тих самих двох.",
     noteLinks: [{ word: "pouze", wordId: "adv-pouze", kind: "service-word" }],
     examples: [
       { cz: "Mám jen pět korun.", uk: "У мене лише п'ять крон." },
@@ -216,7 +216,7 @@ export const SERVICE_ADVERBS: InvariantWordEntry[] = [
     id: "adv-pouze",
     cz: "pouze",
     uk: "лише / тільки",
-    note: "Книжний/офіційний відповідник jen/jenom — те саме значення, стилістично формальніше (частіше в написах, документах).",
+    note: "Книжний відповідник jen/jenom, те саме значення, формальніший стиль.",
     noteLinks: [{ word: "jen/jenom", wordId: "adv-jen", kind: "service-word" }],
     examples: [
       { cz: "Mám pouze pět minut.", uk: "У мене лише п'ять хвилин." },
