@@ -381,6 +381,19 @@ export interface InvariantWordEntry {
   // проти вже наявного питального kdy), не для стилістичних нюансів. Той
   // самий патерн, що PrepositionEntry.vocalNote.
   note?: string;
+  // Слова всередині note, які стають клікабельними — СТРУКТУРНЕ поле (як
+  // VerbEntry.aspectPairId), не регулярка на довільний текст note: кожен
+  // елемент називає ТОЧНИЙ підрядок і його ціль. word шукається як перше
+  // входження в note рядка renderNoteWithLinks (див. NoteLinks.tsx).
+  noteLinks?: NoteLink[];
+}
+
+// Один клікабельний підрядок усередині note. kind окремо на кожен лінк —
+// ціль може бути з ІНШОГО розділу (напр. když → kdy в "Питальні слова").
+export interface NoteLink {
+  word: string;
+  wordId: string;
+  kind: BrowseKind;
 }
 
 
@@ -421,6 +434,7 @@ export interface ConditionalConjunctionEntry {
   // Той самий банер-принцип, що InvariantWordEntry.note — тут: ризик плутанини
   // aby↔kdyby (однакова сітка закінчень, різне значення мета/умова).
   note?: string;
+  noteLinks?: NoteLink[];
 }
 
 // Вид дієслова

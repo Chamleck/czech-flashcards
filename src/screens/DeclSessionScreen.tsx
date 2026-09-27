@@ -220,8 +220,8 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       const r = resolveServiceWord(current.id);
       if (!r) return null;
       if (r.cardType === "conditional")
-        return <ConditionalParticleCard entry={r.entry as ConditionalConjunctionEntry} {...p} />;
-      return <SimpleWordCard entry={r.entry as InvariantWordEntry} {...p} />;
+        return <ConditionalParticleCard entry={r.entry as ConditionalConjunctionEntry} {...p} navigation={navigation} />;
+      return <SimpleWordCard entry={r.entry as InvariantWordEntry} {...p} navigation={navigation} />;
     }
     if (isPersonal)
       return <PersonalPronounCard entry={current as (typeof PERSONAL_PRONOUNS)[number]} {...p} />;

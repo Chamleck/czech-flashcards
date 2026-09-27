@@ -63,9 +63,12 @@ function CardFor({ kind, entry, navigation }: { kind: BrowseKind; entry: any; na
       // Розділ "Службові слова" — той самий принцип, що interrogative вище:
       // aby/kdyby мають парадигму (ConditionalConjunctionEntry), решта —
       // InvariantWordEntry, диспетчер за id через serviceWordCardType.
+      // navigation/linkMode="replace" — клікабельні слова в банерах "Важливо"
+      // (aby↔kdyby, však↔avšak тощо), той самий принцип, що VerbCard вище.
       const t = serviceWordCardType(entry.id);
-      if (t === "conditional") return <ConditionalParticleCard entry={entry} {...p} />;
-      return <SimpleWordCard entry={entry} {...p} />;
+      if (t === "conditional")
+        return <ConditionalParticleCard entry={entry} {...p} navigation={navigation} linkMode="replace" />;
+      return <SimpleWordCard entry={entry} {...p} navigation={navigation} linkMode="replace" />;
     }
     case "pronouns": {
       // Присвійні/вказівні vs особові — той самий принцип, що interrogative

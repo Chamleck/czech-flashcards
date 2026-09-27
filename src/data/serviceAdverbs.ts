@@ -57,6 +57,7 @@ export const SERVICE_ADVERBS: InvariantWordEntry[] = [
     cz: "tehdy",
     uk: "тоді",
     note: "Не плутати з pak — tehdy вказує на вже ЗГАДАНИЙ момент часу (переважно минулого): «Tehdy jsem byl mladý». pak означає наступну дію в послідовності («потім») або розмовне «тоді, в такому разі», не прив'язане до конкретного моменту.",
+    noteLinks: [{ word: "pak", wordId: "adv-pak", kind: "service-word" }],
     examples: [
       { cz: "Tehdy jsem byl mladý.", uk: "Тоді я був молодим." },
       { cz: "Bydleli jsme tehdy v Praze.", uk: "Ми тоді жили в Празі." },
@@ -69,6 +70,7 @@ export const SERVICE_ADVERBS: InvariantWordEntry[] = [
     cz: "pak",
     uk: "потім / тоді",
     note: "Два значення: 1) наступна дія в послідовності («потім») — приклади 1 і 4; 2) розмовне «тоді, в такому разі» після умови («якщо X, pak Y») — приклади 2 і 3. Не плутати з tehdy — те вказує на конкретний вже згаданий момент минулого, а не на висновок з умови.",
+    noteLinks: [{ word: "tehdy", wordId: "adv-tehdy", kind: "service-word" }],
     examples: [
       { cz: "Nejdřív se najíme, pak půjdeme.", uk: "Спочатку поїмо, потім підемо." },
       { cz: "Pokud nepřijdeš, pak to udělám sám.", uk: "Якщо не прийдеш, тоді я зроблю це сам." },
@@ -158,6 +160,7 @@ export const SERVICE_ADVERBS: InvariantWordEntry[] = [
     cz: "jen / jenom",
     uk: "тільки / лише",
     note: "jen і jenom — взаємозамінні розмовні варіанти (jenom трохи емфатичніше); pouze — книжний/офіційний відповідник тих самих двох, стилістично формальніший (частіше в написах, документах).",
+    noteLinks: [{ word: "pouze", wordId: "adv-pouze", kind: "service-word" }],
     examples: [
       { cz: "Mám jen pět korun.", uk: "У мене лише п'ять крон." },
       { cz: "Chci jenom čaj.", uk: "Я хочу тільки чай." },
@@ -214,6 +217,7 @@ export const SERVICE_ADVERBS: InvariantWordEntry[] = [
     cz: "pouze",
     uk: "лише / тільки",
     note: "Книжний/офіційний відповідник jen/jenom — те саме значення, стилістично формальніше (частіше в написах, документах).",
+    noteLinks: [{ word: "jen/jenom", wordId: "adv-jen", kind: "service-word" }],
     examples: [
       { cz: "Mám pouze pět minut.", uk: "У мене лише п'ять хвилин." },
       { cz: "To je pouze návrh.", uk: "Це лише пропозиція." },

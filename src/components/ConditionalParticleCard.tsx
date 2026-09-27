@@ -7,11 +7,15 @@ import { TileEmoji } from "./TileEmoji";
 import { Speakable } from "./Speakable";
 import { InfoBanner } from "./InfoBanner";
 import { PersonFormsTable } from "./PersonFormsTable";
+import { AppNav } from "./ClickableWord";
+import { renderNoteWithLinks } from "./NoteLinks";
 
 interface Props {
   entry: ConditionalConjunctionEntry;
   revealed: boolean;
   onReveal: () => void;
+  navigation?: AppNav;
+  linkMode?: "push" | "replace";
 }
 
 // Картка для aby/kdyby — на відміну від SimpleWordCard (InvariantWordEntry,
@@ -24,7 +28,7 @@ const ACCENT = "#d98cbf";
 
 const PERSON_ROW_LABELS = PERSON_ORDER.map((p) => PERSON_LABELS[p]);
 
-export function ConditionalParticleCard({ entry, revealed, onReveal }: Props) {
+export function ConditionalParticleCard({ entry, revealed, onReveal, navigation, linkMode }: Props) {
   const rows = PERSON_ORDER.map((p) => ({ cz: entry.paradigm[p] }));
 
   return (
@@ -58,7 +62,9 @@ export function ConditionalParticleCard({ entry, revealed, onReveal }: Props) {
             <Speakable id={`${entry.id}:headline`} text={entry.cz} style={styles.answerWord} />
           </View>
 
-          {entry.note && <InfoBanner paragraphs={[entry.note]} />}
+          {entry.note && (
+            <InfoBanner paragraphs={[renderNoteWithLinks(entry.note, entry.noteLinks, navigation, linkMode)]} />
+          )}
 
           <View style={styles.section}>
             <PersonFormsTable
@@ -121,7 +127,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.space(3.5),
   },
-  exampleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5 },
-  exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600", flexShrink: 1 },
+  exampleRow: { flexDirection: "row", alignItems: "flex-start", gap: 5 },
+  exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600", flex: 1 },
   exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
 });
