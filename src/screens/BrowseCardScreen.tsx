@@ -53,10 +53,13 @@ function CardFor({ kind, entry, navigation }: { kind: BrowseKind; entry: any; na
     case "interrogative": {
       // Розділ "Питальні слова" — три форми запису в одному kind, диспетчер
       // за id через interrogativeCardType (те саме, що DeclSessionScreen
-      // використовує для kind="interrogative" у Тренуванні).
+      // використовує для kind="interrogative" у Тренуванні). navigation —
+      // лише для "invariant" (kdy тепер має клікабельне посилання на když,
+      // service-word), той самий принцип, що case "service-word" нижче.
       const t = interrogativeCardType(entry.id);
       if (t === "core") return <PersonalPronounCard entry={entry} {...p} />;
-      if (t === "invariant") return <SimpleWordCard entry={entry} {...p} />;
+      if (t === "invariant")
+        return <SimpleWordCard entry={entry} {...p} navigation={navigation} linkMode="replace" />;
       return <AdjPronounCard entry={entry} {...p} />;
     }
     case "service-word": {

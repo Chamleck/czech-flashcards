@@ -390,10 +390,14 @@ export interface InvariantWordEntry {
 
 // Один клікабельний підрядок усередині note. kind окремо на кожен лінк —
 // ціль може бути з ІНШОГО розділу (напр. když → kdy в "Питальні слова").
+// mode — перевизначає linkMode картки для ЦЬОГО конкретного посилання;
+// потрібно лише коли kind відрізняється від розділу картки (тоді "crossKind",
+// щоб "назад" вів на список ЦІЛЬОВОГО розділу, а не старого).
 export interface NoteLink {
   word: string;
   wordId: string;
   kind: BrowseKind;
+  mode?: "push" | "replace" | "crossKind";
 }
 
 

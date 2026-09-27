@@ -121,6 +121,8 @@ export const SERVICE_ADVERBS: InvariantWordEntry[] = [
     id: "adv-presto",
     cz: "přesto",
     uk: "і все ж / попри це",
+    note: "Не плутати з přestože — přesto самостійне слово в головному реченні, přestože вводить підрядне («хоча»).",
+    noteLinks: [{ word: "přestože", wordId: "conj-prestoze", kind: "service-word" }],
     examples: [
       { cz: "Pršelo, přesto jsme šli ven.", uk: "Йшов дощ, і все ж ми пішли гуляти." },
       { cz: "Byl unavený, přesto pokračoval.", uk: "Він був втомлений, і все ж продовжував." },

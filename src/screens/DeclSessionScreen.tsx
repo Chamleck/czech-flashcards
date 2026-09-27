@@ -213,7 +213,7 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       if (r.cardType === "core")
         return <PersonalPronounCard entry={r.entry as (typeof PERSONAL_PRONOUNS)[number]} {...p} />;
       if (r.cardType === "invariant")
-        return <SimpleWordCard entry={r.entry as InvariantWordEntry} {...p} />;
+        return <SimpleWordCard entry={r.entry as InvariantWordEntry} {...p} navigation={navigation} />;
       return <AdjPronounCard entry={r.entry as DeclEntry} {...p} />;
     }
     if (isServiceWord) {

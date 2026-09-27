@@ -48,6 +48,8 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     id: "conj-protoze",
     cz: "protože",
     uk: "тому що",
+    note: "Не плутати з proto — protože вказує на ПРИЧИНУ («тому що»), а proto — на НАСЛІДОК («тому»).",
+    noteLinks: [{ word: "proto", wordId: "conj-proto", kind: "service-word" }],
     examples: [
       { cz: "Nepřišel, protože byl nemocný.", uk: "Він не прийшов, тому що був хворий." },
       { cz: "Miluju Prahu, protože je krásná.", uk: "Я люблю Прагу, тому що вона гарна." },
@@ -71,7 +73,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     cz: "když",
     uk: "коли / якщо",
     note: "Не плутати з питальним kdy («коли?») — když це сполучник умови/часу, не запитання.",
-    noteLinks: [{ word: "kdy", wordId: "int-kdy", kind: "interrogative" }],
+    noteLinks: [{ word: "kdy", wordId: "int-kdy", kind: "interrogative", mode: "crossKind" }],
     examples: [
       { cz: "Když prší, zůstávám doma.", uk: "Коли йде дощ, я залишаюсь удома." },
       { cz: "Zavolej, když budeš mít čas.", uk: "Подзвони, коли матимеш час." },
@@ -161,8 +163,11 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     id: "conj-vsak",
     cz: "však",
     uk: "проте / однак",
-    note: "На відміну від avšak, však ніколи не стоїть першим словом речення: «On však má pravdu», не «Však on má pravdu».",
-    noteLinks: [{ word: "avšak", wordId: "conj-avsak", kind: "service-word" }],
+    note: "На відміну від avšak, však ніколи не стоїть першим словом речення: «On však má pravdu», не «Však on má pravdu». Той самий порядок слів — і в totiž.",
+    noteLinks: [
+      { word: "avšak", wordId: "conj-avsak", kind: "service-word" },
+      { word: "totiž", wordId: "conj-totiz", kind: "service-word" },
+    ],
     examples: [
       { cz: "Chtěl jsem to koupit, neměl jsem však peníze.", uk: "Я хотів це купити, проте не мав грошей." },
       { cz: "Slíbil, že přijde, nepřišel však.", uk: "Він обіцяв, що прийде, проте не прийшов." },
@@ -198,6 +203,8 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     id: "conj-takze",
     cz: "takže",
     uk: "отже / тож",
+    note: "Розмовний варіант — tudíž те саме значення, стилістично офіційніше.",
+    noteLinks: [{ word: "tudíž", wordId: "conj-tudiz", kind: "service-word" }],
     examples: [
       { cz: "Nemám peníze, takže nemůžu jet.", uk: "У мене нема грошей, тож я не можу поїхати." },
       { cz: "Bylo pozdě, takže jsme šli spát.", uk: "Було пізно, тож ми пішли спати." },
@@ -232,8 +239,11 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     id: "conj-proto",
     cz: "proto",
     uk: "тому / тому-то",
-    note: "Не плутати з protože — proto це наслідок («тому»), protože причина («тому що»).",
-    noteLinks: [{ word: "protože", wordId: "conj-protoze", kind: "service-word" }],
+    note: "Не плутати з protože — proto це наслідок («тому»), protože причина («тому що»). Книжний синонім: tudíž.",
+    noteLinks: [
+      { word: "protože", wordId: "conj-protoze", kind: "service-word" },
+      { word: "tudíž", wordId: "conj-tudiz", kind: "service-word" },
+    ],
     examples: [
       { cz: "Bylo pozdě, proto jsem šel domů.", uk: "Було пізно, тому я пішов додому." },
       { cz: "Nemám peníze, proto nemůžu jet.", uk: "У мене нема грошей, тому я не можу поїхати." },

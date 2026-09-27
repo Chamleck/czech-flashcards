@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.space(3.5),
   },
-  exampleRow: { flexDirection: "row", alignItems: "flex-start", gap: 5 },
+  exampleRow: { flexDirection: "row", alignItems: "baseline", gap: 5 },
   exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600", flex: 1 },
   exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
 });

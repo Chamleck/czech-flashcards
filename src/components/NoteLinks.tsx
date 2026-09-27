@@ -34,7 +34,14 @@ export function renderNoteWithLinks(
     if (l.index < cursor) return; // перекриття з попереднім лінком — пропускаємо
     parts.push(note.slice(cursor, l.index));
     parts.push(
-      <ClickableWord key={i} word={l.word} wordId={l.wordId} kind={l.kind} navigation={navigation} mode={linkMode} />
+      <ClickableWord
+        key={i}
+        word={l.word}
+        wordId={l.wordId}
+        kind={l.kind}
+        navigation={navigation}
+        mode={l.mode ?? linkMode}
+      />
     );
     cursor = l.index + l.word.length;
   });

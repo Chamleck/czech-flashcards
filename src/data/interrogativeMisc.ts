@@ -18,6 +18,8 @@ export const INTERROGATIVE_MISC: InvariantWordEntry[] = [
     id: "int-kdy",
     cz: "kdy",
     uk: "коли?",
+    note: "Не плутати з když — той сполучник умови/часу у стверджувальному реченні, а kdy саме питальне слово («коли?»).",
+    noteLinks: [{ word: "když", wordId: "conj-kdyz", kind: "service-word", mode: "crossKind" }],
     examples: [
       { cz: "Kdy přijedeš?", uk: "Коли ти приїдеш?" },
       { cz: "Kdy začíná film?", uk: "Коли починається фільм?" },
