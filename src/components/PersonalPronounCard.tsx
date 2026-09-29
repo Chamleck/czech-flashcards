@@ -106,7 +106,7 @@ export function PersonalPronounCard({ entry, revealed, onReveal }: Props) {
             {example && (
               <View style={styles.example}>
                 <View style={styles.exampleRow}>
-                  <TileEmoji name="speechBalloon" size={15} />
+                  <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
                   <Speakable id={exampleId} text={example.cz} style={styles.exampleCz} />
                 </View>
                 <Text style={styles.exampleUk}>{example.uk}</Text>

@@ -75,7 +75,7 @@ function ExampleBlock({
     <View style={[styles.example, style]}>
       {label && <Text style={styles.senseLabel}>{label}</Text>}
       <View style={styles.exampleRow}>
-        <TileEmoji name="speechBalloon" size={15} />
+        <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
         <Speakable id={speakId} text={cz} style={styles.exampleCz} />
       </View>
       <Text style={styles.exampleUk}>{uk}</Text>
@@ -185,7 +185,7 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
               ? (entry as any).exampleSentenceCz && (
                   <View style={styles.example}>
                     <View style={styles.exampleRow}>
-                      <TileEmoji name="speechBalloon" size={15} />
+                      <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
                       <Speakable
                         id={`${entry.id}:example`}
                         text={(entry as any).exampleSentenceCz}

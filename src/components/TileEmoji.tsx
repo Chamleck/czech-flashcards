@@ -1,4 +1,5 @@
 import React from "react";
+import { StyleProp, ViewStyle } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { TILE_EMOJI, TileEmojiName } from "./icons/tileEmoji";
 
@@ -13,6 +14,19 @@ import { TILE_EMOJI, TileEmojiName } from "./icons/tileEmoji";
 // інакше пропорції плиток розʼїдуться між собою). Всі 5 гліфів — власного
 // кольору (Twemoji), currentColor ніде не використовується — tint-пропа
 // немає навмисно, не додавай його без нового currentColor-гліфа.
-export function TileEmoji({ name, size = 34 }: { name: TileEmojiName; size?: number }) {
-  return <SvgXml xml={TILE_EMOJI[name]} width={size} height={size} />;
+// style — опційний, для точкової компенсації оптичного зсуву конкретного
+// гліфа в конкретному контексті (напр. speechBalloon поруч із текстом
+// прикладу — тонкий хвостик бульбашки внизу viewBox робить низ боксу майже
+// порожнім, тому іконка виглядає зсунутою вгору при baseline-вирівнюванні
+// з текстом). НЕ для зміни розміру/кольору — тільки позиціонування.
+export function TileEmoji({
+  name,
+  size = 34,
+  style,
+}: {
+  name: TileEmojiName;
+  size?: number;
+  style?: StyleProp<ViewStyle>;
+}) {
+  return <SvgXml xml={TILE_EMOJI[name]} width={size} height={size} style={style} />;
 }

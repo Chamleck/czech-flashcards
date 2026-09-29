@@ -78,7 +78,7 @@ export function ConditionalParticleCard({ entry, revealed, onReveal, navigation,
           {entry.examples.map((ex, i) => (
             <View key={i} style={styles.example}>
               <View style={styles.exampleRow}>
-                <TileEmoji name="speechBalloon" size={15} />
+                <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
                 <Speakable id={`${entry.id}:ex${i}`} text={ex.cz} style={styles.exampleCz} />
               </View>
               <Text style={styles.exampleUk}>{ex.uk}</Text>

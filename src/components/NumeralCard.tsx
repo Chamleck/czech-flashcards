@@ -201,7 +201,7 @@ export function NumeralCard({ entry, revealed, onReveal }: Props) {
                 return (
                   <>
                     <View style={styles.exampleRow}>
-                      <TileEmoji name="speechBalloon" size={15} />
+                      <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
                       <Speakable
                         id={`${entry.id}:${gender}:example`}
                         text={ex.cz}
@@ -217,7 +217,7 @@ export function NumeralCard({ entry, revealed, onReveal }: Props) {
           {(entry.kind === "invariantDecl" || entry.kind === "oblique") && (
             <View style={styles.example}>
               <View style={styles.exampleRow}>
-                <TileEmoji name="speechBalloon" size={15} />
+                <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
                 <Speakable id={`${entry.id}:example`} text={entry.exampleCz} style={styles.exampleCz} />
               </View>
               <Text style={styles.exampleUk}>{entry.exampleUk}</Text>

@@ -20,7 +20,7 @@ function ExampleRow({ id, cz, uk }: { id: string; cz: string; uk: string }) {
   return (
     <View style={styles.example}>
       <View style={styles.exampleRow}>
-        <TileEmoji name="speechBalloon" size={15} />
+        <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
         <Speakable id={id} text={cz} style={styles.exampleCz} />
       </View>
       <Text style={styles.exampleUk}>{uk}</Text>

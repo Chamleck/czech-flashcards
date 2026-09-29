@@ -34,7 +34,7 @@ function ExampleRow({ id, cz, uk }: { id: string; cz: string; uk: string }) {
   return (
     <View style={styles.example}>
       <View style={styles.exampleRow}>
-        <TileEmoji name="speechBalloon" size={15} />
+        <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
         <Speakable id={id} text={cz} style={styles.exampleCz} />
       </View>
       <Text style={styles.exampleUk}>{uk}</Text>
@@ -48,7 +48,7 @@ function ExampleRow({ id, cz, uk }: { id: string; cz: string; uk: string }) {
 // заголовка над усіма блоками — кожен блок сам собі голова.
 function SenseBlock({ idPrefix, sense, accent }: { idPrefix: string; sense: AdverbSense; accent: string }) {
   return (
-    <View style={styles.senseBlock}>
+    <View style={[styles.senseBlock, { borderLeftColor: accent }]}>
       <Text style={[styles.senseHeading, { color: accent }]}>{sense.label}</Text>
       <Speakable id={`${idPrefix}:word`} text={sense.cz} style={[styles.senseWord, { color: accent }]} />
       {sense.examples.map((ex, i) => (
@@ -113,7 +113,12 @@ const styles = StyleSheet.create({
   revealBtnText: { color: "#3a1f00", fontWeight: "800", fontSize: 16 },
   revealBtnRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   answerScroll: { marginTop: theme.space(4) },
+  // Той самий еталон, що answerHead у FlashCard.tsx/SimpleWordCard.tsx —
+  // кольорова рамка навколо "головного" елемента блоку, borderLeftColor
+  // виставляється по кожному сенсу окремо (inline, як gColor у FlashCard).
   senseBlock: {
+    borderLeftWidth: 4,
+    paddingLeft: theme.space(3),
     marginBottom: theme.space(4),
   },
   senseHeading: { fontSize: 14, fontWeight: "700" },
