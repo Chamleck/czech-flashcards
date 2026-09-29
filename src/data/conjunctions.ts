@@ -73,7 +73,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     cz: "když",
     uk: "коли / якщо",
     note: "Не плутати з питальним kdy («коли?») — když це сполучник умови/часу, не запитання.",
-    noteLinks: [{ word: "kdy", wordId: "int-kdy", kind: "interrogative", mode: "crossKind" }],
+    noteLinks: [{ word: "kdy", wordId: "int-kdy", kind: "interrogative", crossKind: true }],
     examples: [
       { cz: "Když prší, zůstávám doma.", uk: "Коли йде дощ, я залишаюсь удома." },
       { cz: "Zavolej, když budeš mít čas.", uk: "Подзвони, коли матимеш час." },
