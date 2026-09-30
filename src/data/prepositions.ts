@@ -289,7 +289,7 @@ export const PREPOSITIONS: PrepositionEntry[] = [
     examples: [
       { cz: "Jdu do kina s kamarádem.", uk: "Я йду в кіно з другом." },
       { cz: "Mluvil se mnou.", uk: "Він розмовляв зі мною." },
-      { cz: "Piju čaj s medem.", uk: "Я п'ю чай з медом." },
+      { cz: "Piji čaj s medem.", uk: "Я п'ю чай з медом." },
       { cz: "Přijela s dětmi na návštěvu.", uk: "Вона приїхала в гості з дітьми." },
     ],
   },

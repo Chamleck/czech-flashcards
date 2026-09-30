@@ -52,7 +52,7 @@ export const CONJUNCTIONS: (InvariantWordEntry | ConditionalConjunctionEntry)[] 
     noteLinks: [{ word: "proto", wordId: "conj-proto", kind: "service-word" }],
     examples: [
       { cz: "Nepřišel, protože byl nemocný.", uk: "Він не прийшов, тому що був хворий." },
-      { cz: "Miluju Prahu, protože je krásná.", uk: "Я люблю Прагу, тому що вона гарна." },
+      { cz: "Miluji Prahu, protože je krásná.", uk: "Я люблю Прагу, тому що вона гарна." },
       { cz: "Zůstal doma, protože pršelo.", uk: "Він залишився вдома, тому що йшов дощ." },
       { cz: "Nerozumím, protože mluvíš rychle.", uk: "Я не розумію, тому що ти говориш швидко." },
     ],

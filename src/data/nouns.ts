@@ -942,7 +942,7 @@ export const NOUNS: NounEntry[] = [
       lokal: { sg: "vodě", pl: "vodách" },
       instrumental: { sg: "vodou", pl: "vodami" },
     },
-    exampleSentenceCz: "Piju vodu.",
+    exampleSentenceCz: "Piji vodu.",
     exampleSentenceUk: "Я п'ю воду.",
   },
   {
@@ -2271,13 +2271,14 @@ export const NOUNS: NounEntry[] = [
     pattern: "hrad",
     category: "time",
     declension: {
-      // Нерегулярне: лок. sg "roce" (дублет з "roku", беремо сучасніший),
+      // Вок.од. "roku" (не "roce"): основа на -k має в 5. п. закінчення -u — IJP (?id=225).
+    // Нерегулярне: лок. sg "roce" (дублет з "roku", беремо сучасніший),
       // лок. pl "rocích" (НЕ "rocech" — звірено ÚJČ: "6. mn. -cích").
       nominativ: { sg: "rok", pl: "roky" },
       genitiv: { sg: "roku", pl: "roků" },
       dativ: { sg: "roku", pl: "rokům" },
       akuzativ: { sg: "rok", pl: "roky" },
-      vokativ: { sg: "roce", pl: "roky" },
+      vokativ: { sg: "roku", pl: "roky" },
       lokal: { sg: "roce", pl: "rocích" },
       instrumental: { sg: "rokem", pl: "roky" },
     },
@@ -3025,7 +3026,7 @@ export const NOUNS: NounEntry[] = [
       lokal: { sg: "počítači", pl: "počítačích" },
       instrumental: { sg: "počítačem", pl: "počítači" },
     },
-    exampleSentenceCz: "Pracuju na počítači.",
+    exampleSentenceCz: "Pracuji na počítači.",
     exampleSentenceUk: "Я працюю на комп'ютері.",
   },
 
@@ -3341,7 +3342,7 @@ export const NOUNS: NounEntry[] = [
     category: "home",
     declension: {
       nominativ: { sg: "košile", pl: "košile" },
-      genitiv: { sg: "košile", pl: "košilí" },
+      genitiv: { sg: "košile", pl: "košil" },
       dativ: { sg: "košili", pl: "košilím" },
       akuzativ: { sg: "košili", pl: "košile" },
       vokativ: { sg: "košile", pl: "košile" },
@@ -3663,11 +3664,11 @@ export const NOUNS: NounEntry[] = [
     declension: {
       nominativ: { sg: "noc", pl: "noci" },
       genitiv: { sg: "noci", pl: "nocí" },
-      dativ: { sg: "noci", pl: "nocem" },
+      dativ: { sg: "noci", pl: "nocím" },
       akuzativ: { sg: "noc", pl: "noci" },
       vokativ: { sg: "noci", pl: "noci" },
-      lokal: { sg: "noci", pl: "nocech" },
-      instrumental: { sg: "nocí", pl: "nocmi" },
+      lokal: { sg: "noci", pl: "nocích" },
+      instrumental: { sg: "nocí", pl: "nocemi" },
     },
     exampleSentenceCz: "V noci je tma.",
     exampleSentenceUk: "Вночі темно.",
@@ -3764,7 +3765,7 @@ export const NOUNS: NounEntry[] = [
       lokal: { sg: "ránu", pl: "ránech" },
       instrumental: { sg: "ránem", pl: "rány" },
     },
-    exampleSentenceCz: "Ráno piju kávu.",
+    exampleSentenceCz: "Ráno piji kávu.",
     exampleSentenceUk: "Вранці я п'ю каву.",
   },
   {
@@ -3780,7 +3781,7 @@ export const NOUNS: NounEntry[] = [
       dativ: { sg: "večeru", pl: "večerům" },
       akuzativ: { sg: "večer", pl: "večery" },
       vokativ: { sg: "večere", pl: "večery" },
-      lokal: { sg: "večere", pl: "večerech" },
+      lokal: { sg: "večeru", pl: "večerech" },
       instrumental: { sg: "večerem", pl: "večery" },
     },
     exampleSentenceCz: "Večer čtu knihu.",
