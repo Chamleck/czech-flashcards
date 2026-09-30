@@ -156,7 +156,7 @@ function push(
 function buildIndex(): SearchEntry[] {
   const out: SearchEntry[] = [];
 
-  // Іменники — group за category, KРІМ "numbers" (сотні/тисячі, прихована з
+  // Іменники — group за category, КРІМ "numbers" (сотні/тисячі, прихована з
   // тайлу іменників, реальний вхід — «Числівники»). "time" з 2026-09 більше не
   // прихована — індексується через загальну гілку нижче (той самий шлях, що
   // "months").

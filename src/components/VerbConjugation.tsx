@@ -156,6 +156,7 @@ export function VerbConjugation({
       ? ["Доконаний вид не має теперішнього часу. Його «теперішня» дієвідміна за значенням є майбутньою."]
       : []),
     ...(entry.aspectPairNote ? [renderAspectPairNote(entry.aspectPairNote)] : []),
+    ...(entry.presentNote ? [entry.presentNote] : []),
   ];
 
   return (

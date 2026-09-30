@@ -116,7 +116,7 @@ export function pastForm(v: VerbEntry, s: PastSubject): string {
   // Виняток для "ty" (2 особи однини) зі зворотним дієсловом: "jsi" + se/si
   // стягується в ОДНЕ слово — ses/sis. Це кодифікована норма (не розмовне
   // спрощення!), повна форма "jsi se/si" досі офіційно некодифікована, хоч і
-  // часта усно (ÚJЧ prirucka.ujc.cas.cz/?id=580). Дублет, як усюди в проєкті:
+  // часта усно (ÚJČ prirucka.ujc.cas.cz/?id=580). Дублет, як усюди в проєкті:
   // стягнена форма першою (кодифікована), повна — другою.
   if (s === "ty" && v.reflexive) {
     const contracted = v.reflexive === "se" ? "ses" : "sis";

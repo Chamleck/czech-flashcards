@@ -7,7 +7,7 @@ import { DateOrdinal, MonthName } from "../types";
 // AdjectiveEntry (56 форм) — за принципом проєкту моделюємо рівно те, що
 // потрібно, як зробили з CardinalEntry.
 //
-// Формула дати (звірено з ÚJЧ / realityczech.org / elon.io / language-hub):
+// Формула дати (звірено з ÚJČ / realityczech.org / elon.io / language-hub):
 //   родовий порядкового (день) + родовий назви місяця → «pátého května»
 // Складені дати 13–31 мають ДВА нормативні варіанти:
 //   • аналітичний: обидві частини порядкові й відмінювані — «dvacátého pátého»

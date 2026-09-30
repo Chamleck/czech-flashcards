@@ -1,6 +1,6 @@
 import { CardinalEntry } from "../types";
 
-// Кількісні числівники 1–19 + круглі десятки 20–90. Форми звірено з ÚJЧ
+// Кількісні числівники 1–19 + круглі десятки 20–90. Форми звірено з ÚJČ
 // (prirucka.ujc.cas.cz) / czechency.org / cesky-jazyk.cz / erikahanackova /
 // umimecesky / mozaika.eu:
 //  • jeden — займенникове тверде відмінювання (як ten), лише однина;
@@ -11,7 +11,7 @@ import { CardinalEntry } from "../types";
 // Вокатив числівники не мають — його немає в NUMERAL_CASE_ORDER.
 // Дублети (tří / třech, deseti / desíti) зберігаються цілим рядком через " / "
 // (як в іменниках). Дублет за довготою мають лише deset і dvacet (звірено з
-// ÚJЧ: dvaceti i dvacíti); 30–90 — одна форма (-desáti / -ceti).
+// ÚJČ: dvaceti i dvacíti); 30–90 — одна форма (-desáti / -ceti).
 // Складені числа 21–99 (dvacet jeden…) НЕ мають окремих записів — вони
 // генеруються композиційно в квизі (desítka + jednotka), див.
 // numeralAgreementEngine.ts.

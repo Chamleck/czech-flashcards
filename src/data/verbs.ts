@@ -5,7 +5,7 @@ import { VerbEntry } from "../types";
 //
 // Розподіл за 5 традиційними класами + нерегулярні/модальні.
 // Нерегулярні форми звірено з ÚJČ, IJP, Wikipedie (česká slovesa),
-// univerzitними матеріалами (FF UK) та навчальними джерелами.
+// університетськими матеріалами (FF UK) та навчальними джерелами.
 //
 // Позначки: aspect (imperfective/perfective), verbClass, reflexive (se/si).
 // Майбутній час:
@@ -114,7 +114,8 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "piju", ty: "piješ", on: "pije", my: "pijeme", vy: "pijete", oni: "pijou" },
     pastParticiple: { m: "pil", f: "pila", n: "pilo", manim_pl: "pili", other_pl: "pily" },
     imperative: { ty: "pij", vy: "pijte", my: "pijme" },
-    aspectPairNote: "доконаний партнер: vypít (випити); варіант 1 ос. piji (книжн.)",
+    presentNote: "Теперішній час, я / вони: piju / pijou (розм.) або piji / pijí (нейтр.). Обидва варіанти правильні.",
+    aspectPairNote: "доконаний партнер: vypít (випити)",
     aspectPairId: "vypit",
     examples: {
       present: { cz: "Piju vodu.", uk: "Я п'ю воду." },
@@ -132,7 +133,8 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "myju", ty: "myješ", on: "myje", my: "myjeme", vy: "myjete", oni: "myjou" },
     pastParticiple: { m: "myl", f: "myla", n: "mylo", manim_pl: "myli", other_pl: "myly" },
     imperative: { ty: "myj", vy: "myjte", my: "myjme" },
-    aspectPairNote: "доконаний партнер: umýt (вимити); варіант 1 ос. myji (книжн.)",
+    presentNote: "Теперішній час, я / вони: myju / myjou (розм.) або myji / myjí (нейтр.). Обидва варіанти правильні.",
+    aspectPairNote: "доконаний партнер: umýt (вимити)",
     aspectPairId: "umyt",
     examples: {
       present: { cz: "Myju nádobí.", uk: "Я мию посуд." },
@@ -328,7 +330,8 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "kupuju", ty: "kupuješ", on: "kupuje", my: "kupujeme", vy: "kupujete", oni: "kupujou" },
     pastParticiple: { m: "kupoval", f: "kupovala", n: "kupovalo", manim_pl: "kupovali", other_pl: "kupovaly" },
     imperative: { ty: "kupuj", vy: "kupujte", my: "kupujme" },
-    aspectPairNote: "доконаний партнер: koupit (купити); варіант 1 ос. kupuji (книжн.)",
+    presentNote: "Теперішній час, я / вони: kupuju / kupujou (розм.) або kupuji / kupují (нейтр.). Обидва варіанти правильні.",
+    aspectPairNote: "доконаний партнер: koupit (купити)",
     aspectPairId: "koupit",
     examples: {
       present: { cz: "Kupuju chleba každý den.", uk: "Я купую хліб щодня." },
@@ -346,7 +349,7 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "pracuju", ty: "pracuješ", on: "pracuje", my: "pracujeme", vy: "pracujete", oni: "pracujou" },
     pastParticiple: { m: "pracoval", f: "pracovala", n: "pracovalo", manim_pl: "pracovali", other_pl: "pracovaly" },
     imperative: { ty: "pracuj", vy: "pracujte", my: "pracujme" },
-    aspectPairNote: "варіант 1 ос. pracuji (книжн.)",
+    presentNote: "Теперішній час, я / вони: pracuju / pracujou (розм.) або pracuji / pracují (нейтр.). Обидва варіанти правильні.",
     examples: {
       present: { cz: "Pracuju v nemocnici.", uk: "Я працюю в лікарні." },
       past: { cz: "Pracoval jsem v nemocnici.", uk: "Я працював у лікарні." },
@@ -363,7 +366,7 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "studuju", ty: "studuješ", on: "studuje", my: "studujeme", vy: "studujete", oni: "studujou" },
     pastParticiple: { m: "studoval", f: "studovala", n: "studovalo", manim_pl: "studovali", other_pl: "studovaly" },
     imperative: { ty: "studuj", vy: "studujte", my: "studujme" },
-    aspectPairNote: "варіант 1 ос. studuji (книжн.)",
+    presentNote: "Теперішній час, я / вони: studuju / studujou (розм.) або studuji / studují (нейтр.). Обидва варіанти правильні.",
     examples: {
       present: { cz: "Studuju na univerzitě.", uk: "Я вчуся в університеті." },
       past: { cz: "Studoval jsem na univerzitě.", uk: "Я вчився в університеті." },
@@ -400,7 +403,7 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "jmenuju", ty: "jmenuješ", on: "jmenuje", my: "jmenujeme", vy: "jmenujete", oni: "jmenujou" },
     pastParticiple: { m: "jmenoval", f: "jmenovala", n: "jmenovalo", manim_pl: "jmenovali", other_pl: "jmenovaly" },
     imperative: { ty: "jmenuj se", vy: "jmenujte se", my: "jmenujme se" },
-    aspectPairNote: "варіант 1 ос. jmenuji (книжн.)",
+    presentNote: "Теперішній час, я / вони: jmenuju / jmenujou (розм.) або jmenuji / jmenují (нейтр.). Обидва варіанти правильні.",
     examples: {
       present: { cz: "Jmenuju se Petr.", uk: "Мене звати Петро." },
       past: { cz: "Jmenoval jsem se Petr.", uk: "Мене звали Петро." },
@@ -417,7 +420,8 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "kryju", ty: "kryješ", on: "kryje", my: "kryjeme", vy: "kryjete", oni: "kryjou" },
     pastParticiple: { m: "kryl", f: "kryla", n: "krylo", manim_pl: "kryli", other_pl: "kryly" },
     imperative: { ty: "kryj", vy: "kryjte", my: "kryjme" },
-    aspectPairNote: "доконаний партнер: zakrýt (закрити); варіант 1 ос. kryji (книжн.)",
+    presentNote: "Теперішній час, я / вони: kryju / kryjou (розм.) або kryji / kryjí (нейтр.). Обидва варіанти правильні.",
+    aspectPairNote: "доконаний партнер: zakrýt (закрити)",
     aspectPairId: "zakryt",
     examples: {
       present: { cz: "Střecha kryje dům.", uk: "Дах криє будинок." },
@@ -435,7 +439,7 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "potřebuju", ty: "potřebuješ", on: "potřebuje", my: "potřebujeme", vy: "potřebujete", oni: "potřebujou" },
     pastParticiple: { m: "potřeboval", f: "potřebovala", n: "potřebovalo", manim_pl: "potřebovali", other_pl: "potřebovaly" },
     imperative: { ty: "potřebuj", vy: "potřebujte", my: "potřebujme" },
-    aspectPairNote: "варіант 1 ос. potřebuji (книжн.)",
+    presentNote: "Теперішній час, я / вони: potřebuju / potřebujou (розм.) або potřebuji / potřebují (нейтр.). Обидва варіанти правильні.",
     examples: {
       present: { cz: "Potřebuju pomoc.", uk: "Мені потрібна допомога." },
       past: { cz: "Potřeboval jsem pomoc.", uk: "Мені була потрібна допомога." },
@@ -452,7 +456,8 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "děkuju", ty: "děkuješ", on: "děkuje", my: "děkujeme", vy: "děkujete", oni: "děkujou" },
     pastParticiple: { m: "děkoval", f: "děkovala", n: "děkovalo", manim_pl: "děkovali", other_pl: "děkovaly" },
     imperative: { ty: "děkuj", vy: "děkujte", my: "děkujme" },
-    aspectPairNote: "доконаний партнер: poděkovat (подякувати); варіант 1 ос. děkuji (книжн.)",
+    presentNote: "Теперішній час, я / вони: děkuju / děkujou (розм.) або děkuji / děkují (нейтр.). Обидва варіанти правильні.",
+    aspectPairNote: "доконаний партнер: poděkovat (подякувати)",
     aspectPairId: "podekovat",
     examples: {
       present: { cz: "Děkuju za pomoc.", uk: "Я дякую за допомогу." },
@@ -470,7 +475,7 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "miluju", ty: "miluješ", on: "miluje", my: "milujeme", vy: "milujete", oni: "milujou" },
     pastParticiple: { m: "miloval", f: "milovala", n: "milovalo", manim_pl: "milovali", other_pl: "milovaly" },
     imperative: { ty: "miluj", vy: "milujte", my: "milujme" },
-    aspectPairNote: "варіант 1 ос. miluji (книжн.)",
+    presentNote: "Теперішній час, я / вони: miluju / milujou (розм.) або miluji / milují (нейтр.). Обидва варіанти правильні.",
     examples: {
       present: { cz: "Miluju tě.", uk: "Я тебе кохаю." },
       past: { cz: "Miloval jsem tě.", uk: "Я тебе кохав." },
@@ -487,7 +492,8 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "opakuju", ty: "opakuješ", on: "opakuje", my: "opakujeme", vy: "opakujete", oni: "opakujou" },
     pastParticiple: { m: "opakoval", f: "opakovala", n: "opakovalo", manim_pl: "opakovali", other_pl: "opakovaly" },
     imperative: { ty: "opakuj", vy: "opakujte", my: "opakujme" },
-    aspectPairNote: "доконаний партнер: zopakovat (повторити); варіант 1 ос. opakuji (книжн.)",
+    presentNote: "Теперішній час, я / вони: opakuju / opakujou (розм.) або opakuji / opakují (нейтр.). Обидва варіанти правильні.",
+    aspectPairNote: "доконаний партнер: zopakovat (повторити)",
     aspectPairId: "zopakovat",
     examples: {
       present: { cz: "Opakuju si slovíčka.", uk: "Я повторюю слова." },
@@ -811,7 +817,8 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "hraju", ty: "hraješ", on: "hraje", my: "hrajeme", vy: "hrajete", oni: "hrajou" },
     pastParticiple: { m: "hrál", f: "hrála", n: "hrálo", manim_pl: "hráli", other_pl: "hrály" },
     imperative: { ty: "hraj", vy: "hrajte", my: "hrajme" },
-    aspectPairNote: "доконаний партнер: zahrát (зіграти); дієвідміна за зразком -je (hraju), варіант 1 ос. hraji (книжн.)",
+    presentNote: "Теперішній час, я / вони: hraju / hrajou (розм.) або hraji / hrají (нейтр.). Обидва варіанти правильні.",
+    aspectPairNote: "доконаний партнер: zahrát (зіграти); дієвідміна за зразком -je (hraju)",
     aspectPairId: "zahrat",
     examples: {
       present: { cz: "Hraju fotbal.", uk: "Я граю у футбол." },
@@ -1346,7 +1353,7 @@ export const VERBS: VerbEntry[] = [
   // ─────────────── Видові пари, частина 2: доконані партнери (по-/з-/за-/на-/у-) ───────────────
   // Префіксальні доконані від III–V класу. Дієвідміна = основа базового + префікс,
   // клас успадковується (виняток: poslechnout — II клас -ne, інший словотвір, ніж
-  // poslouchat). Форми звірено з ÚJЧ (dotazy/prirucka) / Wikislovník / dobryslovnik /
+  // poslouchat). Форми звірено з ÚJČ (dotazy/prirucka) / Wikislovník / dobryslovnik /
   // pravidla.cz. Доконані: future замість present, значення майбутнє.
   {
     id: "podivat-se",
@@ -1706,7 +1713,7 @@ export const VERBS: VerbEntry[] = [
   // Зворотний бік: недоконані партнери до вже наявних доконаних. Це імперфективи
   // з ітеративним суфіксом (-at/-ávat), V або IV клас. Мають теперішній час і
   // складене майбутнє («budu + інфінітив») — тому present задаємо, а майбутнє
-  // в прикладі йде через budu. Форми звірено з ÚJЧ / Wikislovník / dobryslovnik.
+  // в прикладі йде через budu. Форми звірено з ÚJČ / Wikislovník / dobryslovnik.
   {
     id: "zacinat",
     uk: "починати",
@@ -2119,7 +2126,8 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "ukazuju", ty: "ukazuješ", on: "ukazuje", my: "ukazujeme", vy: "ukazujete", oni: "ukazujou" },
     pastParticiple: { m: "ukazoval", f: "ukazovala", n: "ukazovalo", manim_pl: "ukazovali", other_pl: "ukazovaly" },
     imperative: { ty: "ukazuj", vy: "ukazujte", my: "ukazujme" },
-    aspectPairNote: "доконаний партнер: ukázat (показати); варіант ukazuji (книжн.)",
+    presentNote: "Теперішній час, я / вони: ukazuju / ukazujou (розм.) або ukazuji / ukazují (нейтр.). Обидва варіанти правильні.",
+    aspectPairNote: "доконаний партнер: ukázat (показати)",
     aspectPairId: "ukazat",
     examples: {
       present: { cz: "Ukazuju ti obrázek.", uk: "Я показую тобі малюнок." },
@@ -2423,6 +2431,7 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "rozhoduju", ty: "rozhoduješ", on: "rozhoduje", my: "rozhodujeme", vy: "rozhodujete", oni: "rozhodujou" },
     pastParticiple: { m: "rozhodoval", f: "rozhodovala", n: "rozhodovalo", manim_pl: "rozhodovali", other_pl: "rozhodovaly" },
     imperative: { ty: "rozhoduj se", vy: "rozhodujte se", my: "rozhodujme se" },
+    presentNote: "Теперішній час, я / вони: rozhoduju / rozhodujou (розм.) або rozhoduji / rozhodují (нейтр.). Обидва варіанти правильні.",
     aspectPairNote: "доконаний партнер: rozhodnout se (вирішити)",
     aspectPairId: "rozhodnout-se",
     examples: {
@@ -2576,7 +2585,7 @@ export const VERBS: VerbEntry[] = [
 
   // ═══════════════════ Батч розширення словника #4 (6 пар + 2 самостійних) ═══════════════════
   // Джерела: prirucka.ujc.cas.cz, dobryslovnik.cz, wiktionary. Родина jít розкрилась
-  // НЕОДНОРІДНОЮ: přijít — нерегулярний наказовий (přijď, звірено ÚJЧ-таблицею
+  // НЕОДНОРІДНОЮ: přijít — нерегулярний наказовий (přijď, звірено ÚJČ-таблицею
   // нерегулярних дієслів), а odejít — регулярний (odejdi, як najít) — перевірено
   // ОБИДВА окремо, не екстрапольовано з одного на інше.
   {

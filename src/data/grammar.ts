@@ -831,7 +831,11 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           },
           {
             term: [{ word: "její", wordId: "jeji", kind: "pronouns" }],
-            note: [{ text: "відмінюється як прикметник jarní: jejího, jejímu, jejím, jejích. Форма змінюється за відмінком, хоч і схожа на незмінну." }],
+            note: [
+              { text: "відмінюється як прикметник " },
+              { word: "jarní", wordId: "jarni", kind: "adjectives" },
+              { text: " (м'який зразок, див. тему «Прикметники»): jejího, jejímu, jejím, jejích. Форма змінюється за відмінком, хоч і схожа на незмінну." },
+            ],
           },
           {
             term: [
@@ -1002,7 +1006,11 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           { word: "druhý", wordId: "ord-druhy", kind: "adjectives" },
           { text: ", " },
           { word: "třetí", wordId: "ord-treti", kind: "adjectives" },
-          { text: " — «котрий?»). Кількісні мають особливе відмінювання, а порядкові відмінюються як звичайні прикметники (зразок mladý, а перший/третій — за м'яким jarní)." },
+          { text: " — «котрий?»). Кількісні мають особливе відмінювання, а порядкові відмінюються як звичайні прикметники (зразок " },
+          { word: "mladý", wordId: "mlady", kind: "adjectives" },
+          { text: ", а перший/третій — за м'яким " },
+          { word: "jarní", wordId: "jarni", kind: "adjectives" },
+          { text: ")." },
         ],
       },
       { type: "heading", text: "Узгодження з іменником" },

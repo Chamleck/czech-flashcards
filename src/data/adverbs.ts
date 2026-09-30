@@ -1,6 +1,6 @@
 import { SpatialAdverbEntry } from "../types";
 
-// Незмінні прислівники місця: де? / куди? / звідки? Форми звірено з ÚJЧ
+// Незмінні прислівники місця: де? / куди? / звідки? Форми звірено з ÚJČ
 // (prirucka.ujc.cas.cz), Naše řeč (nase-rec.ujc.cas.cz — зокрема архівна
 // стаття про "prostřed", що прямо підтверджує трійку uprostřed/doprostřed/
 // zprostřed), czechency.org, rodicka.cz, cesky-jazyk.cz.

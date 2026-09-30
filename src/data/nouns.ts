@@ -52,7 +52,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── muž (чол. істот., м'який) ───────────────
   {
     id: "muz-muz",
-    uk: "мужчина (муж)",
+    uk: "чоловік",
     cz: "muž",
     gender: "masc_anim",
     pattern: "muz",
@@ -2111,7 +2111,7 @@ export const NOUNS: NounEntry[] = [
   // ═══════════════════ СОТНІ І ТИСЯЧІ ═══════════════════
   // sto/tisíc — граматично ЗВИЧАЙНІ іменники (не окремий числівниковий тип):
   // sto відмінюється як město (сер.), tisíc як stroj (чол. неіст.). Винятки в
-  // родовому множини звірено з ÚJЧ/umimecesky: sto → "set" (епентетичне -e-),
+  // родовому множини звірено з ÚJČ/umimecesky: sto → "set" (епентетичне -e-),
   // tisíc → "tisíc" (нульове закінчення, не "tisíců"). У множниках (dvě stě /
   // tři sta / pět set) — див. окрему тему в розділі Граматика.
   {
@@ -2143,7 +2143,7 @@ export const NOUNS: NounEntry[] = [
     category: "numbers",
     declension: {
       // Родовий множини: "tisíc" (старобильна форма без закінчення) і новіша
-      // "tisíců" — обидві нормативні (звірено з ÚJЧ). Показуємо обидві.
+      // "tisíců" — обидві нормативні (звірено з ÚJČ). Показуємо обидві.
       nominativ: { sg: "tisíc", pl: "tisíce" },
       genitiv: { sg: "tisíce", pl: "tisíc / tisíců" },
       dativ: { sg: "tisíci", pl: "tisícům" },
@@ -2240,7 +2240,7 @@ export const NOUNS: NounEntry[] = [
   },
 
   // ═══════════════════ Батч розширення словника іменників #1 (13 слів) ═══════════════════
-  // Джерела: prirucka.ujc.cas.cz (ÚJЧ) — den/rok/týden/ruka/noha/oko/peníze звірено
+  // Джерела: prirucka.ujc.cas.cz (ÚJČ) — den/rok/týden/ruka/noha/oko/peníze звірено
   // явно (усі мають реальні нерегулярності, жодна не виведена механічно за зразком).
   {
     id: "den",
@@ -2251,7 +2251,7 @@ export const NOUNS: NounEntry[] = [
     category: "time",
     declension: {
       // Нерегулярне: gen "dne" (не "denu"), gen.pl "dní" (НЕ "dnů" — застаріла/
-      // нормативно неправильна форма, звірено окремою статтею ÚJЧ).
+      // нормативно неправильна форма, звірено окремою статтею ÚJČ).
       nominativ: { sg: "den", pl: "dny" },
       genitiv: { sg: "dne", pl: "dní" },
       dativ: { sg: "dni", pl: "dnům" },
@@ -2272,7 +2272,7 @@ export const NOUNS: NounEntry[] = [
     category: "time",
     declension: {
       // Нерегулярне: лок. sg "roce" (дублет з "roku", беремо сучасніший),
-      // лок. pl "rocích" (НЕ "rocech" — звірено ÚJЧ: "6. mn. -cích").
+      // лок. pl "rocích" (НЕ "rocech" — звірено ÚJČ: "6. mn. -cích").
       nominativ: { sg: "rok", pl: "roky" },
       genitiv: { sg: "roku", pl: "roků" },
       dativ: { sg: "roku", pl: "rokům" },
@@ -2294,7 +2294,7 @@ export const NOUNS: NounEntry[] = [
     declension: {
       // Нерегулярне лише в однині (gen "týdne", dat/lok "týdni"); множина —
       // ПОВНІСТЮ регулярна за зразком hrad (týdnů, не *týdní — на відміну
-      // від den! Звірено ÚJЧ явно: "v mn. č. tvary podle vzoru hrad").
+      // від den! Звірено ÚJČ явно: "v mn. č. tvary podle vzoru hrad").
       nominativ: { sg: "týden", pl: "týdny" },
       genitiv: { sg: "týdne", pl: "týdnů" },
       dativ: { sg: "týdni", pl: "týdnům" },
@@ -2334,7 +2334,7 @@ export const NOUNS: NounEntry[] = [
     category: "body",
     declension: {
       // Множина — залишки ДУАЛУ (частина тіла): nom "ruce" (НЕ "ruky"!),
-      // gen/лок "rukou", ор. "rukama" (НЕ regular "-ami"). Звірено ÚJЧ +
+      // gen/лок "rukou", ор. "rukama" (НЕ regular "-ami"). Звірено ÚJČ +
       // кілька незалежних джерел. sg instr "rukou" — регулярний zena-тип,
       // ЗБІГАЄТЬСЯ рядком з нерегулярним pl gen/лок — це не помилка.
       nominativ: { sg: "ruka", pl: "ruce" },
@@ -2499,7 +2499,7 @@ export const NOUNS: NounEntry[] = [
     declension: {
       // Pluralia tantum — однини НЕМАЄ взагалі ("—" у кожній клітинці sg,
       // рушій квизу (flashcardEngine.ts) явно навчений пропускати такі
-      // комбінації, звірено харнессом). Множина звірена напряму ÚJЧ,
+      // комбінації, звірено харнессом). Множина звірена напряму ÚJČ,
       // gen.pl "peněz" — виняток (НЕ "penězů", як типово для vzoru stroj).
       nominativ: { sg: "—", pl: "peníze" },
       genitiv: { sg: "—", pl: "peněz" },
@@ -2514,7 +2514,7 @@ export const NOUNS: NounEntry[] = [
   },
 
   // ═══════════════════ Батч розширення словника іменників #2 (10 слів) ═══════════════════
-  // Джерела: prirucka.ujc.cas.cz (ÚJЧ), dobryslovnik.cz. ucho звірено явно — той самий
+  // Джерела: prirucka.ujc.cas.cz (ÚJČ), dobryslovnik.cz. ucho звірено явно — той самий
   // залишок дуалу, що й oko (суплетивна множина "uši"). dědeček/manžel/soused — повна
   // парадигма множини звірена окремо (не виведена механічно за зразком pán/muž).
   {
@@ -2564,7 +2564,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "muz",
     category: "people",
     declension: {
-      // Nom.pl "manželé" — звірено ÚJЧ прямо (той самий клас, що andělé).
+      // Nom.pl "manželé" — звірено ÚJČ прямо (той самий клас, що andělé).
       nominativ: { sg: "manžel", pl: "manželé" },
       genitiv: { sg: "manžela", pl: "manželů" },
       dativ: { sg: "manželovi", pl: "manželům" },
@@ -2622,7 +2622,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "pan",
     category: "people",
     declension: {
-      // Nom.pl "sousedi" — звірено ÚJЧ як основну (частішу) форму, "sousedé" —
+      // Nom.pl "sousedi" — звірено ÚJČ як основну (частішу) форму, "sousedé" —
       // рівноцінний дублет.
       nominativ: { sg: "soused", pl: "sousedi" },
       genitiv: { sg: "souseda", pl: "sousedů" },
@@ -2716,11 +2716,11 @@ export const NOUNS: NounEntry[] = [
   },
 
   // ═══════════════════ Батч розширення словника іменників #3 (15 слів) ═══════════════════
-  // Джерела: prirucka.ujc.cas.cz (ÚJЧ), dobryslovnik.cz, Naše řeč (ÚJЧ-афілійований журнал).
+  // Джерела: prirucka.ujc.cas.cz (ÚJČ), dobryslovnik.cz, Naše řeč (ÚJČ-афілійований журнал).
   // paní — АДЄКТИВНЕ відмінювання (зразок "jarní"), не вписується в жоден з 11 наявних
   // patterns; однина ПОВНІСТЮ незмінна (paní у всіх 7 відмінках) — звірено двома
   // незалежними джерелами. ústa — pluralia tantum (як peníze). déšť/sníh — коротка
-  // голосна в непрямих відмінках (déšť→deště, sníh→sněhu), звірено Naše řeč/ÚJЧ, НЕ
+  // голосна в непрямих відмінках (déšť→deště, sníh→sněhu), звірено Naše řeč/ÚJČ, НЕ
   // виведено механічно.
   {
     id: "snidane",
@@ -2848,7 +2848,7 @@ export const NOUNS: NounEntry[] = [
     declension: {
       // АДЄКТИВНЕ відмінювання (зразок "jarní") — унікальний випадок, жоден з 11
       // patterns не описує це точно; pattern="kost" — лише організаційна мітка,
-      // самі форми звірені напряму (ptejteseknihovny.cz, цитує ÚJЧ + dobryslovnik.cz,
+      // самі форми звірені напряму (ptejteseknihovny.cz, цитує ÚJČ + dobryslovnik.cz,
       // повний збіг). Однина ПОВНІСТЮ незмінна — це не помилка копіювання.
       nominativ: { sg: "paní", pl: "paní" },
       genitiv: { sg: "paní", pl: "paní" },
@@ -2890,7 +2890,7 @@ export const NOUNS: NounEntry[] = [
     category: "nature",
     declension: {
       // Довге é лише в nom./akuz., усі непрямі відмінки — коротке e (deště, dešti).
-      // Звірено Naše řeč (журнал ÚJЧ): "ve všech nepřímých pádech základovou
+      // Звірено Naše řeč (журнал ÚJČ): "ve všech nepřímých pádech základovou
       // samohlásku krátkou (deště atd.)".
       nominativ: { sg: "déšť", pl: "deště" },
       genitiv: { sg: "deště", pl: "dešťů" },
@@ -2914,11 +2914,12 @@ export const NOUNS: NounEntry[] = [
     declension: {
       // Довге í лише в nom./akuz., непрямі відмінки — коротке e (sněhu, sněhem).
       // Лок.мн. "snězích" (h→z, м'якшення) — звірено напряму dobryslovnik.cz.
+  // Вок.од. "sněhu" (не *sněze) — звірено IJP (prirucka.ujc.cas.cz, 5. п. j. č.).
       nominativ: { sg: "sníh", pl: "sněhy" },
       genitiv: { sg: "sněhu", pl: "sněhů" },
       dativ: { sg: "sněhu", pl: "sněhům" },
       akuzativ: { sg: "sníh", pl: "sněhy" },
-      vokativ: { sg: "sněze", pl: "sněhy" },
+      vokativ: { sg: "sněhu", pl: "sněhy" },
       lokal: { sg: "sněhu", pl: "snězích" },
       instrumental: { sg: "sněhem", pl: "sněhy" },
     },
@@ -2979,7 +2980,7 @@ export const NOUNS: NounEntry[] = [
     category: "transport",
     declension: {
       nominativ: { sg: "letiště", pl: "letiště" },
-      genitiv: { sg: "letiště", pl: "letiští" },
+      genitiv: { sg: "letiště", pl: "letišť" },
       dativ: { sg: "letišti", pl: "letištím" },
       akuzativ: { sg: "letiště", pl: "letiště" },
       vokativ: { sg: "letiště", pl: "letiště" },
@@ -3029,7 +3030,7 @@ export const NOUNS: NounEntry[] = [
   },
 
   // ═══════════════════ Батч розширення словника іменників #4 (15 слів, побутова лексика) ═══════════════════
-  // Джерела: prirucka.ujc.cas.cz (ÚJЧ), dobryslovnik.cz, Nechybujte.cz, pravidla.cz.
+  // Джерела: prirucka.ujc.cas.cz (ÚJČ), dobryslovnik.cz, Nechybujte.cz, pravidla.cz.
   // brýle — pluralia tantum (як peníze/ústa). lžíce/sklenice — слова на -ice йдуть за
   // "підзразком ulice" (НЕ růže!): gen.pl БЕЗ закінчення й з коротким голосним (lžic,
   // sklenic) — НЕ "lžící"/"sklenicí" (це збіглося б з ор.в. однини!). Перевірено явно,
@@ -3324,8 +3325,8 @@ export const NOUNS: NounEntry[] = [
   },
 
   // ═══════════════════ Батч розширення словника іменників #5 (15 слів) ═══════════════════
-  // Джерела: prirucka.ujc.cas.cz (ÚJЧ), Nechybujte.cz, шкільний ключ відповідей (novaskoladuha.cz).
-  // ponožka виявилась НЕ pluralia tantum (на відміну від початкової підозри — ÚJЧ-афілійований
+  // Джерела: prirucka.ujc.cas.cz (ÚJČ), Nechybujte.cz, шкільний ключ відповідей (novaskoladuha.cz).
+  // ponožka виявилась НЕ pluralia tantum (на відміну від початкової підозри — ÚJČ-афілійований
   // ключ явно: "ponožka (jedn.)"), тоді як kalhoty підтверджено в одному списку з dveře/nůžky/
   // játra (справжні pluralia tantum). rameno/koleno — залишки ДВОЙНОГО числа в род./місц. мн.
   // (ramenou/kolenou), АЛЕ ор. мн. РЕГУЛЯРНИЙ (rameny/koleny, НЕ "-ma" як у ruka/noha) — звірено
@@ -3379,7 +3380,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "zena",
     category: "home",
     declension: {
-      // На відміну від kalhoty — ЗВИЧАЙНИЙ іменник з повною однини (ÚJЧ-афілійований
+      // На відміну від kalhoty — ЗВИЧАЙНИЙ іменник з повною однини (ÚJČ-афілійований
       // шкільний ключ прямо: не pluralia tantum, лише переважає вживання в множині).
       nominativ: { sg: "bota", pl: "boty" },
       genitiv: { sg: "boty", pl: "bot" },
@@ -3594,7 +3595,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "mesto",
     category: "body",
     declension: {
-      // Залишок ДВОЙНОГО числа: gen.pl/лок.pl "ramenou" (звірено ÚJЧ прямо), АЛЕ
+      // Залишок ДВОЙНОГО числа: gen.pl/лок.pl "ramenou" (звірено ÚJČ прямо), АЛЕ
       // ор.pl РЕГУЛЯРНИЙ "rameny" (НЕ "-ma"!) — на відміну від ruka/noha. Дублет
       // ramenou/ramen існує, беремо дуальну форму як основну (значення "частина тіла").
       nominativ: { sg: "rameno", pl: "ramena" },
