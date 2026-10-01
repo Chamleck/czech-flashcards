@@ -80,6 +80,9 @@ export function VerbConjugation({
   ];
   // Стартовий таб: у доконаного — "past", інакше "present".
   const [mode, setMode] = useState<Mode>(isPerfective ? "past" : "present");
+  // Таб, у якому живе «теперішня» дієвідміна слова (до неї належить registerNote):
+  // у недоконаного це present, у доконаного — future (теперішнього часу в нього нема).
+  const registerMode: Mode = isPerfective ? "future" : "present";
 
   const pp = entry.pastParticiple;
 
@@ -156,7 +159,6 @@ export function VerbConjugation({
       ? ["Доконаний вид не має теперішнього часу. Його «теперішня» дієвідміна за значенням є майбутньою."]
       : []),
     ...(entry.aspectPairNote ? [renderAspectPairNote(entry.aspectPairNote)] : []),
-    ...(entry.registerNote ? [entry.registerNote] : []),
   ];
 
   return (
@@ -189,6 +191,10 @@ export function VerbConjugation({
           ]}
         />
       )}
+
+      {/* Банер про регістр (нейтральна / розмовна форма) — лише під табом, якого
+          стосується, як і банер наказового вище */}
+      {mode === registerMode && entry.registerNote && <InfoBanner paragraphs={[entry.registerNote]} />}
 
       {/* Таблиця форм поточного режиму */}
       <View style={styles.section}>

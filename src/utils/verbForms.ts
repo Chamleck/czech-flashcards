@@ -58,28 +58,32 @@ export const PAST_SUBJECT_ORDER: PastSubject[] = [
 ];
 
 // Підписи підметів минулого часу (займенник cz + укр). Рід вказано явно, інакше
-// «dělal jsem» і «dělala jsem» були б обидві правильні для «я». Підпис має
-// вміщатись в один рядок завдання (≤ 41 символ разом із «Минулий час — »).
+// «dělal jsem» і «dělala jsem» були б обидві правильні для «я». Формат один для
+// всього квізу: «cz (uk)» — ОДНА пара дужок, складові uk (особа, рід, ввічливість)
+// через кому, без вкладених дужок (їх розплющує taskLabel у рушії). Підпис має
+// вміщатись в один рядок завдання (LABEL_MAX у scripts/check-verb-quiz.ts).
+// Середній рід множини: чеське ona збігається з ona (вона, ед.), тому українська
+// частина прямо каже «множина, сер. рід».
 // variant: клітинка — ВАРІАНТ тієї ж особи за родом/ввічливістю/числом; вона не
 // збільшує вагу минулого часу в квізі (див. PAST_BASE_SHARE). Нова клітинка без
 // variant вважається окремою особою і додає вагу.
 export const PAST_SUBJECT_LABELS: Record<PastSubject, { cz: string; uk: string; variant?: boolean }> = {
-  ja: { cz: "já", uk: "я (чол.)" },
-  ja_f: { cz: "já", uk: "я (жін.)", variant: true },
-  ty: { cz: "ty", uk: "ти (чол.)" },
-  ty_f: { cz: "ty", uk: "ти (жін.)", variant: true },
+  ja: { cz: "já", uk: "я, чол." },
+  ja_f: { cz: "já", uk: "я, жін.", variant: true },
+  ty: { cz: "ty", uk: "ти, чол." },
+  ty_f: { cz: "ty", uk: "ти, жін.", variant: true },
   on: { cz: "on", uk: "він" },
   ona: { cz: "ona", uk: "вона" },
   ono: { cz: "ono", uk: "воно" },
-  my: { cz: "my", uk: "ми (чол./змішана)" },
-  my_f: { cz: "my", uk: "ми (жін.)", variant: true },
-  vy: { cz: "vy", uk: "ви (мн., чол./змішана)" },
-  vy_f: { cz: "vy", uk: "ви (мн., жін.)", variant: true },
-  vy_sg_m: { cz: "vy", uk: "Ви (ввічливо, чол.)", variant: true },
-  vy_sg_f: { cz: "vy", uk: "Ви (ввічливо, жін.)", variant: true },
-  oni_manim: { cz: "oni", uk: "вони (чол. істот.)" },
-  oni_other: { cz: "ony", uk: "вони (жін., неістот.)" },
-  oni_neut: { cz: "ona", uk: "вони (сер.)", variant: true },
+  my: { cz: "my", uk: "ми, чол./змішана" },
+  my_f: { cz: "my", uk: "ми, жін.", variant: true },
+  vy: { cz: "vy", uk: "ви, чол./змішана" },
+  vy_f: { cz: "vy", uk: "ви, жін.", variant: true },
+  vy_sg_m: { cz: "vy", uk: "Ви, ввічливо, чол.", variant: true },
+  vy_sg_f: { cz: "vy", uk: "Ви, ввічливо, жін.", variant: true },
+  oni_manim: { cz: "oni", uk: "вони, чол. істот." },
+  oni_other: { cz: "ony", uk: "вони, жін." },
+  oni_neut: { cz: "ona", uk: "множина, сер. рід", variant: true },
 };
 
 // Частка «базових» клітинок серед усіх клітинок минулого. Квіз дієслів множить

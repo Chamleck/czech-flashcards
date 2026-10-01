@@ -6,7 +6,7 @@
 | Ассет | Де лежить | Походження | Ліцензія | Атрибуція в застосунку |
 |---|---|---|---|---|
 | `correct.wav`, `wrong.wav` | `assets/sounds/`, `modules/quiz-sounds/android/src/main/res/raw/` | Синтезовані тони (correct: ≈1047 → ≈1319 Гц; wrong: ≈225 → ≈175 Гц; ≈0,29 с, mono 44,1 кГц 16 біт). Згенеровані Claude на початку проєкту на запит власника (Nick). Скрипта генерації в репозиторії немає; чужого аудіо не використано. | Власний контент проєкту (сторонніх прав немає) | Не потрібна |
-| Twemoji (SVG-гліфи) | `src/utils/tileEmoji.ts`, `src/utils/posEmoji.ts` | Twitter/X Twemoji (форк jdecked/twemoji), вендорено без npm-залежності | CC-BY 4.0 (графіка) | **ПОТРІБНА, ще не додана** (екран «Про застосунок» або README; фаза H) |
+| Twemoji (SVG-гліфи) | `src/components/icons/tileEmoji.ts`, `src/components/icons/posEmoji.ts` | Twitter/X Twemoji (форк jdecked/twemoji), вендорено без npm-залежності | CC-BY 4.0 (графіка) | **ПОТРІБНА, ще не додана** (екран «Про застосунок» або README; фаза H) |
 | Lucide icons | `lucide-react-native` (npm), deep-import по іконках | https://lucide.dev | ISC | Рекомендована в «Про застосунок» (ISC вимагає збереження повідомлення про авторські права в копіях вихідного коду) |
 
 ## Текст атрибуції для Twemoji (готовий до вставки)

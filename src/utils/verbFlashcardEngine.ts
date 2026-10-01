@@ -375,17 +375,21 @@ function enumerateCombos(pool: VerbEntry[]): Combo[] {
 }
 
 // Текст завдання: "[Час/спосіб] — [займенник cz] ([займенник uk])".
-function taskTextFor(tense: VerbQuestion["tense"], personKey: string): string {
-  if (tense === "past") {
-    const l = PAST_SUBJECT_LABELS[personKey as PastSubject];
-    return `${TENSE_LABEL[tense]} — ${l.cz} (${l.uk})`;
-  }
-  if (tense === "imperative") {
-    const l = IMPERATIVE_LABELS[personKey as ImperativePerson];
-    return `${TENSE_LABEL[tense]} — ${l.cz} (${l.uk})`;
-  }
-  const l = PERSON_LABELS[personKey as VerbPerson];
-  return `${TENSE_LABEL[tense]} — ${l.cz} (${l.uk})`;
+// Підпис особи в завданні: «cz (uk)» — завжди ОДНА пара дужок. Вкладені дужки в
+// uk (напр. «ми (закличне)») розплющуються в кому: «my (ми, закличне)». Тому
+// будь-який майбутній підпис не поверне подвійних дужок.
+function taskLabel(l: { cz: string; uk: string }): string {
+  return `${l.cz} (${l.uk.replace(/\s*\(([^()]*)\)/g, ", $1")})`;
+}
+
+export function taskTextFor(tense: VerbQuestion["tense"], personKey: string): string {
+  const label =
+    tense === "past"
+      ? PAST_SUBJECT_LABELS[personKey as PastSubject]
+      : tense === "imperative"
+      ? IMPERATIVE_LABELS[personKey as ImperativePerson]
+      : PERSON_LABELS[personKey as VerbPerson];
+  return `${TENSE_LABEL[tense]} — ${taskLabel(label)}`;
 }
 
 function makeQuestion(combo: Combo): VerbQuestion | null {

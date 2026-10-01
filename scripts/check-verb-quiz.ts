@@ -16,7 +16,8 @@
 //  5. Делімітативні пари: кандидати без прапорця delimitativePartner (INFO).
 //  6. Пари без жодного придатного фрейму (WARN — питань на таку пару не буде).
 //  7. Вага минулого (PAST_BASE_SHARE) у межах (0, 1].
-//  8. Симуляція сесій: жодного зламаного питання.
+//  8. Підписи завдань (усі часи й особи): одна пара дужок, не довші за LABEL_MAX.
+//  9. Симуляція сесій: жодного зламаного питання.
 //
 // Це перевірка ПОРЯДКУ СЛІВ і ФОРМ, не лексики: природність речення з конкретним
 // дієсловом (напр. "Celou noc jsem otevřel" для пари, де це дивно) скрипт не оцінює.
@@ -27,6 +28,7 @@ import { PastParticiple, VerbEntry, PERSON_ORDER } from "../src/types";
 import {
   PAST_SUBJECT_ORDER,
   PAST_BASE_SHARE,
+  IMPERATIVE_ORDER,
   PastSubject,
   pastForm,
   pastFormAfterAdverb,
@@ -38,6 +40,7 @@ import {
   PERF_FRAMES,
   aspectCandidates,
   generateVerbSession,
+  taskTextFor,
 } from "../src/utils/verbFlashcardEngine";
 
 const errors: string[] = [];
@@ -56,6 +59,14 @@ for (const v of VERBS) {
     else if (/ \/ /.test(x)) warnings.push(`${v.id}: pastParticiple.${k} містить дублет "${x}" — рушій дублетів у дієприкметниках не підтримує`);
   }
   if (v.reflexive && v.reflexive !== "se" && v.reflexive !== "si") err(`${v.id}: reflexive має бути se/si`);
+  // registerNote показується на табі «своєї» дієвідміни (недоконаний — теперішній,
+  // доконаний — майбутній): без таблиці банеру нема де з'явитись. Назву часу в тексті
+  // не пишемо — її вже показує активний таб.
+  if (v.registerNote) {
+    if (v.aspect === "imperfective" && !v.present) err(`${v.id}: registerNote без таблиці теперішнього часу`);
+    if (v.aspect === "perfective" && !v.future) err(`${v.id}: registerNote без таблиці майбутнього часу`);
+    if (/теперішн|майбутн/i.test(v.registerNote)) warnings.push(`${v.id}: registerNote називає час — його вже показує таб`);
+  }
   if (v.aspectPairId && !byId[v.aspectPairId]) err(`${v.id}: aspectPairId "${v.aspectPairId}" не знайдено`);
   if (v.aspectPairId && byId[v.aspectPairId] && byId[v.aspectPairId].aspectPairId !== v.id) {
     err(`${v.id}: видова пара не двонапрямна`);
@@ -203,7 +214,28 @@ for (const v of VERBS) {
 if (!(PAST_BASE_SHARE > 0 && PAST_BASE_SHARE <= 1)) err(`PAST_BASE_SHARE=${PAST_BASE_SHARE} поза (0, 1]`);
 infos.push(`PAST_BASE_SHARE = ${PAST_BASE_SHARE.toFixed(4)} (клітинок минулого: ${PAST_SUBJECT_ORDER.length})`);
 
-// ── 8. Симуляція ──
+// ── 8. Підписи завдань ──
+// Рядок завдання — один центрований текст без обмеження рядків; задовгий переноситься
+// на другий рядок. Планка — найдовший підпис, що вже є в застосунку ("on/ona/ono
+// (він/вона/воно)", 43 символи); нові підписи її не перевищують.
+const LABEL_MAX = 43;
+const allLabelTexts: string[] = [
+  ...PAST_SUBJECT_ORDER.map((k) => taskTextFor("past", k)),
+  ...PERSON_ORDER.flatMap((p) => [taskTextFor("present", p), taskTextFor("future", p)]),
+  ...IMPERATIVE_ORDER.map((p) => taskTextFor("imperative", p)),
+];
+let longestLabel = 0;
+for (const t of allLabelTexts) {
+  longestLabel = Math.max(longestLabel, t.length);
+  const open = (t.match(/\(/g) ?? []).length;
+  const close = (t.match(/\)/g) ?? []).length;
+  if (open !== 1 || close !== 1) err(`підпис «${t}»: має бути рівно одна пара дужок (є ${open}/${close})`);
+  if (t.length > LABEL_MAX) err(`підпис «${t}»: ${t.length} символів > ${LABEL_MAX}`);
+  if (/undefined/.test(t)) err(`підпис «${t}»: "undefined"`);
+}
+infos.push(`Підписів завдань: ${allLabelTexts.length}; найдовший ${longestLabel} символів (ліміт ${LABEL_MAX})`);
+
+// ── 9. Симуляція ──
 let questions = 0;
 let aspectQuestions = 0;
 for (let r = 0; r < 1500; r++) {
