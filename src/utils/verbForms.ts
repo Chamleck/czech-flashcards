@@ -9,10 +9,35 @@ import { BYT_FUTURE, PAST_AUX } from "../data/auxVerbs";
 // ─────────────────────────────────────────────────────────────
 
 // Рід/число підмета для минулого часу впливає на форму дієприкметника.
-// on = чол. однина, ona = жін. однина, ono = сер. однина,
-// oni_manim = чол. істот. множини, oni_other = решта множини.
-export type PastSubject = "ja" | "ty" | "on" | "ona" | "ono" | "my" | "vy" | "oni_manim" | "oni_other";
+// Без суфікса — чоловічий (або змішана група) рід, з суфіксом _f — жіночий
+// (мовець/адресат — жінка), _neut — середній рід множини:
+//  on = чол. однина, ona = жін. однина, ono = сер. однина;
+//  ja/ty/my/vy = чол. або змішана група, ja_f/ty_f/my_f/vy_f = жінка/жінки;
+//  vy_sg_m/vy_sg_f = ввічливе «Ви» до ОДНІЄЇ особи (vykání): множинне допоміжне
+//  jste + дієприкметник ОДНИНИ за реальним родом адресата («jste dělal/dělala»);
+//  oni_manim = чол. істот. множини, oni_other = жін. та чол. неістот. множини
+//  (-ly), oni_neut = середній рід множини (-la, збігається з жін. однини).
+// Джерела: Rosen & Saloni (ÚČNK UK, honorativ); Adam (APČJ, shoda podle smyslu);
+// Wikipedia «Czech conjugation» (neuter plural -la).
+export type PastSubject =
+  | "ja"
+  | "ty"
+  | "on"
+  | "ona"
+  | "ono"
+  | "my"
+  | "vy"
+  | "oni_manim"
+  | "oni_other"
+  | "ja_f"
+  | "ty_f"
+  | "my_f"
+  | "vy_f"
+  | "vy_sg_m"
+  | "vy_sg_f"
+  | "oni_neut";
 
+// Перші 9 — в тому ж порядку, що й раніше; нові додано в кінець.
 export const PAST_SUBJECT_ORDER: PastSubject[] = [
   "ja",
   "ty",
@@ -23,31 +48,63 @@ export const PAST_SUBJECT_ORDER: PastSubject[] = [
   "vy",
   "oni_manim",
   "oni_other",
+  "ja_f",
+  "ty_f",
+  "my_f",
+  "vy_f",
+  "vy_sg_m",
+  "vy_sg_f",
+  "oni_neut",
 ];
 
-// Підписи підметів минулого часу (займенник cz + укр).
-export const PAST_SUBJECT_LABELS: Record<PastSubject, { cz: string; uk: string }> = {
-  ja: { cz: "já", uk: "я" },
-  ty: { cz: "ty", uk: "ти" },
+// Підписи підметів минулого часу (займенник cz + укр). Рід вказано явно, інакше
+// «dělal jsem» і «dělala jsem» були б обидві правильні для «я». Підпис має
+// вміщатись в один рядок завдання (≤ 41 символ разом із «Минулий час — »).
+// variant: клітинка — ВАРІАНТ тієї ж особи за родом/ввічливістю/числом; вона не
+// збільшує вагу минулого часу в квізі (див. PAST_BASE_SHARE). Нова клітинка без
+// variant вважається окремою особою і додає вагу.
+export const PAST_SUBJECT_LABELS: Record<PastSubject, { cz: string; uk: string; variant?: boolean }> = {
+  ja: { cz: "já", uk: "я (чол.)" },
+  ja_f: { cz: "já", uk: "я (жін.)", variant: true },
+  ty: { cz: "ty", uk: "ти (чол.)" },
+  ty_f: { cz: "ty", uk: "ти (жін.)", variant: true },
   on: { cz: "on", uk: "він" },
   ona: { cz: "ona", uk: "вона" },
   ono: { cz: "ono", uk: "воно" },
-  my: { cz: "my", uk: "ми" },
-  vy: { cz: "vy", uk: "ви" },
+  my: { cz: "my", uk: "ми (чол./змішана)" },
+  my_f: { cz: "my", uk: "ми (жін.)", variant: true },
+  vy: { cz: "vy", uk: "ви (мн., чол./змішана)" },
+  vy_f: { cz: "vy", uk: "ви (мн., жін.)", variant: true },
+  vy_sg_m: { cz: "vy", uk: "Ви (ввічливо, чол.)", variant: true },
+  vy_sg_f: { cz: "vy", uk: "Ви (ввічливо, жін.)", variant: true },
   oni_manim: { cz: "oni", uk: "вони (чол. істот.)" },
-  oni_other: { cz: "ony", uk: "вони (решта)" },
+  oni_other: { cz: "ony", uk: "вони (жін., неістот.)" },
+  oni_neut: { cz: "ona", uk: "вони (сер.)", variant: true },
 };
+
+// Частка «базових» клітинок серед усіх клітинок минулого. Квіз дієслів множить
+// на неї вагу минулого в пулі (kindWeight), тож клітинки-варіанти (рід 1–2 особи,
+// ввічливе «Ви», сер. рід множини) тренуються, але не витісняють інші часи:
+// частка минулого лишається такою, як була до їх появи.
+export const PAST_BASE_SHARE =
+  PAST_SUBJECT_ORDER.filter((x) => !PAST_SUBJECT_LABELS[x].variant).length / PAST_SUBJECT_ORDER.length;
 
 // Яку особу допоміжного дієслова "být" використовує підмет минулого часу.
 function auxPersonFor(s: PastSubject): VerbPerson {
   switch (s) {
     case "ja":
+    case "ja_f":
       return "ja";
     case "ty":
+    case "ty_f":
       return "ty";
     case "my":
+    case "my_f":
       return "my";
     case "vy":
+    case "vy_f":
+    case "vy_sg_m":
+    case "vy_sg_f":
       return "vy";
     // 3-тя особа (on/ona/ono/oni*) — допоміжного немає
     default:
@@ -62,8 +119,12 @@ function participleFor(v: VerbEntry, s: PastSubject): string {
     case "ja":
     case "ty":
     case "on":
+    case "vy_sg_m":
       return pp.m;
     case "ona":
+    case "ja_f":
+    case "ty_f":
+    case "vy_sg_f":
       return pp.f;
     case "ono":
       return pp.n;
@@ -72,8 +133,18 @@ function participleFor(v: VerbEntry, s: PastSubject): string {
     case "oni_manim":
       return pp.manim_pl;
     case "oni_other":
+    case "my_f":
+    case "vy_f":
       return pp.other_pl;
+    // Середній рід множини: -la, та сама форма, що жін. однини ("města byla").
+    case "oni_neut":
+      return pp.f;
   }
+}
+
+// Стягнення "jsi" + se/si → ses/sis стосується ЛИШЕ 2-ї особи однини.
+function isTySingular(s: PastSubject): boolean {
+  return s === "ty" || s === "ty_f";
 }
 
 // Теперішній час для особи (тільки недоконані мають present).
@@ -97,15 +168,16 @@ export function futureForm(v: VerbEntry, p: VerbPerson): string {
 }
 
 // Дублетні форми зберігаються як "форма1 / форма2" (як усюди в проєкті —
-// іменники, дати). firstForm — детермінований вибір (для дистрактора),
-// randomForm — випадковий (для правильної відповіді, щоб обидва варіанти
-// траплялись з часом).
+// іменники, дати). firstForm — детермінований вибір (пул дистракторів і
+// комбінації питань на дієвідміну), nthForm — вибір половини за індексом: ОДНУ й
+// ту саму для обох варіантів відповіді в питанні, щоб з часом траплялись обидві
+// форми, а кнопки різнились лише тим, що тестується.
 function firstForm(s: string): string {
   return s.split(" / ")[0];
 }
-function randomForm(s: string): string {
+function nthForm(s: string, n: number): string {
   const parts = s.split(" / ");
-  return parts[Math.floor(Math.random() * parts.length)];
+  return parts[Math.min(n, parts.length - 1)];
 }
 
 // Минулий час для підмета: [дієприкметник] [допоміжне] se ("učil jsem se").
@@ -118,7 +190,7 @@ export function pastForm(v: VerbEntry, s: PastSubject): string {
   // спрощення!), повна форма "jsi se/si" досі офіційно некодифікована, хоч і
   // часта усно (ÚJČ prirucka.ujc.cas.cz/?id=580). Дублет, як усюди в проєкті:
   // стягнена форма першою (кодифікована), повна — другою.
-  if (s === "ty" && v.reflexive) {
+  if (isTySingular(s) && v.reflexive) {
     const contracted = v.reflexive === "se" ? "ses" : "sis";
     return `${participle} ${contracted} / ${participle} jsi ${v.reflexive}`;
   }
@@ -129,7 +201,40 @@ export function pastForm(v: VerbEntry, s: PastSubject): string {
   return aux ? `${participle} ${aux}${refl}` : `${participle}${refl}`;
 }
 
-export { firstForm, randomForm };
+// ── Форми для вставки у речення ПІСЛЯ початкового прислівника ──
+// Таблична форма ("učil jsem se", "naučím se", "budu se učit") правильна, коли
+// дієслово відкриває речення. Якщо ж перед ним стоїть прислівник ("Konečně ___"),
+// клітики (допоміжне jsem/jsi/jsme/jste, se/si) стають на друге місце ПЕРЕД
+// дієприкметником/дієсловом: "Konečně jsem se naučil", "Zítra se naučím",
+// "Zítra se budu učit". Порядок клітик: допоміжне → se/si (ÚJČ/FF UK: pořadí
+// stálých příklonek -li – být – se/si – zájmena). 2 ос. одн. зі зворотним —
+// стягнене ses/sis першим, повна "jsi se" — другою (дублет, як у pastForm).
+export function pastFormAfterAdverb(v: VerbEntry, s: PastSubject): string {
+  const participle = participleFor(v, s);
+  if (isTySingular(s) && v.reflexive) {
+    const contracted = v.reflexive === "se" ? "ses" : "sis";
+    return `${contracted} ${participle} / jsi ${v.reflexive} ${participle}`;
+  }
+  const auxP = auxPersonFor(s);
+  const aux = auxP === "on" ? "" : PAST_AUX[auxP];
+  const clitics = [aux, v.reflexive ?? ""].filter(Boolean).join(" ");
+  return clitics ? `${clitics} ${participle}` : participle;
+}
+
+// Майбутній час після початкового прислівника: se/si ПЕРЕД дієсловом/budu.
+// Дублетні форми ("a / b") обробляються покомпонентно.
+export function futureFormAfterAdverb(v: VerbEntry, p: VerbPerson): string {
+  const refl = v.reflexive ? `${v.reflexive} ` : "";
+  if (v.future) {
+    return v.future[p]
+      .split(" / ")
+      .map((f) => `${refl}${f}`)
+      .join(" / ");
+  }
+  return `${refl}${BYT_FUTURE[p]} ${v.cz}`;
+}
+
+export { firstForm, nthForm };
 
 // Зручний доступ до 6 стандартних осіб для теп./майб. таблиць.
 export { PERSON_ORDER };

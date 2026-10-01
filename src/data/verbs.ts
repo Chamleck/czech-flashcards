@@ -533,6 +533,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "mluv", vy: "mluvte", my: "mluvme" },
     aspectPairNote: "доконаний партнер: promluvit (заговорити)",
     aspectPairId: "promluvit",
+    delimitativePartner: true,
     examples: {
       present: { cz: "Mluvím česky.", uk: "Я говорю чеською." },
       past: { cz: "Mluvil jsem česky.", uk: "Я говорив чеською." },
@@ -676,6 +677,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "seď", vy: "seďte", my: "seďme" },
     aspectPairNote: "доконаний партнер: posedět (посидіти)",
     aspectPairId: "posedet",
+    delimitativePartner: true,
     examples: {
       present: { cz: "Sedím na židli.", uk: "Я сиджу на стільці." },
       past: { cz: "Seděl jsem na židli.", uk: "Я сидів на стільці." },
@@ -694,6 +696,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "lež", vy: "ležte", my: "ležme" },
     aspectPairNote: "доконаний партнер: poležet (полежати)",
     aspectPairId: "polezet",
+    delimitativePartner: true,
     examples: {
       present: { cz: "Kniha leží na stole.", uk: "Книга лежить на столі." },
       past: { cz: "Kniha ležela na stole.", uk: "Книга лежала на столі." },
@@ -801,6 +804,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "čekej", vy: "čekejte", my: "čekejme" },
     aspectPairNote: "доконаний партнер: počkat (почекати)",
     aspectPairId: "pockat",
+    delimitativePartner: true,
     examples: {
       present: { cz: "Čekám na autobus.", uk: "Я чекаю на автобус." },
       past: { cz: "Čekal jsem na autobus.", uk: "Я чекав на автобус." },

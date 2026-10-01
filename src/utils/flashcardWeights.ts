@@ -93,15 +93,19 @@ export function recordAnswer(
 function pickWeighted<C extends { id: string }>(
   source: C[],
   usedIds: Set<string>,
-  store: MistakeStore
+  store: MistakeStore,
+  poolWeight?: (c: C) => number
 ): C | null {
   const cand = source.filter((c) => !usedIds.has(c.id));
   if (cand.length === 0) return null;
+  // Вага типу (poolWeight) не діє на комбо з активною помилкою — див. KindQuota.
+  const w = (c: C) =>
+    c.id in store || !poolWeight ? weightFor(store, c.id) : weightFor(store, c.id) * poolWeight(c);
   let total = 0;
-  for (const c of cand) total += weightFor(store, c.id);
+  for (const c of cand) total += w(c);
   let r = Math.random() * total;
   for (const c of cand) {
-    r -= weightFor(store, c.id);
+    r -= w(c);
     if (r <= 0) return c;
   }
   return cand[cand.length - 1];
@@ -124,14 +128,22 @@ function orderNoConsecutiveWord<C>(items: C[], wordIdOf: (c: C) => string): C[] 
 
 // Опційний баланс за типом (kind): гарантує мінімальну кількість слотів раунду
 // під «рідкісні» типи, щоб численніший тип (напр. прикметники) не витісняв їх.
-// Використовується ЛИШЕ adj-pron квізом; nouns/verbs передають undefined і
-// працюють як раніше (однорідний пул — балансувати нема що).
+// Використовується квізами з неоднорідним пулом (adj-pron, прислівники, дата/час,
+// числівники, прийменники, дієслова); іменники передають undefined і працюють
+// як раніше (однорідний пул — балансувати нема що).
 export interface KindQuota<K extends string> {
   kindOf: (c: { id: string }) => K;
   // Мінімум слотів на кожен вказаний тип. Порядок ключів = пріоритет віддачі
   // «зайвих» слотів: якщо типу не вистачає на його квоту, залишок переходить
   // наступному в цьому списку, а вже потім — у загальний пул.
   minSlots: Partial<Record<K, number>>;
+  // Вага комбінацій типу в загальному пулі (кроки 2–3), у межах (0, 1]; тип без
+  // запису має вагу 1. Протилежність minSlots: не піднімає частку рідкісного
+  // типу, а не дає частці типу рости, коли його комбінацій побільшало за рахунок
+  // ВАРІАНТІВ однієї клітинки (рід, ввічливість) — напр. минулий час дієслів.
+  // Комбо з активною помилкою вагу типу ігнорує (їхня вага — BOOST_WEIGHT), тож
+  // зарезервовані слоти під помилки та їх підвищена вага працюють як раніше.
+  kindWeight?: Partial<Record<K, number>>;
 }
 
 export function selectRoundCombos<C extends { id: string }>(
@@ -144,6 +156,8 @@ export function selectRoundCombos<C extends { id: string }>(
 ): C[] {
   const usedIds = new Set<string>();
   const chosen: C[] = [];
+  const kindWeight = kindQuota?.kindWeight;
+  const poolWeight = kindWeight ? (c: C) => kindWeight[kindQuota.kindOf(c)] ?? 1 : undefined;
 
   // 1. Зарезервовані слоти під активні помилки (гарантований показ).
   const mistakePool = combos.filter((c) => c.id in store);
@@ -170,7 +184,7 @@ export function selectRoundCombos<C extends { id: string }>(
       let need = Math.min(want - (already[kind] ?? 0), roundSize - chosen.length);
       const kindPool = combos.filter((c) => kindQuota.kindOf(c) === kind);
       while (need > 0) {
-        const c = pickWeighted(kindPool, usedIds, store);
+        const c = pickWeighted(kindPool, usedIds, store, poolWeight);
         if (!c) break;
         usedIds.add(c.id);
         chosen.push(c);
@@ -183,7 +197,7 @@ export function selectRoundCombos<C extends { id: string }>(
   let guard = 0;
   while (chosen.length < roundSize && guard < roundSize * 40) {
     guard++;
-    const c = pickWeighted(combos, usedIds, store);
+    const c = pickWeighted(combos, usedIds, store, poolWeight);
     if (!c) break;
     usedIds.add(c.id);
     chosen.push(c);
