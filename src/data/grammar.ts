@@ -156,13 +156,73 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       { type: "heading", text: "Таблиця відмінків із питаннями" },
       { type: "cases" },
+      { type: "heading", text: "Для чого який відмінок" },
       {
-        type: "rich-tip",
-        segments: [
-          { text: "Кличний відмінок (5.) в українській теж є (мамо, Петре) — використовується при звертанні. У чеській він активний у щоденному мовленні: '" },
-          { word: "Pane", wordId: "muz-pan", kind: "nouns" },
-          { text: "!', 'Petře!'." },
+        type: "paragraph",
+        text: "Кожен відмінок має свою типову роль у реченні. Це не повний перелік, а те, що треба знати насамперед:",
+      },
+      {
+        type: "rich-list",
+        items: [
+          { term: [{ text: "1. Називний" }], note: [{ text: "підмет («хто? що?») і іменна частина присудка після být: Ten pán je učitel." }] },
+          { term: [{ text: "2. Родовий" }], note: [{ text: "належність і частина цілого: dům otce (дім батька). Також після числівників 5 і більше (pět studentů) та багатьох прийменників: bez, do, od, z, u." }] },
+          { term: [{ text: "3. Давальний" }], note: [{ text: "кому адресована дія: Dám knihu studentovi. Також після прийменників k, díky, kvůli, proti." }] },
+          { term: [{ text: "4. Знахідний" }], note: [{ text: "прямий додаток («кого? що?»): Vidím psa. Також після pro, přes, skrz і після прийменників руху на питання «куди?»." }] },
+          { term: [{ text: "5. Кличний" }], note: [{ text: "звертання: Pane! Petře! (докладніше нижче)." }] },
+          { term: [{ text: "6. Місцевий" }], note: [{ text: "«де?» і «про що?», завжди з прийменником: Kniha je na stole. Mluvím o práci." }] },
+          { term: [{ text: "7. Орудний" }], note: [{ text: "засіб і супровід: Jedu autem (їду автомобілем). Mluvím s tím mužem (розмовляю з ним)." }] },
         ],
+      },
+      {
+        type: "tip-group",
+        items: [
+          { text: "Прийменник не вимагає ні називного, ні кличного, а місцевий без прийменника не вживається взагалі: форма 6-го відмінка завжди має перед собою v, na, o, po або při." },
+          {
+            segments: [
+              { text: "Кличний відмінок (5.) в українській теж є (мамо, Петре) — використовується при звертанні. У чеській він активний у щоденному мовленні: '" },
+              { word: "Pane", wordId: "muz-pan", kind: "nouns" },
+              { text: "!', 'Petře!'." },
+            ],
+          },
+        ],
+      },
+      { type: "heading", text: "Відмінок задає дієслово" },
+      {
+        type: "paragraph",
+        text: "Багато дієслів вимагають після себе певного відмінка, тому його вчать разом зі словом. Здебільшого він збігається з українським:",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ word: "děkovat", wordId: "dekovat", kind: "verbs" }, { text: " + 3. (za + 4.)" }],
+            note: [{ text: "дякувати кому за що: Děkuji učiteli za pomoc." }],
+          },
+          {
+            term: [{ word: "pomáhat", wordId: "pomahat", kind: "verbs" }, { text: " + 3." }],
+            note: [{ text: "допомагати кому: Pomáhám matce." }],
+          },
+          {
+            term: [{ word: "líbit se", wordId: "libit-se", kind: "verbs" }, { text: " + 3." }],
+            note: [{ text: "подобатися кому: Líbí se mi to auto. Особа — у давальному (mi), річ — підмет." }],
+          },
+          {
+            term: [{ word: "čekat", wordId: "cekat", kind: "verbs" }, { text: " + na + 4." }],
+            note: [{ text: "чекати на кого/що: Čekám na matku." }],
+          },
+          {
+            term: [{ word: "bát se", wordId: "bat-se", kind: "verbs" }, { text: " + 2." }],
+            note: [{ text: "боятися кого/чого: Bojím se psa." }],
+          },
+          {
+            term: [{ word: "ptát se", wordId: "ptat-se", kind: "verbs" }, { text: " koho (2.) + na + 4." }],
+            note: [{ text: "питати кого про що: Ptám se učitele na cestu." }],
+          },
+        ],
+      },
+      {
+        type: "tip",
+        text: "Серед цих дієслів лише ptát se розходиться з українським: після нього «про що?» передається прийменником na + знахідний, а не «про».",
       },
     ],
   },
@@ -320,6 +380,56 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
                   { text: " — незмінне в однині, орудний множини на -ími" },
                 ],
               },
+            ],
+          },
+        ],
+      },
+      { type: "heading", text: "Зміни в основі слова" },
+      {
+        type: "paragraph",
+        text: "Крім закінчень, у багатьох слів змінюється й сама основа. Це закономірності, а не помилки в картках:",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ text: "Випадає -e-" }],
+            note: [
+              { text: "у слів на -ek, -ec, -en та деяких інших голосний -e- зникає в непрямих відмінках: " },
+              { word: "pes", wordId: "pes", kind: "nouns" },
+              { text: " → psa, " },
+              { word: "otec", wordId: "otec", kind: "nouns" },
+              { text: " → otce, " },
+              { word: "den", wordId: "den", kind: "nouns" },
+              { text: " → dne." },
+            ],
+          },
+          {
+            term: [{ text: "ů → o" }],
+            note: [
+              { text: "у називному (і знахідному неістот.) стоїть ů, у решті форм — o: " },
+              { word: "dům", wordId: "dum", kind: "nouns" },
+              { text: " → domu, " },
+              { word: "stůl", wordId: "stul", kind: "nouns" },
+              { text: " → stolu, " },
+              { word: "nůž", wordId: "stul-nuz", kind: "nouns" },
+              { text: " → nože, " },
+              { word: "kůň", wordId: "kun", kind: "nouns" },
+              { text: " → koně. Не в кожному слові: důvod → důvodu." },
+            ],
+          },
+          {
+            term: [{ text: "k → c, h → z, ch → š, r → ř" }],
+            note: [
+              { text: "перед закінченням -e/-i: у жін. роду на -a в давальному й місцевому однини — " },
+              { word: "matka", wordId: "matka", kind: "nouns" },
+              { text: " → matce, " },
+              { word: "kniha", wordId: "kniha", kind: "nouns" },
+              { text: " → knize, " },
+              { word: "sprcha", wordId: "sprcha", kind: "nouns" },
+              { text: " → sprše, " },
+              { word: "dcera", wordId: "dcera", kind: "nouns" },
+              { text: " → dceři." },
             ],
           },
         ],
@@ -569,11 +679,11 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           },
         ],
       },
-      { type: "heading", text: "Нерегулярні та модальні" },
+      { type: "heading", text: "Нерегулярні дієслова" },
       {
         type: "rich-paragraph",
         segments: [
-          { text: "Нерегулярні та модальні. Кілька високочастотних дієслів мають власну парадигму й не вкладаються в жоден клас: " },
+          { text: "Нерегулярні дієслова. Кілька високочастотних дієслів мають власну парадигму й не вкладаються в жоден клас: " },
           { word: "být", wordId: "byt", kind: "verbs" },
           { text: " (jsem/jsi/je…), " },
           { word: "mít", wordId: "mit", kind: "verbs" },
@@ -583,15 +693,51 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           { word: "jíst", wordId: "jist", kind: "verbs" },
           { text: " (jím, але oni jedí), " },
           { word: "vědět", wordId: "vedet", kind: "verbs" },
-          { text: " (vím, але oni vědí). Модальні " },
-          { word: "moci", wordId: "moci", kind: "verbs" },
-          { text: " (можу), " },
-          { word: "muset", wordId: "muset", kind: "verbs" },
-          { text: " (мушу), " },
-          { word: "umět", wordId: "umet", kind: "verbs" },
-          { text: " (вмію), " },
-          { word: "smět", wordId: "smet", kind: "verbs" },
-          { text: " (мати дозвіл) зазвичай ідуть з інфінітивом: chci jít, musím pracovat." },
+          { text: " (vím, але oni vědí)." },
+        ],
+      },
+      { type: "heading", text: "Модальні дієслова" },
+      {
+        type: "paragraph",
+        text: "Модальні дієслова виражають бажання, обов'язок, можливість чи дозвіл і йдуть з інфінітивом: Chci pracovat. Musím pracovat. Může pracovat.",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ word: "chtít", wordId: "chtit", kind: "verbs" }],
+            note: [{ text: "хотіти: Chci pracovat. Може мати й додаток у знахідному: Chci nové auto." }],
+          },
+          {
+            term: [{ word: "muset", wordId: "muset", kind: "verbs" }],
+            note: [{ text: "мусити, бути змушеним: Musím pracovat." }],
+          },
+          {
+            term: [{ word: "moci", wordId: "moci", kind: "verbs" }],
+            note: [{ text: "могти, мати можливість: Může přijít zítra." }],
+          },
+          {
+            term: [{ word: "smět", wordId: "smet", kind: "verbs" }],
+            note: [{ text: "мати дозвіл: Smím otevřít okno?" }],
+          },
+          {
+            term: [{ word: "umět", wordId: "umet", kind: "verbs" }],
+            note: [{ text: "уміти, володіти навичкою чи мовою: Umím plavat. Umíte anglicky?" }],
+          },
+          {
+            term: [{ word: "mít", wordId: "mit", kind: "verbs" }],
+            note: [{ text: "з інфінітивом — «маю зробити, повинен»: Nevím, co mám koupit (що мені купити)." }],
+          },
+        ],
+      },
+      {
+        type: "rich-tip",
+        segments: [
+          { text: "Заперечення змінює зміст: " },
+          { word: "nemusím", wordId: "muset", kind: "verbs" },
+          { text: " — «не обов'язково» (Nemusím chodit pěšky, mám auto), але " },
+          { word: "nesmím", wordId: "smet", kind: "verbs" },
+          { text: " — «заборонено» (Nesmím kouřit). Не плутай «не мушу» і «не можна»." },
         ],
       },
       { type: "heading", text: "Три часи" },
@@ -618,6 +764,36 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             ],
           },
         ],
+      },
+      { type: "heading", text: "Дієслова руху: однократні й багатократні" },
+      {
+        type: "paragraph",
+        text: "Для руху чеська має пари дієслів. Однократне (jít, jet) — рух в один бік у конкретний момент; багатократне (chodit, jezdit) — рух регулярно чи туди й назад:",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ word: "jít", wordId: "jit", kind: "verbs" }, { text: " — " }, { word: "chodit", wordId: "chodit", kind: "verbs" }],
+            note: [{ text: "іти пішки: Jdu domů. (зараз) — Chodím do školy pěšky. (регулярно)" }],
+          },
+          {
+            term: [{ word: "jet", wordId: "jet", kind: "verbs" }, { text: " — jezdit" }],
+            note: [{ text: "їхати транспортом: Jedu do Prahy. (зараз) — Jezdím do Prahy každý týden. (регулярно)" }],
+          },
+          {
+            term: [{ text: "Так само" }],
+            note: [
+              { text: "nést — " },
+              { word: "nosit", wordId: "nosit", kind: "verbs" },
+              { text: " (нести), letět — létat (летіти), běžet — běhat (бігти)." },
+            ],
+          },
+        ],
+      },
+      {
+        type: "tip",
+        text: "Майбутній час: однократні мають власну форму (půjdu, pojedu), багатократні — складену: budu chodit, budu jezdit.",
       },
       { type: "heading", text: "Зворотні se / si" },
       {
