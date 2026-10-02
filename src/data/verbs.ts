@@ -13,6 +13,19 @@ import { VerbEntry } from "../types";
 //  - jít/jet мають власне future (půjdu/pojedu);
 //  - доконані мають future = їхня власна дієвідміна (значення майбутнє).
 
+// ПРАВИЛА ДОДАВАННЯ ДІЄСЛІВ (квіз і картка покладаються на них; перевіряє
+// scripts/check-verb-quiz.ts):
+//  1. Жодних дублетів "a / b" у формах дієслів — одна кодифікована форма (друга
+//     допустима форма не додається; різницю регістру дає registerNote).
+//  2. Доконане ОБОВ'ЯЗКОВО має future; недоконане — present (виняток: být/jít/jet
+//     мають власне future). Забуте future дало б «budu udělat».
+//  3. Пара видів — двобічна aspectPairId.
+//  4. Партнер-делімітатив (po-/pro-: sedět → posedět, čekat → počkat): delimitativePartner
+//     на недоконаному.
+//  5. Миттєве недоконане (přicházet, začínat, končit, nacházet…): momentary на
+//     недоконаному — тест у коментарі до поля VerbEntry.momentary. Кожне нове
+//     недоконане дієслово з парою перевірити за цим тестом.
+
 export const VERBS: VerbEntry[] = [
   // ═══════════════════ I КЛАС (-e/-ě) ═══════════════════
   {
@@ -932,6 +945,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "vstávej", vy: "vstávejte", my: "vstávejme" },
     aspectPairNote: "доконаний партнер: vstát (встати)",
     aspectPairId: "vstat",
+    momentary: true,
     examples: {
       present: { cz: "Vstávám brzy ráno.", uk: "Я встаю рано вранці." },
       past: { cz: "Vstával jsem brzy ráno.", uk: "Я вставав рано вранці." },
@@ -1735,6 +1749,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "začínej", vy: "začínejte", my: "začínejme" },
     aspectPairNote: "доконаний партнер: začít (почати)",
     aspectPairId: "zacit",
+    momentary: true,
     examples: {
       present: { cz: "Každý den začínám v osm.", uk: "Щодня я починаю о восьмій." },
       past: { cz: "Vždycky jsem začínal brzy.", uk: "Я завжди починав рано." },
@@ -1753,6 +1768,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "zapomínej", vy: "zapomínejte", my: "zapomínejme" },
     aspectPairNote: "доконаний партнер: zapomenout (забути)",
     aspectPairId: "zapomenout",
+    momentary: true,
     examples: {
       present: { cz: "Často zapomínám klíče.", uk: "Я часто забуваю ключі." },
       past: { cz: "Pořád jsem zapomínal jména.", uk: "Я постійно забував імена." },
@@ -1791,6 +1807,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "sedej si", vy: "sedejte si", my: "sedejme si" },
     aspectPairNote: "доконаний партнер: sednout si (сісти)",
     aspectPairId: "sednout-si",
+    momentary: true,
     examples: {
       present: { cz: "Sedám si vždycky dopředu.", uk: "Я завжди сідаю спереду." },
       past: { cz: "Sedal si k oknu.", uk: "Він сідав біля вікна." },
@@ -1958,6 +1975,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "nacházej", vy: "nacházejte", my: "nacházejme" },
     aspectPairNote: "доконаний партнер: najít (знайти)",
     aspectPairId: "najit",
+    momentary: true,
     examples: {
       present: { cz: "Nacházím klíče.", uk: "Я знаходжу ключі." },
       past: { cz: "Nacházel jsem klíče.", uk: "Я знаходив ключі." },
@@ -2028,6 +2046,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "otevírej", vy: "otevírejte", my: "otevírejme" },
     aspectPairNote: "доконаний партнер: otevřít (відкрити)",
     aspectPairId: "otevrit",
+    momentary: true,
     examples: {
       present: { cz: "Otevírám dveře.", uk: "Я відкриваю двері." },
       past: { cz: "Otevíral jsem dveře.", uk: "Я відкривав двері." },
@@ -2063,6 +2082,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "zavírej", vy: "zavírejte", my: "zavírejme" },
     aspectPairNote: "доконаний партнер: zavřít (закрити)",
     aspectPairId: "zavrit",
+    momentary: true,
     examples: {
       present: { cz: "Zavírám obchod.", uk: "Я закриваю магазин." },
       past: { cz: "Zavíral jsem obchod.", uk: "Я закривав магазин." },
@@ -2244,6 +2264,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "potkávej", vy: "potkávejte", my: "potkávejme" },
     aspectPairNote: "доконаний партнер: potkat (зустріти)",
     aspectPairId: "potkat",
+    momentary: true,
     examples: {
       present: { cz: "Potkávám kamaráda.", uk: "Я зустрічаю друга." },
       past: { cz: "Potkával jsem kamaráda.", uk: "Я зустрічав друга." },
@@ -2279,6 +2300,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "konči", vy: "končete", my: "končeme" },
     aspectPairNote: "доконаний партнер: skončit (закінчити); природна пара-антонім до začínat/začít",
     aspectPairId: "skoncit",
+    momentary: true,
     examples: {
       present: { cz: "Končím práci v pět.", uk: "Я закінчую роботу о п'ятій." },
       past: { cz: "Končil jsem práci v pět.", uk: "Я закінчував роботу о п'ятій." },
@@ -2372,6 +2394,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "dostávej", vy: "dostávejte", my: "dostávejme" },
     aspectPairNote: "доконаний партнер: dostat (отримати)",
     aspectPairId: "dostat",
+    momentary: true,
     examples: {
       present: { cz: "Dostávám dopisy.", uk: "Я отримую листи." },
       past: { cz: "Dostával jsem dopisy.", uk: "Я отримував листи." },
@@ -2644,6 +2667,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "přicházej", vy: "přicházejte", my: "přicházejme" },
     aspectPairNote: "доконаний партнер: přijít (прийти)",
     aspectPairId: "prijit",
+    momentary: true,
     examples: {
       present: { cz: "Přicházím pozdě.", uk: "Я приходжу пізно." },
       past: { cz: "Přicházel jsem pozdě.", uk: "Я приходив пізно." },
@@ -2679,6 +2703,7 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "odcházej", vy: "odcházejte", my: "odcházejme" },
     aspectPairNote: "доконаний партнер: odejít (піти геть)",
     aspectPairId: "odejit",
+    momentary: true,
     examples: {
       present: { cz: "Odcházím z práce.", uk: "Я йду з роботи." },
       past: { cz: "Odcházel jsem z práce.", uk: "Я йшов з роботи." },

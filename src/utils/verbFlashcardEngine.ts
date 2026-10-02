@@ -139,6 +139,7 @@ type FramePosition = "initial" | "afterAdverb";
 //  - "durative": обставина тривалості ("celou noc", "dvě hodiny") — з доконаним
 //    неможлива, КРІМ делімітативних (poseděl, proplakala celou noc); для таких
 //    пар питання лишається, бо вид визначає підказка (taskText);
+//    для миттєвих недоконаних (momentary) вимкнено — «celou noc přicházel» дивно;
 //  - "terminative": "za + час" (час до досягнення результату) — природний
 //    вибір доконаного; недоконаний змінює значення. Для делімітативних пар
 //    (delimitativePartner) вимкнено: "Poseděl jsem za hodinu" неприродно;
@@ -179,11 +180,14 @@ export const IMPERF_FRAMES: AspectFrame[] = [
   { text: "{V} celý týden.", tense: "future", subjects: ALL_FUTURE, position: "initial", kind: "durative" },
 ];
 
-// Доконаний вид — «za + час» (результат за певний час) та контексти
+// Доконаний вид — «za + час» (результат за певний час; «Nakonec» додає ознаку
+// завершення і прибирає двозначність «за годину» = «через годину») та контексти
 // завершеності.
 export const PERF_FRAMES: AspectFrame[] = [
   { text: "{V} za hodinu.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "terminative" },
   { text: "{V} za tři dny.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "terminative" },
+  { text: "Nakonec {V} za hodinu.", tense: "past", subjects: ALL_PAST, position: "afterAdverb", kind: "terminative" },
+  { text: "Nakonec {V} za tři dny.", tense: "past", subjects: ALL_PAST, position: "afterAdverb", kind: "terminative" },
   { text: "Konečně {V}.", tense: "past", subjects: ALL_PAST, position: "afterAdverb", kind: "other" },
   { text: "Zítra {V} a bude hotovo.", tense: "future", subjects: ALL_FUTURE, position: "afterAdverb", kind: "other" },
 ];
@@ -207,12 +211,17 @@ function renderAspectForm(v: VerbEntry, frame: AspectFrame, i: number, half: num
 // aspectId → сам entry (для швидкого пошуку партнера).
 const VERB_BY_ID: Record<string, VerbEntry> = Object.fromEntries(VERBS.map((v) => [v.id, v]));
 
-// Фрейми, придатні для пари. Для делімітативних пар (прапорець delimitativePartner
-// на недоконаному) відпадають лише "terminative".
+// Фрейми, придатні для пари:
+//  - делімітативна пара (delimitativePartner на недоконаному): відпадають "terminative";
+//  - миттєве недоконане (momentary): відпадають "durative" (див. VerbEntry.momentary);
+//    у недоконаного інших фреймів нема — воно не береться як відповідь «недоконаний».
 function availableAspectFrames(testVerb: VerbEntry, partner: VerbEntry): AspectFrame[] {
   const frames = testVerb.aspect === "imperfective" ? IMPERF_FRAMES : PERF_FRAMES;
   const delimitative = !!(testVerb.delimitativePartner || partner.delimitativePartner);
-  return frames.filter((f) => !(delimitative && f.kind === "terminative"));
+  const momentary = !!testVerb.momentary;
+  return frames.filter(
+    (f) => !(delimitative && f.kind === "terminative") && !(momentary && f.kind === "durative")
+  );
 }
 
 // Усі придатні (фрейм × підмет × половина дублета) для дієслова — для скрипту

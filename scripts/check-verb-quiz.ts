@@ -59,6 +59,11 @@ for (const v of VERBS) {
     else if (/ \/ /.test(x)) warnings.push(`${v.id}: pastParticiple.${k} містить дублет "${x}" — рушій дублетів у дієприкметниках не підтримує`);
   }
   if (v.reflexive && v.reflexive !== "se" && v.reflexive !== "si") err(`${v.id}: reflexive має бути se/si`);
+  // Правила додавання дієслів (шапка verbs.ts): future/present обов'язкові, без дублетів.
+  if (v.aspect === "perfective" && !v.future) err(`${v.id}: доконане без поля future ("budu udělat")`);
+  if (v.aspect === "imperfective" && !v.present) err(`${v.id}: недоконане без поля present`);
+  if (v.momentary && v.aspect !== "imperfective") err(`${v.id}: momentary ставиться лише на недоконаному`);
+  if (v.momentary && !v.aspectPairId) warnings.push(`${v.id}: momentary без видової пари не діє (пара потрібна для aspect-питань)`);
   // registerNote показується на табі «своєї» дієвідміни (недоконаний — теперішній,
   // доконаний — майбутній): без таблиці банеру нема де з'явитись. Назву часу в тексті
   // не пишемо — її вже показує активний таб.
@@ -195,7 +200,11 @@ for (const v of VERBS) {
     if (c.half === 1) halfPairs++;
   }
 }
-if (noFrames.length > 0) warnings.push(`пари без жодного придатного фрейму (питань на них не буде): ${noFrames.join(", ")}`);
+// Миттєві (momentary) недоконані НЕ мають фреймів за задумом; усі інші — мусять мати.
+const momentaryNames = VERBS.filter((v) => v.momentary).map((v) => `${v.cz}${v.reflexive ? " " + v.reflexive : ""}`);
+const unexpectedNoFrames = noFrames.filter((n) => !momentaryNames.some((m) => n.startsWith(m + " (")));
+if (unexpectedNoFrames.length > 0) warnings.push(`пари без жодного придатного фрейму (питань на них не буде): ${unexpectedNoFrames.join(", ")}`);
+infos.push(`momentary (${momentaryNames.length}, без фреймів недоконаного за задумом): ${momentaryNames.join(", ")}`);
 infos.push(`Кандидатів з другою половиною дублета (jsi se/si): ${halfPairs}`);
 
 for (const v of VERBS) {
