@@ -210,6 +210,7 @@ export function VerbConjugation({
           <View style={styles.participleBox}>
             <Text style={styles.participleLabel}>Дієприкметник за родом:</Text>
             <View style={styles.participleRow}>
+              <Text style={styles.participleForms}>однина: </Text>
               <Speakable id={`${entry.id}:pp:m`} text={pp.m} style={[styles.participleForms, styles.pMasc]} />
               <Text style={styles.participleForms}> (чол.) · </Text>
               <Speakable id={`${entry.id}:pp:f`} text={pp.f} style={[styles.participleForms, styles.pFem]} />
@@ -218,7 +219,7 @@ export function VerbConjugation({
               <Text style={styles.participleForms}> (сер.)</Text>
             </View>
             <View style={styles.participleRow}>
-              <Text style={styles.participleForms}>мн.: </Text>
+              <Text style={styles.participleForms}>множина: </Text>
               <Speakable
                 id={`${entry.id}:pp:manim_pl`}
                 text={pp.manim_pl}
@@ -230,7 +231,10 @@ export function VerbConjugation({
                 text={pp.other_pl}
                 style={[styles.participleForms, styles.pFem]}
               />
-              <Text style={styles.participleForms}> (решта)</Text>
+              <Text style={styles.participleForms}> (жін.) · </Text>
+              {/* Середній рід множини: -la, та сама форма, що жін. однини ("města byla") */}
+              <Speakable id={`${entry.id}:pp:n_pl`} text={pp.f} style={[styles.participleForms, styles.pNeut]} />
+              <Text style={styles.participleForms}> (сер.)</Text>
             </View>
           </View>
         )}
