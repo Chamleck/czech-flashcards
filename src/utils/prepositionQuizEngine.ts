@@ -102,6 +102,11 @@ function partnerFormN(noun: NounEntry, c: CzechCase, n: GrammaticalNumber): stri
 // numeral). Решта — можна і множину.
 function pickNumber(noun: NounEntry, forcePlural: boolean): GrammaticalNumber {
   if (forcePlural) return "pl";
+  // Pluralia tantum (peníze, brýle, kalhoty, ústa) не мають однини: клітинка "—" у відповіді
+  // давала питання «___ —». Те саме навпаки — лише однина.
+  const nom = noun.declension.nominativ;
+  if (nom.sg === "—") return "pl";
+  if (nom.pl === "—") return "sg";
   if ((noun as unknown as { uncountable?: boolean }).uncountable) return "sg";
   return Math.random() < 0.5 ? "sg" : "pl";
 }

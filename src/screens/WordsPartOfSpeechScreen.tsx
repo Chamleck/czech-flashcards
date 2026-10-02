@@ -59,7 +59,7 @@ const TILES: POSTile[] = [
   { key: "nouns", icon: "label", title: KIND_LABEL_NOUNS, subtitle: `${VISIBLE_NOUNS} слів з відмінюванням`, ready: true },
   { key: "verbs", icon: "running", title: KIND_LABEL_VERBS, subtitle: `${VERBS.length} слів з дієвідміною`, ready: true },
   { key: "adjectives", icon: "palette", title: KIND_LABEL_ADJECTIVES, subtitle: `${VISIBLE_ADJS} слів з відмінюванням`, ready: true },
-  { key: "pronouns", icon: "pointing", title: KIND_LABEL_PRONOUNS, subtitle: `${PRONOUNS.length} присвійних і вказівних`, ready: true },
+  { key: "pronouns", icon: "pointing", title: KIND_LABEL_PRONOUNS, subtitle: `${ALL_PRONOUN_MIXED_IDS.length} слів з відмінюванням`, ready: true },
   { key: "interrogatives", icon: "question", title: KIND_LABEL_INTERROGATIVE, subtitle: "як ставити запитання", ready: true },
   { key: "serviceWords", icon: "link", title: KIND_LABEL_SERVICE_WORDS, subtitle: `${CONJUNCTIONS.length + SERVICE_ADVERBS.length} — сполучники, прислівники`, ready: true },
   { key: "numerals", icon: "numbers", title: KIND_LABEL_NUMERALS, subtitle: "порядкові, сотні, тисячі", ready: true },

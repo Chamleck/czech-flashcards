@@ -26,7 +26,7 @@ export const CATEGORIES: CategoryMeta[] = [
   { key: "nature", icon: "deciduousTree", title: "Природа" },
   { key: "animals", icon: "dog", title: "Тварини" },
   { key: "days", icon: "calendar", title: "Дні тижня", unsuitableAsPartner: true },
-  { key: "months", icon: "crescentMoon", title: "Місяці", unsuitableAsPartner: true },
+  { key: "months", icon: "crescentMoon", title: "Місяці й пори року", unsuitableAsPartner: true },
   { key: "numbers", icon: "abacus", title: "Сотні і тисячі", hiddenFromPartOfSpeech: true },
   { key: "time", icon: "hourglassNotDone", title: "Час" },
   { key: "body", icon: "flexedBiceps", title: "Тіло" },

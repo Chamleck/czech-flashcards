@@ -569,6 +569,114 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           },
         ],
       },
+      { type: "heading", text: "Прислівники від прикметників" },
+      {
+        type: "paragraph",
+        text: "Прикметник відповідає на «який?», прислівник — на «як?». Прислівник утворюється від основи прикметника:",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ text: "-ě / -e" }],
+            note: [{ text: "суфікс -ě після d, t, n, b, p, m, v: " }, { word: "nový", wordId: "novy", kind: "adjectives" }, { text: " → nově, " }, { word: "špatný", wordId: "spatny", kind: "adjectives" }, { text: " → špatně. Суфікс -e після l, s, z: " }, { word: "rychlý", wordId: "rychly", kind: "adjectives" }, { text: " → rychle." }],
+          },
+          {
+            term: [{ text: "Чергування + -e" }],
+            note: [{ text: "перед суфіксом приголосний змінюється (r → ř, h → z, ch → š, k → c): " }, { word: "dobrý", wordId: "dobry", kind: "adjectives" }, { text: " → dobře, tichý → tiše, krátký → krátce." }],
+          },
+          {
+            term: [{ text: "-y" }],
+            note: [{ text: "від прикметників на -sky, -cky, -zky: " }, { word: "hezký", wordId: "hezky", kind: "adjectives" }, { text: " → hezky, český → česky." }],
+          },
+          {
+            term: [{ text: "-u / -o" }],
+            note: [{ word: "pomalý", wordId: "pomaly", kind: "adjectives" }, { text: " → pomalu; а також daleko, blízko, vysoko (на -o)." }],
+          },
+        ],
+      },
+      {
+        type: "tip",
+        text: "У слів на -o є й форма на -e, але вона має переносне значення: vysoko — «високо» (місце: letadlo letí vysoko), vysoce — «дуже» (vysoce ceněný odborník).",
+      },
+      { type: "heading", text: "Ступені порівняння прислівників" },
+      {
+        type: "rich-paragraph",
+        segments: [{ text: "Вищий ступінь прислівника — суфікс -eji / -ěji, найвищий — nej- + вищий: " }, { word: "rychlý", wordId: "rychly", kind: "adjectives" }, { text: " → rychle → rychleji → nejrychleji. Нерегулярні треба запам'ятати:" }],
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ text: "dobře" }],
+            note: [{ text: "lépe, у розмові líp; nejlépe." }],
+          },
+          {
+            term: [{ text: "špatně" }],
+            note: [{ text: "hůř, hůře; nejhůře." }],
+          },
+          {
+            term: [{ text: "málo / hodně" }],
+            note: [{ text: "méně (розм. míň) / více (розм. víc)." }],
+          },
+          {
+            term: [{ text: "daleko / blízko" }],
+            note: [{ text: "dál, dále / blíž, blíže." }],
+          },
+          {
+            term: [{ text: "brzy / dlouho / vysoko" }],
+            note: [{ text: "dřív, dříve / déle / výš, výše." }],
+          },
+        ],
+      },
+      { type: "heading", text: "Присвійні прикметники" },
+      {
+        type: "paragraph",
+        text: "В українській є «мамин, батьків» — чеська теж утворює прикметник від імені власника. Він відповідає на «чий?» і означає одну конкретну особу:",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ text: "Власник-чоловік: -ův, -ova, -ovo" }],
+            note: [{ text: "Pavlův dům, Pavlova žena, Pavlovo auto; " }, { word: "otec", wordId: "otec", kind: "nouns" }, { text: " → otcův, bratr → bratrův, dědeček → dědečkův." }],
+          },
+          {
+            term: [{ text: "Власниця-жінка: -in, -ina, -ino" }],
+            note: [{ word: "matka", wordId: "matka", kind: "nouns" }, { text: " → matčin (k → č), babička → babiččin, dcera → dceřin (r → ř)." }],
+          },
+          {
+            term: [{ text: "Відмінювання" }],
+            note: [{ text: "змінюється за відмінком і родом: z matčina dopisu, po strýcově odjezdu, na dceřinu promoci, v dědečkově zahradě." }],
+          },
+        ],
+      },
+      {
+        type: "tip",
+        text: "Те саме можна сказати родовим: matčina kniha = kniha matky. Від деяких імен (зокрема жіночих на -ice, -yně) такий прикметник зазвичай не утворюється — тоді вживають тільки родовий.",
+      },
+      { type: "heading", text: "Прикметники в ролі іменників" },
+      {
+        type: "paragraph",
+        text: "Деякі прикметники самі стали іменниками й зберегли прикметникове відмінювання:",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ word: "nemocný", wordId: "nemocny", kind: "adjectives" }],
+            note: [{ text: "хворий: Doktor mluví s nemocným. Znám tu nemocnou. (Жін. рід: nemocná, nemocné, nemocnou…)" }],
+          },
+          {
+            term: [{ word: "vedoucí", wordId: "vedouci", kind: "adjectives" }],
+            note: [{ text: "керівник / керівниця: Ptám se vedoucího. Znám novou vedoucí. Відмінюється за м'яким зразком, як jarní." }],
+          },
+        ],
+      },
+      {
+        type: "tip",
+        text: "У vedoucí однакова форма для чоловіка й жінки, рід видно з узгодженого слова: nový vedoucí / nová vedoucí.",
+      },
     ],
   },
   {
@@ -778,15 +886,24 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             note: [{ text: "іти пішки: Jdu domů. (зараз) — Chodím do školy pěšky. (регулярно)" }],
           },
           {
-            term: [{ word: "jet", wordId: "jet", kind: "verbs" }, { text: " — jezdit" }],
+            term: [{ word: "jet", wordId: "jet", kind: "verbs" }, { text: " — " }, { word: "jezdit", wordId: "jezdit", kind: "verbs" }],
             note: [{ text: "їхати транспортом: Jedu do Prahy. (зараз) — Jezdím do Prahy každý týden. (регулярно)" }],
           },
           {
             term: [{ text: "Так само" }],
             note: [
-              { text: "nést — " },
+              { word: "nést", wordId: "nest", kind: "verbs" },
+              { text: " — " },
               { word: "nosit", wordId: "nosit", kind: "verbs" },
-              { text: " (нести), letět — létat (летіти), běžet — běhat (бігти)." },
+              { text: " (нести), " },
+              { word: "letět", wordId: "letet", kind: "verbs" },
+              { text: " — " },
+              { word: "létat", wordId: "letat", kind: "verbs" },
+              { text: " (летіти), " },
+              { word: "běžet", wordId: "bezet", kind: "verbs" },
+              { text: " — " },
+              { word: "běhat", wordId: "behat", kind: "verbs" },
+              { text: " (бігти)." },
             ],
           },
         ],
@@ -1158,6 +1275,66 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           { text: " vs sebou: «vezmi to s sebou» (візьми з собою) — з прийменником s; але «hodil sebou» (кинувся) — без прийменника. У сучасній мові часто плутають, орієнтуйся на зміст: якщо «разом зі мною/тобою» — пиши s sebou." },
         ],
       },
+      { type: "heading", text: "Неозначені й заперечні — хтось, ніхто" },
+      {
+        type: "paragraph",
+        text: "Від питальних слів kdo, co утворюються пари з приставками ně- («хтось, щось») і ni- («ніхто, нічого»). Основа відмінюється як у питального слова:",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ word: "někdo", wordId: "nekdo-ind", kind: "pronouns" }, { text: " / " }, { word: "nikdo", wordId: "nikdo-ind", kind: "pronouns" }],
+            note: [{ text: "хтось / ніхто (від " }, { word: "kdo", wordId: "kdo-int", kind: "interrogative" }, { text: "): někoho, někomu, o někom, s někým; nikoho, nikomu, o nikom, s nikým." }],
+          },
+          {
+            term: [{ word: "něco", wordId: "neco-ind", kind: "pronouns" }, { text: " / " }, { word: "nic", wordId: "nic-ind", kind: "pronouns" }],
+            note: [{ text: "щось / ніщо (від " }, { word: "co", wordId: "co-int", kind: "interrogative" }, { text: "): něčeho, něčemu, o něčem, s něčím; ničeho, ničemu, o ničem, s ničím." }],
+          },
+          {
+            term: [{ word: "nějaký", wordId: "nejaky-ind", kind: "pronouns" }],
+            note: [{ text: "якийсь: nějaký muž, nějaká žena, nějaké auto. Відмінюється як прикметник: nějakého, nějakému…" }],
+          },
+          {
+            term: [{ word: "žádný", wordId: "zadny-ind", kind: "pronouns" }],
+            note: [{ text: "жодний: žádný problém, žádná práce. Теж як прикметник: žádného, žádnému…" }],
+          },
+          {
+            term: [{ word: "každý", wordId: "kazdy-ind", kind: "pronouns" }],
+            note: [{ text: "кожний: každý den, každá žena. Як прикметник: každého, každému…" }],
+          },
+        ],
+      },
+      {
+        type: "tip",
+        text: "Подвійне заперечення, як і в українській: після nikdo, nic, nikdy дієслово теж у запереченні. Nikdo nepřišel (ніхто не прийшов). Nic nevidím (нічого не бачу). Nikdy nic nikomu neřeknu (нікому нічого ніколи не скажу).",
+      },
+      { type: "heading", text: "Відносні — який, що" },
+      {
+        type: "paragraph",
+        text: "Відносне слово відкриває підрядне речення про щойно названу особу чи річ і заступає її. Рід і число воно бере від цього слова, а відмінок — від своєї ролі в підрядному реченні:",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ word: "který", wordId: "ktery-int", kind: "interrogative" }],
+            note: [{ text: "який, котрий: Muž, kterého jsem viděl (чоловік, якого я бачив). Žena, se kterou jsem mluvil. Studenti, kteří bydlí v Praze. У книжних текстах трапляється й jenž — він теж змінюється за родом, числом і відмінком." }],
+          },
+          {
+            term: [{ word: "co", wordId: "co-int", kind: "interrogative" }],
+            note: [{ text: "у розмові замість který часто ставлять незмінне co, а особу повторюють перед дієсловом: Muž, co jsem ho viděl — те саме, що Muž, kterého jsem viděl." }],
+          },
+          {
+            term: [{ text: "to, co / všechno, co" }],
+            note: [{ text: "те, що / все, що: Není všechno zlato, co se třpytí." }],
+          },
+          {
+            term: [{ text: "ten, kdo / kdo" }],
+            note: [{ text: "той, хто: Kdo pozdě chodí, sám sobě škodí." }],
+          },
+        ],
+      },
     ],
   },
   {
@@ -1310,6 +1487,85 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         type: "tip",
         text: "Кожен шматок (тисячі → сотні → десятки-одиниці) просто йде по черзі своєю формою — не треба узгоджувати їх між собою. Складне лише саме число сотень/тисяч перед іменником, який рахують (див. вище).",
       },
+      { type: "heading", text: "Вік: je mi … let" },
+      {
+        type: "paragraph",
+        text: "Вік називають так само, як в українській «мені двадцять років»: особа в давальному відмінку, дієслово je, число і слово «рік» (let). Не «jsem dvacet», а:",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ text: "Kolik je ti let?" }],
+            note: [{ text: "скільки тобі років? Je mi dvacet pět let. А ввічливо: Kolik je vám let?" }],
+          },
+          {
+            term: [{ text: "Je mu / jí …" }],
+            note: [{ text: "йому / їй: Je mu deset let. Je jí třicet let." }],
+          },
+          {
+            term: [{ text: "Минулий і майбутній час" }],
+            note: [{ text: "Bylo mi deset let. Bude mi třicet." }],
+          },
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "Слово «рік» при числівниках має три форми — від числа залежить і дієслово:",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ text: "1" }],
+            note: [{ word: "rok", wordId: "rok", kind: "nouns" }, { text: " — Synovi je rok. (синові рік)" }],
+          },
+          {
+            term: [{ text: "2, 3, 4" }],
+            note: [{ text: "roky, дієслово у множині: Naší dceři jsou tři roky." }],
+          },
+          {
+            term: [{ text: "5 і більше" }],
+            note: [{ text: "let, а не roků: Je mi pět let. Це окрема форма (родовий множини від " }, { word: "léto", wordId: "leto", kind: "nouns" }, { text: "), її треба запам'ятати." }],
+          },
+        ],
+      },
+      { type: "heading", text: "Гроші й ціни" },
+      {
+        type: "paragraph",
+        text: "Ціну питають так: Kolik to stojí? Відповідь: Stojí to sto korun. Валюти рахуються за загальним правилом чисел (1 / 2–4 / 5 і більше):",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ word: "koruna", wordId: "koruna", kind: "nouns" }],
+            note: [{ text: "1 koruna, 2–4 koruny, 5 і більше — korun (родовий множини): Stojí to dvacet korun." }],
+          },
+          {
+            term: [{ word: "euro", wordId: "euro", kind: "nouns" }],
+            note: [{ text: "середній рід: 1 euro, 2–4 eura, 5 і більше — eur: Stojí to deset eur." }],
+          },
+        ],
+      },
+      { type: "heading", text: "Порядкові в побуті: поверхи й місце" },
+      {
+        type: "rich-paragraph",
+        segments: [{ text: "Порядкові відповідають на " }, { word: "kolikátý", wordId: "kolikaty-int", kind: "interrogative" }, { text: "? (котрий за рахунком?) і відмінюються як прикметники: " }, { word: "první", wordId: "ord-prvni", kind: "adjectives" }, { text: ", " }, { word: "druhý", wordId: "ord-druhy", kind: "adjectives" }, { text: ", " }, { word: "třetí", wordId: "ord-treti", kind: "adjectives" }, { text: ". Крім дат вони потрібні для поверхів і порядку:" }],
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ text: "Поверхи" }],
+            note: [{ text: "Перший поверх на рівні землі — " }, { word: "přízemí", wordId: "prizemi", kind: "nouns" }, { text: " (нульовий), далі 1. " }, { word: "patro", wordId: "patro", kind: "nouns" }, { text: ", 2. patro… Тобто 1. patro — це другий поверх за українським рахунком: Bydlím v prvním patře. Obchod je v druhém patře." }],
+          },
+          {
+            term: [{ text: "Місце" }],
+            note: [{ text: "Je na prvním místě. (Він на першому місці.)" }],
+          },
+        ],
+      },
       { type: "heading", text: "Дні тижня і місяці: v / ve" },
       {
         type: "paragraph",
@@ -1452,6 +1708,79 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [{ text: "Межі цих слів у чеській дещо розмиті (навіть мовознавці це визнають) — приблизно: " }, { word: "ráno", wordId: "rano", kind: "nouns" }, { text: " 6–9, " }, { word: "dopoledne", wordId: "dopoledne", kind: "nouns" }, { text: " 9–12, " }, { word: "odpoledne", wordId: "odpoledne", kind: "nouns" }, { text: " 12–18, " }, { word: "večer", wordId: "vecer", kind: "nouns" }, { text: " 18–22, v " }, { word: "noci", wordId: "noc", kind: "nouns" }, { text: " 22–6. Не намагайся визначити межу з точністю до хвилини — носії теж не завжди погоджуються." }],
+      },
+      { type: "heading", text: "Коли саме: вчора, за тиждень, тиждень тому" },
+      {
+        type: "paragraph",
+        text: "Прості слова на питання «коли?» — це прислівники, їх треба просто знати:",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ word: "včera", wordId: "adv-vcera", kind: "service-word" }, { text: " / " }, { word: "dnes", wordId: "adv-dnes", kind: "service-word" }, { text: " / " }, { word: "zítra", wordId: "adv-zitra", kind: "service-word" }],
+            note: [{ text: "вчора / сьогодні / завтра. Ще: " }, { word: "předevčírem", wordId: "adv-predevcirem", kind: "service-word" }, { text: " (позавчора), " }, { word: "pozítří", wordId: "adv-pozitri", kind: "service-word" }, { text: " (післязавтра)." }],
+          },
+          {
+            term: [{ word: "loni", wordId: "adv-loni", kind: "service-word" }, { text: " / " }, { word: "letos", wordId: "adv-letos", kind: "service-word" }],
+            note: [{ text: "торік / цього року: Letos jedeme na hory." }],
+          },
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "Для днів, тижнів, місяців і років працюють три моделі:",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ text: "minulý / příští + " }, { word: "týden", wordId: "tyden", kind: "nouns" }],
+            note: [{ text: "без прийменника, у знахідному: Minulý týden jsem byl v Praze. Příští týden jedeme na hory. Так само: tento týden, příští " }, { word: "měsíc", wordId: "mesic", kind: "nouns" }, { text: ", příští " }, { word: "rok", wordId: "rok", kind: "nouns" }, { text: "." }],
+          },
+          {
+            term: [{ text: "za + знахідний" }],
+            note: [{ text: "через (рахуючи від цього моменту): Za týden mám zkoušku. Vlak odjíždí za pět minut." }],
+          },
+          {
+            term: [{ text: "před + орудний" }],
+            note: [{ text: "тому (назад): Před týdnem jsem byla nemocná. Před třemi roky." }],
+          },
+        ],
+      },
+      {
+        type: "tip",
+        text: "Запам'ятай пару: za týden (вперед, знахідний) і před týdnem (назад, орудний) — це різні напрямки в часі, їх не можна міняти місцями.",
+      },
+      { type: "heading", text: "Як часто" },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ word: "vždy", wordId: "adv-vzdy", kind: "service-word" }, { text: " / " }, { word: "vždycky", wordId: "adv-vzdycky", kind: "service-word" }],
+            note: [{ text: "завжди (vždycky — розмовніше)." }],
+          },
+          {
+            term: [{ word: "často", wordId: "adv-casto", kind: "service-word" }],
+            note: [{ text: "часто." }],
+          },
+          {
+            term: [{ word: "obvykle", wordId: "adv-obvykle", kind: "service-word" }],
+            note: [{ text: "зазвичай." }],
+          },
+          {
+            term: [{ word: "někdy", wordId: "adv-nekdy", kind: "service-word" }],
+            note: [{ text: "іноді." }],
+          },
+          {
+            term: [{ word: "nikdy", wordId: "adv-nikdy", kind: "service-word" }],
+            note: [{ text: "ніколи. Дієслово при ньому в запереченні: Nikdy to nedělám." }],
+          },
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "Скільки разів за період — число + -krát + за + знахідний: dvakrát za den (двічі на день).",
       },
     ],
   },
@@ -1677,6 +2006,36 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             ],
           },
         ],
+      },
+      { type: "heading", text: "v чи na: яке слово обрати?" },
+      {
+        type: "paragraph",
+        text: "Простого правила, коли брати v/ve, а коли na, немає — вибір часто задає традиція, тому зручніше запам'ятовувати сполуки. Пари «де? → куди?» такі: v/ve + місцевий ↔ do + родовий, а na + місцевий ↔ na + знахідний.",
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ text: "Країни: здебільшого v — do" }],
+            note: [{ text: "v Itálii — do Itálie, v Polsku — do Polska, v Ukrajině — do Ukrajiny, ve Slovinsku — do Slovinska. Винятки: na Slovensku — na Slovensko, na Moravě — na Moravu." }],
+          },
+          {
+            term: [{ text: "Гори: здебільшого v — do" }],
+            note: [{ text: "v Jeseníkách — do Jeseníků, v Alpách. Виняток: na Šumavě — na Šumavu." }],
+          },
+          {
+            term: [{ text: "Пори року" }],
+            note: [{ text: "v " }, { word: "létě", wordId: "leto", kind: "nouns" }, { text: ", v " }, { word: "zimě", wordId: "zima", kind: "nouns" }, { text: " — але na " }, { word: "jaře", wordId: "jaro", kind: "nouns" }, { text: ", na " }, { word: "podzim", wordId: "podzim", kind: "nouns" }, { text: "." }],
+          },
+          {
+            term: [{ text: "Будівлі й місця" }],
+            note: [{ text: "v " }, { word: "obchodě", wordId: "obchod", kind: "nouns" }, { text: ", ve " }, { word: "škole", wordId: "skola", kind: "nouns" }, { text: ", v " }, { word: "hotelu", wordId: "hotel", kind: "nouns" }, { text: "; na " }, { word: "poště", wordId: "posta", kind: "nouns" }, { text: ", na " }, { word: "nádraží", wordId: "nadrazi", kind: "nouns" }, { text: ", na " }, { word: "úřadě", wordId: "urad", kind: "nouns" }, { text: " (державна установа)." }],
+          },
+        ],
+      },
+      {
+        type: "tip",
+        text: "Україна: v Ukrajině / do Ukrajiny — коректна форма, і її вживають дедалі частіше. Традиційно в чеській казали й na Ukrajině / na Ukrajinu: прийменник na тут не має зневажливого відтінку (так пояснює ÚJČ), це просто усталена звичка мови, тому почути можна обидва варіанти.",
       },
       { type: "heading", text: "Особливий випадок: za" },
       {

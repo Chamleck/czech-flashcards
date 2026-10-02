@@ -117,7 +117,7 @@ export function InterrogativesScreen({ navigation }: Props) {
           <PosEmoji name="question" size={32} />
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>{INTERROGATIVE_PRONOUNS_TITLE}</Text>
-            <Text style={styles.hint}>kdo, co, jaký, který, čí</Text>
+            <Text style={styles.hint}>kdo, co, jaký, který, čí, kolikátý</Text>
             <Text style={styles.sub}>
               {ALL_INTERROGATIVE_IDS.length} {plural(ALL_INTERROGATIVE_IDS.length, "слово", "слова", "слів")}
             </Text>

@@ -9,6 +9,7 @@
 // підтягнув би React Native транзитивно і зламав би це.
 export const PRONOUN_GROUP_TITLE = "Присвійні та вказівні";
 export const PERSONAL_GROUP_TITLE = "Особові";
+export const INDEFINITE_GROUP_TITLE = "Неозначені та заперечні";
 export const INTERROGATIVE_GROUP_TITLE = "Займенникові (хто? що? який?)"; // конкретна назва підгрупи, узгоджена зі стилем сусідів (ADVERBS/MISC нижче), а не родова назва хаба "Питальні слова" — ЛИШЕ для searchIndex.ts (групування результатів пошуку); заголовок екрана/рядка бере INTERROGATIVE_PRONOUNS_TITLE нижче
 export const NUMERAL_CARDINAL_TITLE = "Кількісні";
 export const NUMERAL_ORDINAL_TITLE = "Порядкові";

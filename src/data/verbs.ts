@@ -2891,4 +2891,99 @@ export const VERBS: VerbEntry[] = [
       imperative: { cz: "Nacházej se blízko mě!", uk: "Знаходься поблизу мене!" },
     },
   },
+
+  // ═══════════════════ Дієслова руху (однократні / багатократні) ═══════════════════
+  // Форми звірено: MorfFlex (UniMorph ces) — теперішній, l-дієприкметник, наказовий; chodit/nosit
+  // уже є вище. Пари видів тут НЕ задаємо (aspectPairId): jít–chodit, letět–létat тощо — це
+  // однократне/багатократне, а не доконаний/недоконаний (обидва члени — недоконані).
+  {
+    id: "jezdit",
+    uk: "їздити",
+    cz: "jezdit",
+    aspect: "imperfective",
+    verbClass: "IV",
+    present: { ja: "jezdím", ty: "jezdíš", on: "jezdí", my: "jezdíme", vy: "jezdíte", oni: "jezdí" },
+    pastParticiple: { m: "jezdil", f: "jezdila", n: "jezdilo", manim_pl: "jezdili", other_pl: "jezdily" },
+    imperative: { ty: "jezdi", vy: "jezděte", my: "jezděme" },
+    aspectPairNote: "багатократне дієслово руху (пор. jet — однократне)",
+    examples: {
+      present: { cz: "Do práce jezdím autobusem.", uk: "Я їжджу на роботу автобусом." },
+      past: { cz: "Do práce jsem jezdil autobusem.", uk: "Я їздив на роботу автобусом." },
+      future: { cz: "Do práce budu jezdit autobusem.", uk: "Я їздитиму на роботу автобусом." },
+      imperative: { cz: "Jezdi do práce autobusem!", uk: "Їзди на роботу автобусом!" },
+    },
+  },
+
+  {
+    id: "letet",
+    uk: "летіти",
+    cz: "letět",
+    aspect: "imperfective",
+    verbClass: "IV",
+    present: { ja: "letím", ty: "letíš", on: "letí", my: "letíme", vy: "letíte", oni: "letí" },
+    pastParticiple: { m: "letěl", f: "letěla", n: "letělo", manim_pl: "letěli", other_pl: "letěly" },
+    imperative: { ty: "leť", vy: "leťte", my: "leťme" },
+    aspectPairNote: "однократне дієслово руху (пор. létat — багатократне)",
+    examples: {
+      present: { cz: "Letím do Prahy.", uk: "Я лечу до Праги." },
+      past: { cz: "Letěl jsem do Prahy.", uk: "Я летів до Праги." },
+      future: { cz: "Budu letět do Prahy.", uk: "Я летітиму до Праги." },
+      imperative: { cz: "Leť do Prahy!", uk: "Лети до Праги!" },
+    },
+  },
+
+  {
+    id: "letat",
+    uk: "літати",
+    cz: "létat",
+    aspect: "imperfective",
+    verbClass: "V",
+    present: { ja: "létám", ty: "létáš", on: "létá", my: "létáme", vy: "létáte", oni: "létají" },
+    pastParticiple: { m: "létal", f: "létala", n: "létalo", manim_pl: "létali", other_pl: "létaly" },
+    imperative: { ty: "létej", vy: "létejte", my: "létejme" },
+    aspectPairNote: "багатократне дієслово руху (пор. letět — однократне)",
+    examples: {
+      present: { cz: "Často létám do Vídně.", uk: "Я часто літаю до Відня." },
+      past: { cz: "Často jsem létal do Vídně.", uk: "Я часто літав до Відня." },
+      future: { cz: "Budu často létat do Vídně.", uk: "Я часто літатиму до Відня." },
+      imperative: { cz: "Létej do Vídně častěji!", uk: "Літай до Відня частіше!" },
+    },
+  },
+
+  {
+    id: "bezet",
+    uk: "бігти",
+    cz: "běžet",
+    aspect: "imperfective",
+    verbClass: "IV",
+    present: { ja: "běžím", ty: "běžíš", on: "běží", my: "běžíme", vy: "běžíte", oni: "běží" },
+    pastParticiple: { m: "běžel", f: "běžela", n: "běželo", manim_pl: "běželi", other_pl: "běžely" },
+    imperative: { ty: "běž", vy: "běžte", my: "běžme" },
+    aspectPairNote: "однократне дієслово руху (пор. běhat — багатократне)",
+    examples: {
+      present: { cz: "Běžím na autobus.", uk: "Я біжу на автобус." },
+      past: { cz: "Běžel jsem na autobus.", uk: "Я біг на автобус." },
+      future: { cz: "Budu běžet na autobus.", uk: "Я бігтиму на автобус." },
+      imperative: { cz: "Běž na autobus!", uk: "Біжи на автобус!" },
+    },
+  },
+
+  {
+    id: "behat",
+    uk: "бігати",
+    cz: "běhat",
+    aspect: "imperfective",
+    verbClass: "V",
+    present: { ja: "běhám", ty: "běháš", on: "běhá", my: "běháme", vy: "běháte", oni: "běhají" },
+    pastParticiple: { m: "běhal", f: "běhala", n: "běhalo", manim_pl: "běhali", other_pl: "běhaly" },
+    imperative: { ty: "běhej", vy: "běhejte", my: "běhejme" },
+    aspectPairNote: "багатократне дієслово руху (пор. běžet — однократне)",
+    examples: {
+      present: { cz: "Každé ráno běhám v parku.", uk: "Щоранку я бігаю в парку." },
+      past: { cz: "Každé ráno jsem běhal v parku.", uk: "Щоранку я бігав у парку." },
+      future: { cz: "Budu běhat v parku.", uk: "Я бігатиму в парку." },
+      imperative: { cz: "Běhej každé ráno!", uk: "Бігай щоранку!" },
+    },
+  },
+
 ];

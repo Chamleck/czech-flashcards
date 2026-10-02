@@ -145,7 +145,7 @@ export interface AdjectiveEntry {
 }
 
 // ── Займенники (присвійні + вказівні) ──
-export type PronounSubtype = "possessive" | "demonstrative" | "interrogative";
+export type PronounSubtype = "possessive" | "demonstrative" | "interrogative" | "indefinite";
 
 interface PronounBase {
   id: string;
@@ -159,6 +159,10 @@ interface PronounBase {
 export interface DeclinablePronoun extends PronounBase {
   declinable: true;
   vzorLabel: string; // короткий підпис зразка для картки/граматики
+  // true → слово є в словнику й на картці, але НЕ береться тестованим у квізі займенників:
+  // у шаблонах «___ + прикметник + іменник» воно дає безглузді фрази (kolikátý — порядкове
+  // питання: «Kolikátými bílými přáteli?»). Нове слово такого роду перевіряти за цим тестом.
+  noQuiz?: boolean;
   declension: FullDeclension;
   examples: GenderExamples; // приклад на кожен рід (як у прикметників)
 }
@@ -196,6 +200,10 @@ interface PersonalPronounBase {
   uk: string;
   cz: string; // словникова форма (já, ty, on, my, vy, oni, se)
   columns: PronounColumnLabels;
+  // Підпис під заголовком картки. Не задано → «особовий займенник · нерегулярне відмінювання»
+  // (їх стільки ж, скільки особових). Для kdo/co і někdo/nikdo/něco/nic задається окремо, бо
+  // вони не особові.
+  patternLabel?: string;
 }
 
 // Без роду: já, ty, my, vy, se — одна парадигма, без табів.
@@ -561,6 +569,7 @@ export type RootStackParamList = {
   PronounGroups: undefined;
   PronounSelection: undefined; // присвійні + вказівні
   PersonalPronounSelection: undefined; // особові
+  IndefinitePronounSelection: undefined; // неозначені, заперечні й означальні (někdo/nikdo/něco/nic/nějaký/žádný/každý)
   InterrogativeSelection: undefined; // питальні (jaký/který/čí + kdo/co)
   InterrogativeAdverbSelection: undefined; // прислівникова група (kde/kam/odkud/kudy)
   InterrogativeMiscSelection: undefined; // інша група (kdy/jak/proč/kolik)

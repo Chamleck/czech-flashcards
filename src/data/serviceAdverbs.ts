@@ -227,4 +227,150 @@ export const SERVICE_ADVERBS: InvariantWordEntry[] = [
       { cz: "Vstup pouze pro zaměstnance.", uk: "Вхід лише для працівників." },
     ],
   },
+
+  // ═══════════════════ Прислівники часу й частоти (посилання з теми «Дати й час») ═══════════════════
+  {
+    id: "adv-vcera",
+    cz: "včera",
+    uk: "вчора",
+    examples: [
+      { cz: "Včera jsem byl doma.", uk: "Вчора я був удома." },
+      { cz: "Včera pršelo celý den.", uk: "Вчора цілий день ішов дощ." },
+      { cz: "Co jsi dělal včera večer?", uk: "Що ти робив вчора ввечері?" },
+      { cz: "Včera to ještě nevěděl.", uk: "Вчора він цього ще не знав." },
+    ],
+  },
+  {
+    id: "adv-dnes",
+    cz: "dnes",
+    uk: "сьогодні",
+    examples: [
+      { cz: "Dnes mám volno.", uk: "Сьогодні в мене вихідний." },
+      { cz: "Co děláš dnes večer?", uk: "Що ти робиш сьогодні ввечері?" },
+      { cz: "Dnes je pondělí.", uk: "Сьогодні понеділок." },
+      { cz: "Dnes už nikam nejdu.", uk: "Сьогодні я вже нікуди не йду." },
+    ],
+  },
+  {
+    id: "adv-zitra",
+    cz: "zítra",
+    uk: "завтра",
+    examples: [
+      { cz: "Zítra jedu do Prahy.", uk: "Завтра я їду до Праги." },
+      { cz: "Zítra bude pršet.", uk: "Завтра буде дощ." },
+      { cz: "Uvidíme se zítra.", uk: "Побачимось завтра." },
+      { cz: "Zítra ráno vstávám brzy.", uk: "Завтра вранці я рано встаю." },
+    ],
+  },
+  {
+    id: "adv-predevcirem",
+    cz: "předevčírem",
+    uk: "позавчора",
+    examples: [
+      { cz: "Předevčírem jsem byl u lékaře.", uk: "Позавчора я був у лікаря." },
+      { cz: "Předevčírem nás navštívila babička.", uk: "Позавчора нас відвідала бабуся." },
+      { cz: "Přijel jsem předevčírem večer.", uk: "Я приїхав позавчора ввечері." },
+      { cz: "Předevčírem bylo krásně.", uk: "Позавчора була гарна погода." },
+    ],
+  },
+  {
+    id: "adv-pozitri",
+    cz: "pozítří",
+    uk: "післязавтра",
+    examples: [
+      { cz: "Pozítří mám zkoušku.", uk: "Післязавтра в мене іспит." },
+      { cz: "Pozítří odjíždíme na dovolenou.", uk: "Післязавтра ми їдемо у відпустку." },
+      { cz: "Zavolám ti pozítří.", uk: "Я зателефоную тобі післязавтра." },
+      { cz: "Pozítří budu doma.", uk: "Післязавтра я буду вдома." },
+    ],
+  },
+  {
+    id: "adv-loni",
+    cz: "loni",
+    uk: "торік",
+    examples: [
+      { cz: "Loni jsme byli u moře.", uk: "Торік ми були на морі." },
+      { cz: "Loni v létě bylo horko.", uk: "Торік улітку було спекотно." },
+      { cz: "Loni se mi narodila dcera.", uk: "Торік у мене народилася дочка." },
+      { cz: "Loni jsem začal studovat.", uk: "Торік я почав навчатися." },
+    ],
+  },
+  {
+    id: "adv-letos",
+    cz: "letos",
+    uk: "цього року",
+    examples: [
+      { cz: "Letos jedeme na hory.", uk: "Цього року ми їдемо в гори." },
+      { cz: "Letos je zima dlouhá.", uk: "Цього року зима довга." },
+      { cz: "Letos mám hodně práce.", uk: "Цього року в мене багато роботи." },
+      { cz: "Letos jsem ještě nebyl na dovolené.", uk: "Цього року я ще не був у відпустці." },
+    ],
+  },
+  {
+    id: "adv-vzdy",
+    cz: "vždy",
+    uk: "завжди",
+    examples: [
+      { cz: "Vždy mluví pravdu.", uk: "Він завжди каже правду." },
+      { cz: "Je tu vždy čisto.", uk: "Тут завжди чисто." },
+      { cz: "Vždy jsem to věděl.", uk: "Я завжди це знав." },
+      { cz: "Obchod je vždy otevřený do osmi.", uk: "Магазин завжди відчинений до восьмої." },
+    ],
+  },
+  {
+    id: "adv-vzdycky",
+    cz: "vždycky",
+    uk: "завжди (розм.)",
+    examples: [
+      { cz: "Vždycky chodím pěšky.", uk: "Я завжди ходжу пішки." },
+      { cz: "Vždycky přijde pozdě.", uk: "Він завжди приходить пізно." },
+      { cz: "Vždycky mi pomůže.", uk: "Він завжди мені допоможе." },
+      { cz: "Táta vždycky vstává brzy.", uk: "Тато завжди рано встає." },
+    ],
+  },
+  {
+    id: "adv-casto",
+    cz: "často",
+    uk: "часто",
+    examples: [
+      { cz: "Často chodím do kina.", uk: "Я часто ходжу в кіно." },
+      { cz: "Často pršelo.", uk: "Часто йшов дощ." },
+      { cz: "Jak často cvičíš?", uk: "Як часто ти займаєшся спортом?" },
+      { cz: "Často na tebe myslím.", uk: "Я часто думаю про тебе." },
+    ],
+  },
+  {
+    id: "adv-obvykle",
+    cz: "obvykle",
+    uk: "зазвичай",
+    examples: [
+      { cz: "Obvykle vstávám v sedm.", uk: "Зазвичай я встаю о сьомій." },
+      { cz: "Obvykle jíme doma.", uk: "Зазвичай ми їмо вдома." },
+      { cz: "Obvykle to trvá hodinu.", uk: "Зазвичай це триває годину." },
+      { cz: "Co děláš obvykle o víkendu?", uk: "Що ти зазвичай робиш на вихідних?" },
+    ],
+  },
+  {
+    id: "adv-nekdy",
+    cz: "někdy",
+    uk: "іноді / колись",
+    examples: [
+      { cz: "Někdy chodím do divadla.", uk: "Іноді я ходжу в театр." },
+      { cz: "Někdy je to těžké.", uk: "Іноді це важко." },
+      { cz: "Zavolej mi někdy.", uk: "Зателефонуй мені колись." },
+      { cz: "Někdy bych tam chtěl jet.", uk: "Колись я хотів би туди поїхати." },
+    ],
+  },
+  {
+    id: "adv-nikdy",
+    cz: "nikdy",
+    uk: "ніколи",
+    examples: [
+      { cz: "Nikdy nepiji kávu.", uk: "Я ніколи не п'ю каву." },
+      { cz: "Tam jsem nikdy nebyl.", uk: "Там я ніколи не був." },
+      { cz: "Nikdy jsem to neviděl.", uk: "Я ніколи цього не бачив." },
+      { cz: "Nikdy nezapomenu na ten den.", uk: "Я ніколи не забуду той день." },
+    ],
+  },
+
 ];

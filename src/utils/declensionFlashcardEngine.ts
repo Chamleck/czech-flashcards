@@ -143,7 +143,7 @@ function buildTestedPool(): Tested[] {
   // (і не вигадувати новий contextPhrase: гілка buildContextPhrase уже working
   // correctly для будь-якого kind !== "adjective" — пропуск першим, декорація
   // після, граматично коректно і для питальних).
-  const interrogativeAdj: Tested[] = INTERROGATIVE_ADJ.filter((p) => p.declinable).map((p) => ({
+  const interrogativeAdj: Tested[] = INTERROGATIVE_ADJ.filter((p) => p.declinable && !p.noQuiz).map((p) => ({
     id: p.id,
     kind: "interrogative-adj",
     cz: p.cz,

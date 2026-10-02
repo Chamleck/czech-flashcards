@@ -12695,4 +12695,61 @@ export const ADJECTIVES: AdjectiveEntry[] = [
       },
     },
   },
+
+  // «vedoucí» — причетник-прикметник (м'який зразок, як jarní), який у мові став ще й іменником
+  // «керівник / керівниця» (відмінюється так само). Рід видно з узгодженого слова: nový vedoucí / nová vedoucí.
+  // Табі masc_anim і fem показують вживання як іменник, masc_inan і neut — як прикметник.
+  {
+    id: "vedouci",
+    uk: "керівний; керівник",
+    cz: "vedoucí",
+    pattern: "mekky",
+    category: "soft",
+    hasConsonantAlternation: false,
+    declension: {
+      masc_anim: {
+        nominativ: { sg: "vedoucí", pl: "vedoucí" },
+        genitiv: { sg: "vedoucího", pl: "vedoucích" },
+        dativ: { sg: "vedoucímu", pl: "vedoucím" },
+        akuzativ: { sg: "vedoucího", pl: "vedoucí" },
+        vokativ: { sg: "vedoucí", pl: "vedoucí" },
+        lokal: { sg: "vedoucím", pl: "vedoucích" },
+        instrumental: { sg: "vedoucím", pl: "vedoucími" },
+      },
+      masc_inan: {
+        nominativ: { sg: "vedoucí", pl: "vedoucí" },
+        genitiv: { sg: "vedoucího", pl: "vedoucích" },
+        dativ: { sg: "vedoucímu", pl: "vedoucím" },
+        akuzativ: { sg: "vedoucí", pl: "vedoucí" },
+        vokativ: { sg: "vedoucí", pl: "vedoucí" },
+        lokal: { sg: "vedoucím", pl: "vedoucích" },
+        instrumental: { sg: "vedoucím", pl: "vedoucími" },
+      },
+      fem: {
+        nominativ: { sg: "vedoucí", pl: "vedoucí" },
+        genitiv: { sg: "vedoucí", pl: "vedoucích" },
+        dativ: { sg: "vedoucí", pl: "vedoucím" },
+        akuzativ: { sg: "vedoucí", pl: "vedoucí" },
+        vokativ: { sg: "vedoucí", pl: "vedoucí" },
+        lokal: { sg: "vedoucí", pl: "vedoucích" },
+        instrumental: { sg: "vedoucí", pl: "vedoucími" },
+      },
+      neut: {
+        nominativ: { sg: "vedoucí", pl: "vedoucí" },
+        genitiv: { sg: "vedoucího", pl: "vedoucích" },
+        dativ: { sg: "vedoucímu", pl: "vedoucím" },
+        akuzativ: { sg: "vedoucí", pl: "vedoucí" },
+        vokativ: { sg: "vedoucí", pl: "vedoucí" },
+        lokal: { sg: "vedoucím", pl: "vedoucích" },
+        instrumental: { sg: "vedoucím", pl: "vedoucími" },
+      },
+    },
+    examples: {
+      masc_anim: { cz: "Náš vedoucí je hodný.", uk: "Наш керівник добрий." },
+      masc_inan: { cz: "Vedoucí vůz je červený.", uk: "Провідний автомобіль червоний." },
+      fem: { cz: "Naše vedoucí je hodná.", uk: "Наша керівниця добра." },
+      neut: { cz: "Máme vedoucí postavení na trhu.", uk: "Ми маємо провідну позицію на ринку." },
+    },
+  },
+
 ];

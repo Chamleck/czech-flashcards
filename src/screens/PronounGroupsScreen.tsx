@@ -10,7 +10,8 @@ import { MistakeDeckCard } from "../components/MistakeDeckCard";
 import { PosEmoji } from "../components/PosEmoji";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
-import { PRONOUN_GROUP_TITLE, PERSONAL_GROUP_TITLE } from "../data/groupTitles";
+import { INDEFINITE_ALL } from "../data/indefinitePronouns";
+import { PRONOUN_GROUP_TITLE, PERSONAL_GROUP_TITLE, INDEFINITE_GROUP_TITLE } from "../data/groupTitles";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { ALL_PRONOUN_MIXED_IDS } from "../utils/pronounEntries";
 import { plural } from "../utils/plural";
@@ -63,6 +64,14 @@ export function PronounGroupsScreen({ navigation }: Props) {
     else navigation.navigate("DeclSession", { title: PERSONAL_GROUP_TITLE, kind: "personal", entryIds: ids });
   }
 
+  // Неозначені та заперечні: дві форми запису (без роду / з родом) — тренування іде через
+  // "pronoun-mixed", картку на кожен id вибирає pronounEntries.ts.
+  function openIndefinite() {
+    const ids = INDEFINITE_ALL.map((p) => p.id);
+    if (mode === "browse") navigation.navigate("BrowseList", { kind: "pronouns", entryIds: ids, title: INDEFINITE_GROUP_TITLE });
+    else navigation.navigate("DeclSession", { title: INDEFINITE_GROUP_TITLE, kind: "pronoun-mixed", entryIds: ids });
+  }
+
   return (
     <ScrollView
       style={styles.safe}
@@ -103,6 +112,23 @@ export function PronounGroupsScreen({ navigation }: Props) {
         </Pressable>
         {mode === "train" && (
                       <EditButton onPress={() => navigation.navigate("PronounSelection")} />
+        )}
+      </View>
+
+      {/* Неозначені та заперечні — активна група */}
+      <View style={styles.catRow}>
+        <Pressable style={styles.catMain} onPress={openIndefinite}>
+          <PosEmoji name="bustInSilhouette" size={26} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.catTitle}>Неозначені та заперечні</Text>
+            <Text style={styles.catHint}>někdo, nikdo, něco, nic, nějaký, žádný, každý</Text>
+            <Text style={styles.catSub}>
+              {INDEFINITE_ALL.length} {plural(INDEFINITE_ALL.length, "слово", "слова", "слів")}
+            </Text>
+          </View>
+        </Pressable>
+        {mode === "train" && (
+          <EditButton onPress={() => navigation.navigate("IndefinitePronounSelection")} />
         )}
       </View>
 

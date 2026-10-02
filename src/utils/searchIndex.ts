@@ -3,6 +3,7 @@ import { VERBS } from "../data/verbs";
 import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
+import { INDEFINITE_ALL } from "../data/indefinitePronouns";
 import { INTERROGATIVE_ALL } from "../data/interrogativePronouns";
 import { INTERROGATIVE_ADVERBS } from "../data/interrogativeAdverbs";
 import { INTERROGATIVE_MISC } from "../data/interrogativeMisc";
@@ -28,6 +29,7 @@ import type { PosEmojiName } from "../components/icons/posEmoji";
 import {
   PRONOUN_GROUP_TITLE,
   PERSONAL_GROUP_TITLE,
+  INDEFINITE_GROUP_TITLE,
   INTERROGATIVE_GROUP_TITLE,
   INTERROGATIVE_ADVERBS_GROUP_TITLE,
   INTERROGATIVE_MISC_GROUP_TITLE,
@@ -204,6 +206,10 @@ function buildIndex(): SearchEntry[] {
   const personalIds = PERSONAL_PRONOUNS.map((p) => p.id);
   for (const p of PERSONAL_PRONOUNS) {
     push(out, p.id, "pronouns", p.cz, p.uk, [], personalIds, PERSONAL_GROUP_TITLE, "PronounGroups");
+  }
+  const indefiniteIds = INDEFINITE_ALL.map((p) => p.id);
+  for (const p of INDEFINITE_ALL) {
+    push(out, p.id, "pronouns", p.cz, p.uk, [], indefiniteIds, INDEFINITE_GROUP_TITLE, "PronounGroups");
   }
   // Питальні — окремий розділ "Питальні слова" (власний екран-хаб Interrogatives),
   // змішана група (jaký/který/čí + kdo/co), суцільний список без підгруп.

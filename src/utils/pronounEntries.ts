@@ -1,5 +1,6 @@
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
+import { INDEFINITE_CORE, INDEFINITE_ADJ } from "../data/indefinitePronouns";
 
 // Розділ "Займенники" (PronounGroupsScreen) показує ДВІ групи на одному екрані —
 // "Особові" (PERSONAL_PRONOUNS, id з префіксом "pp-") і "Присвійні та вказівні"
@@ -24,11 +25,18 @@ export interface ResolvedPronoun {
 export const ALL_PRONOUN_MIXED_IDS: string[] = [
   ...PRONOUNS.map((p) => p.id),
   ...PERSONAL_PRONOUNS.map((p) => p.id),
+  ...INDEFINITE_CORE.map((p) => p.id),
+  ...INDEFINITE_ADJ.map((p) => p.id),
 ];
 
+// Неозначені/заперечні (група «Неозначені та заперечні»): někdo/nikdo/něco/nic — без роду,
+// та сама картка, що в особових (PersonalPronounCard); nějaký/žádný/každý — з табами роду,
+// та сама картка, що в присвійних (AdjPronounCard). Дві форми запису, один розділ.
 export function pronounCardType(id: string): PronounCardType | null {
   if (id.startsWith("pp-")) return "personal";
+  if (INDEFINITE_CORE.some((p) => p.id === id)) return "personal";
   if (PRONOUNS.some((p) => p.id === id)) return "pronoun";
+  if (INDEFINITE_ADJ.some((p) => p.id === id)) return "pronoun";
   return null;
 }
 
@@ -37,8 +45,8 @@ export function resolvePronoun(id: string): ResolvedPronoun | null {
   if (!cardType) return null;
   const entry =
     cardType === "personal"
-      ? PERSONAL_PRONOUNS.find((p) => p.id === id)
-      : PRONOUNS.find((p) => p.id === id);
+      ? [...PERSONAL_PRONOUNS, ...INDEFINITE_CORE].find((p) => p.id === id)
+      : [...PRONOUNS, ...INDEFINITE_ADJ].find((p) => p.id === id);
   if (!entry) return null;
   return { id, cardType, entry };
 }

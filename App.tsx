@@ -19,6 +19,7 @@ import { AdjectiveSelectionScreen } from "./src/screens/AdjectiveSelectionScreen
 import { PronounGroupsScreen } from "./src/screens/PronounGroupsScreen";
 import { PronounSelectionScreen } from "./src/screens/PronounSelectionScreen";
 import { PersonalPronounSelectionScreen } from "./src/screens/PersonalPronounSelectionScreen";
+import { IndefinitePronounSelectionScreen } from "./src/screens/IndefinitePronounSelectionScreen";
 import { InterrogativeSelectionScreen } from "./src/screens/InterrogativeSelectionScreen";
 import { InterrogativesScreen } from "./src/screens/InterrogativesScreen";
 import { InterrogativeAdverbSelectionScreen } from "./src/screens/InterrogativeAdverbSelectionScreen";
@@ -85,6 +86,7 @@ export default function App() {
           <Stack.Screen name="PronounGroups" component={PronounGroupsScreen} options={{ title: "Займенники" }} />
           <Stack.Screen name="PronounSelection" component={PronounSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="PersonalPronounSelection" component={PersonalPronounSelectionScreen} options={{ title: "Вибір слів" }} />
+          <Stack.Screen name="IndefinitePronounSelection" component={IndefinitePronounSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="InterrogativeSelection" component={InterrogativeSelectionScreen} options={{ title: "Вибір слів" }} />
           <Stack.Screen name="Interrogatives" component={InterrogativesScreen} options={{ title: "Питальні слова" }} />
           <Stack.Screen name="InterrogativeAdverbSelection" component={InterrogativeAdverbSelectionScreen} options={{ title: "Вибір слів" }} />
