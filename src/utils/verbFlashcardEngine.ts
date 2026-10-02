@@ -142,7 +142,7 @@ type FramePosition = "initial" | "afterAdverb";
 //    для миттєвих недоконаних (momentary) вимкнено — «celou noc přicházel» дивно;
 //  - "terminative": "za + час" (час до досягнення результату) — природний
 //    вибір доконаного; недоконаний змінює значення. Для делімітативних пар
-//    (delimitativePartner) вимкнено: "Poseděl jsem za hodinu" неприродно;
+//    (delimitativePartner) вимкнено: "Poseděl jsem za minutu" неприродно;
 //  - "other": контекст завершеності/послідовності — доконаний природніший,
 //    недоконаний неприродний, але не заборонений (критерій Macurová: вибір
 //    носія).
@@ -181,13 +181,13 @@ export const IMPERF_FRAMES: AspectFrame[] = [
 ];
 
 // Доконаний вид — «za + час» (результат за певний час; «Nakonec» додає ознаку
-// завершення і прибирає двозначність «за годину» = «через годину») та контексти
+// завершення і прибирає двозначність «за хвилину» = «через хвилину») та контексти
 // завершеності.
 export const PERF_FRAMES: AspectFrame[] = [
-  { text: "{V} za hodinu.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "terminative" },
-  { text: "{V} za tři dny.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "terminative" },
-  { text: "Nakonec {V} za hodinu.", tense: "past", subjects: ALL_PAST, position: "afterAdverb", kind: "terminative" },
-  { text: "Nakonec {V} za tři dny.", tense: "past", subjects: ALL_PAST, position: "afterAdverb", kind: "terminative" },
+  { text: "{V} za minutu.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "terminative" },
+  { text: "{V} za pět minut.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "terminative" },
+  { text: "Nakonec {V} za minutu.", tense: "past", subjects: ALL_PAST, position: "afterAdverb", kind: "terminative" },
+  { text: "Nakonec {V} za pět minut.", tense: "past", subjects: ALL_PAST, position: "afterAdverb", kind: "terminative" },
   { text: "Konečně {V}.", tense: "past", subjects: ALL_PAST, position: "afterAdverb", kind: "other" },
   { text: "Zítra {V} a bude hotovo.", tense: "future", subjects: ALL_FUTURE, position: "afterAdverb", kind: "other" },
 ];

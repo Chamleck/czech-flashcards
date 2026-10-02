@@ -83,7 +83,7 @@ export const PAST_SUBJECT_LABELS: Record<PastSubject, { cz: string; uk: string; 
   vy_sg_f: { cz: "vy", uk: "Ви, ввічливо, жін.", variant: true },
   oni_manim: { cz: "oni", uk: "вони, чол. істот." },
   oni_other: { cz: "ony", uk: "вони, жін." },
-  oni_neut: { cz: "ta města", uk: "ті міста", variant: true },
+  oni_neut: { cz: "ta města", uk: "ті міста, сер. мн.", variant: true },
 };
 
 // Частка «базових» клітинок серед усіх клітинок минулого. Квіз дієслів множить
