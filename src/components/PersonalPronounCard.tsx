@@ -81,7 +81,7 @@ export function PersonalPronounCard({ entry, revealed, onReveal }: Props) {
                 text={entry.cz}
                 style={[styles.answerWord, { color: accent }]}
               />
-              <Text style={styles.patternText}>особовий займенник · нерегулярне відмінювання</Text>
+              <Text style={styles.patternText}>{entry.patternLabel ?? "особовий займенник · нерегулярне відмінювання"}</Text>
             </View>
 
             {/* Таби роду — лише для 3-ї особи (on/ona/ono, oni/ony/ona) */}
