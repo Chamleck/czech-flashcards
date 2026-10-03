@@ -47,7 +47,7 @@ function patternLabel(e: DeclEntry, degree: Degree): string {
   if (degree !== "positive") return "ступінь порівняння · відмінюється як jarní";
   if ("pattern" in e) {
     const base = e.pattern === "tvrdy" ? "твердий зразок (mladý)" : "м'який зразок (jarní)";
-    return e.hasConsonantAlternation ? `${base} · чергування у чол. іст. мн.` : base;
+    return e.hasConsonantAlternation ? `${base} · чергування у чол. істот. мн.` : base;
   }
   if ("vzorLabel" in e) return e.vzorLabel;
   return "незмінний";

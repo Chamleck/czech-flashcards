@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { VerbEntry, PERSON_ORDER, PERSON_LABELS } from "../types";
+import { VERBS } from "../data/verbs";
 import { theme } from "../utils/theme";
 import { TileEmoji } from "./TileEmoji";
 import { Speakable } from "./Speakable";
@@ -154,11 +155,34 @@ export function VerbConjugation({
   // пара) — раніше видова пара була окремим банером у самому кінці картки
   // (VerbCard.tsx), що виглядало як дубль-за-змістом банер під "Зверніть
   // увагу" відразу під прикладом речення поточного табу.
+  // Пара дієслів руху (однократне ↔ багатократне): текст будуємо тут з поля entry.motion, щоб усі
+  // десять слів пояснювалися однаково, а партнер завжди був посиланням (як видовий партнер).
+  function renderMotionNote(m: NonNullable<VerbEntry["motion"]>): React.ReactNode {
+    const partner = VERBS.find((v) => v.id === m.partnerId);
+    const link = partner ? (
+      navigation ? (
+        <ClickableWord word={partner.cz} wordId={partner.id} kind="verbs" navigation={navigation} mode={linkMode} />
+      ) : (
+        partner.cz
+      )
+    ) : null;
+    return m.kind === "single" ? (
+      <>
+        Однократне дієслово руху — рух в один бік, саме зараз. Для регулярного руху або руху туди й назад є багатократне: {link}.
+      </>
+    ) : (
+      <>
+        Багатократне дієслово руху — регулярний рух або рух туди й назад. Рух в один бік зараз передає однократне: {link}.
+      </>
+    );
+  }
+
   const globalNoteParagraphs: React.ReactNode[] = [
     ...(isPerfective
       ? ["Доконаний вид не має теперішнього часу. Його «теперішня» дієвідміна за значенням є майбутньою."]
       : []),
     ...(entry.aspectPairNote ? [renderAspectPairNote(entry.aspectPairNote)] : []),
+    ...(entry.motion ? [renderMotionNote(entry.motion)] : []),
   ];
 
   return (

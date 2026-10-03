@@ -320,7 +320,7 @@ export const SERVICE_ADVERBS: InvariantWordEntry[] = [
   {
     id: "adv-vzdycky",
     cz: "vždycky",
-    uk: "завжди (розм.)",
+    uk: "завжди (розмовне)",
     examples: [
       { cz: "Vždycky chodím pěšky.", uk: "Я завжди ходжу пішки." },
       { cz: "Vždycky přijde pozdě.", uk: "Він завжди приходить пізно." },

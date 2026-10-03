@@ -13,6 +13,11 @@ import { VerbEntry } from "../types";
 //  - jít/jet мають власне future (půjdu/pojedu);
 //  - доконані мають future = їхня власна дієвідміна (значення майбутнє).
 
+// ДІЄСЛОВА РУХУ: пара «однократне ↔ багатократне» (jít–chodit…) задається полем `motion`
+// ({ kind: "single" | "multi", partnerId }) на ОБОХ членах; це не видова пара, тому aspectPairId
+// і прапорці видів (momentary, delimitativePartner) тут не ставимо. Пояснення на картці будує
+// компонент сам, у aspectPairNote про рух нічого не пишемо.
+//
 // ПРАВИЛА ДОДАВАННЯ ДІЄСЛІВ (квіз і картка покладаються на них; перевіряє
 // scripts/check-verb-quiz.ts):
 //  1. Жодних дублетів "a / b" у формах дієслів — одна кодифікована форма (друга
@@ -34,6 +39,7 @@ export const VERBS: VerbEntry[] = [
     cz: "nést",
     aspect: "imperfective",
     verbClass: "I",
+    motion: { kind: "single", partnerId: "nosit" },
     present: { ja: "nesu", ty: "neseš", on: "nese", my: "neseme", vy: "nesete", oni: "nesou" },
     pastParticiple: { m: "nesl", f: "nesla", n: "neslo", manim_pl: "nesli", other_pl: "nesly" },
     imperative: { ty: "nes", vy: "neste", my: "nesme" },
@@ -73,7 +79,7 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "píšu", ty: "píšeš", on: "píše", my: "píšeme", vy: "píšete", oni: "píšou" },
     pastParticiple: { m: "psal", f: "psala", n: "psalo", manim_pl: "psali", other_pl: "psaly" },
     imperative: { ty: "piš", vy: "pište", my: "pišme" },
-    aspectPairNote: "доконаний партнер: napsat (написати); варіант 1 ос. píši (книжн.)",
+    aspectPairNote: "доконаний партнер: napsat (написати); для «я» є й книжна форма píši",
     aspectPairId: "napsat",
     examples: {
       present: { cz: "Píšu dopis.", uk: "Я пишу лист." },
@@ -109,7 +115,7 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "peču", ty: "pečeš", on: "peče", my: "pečeme", vy: "pečete", oni: "pečou" },
     pastParticiple: { m: "pekl", f: "pekla", n: "peklo", manim_pl: "pekli", other_pl: "pekly" },
     imperative: { ty: "peč", vy: "pečte", my: "pečme" },
-    aspectPairNote: "доконаний партнер: upéct (спекти); інфінітив також péci (книжн.)",
+    aspectPairNote: "доконаний партнер: upéct (спекти); книжна форма інфінітива: péci",
     aspectPairId: "upect",
     examples: {
       present: { cz: "Peču chleba.", uk: "Я печу хліб." },
@@ -723,10 +729,10 @@ export const VERBS: VerbEntry[] = [
     cz: "chodit",
     aspect: "imperfective",
     verbClass: "IV",
+    motion: { kind: "multi", partnerId: "jit" },
     present: { ja: "chodím", ty: "chodíš", on: "chodí", my: "chodíme", vy: "chodíte", oni: "chodí" },
     pastParticiple: { m: "chodil", f: "chodila", n: "chodilo", manim_pl: "chodili", other_pl: "chodily" },
     imperative: { ty: "choď", vy: "choďte", my: "choďme" },
-    aspectPairNote: "багатократне дієслово руху (пор. jít — однократне)",
     examples: {
       present: { cz: "Chodím do školy pěšky.", uk: "Я ходжу до школи пішки." },
       past: { cz: "Chodil jsem do školy pěšky.", uk: "Я ходив до школи пішки." },
@@ -740,10 +746,10 @@ export const VERBS: VerbEntry[] = [
     cz: "nosit",
     aspect: "imperfective",
     verbClass: "IV",
+    motion: { kind: "multi", partnerId: "nest" },
     present: { ja: "nosím", ty: "nosíš", on: "nosí", my: "nosíme", vy: "nosíte", oni: "nosí" },
     pastParticiple: { m: "nosil", f: "nosila", n: "nosilo", manim_pl: "nosili", other_pl: "nosily" },
     imperative: { ty: "nos", vy: "noste", my: "nosme" },
-    aspectPairNote: "багатократне дієслово (пор. nést — однократне)",
     examples: {
       present: { cz: "Nosím brýle.", uk: "Я ношу окуляри." },
       past: { cz: "Nosil jsem brýle.", uk: "Я носив окуляри." },
@@ -962,7 +968,7 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "znám", ty: "znáš", on: "zná", my: "známe", vy: "znáte", oni: "znají" },
     pastParticiple: { m: "znal", f: "znala", n: "znalo", manim_pl: "znali", other_pl: "znaly" },
     imperative: { ty: "znej", vy: "znejte", my: "znejme" },
-    aspectPairNote: "знати особу/місце (пор. vědět — знати факт, umět — вміти)",
+    aspectPairNote: "знати особу/місце; знати факт — vědět, вміти — umět",
     examples: {
       present: { cz: "Znám toho člověka.", uk: "Я знаю цю людину." },
       past: { cz: "Znal jsem toho člověka.", uk: "Я знав цю людину." },
@@ -1048,6 +1054,7 @@ export const VERBS: VerbEntry[] = [
     cz: "jít",
     aspect: "imperfective",
     verbClass: "irregular",
+    motion: { kind: "single", partnerId: "chodit" },
     present: { ja: "jdu", ty: "jdeš", on: "jde", my: "jdeme", vy: "jdete", oni: "jdou" },
     future: { ja: "půjdu", ty: "půjdeš", on: "půjde", my: "půjdeme", vy: "půjdete", oni: "půjdou" },
     pastParticiple: { m: "šel", f: "šla", n: "šlo", manim_pl: "šli", other_pl: "šly" },
@@ -1066,6 +1073,7 @@ export const VERBS: VerbEntry[] = [
     cz: "jet",
     aspect: "imperfective",
     verbClass: "irregular",
+    motion: { kind: "single", partnerId: "jezdit" },
     present: { ja: "jedu", ty: "jedeš", on: "jede", my: "jedeme", vy: "jedete", oni: "jedou" },
     future: { ja: "pojedu", ty: "pojedeš", on: "pojede", my: "pojedeme", vy: "pojedete", oni: "pojedou" },
     pastParticiple: { m: "jel", f: "jela", n: "jelo", manim_pl: "jeli", other_pl: "jely" },
@@ -1087,7 +1095,7 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "vím", ty: "víš", on: "ví", my: "víme", vy: "víte", oni: "vědí" },
     pastParticiple: { m: "věděl", f: "věděla", n: "vědělo", manim_pl: "věděli", other_pl: "věděly" },
     imperative: { ty: "věz", vy: "vězte", my: "vězme" },
-    aspectPairNote: "нерегулярне (3 ос. мн. vědí!); знати факт (пор. znát — бути знайомим). Майбутній складений: budu vědět…",
+    aspectPairNote: "нерегулярне («вони» — vědí!); знати факт, а бути знайомим — znát. Майбутній складений: budu vědět…",
     examples: {
       present: { cz: "Vím, kde bydlíš.", uk: "Я знаю, де ти живеш." },
       past: { cz: "Věděl jsem, kde bydlíš.", uk: "Я знав, де ти живеш." },
@@ -1104,7 +1112,7 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "jím", ty: "jíš", on: "jí", my: "jíme", vy: "jíte", oni: "jedí" },
     pastParticiple: { m: "jedl", f: "jedla", n: "jedlo", manim_pl: "jedli", other_pl: "jedly" },
     imperative: { ty: "jez", vy: "jezte", my: "jezme" },
-    aspectPairNote: "нерегулярне (3 ос. мн. jedí!); доконаний: sníst (з'їсти). Майбутній складений: budu jíst…",
+    aspectPairNote: "нерегулярне («вони» — jedí!); доконаний: sníst (з'їсти). Майбутній складений: budu jíst…",
     examples: {
       present: { cz: "Jím oběd.", uk: "Я їм обід." },
       past: { cz: "Jedl jsem oběd.", uk: "Я їв обід." },
@@ -1120,7 +1128,7 @@ export const VERBS: VerbEntry[] = [
     verbClass: "irregular",
     present: { ja: "mohu", ty: "můžeš", on: "může", my: "můžeme", vy: "můžete", oni: "mohou" },
     pastParticiple: { m: "mohl", f: "mohla", n: "mohlo", manim_pl: "mohli", other_pl: "mohly" },
-    aspectPairNote: "модальне; розм. форми můžu/můžou; інфінітив також moct. Майбутній складений: budu moci…",
+    aspectPairNote: "модальне; у розмові můžu/můžou; інфінітив також moct. Майбутній складений: budu moci…",
     examples: {
       present: { cz: "Můžu ti pomoct.", uk: "Я можу тобі допомогти." },
       past: { cz: "Mohl jsem ti pomoct.", uk: "Я міг тобі допомогти." },
@@ -1151,7 +1159,7 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "umím", ty: "umíš", on: "umí", my: "umíme", vy: "umíte", oni: "umí" },
     pastParticiple: { m: "uměl", f: "uměla", n: "umělo", manim_pl: "uměli", other_pl: "uměly" },
     imperative: { ty: "uměj", vy: "umějte", my: "umějme" },
-    aspectPairNote: "модальне; вміти робити щось (пор. znát, vědět)",
+    aspectPairNote: "модальне; вміти щось робити (знати — znát, vědět)",
     examples: {
       present: { cz: "Umím plavat.", uk: "Я вмію плавати." },
       past: { cz: "Uměl jsem plavat.", uk: "Я вмів плавати." },
@@ -1167,7 +1175,7 @@ export const VERBS: VerbEntry[] = [
     verbClass: "irregular",
     present: { ja: "smím", ty: "smíš", on: "smí", my: "smíme", vy: "smíte", oni: "smí" },
     pastParticiple: { m: "směl", f: "směla", n: "smělo", manim_pl: "směli", other_pl: "směly" },
-    aspectPairNote: "модальне; мати дозвіл (3 ос. мн. також smějí)",
+    aspectPairNote: "модальне; мати дозвіл («вони» також smějí)",
     examples: {
       present: { cz: "Smím vstoupit?", uk: "Мені можна увійти?" },
       past: { cz: "Směl jsem vstoupit.", uk: "Мені було можна увійти." },
@@ -1921,7 +1929,7 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "řeknu", ty: "řekneš", on: "řekne", my: "řekneme", vy: "řeknete", oni: "řeknou" },
     pastParticiple: { m: "řekl", f: "řekla", n: "řeklo", manim_pl: "řekli", other_pl: "řekly" },
     imperative: { ty: "řekni", vy: "řekněte", my: "řekněme" },
-    aspectPairNote: "недоконаний партнер: říkat (казати); інфінітив також říci (книжн.)",
+    aspectPairNote: "недоконаний партнер: říkat (казати); книжна форма інфінітива: říci",
     aspectPairId: "rikat",
     examples: {
       past: { cz: "Řekl jsem pravdu.", uk: "Я сказав правду." },
@@ -2027,7 +2035,7 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "pomohu", ty: "pomůžeš", on: "pomůže", my: "pomůžeme", vy: "pomůžete", oni: "pomohou" },
     pastParticiple: { m: "pomohl", f: "pomohla", n: "pomohlo", manim_pl: "pomohli", other_pl: "pomohly" },
     imperative: { ty: "pomoz", vy: "pomozte", my: "pomozme" },
-    aspectPairNote: "недоконаний партнер: pomáhat (допомагати); розм. 1ос./3мн. pomůžu/pomůžou; інфінітив також pomoci (книжн.)",
+    aspectPairNote: "недоконаний партнер: pomáhat (допомагати); у розмові для «я» і «вони»: pomůžu, pomůžou; книжна форма інфінітива: pomoci",
     aspectPairId: "pomahat",
     examples: {
       past: { cz: "Pomohl jsem mamince.", uk: "Я допоміг мамі." },
@@ -2116,7 +2124,7 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "rozumím", ty: "rozumíš", on: "rozumí", my: "rozumíme", vy: "rozumíte", oni: "rozumějí" },
     pastParticiple: { m: "rozuměl", f: "rozuměla", n: "rozumělo", manim_pl: "rozuměli", other_pl: "rozuměly" },
     imperative: { ty: "rozuměj", vy: "rozumějte", my: "rozumějme" },
-    aspectPairNote: "доконаний партнер: porozumět (зрозуміти); варіант 3мн. (oni) rozumí (від 1993 р.)",
+    aspectPairNote: "доконаний партнер: porozumět (зрозуміти); для «вони» є й варіант rozumí (від 1993 року)",
     aspectPairId: "porozumet",
     examples: {
       present: { cz: "Rozumím ti.", uk: "Я розумію тебе." },
@@ -2245,7 +2253,7 @@ export const VERBS: VerbEntry[] = [
     future: { ja: "poznám", ty: "poznáš", on: "pozná", my: "poznáme", vy: "poznáte", oni: "poznají" },
     pastParticiple: { m: "poznal", f: "poznala", n: "poznalo", manim_pl: "poznali", other_pl: "poznaly" },
     imperative: { ty: "poznej", vy: "poznejte", my: "poznejme" },
-    aspectPairNote: "недоконаний партнер: poznávat (впізнавати); пор. znát — вже знати (без набуття)",
+    aspectPairNote: "недоконаний партнер: poznávat (впізнавати); вже знати, без набуття — znát",
     aspectPairId: "poznavat",
     examples: {
       past: { cz: "Poznal jsem nového kolegu.", uk: "Я познайомився з новим колегою." },
@@ -2351,7 +2359,7 @@ export const VERBS: VerbEntry[] = [
     present: { ja: "bydlím", ty: "bydlíš", on: "bydlí", my: "bydlíme", vy: "bydlíte", oni: "bydlí" },
     pastParticiple: { m: "bydlel", f: "bydlela", n: "bydlelo", manim_pl: "bydleli", other_pl: "bydlely" },
     imperative: { ty: "bydli", vy: "bydlete", my: "bydleme" },
-    aspectPairNote: "самостійне (без пари); пор. žít — жити (загальне), bydlet — саме мешкати десь",
+    aspectPairNote: "самостійне (без пари); bydlet — саме мешкати десь, а жити загалом — žít",
     examples: {
       present: { cz: "Bydlím v Praze.", uk: "Я живу в Празі." },
       past: { cz: "Bydlel jsem v Praze.", uk: "Я жив у Празі." },
@@ -2902,10 +2910,10 @@ export const VERBS: VerbEntry[] = [
     cz: "jezdit",
     aspect: "imperfective",
     verbClass: "IV",
+    motion: { kind: "multi", partnerId: "jet" },
     present: { ja: "jezdím", ty: "jezdíš", on: "jezdí", my: "jezdíme", vy: "jezdíte", oni: "jezdí" },
     pastParticiple: { m: "jezdil", f: "jezdila", n: "jezdilo", manim_pl: "jezdili", other_pl: "jezdily" },
     imperative: { ty: "jezdi", vy: "jezděte", my: "jezděme" },
-    aspectPairNote: "багатократне дієслово руху (пор. jet — однократне)",
     examples: {
       present: { cz: "Do práce jezdím autobusem.", uk: "Я їжджу на роботу автобусом." },
       past: { cz: "Do práce jsem jezdil autobusem.", uk: "Я їздив на роботу автобусом." },
@@ -2920,10 +2928,10 @@ export const VERBS: VerbEntry[] = [
     cz: "letět",
     aspect: "imperfective",
     verbClass: "IV",
+    motion: { kind: "single", partnerId: "letat" },
     present: { ja: "letím", ty: "letíš", on: "letí", my: "letíme", vy: "letíte", oni: "letí" },
     pastParticiple: { m: "letěl", f: "letěla", n: "letělo", manim_pl: "letěli", other_pl: "letěly" },
     imperative: { ty: "leť", vy: "leťte", my: "leťme" },
-    aspectPairNote: "однократне дієслово руху (пор. létat — багатократне)",
     examples: {
       present: { cz: "Letím do Prahy.", uk: "Я лечу до Праги." },
       past: { cz: "Letěl jsem do Prahy.", uk: "Я летів до Праги." },
@@ -2938,10 +2946,10 @@ export const VERBS: VerbEntry[] = [
     cz: "létat",
     aspect: "imperfective",
     verbClass: "V",
+    motion: { kind: "multi", partnerId: "letet" },
     present: { ja: "létám", ty: "létáš", on: "létá", my: "létáme", vy: "létáte", oni: "létají" },
     pastParticiple: { m: "létal", f: "létala", n: "létalo", manim_pl: "létali", other_pl: "létaly" },
     imperative: { ty: "létej", vy: "létejte", my: "létejme" },
-    aspectPairNote: "багатократне дієслово руху (пор. letět — однократне)",
     examples: {
       present: { cz: "Často létám do Vídně.", uk: "Я часто літаю до Відня." },
       past: { cz: "Často jsem létal do Vídně.", uk: "Я часто літав до Відня." },
@@ -2956,10 +2964,10 @@ export const VERBS: VerbEntry[] = [
     cz: "běžet",
     aspect: "imperfective",
     verbClass: "IV",
+    motion: { kind: "single", partnerId: "behat" },
     present: { ja: "běžím", ty: "běžíš", on: "běží", my: "běžíme", vy: "běžíte", oni: "běží" },
     pastParticiple: { m: "běžel", f: "běžela", n: "běželo", manim_pl: "běželi", other_pl: "běžely" },
     imperative: { ty: "běž", vy: "běžte", my: "běžme" },
-    aspectPairNote: "однократне дієслово руху (пор. běhat — багатократне)",
     examples: {
       present: { cz: "Běžím na autobus.", uk: "Я біжу на автобус." },
       past: { cz: "Běžel jsem na autobus.", uk: "Я біг на автобус." },
@@ -2974,10 +2982,10 @@ export const VERBS: VerbEntry[] = [
     cz: "běhat",
     aspect: "imperfective",
     verbClass: "V",
+    motion: { kind: "multi", partnerId: "bezet" },
     present: { ja: "běhám", ty: "běháš", on: "běhá", my: "běháme", vy: "běháte", oni: "běhají" },
     pastParticiple: { m: "běhal", f: "běhala", n: "běhalo", manim_pl: "běhali", other_pl: "běhaly" },
     imperative: { ty: "běhej", vy: "běhejte", my: "běhejme" },
-    aspectPairNote: "багатократне дієслово руху (пор. běžet — однократне)",
     examples: {
       present: { cz: "Každé ráno běhám v parku.", uk: "Щоранку я бігаю в парку." },
       past: { cz: "Každé ráno jsem běhal v parku.", uk: "Щоранку я бігав у парку." },

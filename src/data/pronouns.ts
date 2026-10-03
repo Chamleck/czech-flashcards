@@ -619,7 +619,7 @@ export const PRONOUNS: PronounEntry[] = [
     cz: "sám",
     subtype: "demonstrative",
     declinable: true,
-    vzorLabel: "наз./знах. іменні (sám), решта mladý",
+    vzorLabel: "змішаний: sám (називний, знахідний), решта як mladý",
     declension: {
       masc_anim: {
         nominativ: { sg: "sám", pl: "sami" },
