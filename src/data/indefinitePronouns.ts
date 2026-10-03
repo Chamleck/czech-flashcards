@@ -2,7 +2,8 @@ import { PersonalPronounEntry, PronounEntry } from "../types";
 
 // Неозначені, заперечні й означальні займенники — окрема група в розділі «Займенники».
 // Форми звірено: en.wiktionary (таблиці відмінювання) + dl1.cuni.cz / ÚJČ (подвійне заперечення);
-// nějaký/žádný/každý — повна парадигма за зразком mladý (множина чол. істот.: nějací, žádní, každí).
+// nějaký/žádný/každý — повна парадигма за зразком mladý (множина чол. істот.: nějací, žádní, každí);
+// všechen — власна парадигма (cs.wiktionary + en.wiktionary + dl1.cuni.cz/CJV MUNI, усі збігаються).
 // Вокатива в займенників немає — "—".
 //
 // БЕЗ КВІЗУ: група лише для перегляду й карткового тренування. У квізи «Прикметники та займенники»
@@ -251,6 +252,58 @@ export const INDEFINITE_ADJ: PronounEntry[] = [
       neut: { cz: "Každé auto je jiné.", uk: "Кожне авто інше." },
     },
   },
+  {
+    id: "vsechen-ind",
+    uk: "весь",
+    cz: "všechen",
+    subtype: "indefinite",
+    declinable: true,
+    vzorLabel: "власний зразок (м'який -e-: všeho, všemu)",
+    declension: {
+      masc_anim: {
+        nominativ: { sg: "všechen", pl: "všichni" },
+        genitiv: { sg: "všeho", pl: "všech" },
+        dativ: { sg: "všemu", pl: "všem" },
+        akuzativ: { sg: "všeho", pl: "všechny" },
+        vokativ: { sg: "—", pl: "—" },
+        lokal: { sg: "všem", pl: "všech" },
+        instrumental: { sg: "vším", pl: "všemi" },
+      },
+      masc_inan: {
+        nominativ: { sg: "všechen", pl: "všechny" },
+        genitiv: { sg: "všeho", pl: "všech" },
+        dativ: { sg: "všemu", pl: "všem" },
+        akuzativ: { sg: "všechen", pl: "všechny" },
+        vokativ: { sg: "—", pl: "—" },
+        lokal: { sg: "všem", pl: "všech" },
+        instrumental: { sg: "vším", pl: "všemi" },
+      },
+      fem: {
+        nominativ: { sg: "všechna", pl: "všechny" },
+        genitiv: { sg: "vší", pl: "všech" },
+        dativ: { sg: "vší", pl: "všem" },
+        akuzativ: { sg: "všechnu", pl: "všechny" },
+        vokativ: { sg: "—", pl: "—" },
+        lokal: { sg: "vší", pl: "všech" },
+        instrumental: { sg: "vší", pl: "všemi" },
+      },
+      neut: {
+        nominativ: { sg: "všechno", pl: "všechna" },
+        genitiv: { sg: "všeho", pl: "všech" },
+        dativ: { sg: "všemu", pl: "všem" },
+        akuzativ: { sg: "všechno", pl: "všechna" },
+        vokativ: { sg: "—", pl: "—" },
+        lokal: { sg: "všem", pl: "všech" },
+        instrumental: { sg: "vším", pl: "všemi" },
+      },
+    },
+    examples: {
+      masc_anim: { cz: "Všichni lidé to vědí.", uk: "Усі люди це знають." },
+      masc_inan: { cz: "Snědl jsem všechen chléb.", uk: "Я з'їв увесь хліб." },
+      fem: { cz: "Vypil jsem všechnu vodu.", uk: "Я випив усю воду." },
+      neut: { cz: "Všechno je v pořádku.", uk: "Усе гаразд." },
+    },
+  },
 ];
 
 export const INDEFINITE_ALL: (PersonalPronounEntry | PronounEntry)[] = [...INDEFINITE_CORE, ...INDEFINITE_ADJ];
@@ -264,4 +317,5 @@ export const INDEFINITE_TAG: Record<string, string> = {
   "nic-ind": "заперечний",
   "zadny-ind": "заперечний",
   "kazdy-ind": "означальний",
+  "vsechen-ind": "означальний",
 };

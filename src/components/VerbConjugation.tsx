@@ -8,6 +8,7 @@ import { Speakable } from "./Speakable";
 import { InfoBanner } from "./InfoBanner";
 import { ClickableWord, AppNav } from "./ClickableWord";
 import { PersonFormsTable } from "./PersonFormsTable";
+import { renderNoteWithLinks } from "./NoteLinks";
 import {
   presentForm,
   futureForm,
@@ -133,20 +134,25 @@ export function VerbConjugation({
     return { prefix, word: wordMatch[0], suffix: afterLabel.slice(wordMatch[0].length) };
   }
 
+  // Інші слова примітки (схожі за значенням) — з entry.noteLinks; без navigation/noteLinks повертає текст як є.
+  function withNoteLinks(text: string): React.ReactNode {
+    return renderNoteWithLinks(text, entry.noteLinks, navigation, linkMode);
+  }
+
   function renderAspectPairNote(note: string): React.ReactNode {
     if (navigation && entry.aspectPairId) {
       const parsed = parseAspectPairNote(note);
       if (parsed) {
         return (
           <>
-            {parsed.prefix}
+            {withNoteLinks(parsed.prefix)}
             <ClickableWord word={parsed.word} wordId={entry.aspectPairId} kind="verbs" navigation={navigation} mode={linkMode} />
-            {parsed.suffix}
+            {withNoteLinks(parsed.suffix)}
           </>
         );
       }
     }
-    return note; // без navigation/aspectPairId або нерозпізнаний формат — як і раніше, простий текст
+    return withNoteLinks(note); // без navigation — простий текст; нерозпізнаний формат — лише noteLinks
   }
 
   // Обидва факти нижче — глобальні для слова (не залежать від обраного табу),

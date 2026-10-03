@@ -1326,7 +1326,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             note: [{ text: "у розмові замість který часто ставлять незмінне co, а особу повторюють перед дієсловом: Muž, co jsem ho viděl — те саме, що Muž, kterého jsem viděl." }],
           },
           {
-            term: [{ word: "to", wordId: "ten", kind: "pronouns" }, { text: ", " }, { word: "co", wordId: "co-int", kind: "interrogative" }, { text: " / všechno, " }, { word: "co", wordId: "co-int", kind: "interrogative" }],
+            term: [{ word: "to", wordId: "ten", kind: "pronouns" }, { text: ", " }, { word: "co", wordId: "co-int", kind: "interrogative" }, { text: " / " }, { word: "všechno", wordId: "vsechen-ind", kind: "pronouns" }, { text: ", " }, { word: "co", wordId: "co-int", kind: "interrogative" }],
             note: [{ text: "те, що / все, що: Není všechno zlato, co se třpytí." }],
           },
           {

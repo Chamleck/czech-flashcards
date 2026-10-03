@@ -3,8 +3,7 @@ import { NOUNS } from "../data/nouns";
 import { VERBS } from "../data/verbs";
 import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
-import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
-import { INDEFINITE_ALL } from "../data/indefinitePronouns";
+import { ALL_PRONOUN_ENTRIES } from "./pronounEntries";
 import { INTERROGATIVE_ALL } from "../data/interrogativePronouns";
 import { INTERROGATIVE_ADVERBS } from "../data/interrogativeAdverbs";
 import { INTERROGATIVE_MISC } from "../data/interrogativeMisc";
@@ -58,7 +57,7 @@ export function browseSource(kind: BrowseKind): readonly { id: string; uk: strin
       // Присвійні/вказівні + особові в одному пулі (той самий принцип, що
       // "interrogative" вище) — entryIds, що приходять від конкретної
       // групи/пошуку, самі звужують, які записи реально показуються.
-      return [...PRONOUNS, ...PERSONAL_PRONOUNS, ...INDEFINITE_ALL];
+      return ALL_PRONOUN_ENTRIES;
     default:
       return PRONOUNS;
   }

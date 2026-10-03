@@ -33,15 +33,8 @@ export function renderNoteWithLinks(
   found.forEach((l, i) => {
     if (l.index < cursor) return; // перекриття з попереднім лінком — пропускаємо
     parts.push(note.slice(cursor, l.index));
-    // l.crossKind — лише ФАКТ (ціль в іншому розділі), не команда. Тут, і
-    // ЛИШЕ тут, він інтерпретується в реальний ClickableWord.mode: "replace"
-    // (перегляд словника) стає "crossKind" (3-крокова навігація виправляє
-    // список під карткою на цільовий розділ); будь-який інший контекст,
-    // зокрема тренування, де linkMode взагалі не передається — звичайний
-    // push, "назад" повертає на саму картку, з якої тапнули.
-    const mode = l.crossKind && linkMode === "replace" ? "crossKind" : linkMode;
     parts.push(
-      <ClickableWord key={i} word={l.word} wordId={l.wordId} kind={l.kind} navigation={navigation} mode={mode} />
+      <ClickableWord key={i} word={l.word} wordId={l.wordId} kind={l.kind} navigation={navigation} mode={linkMode} />
     );
     cursor = l.index + l.word.length;
   });

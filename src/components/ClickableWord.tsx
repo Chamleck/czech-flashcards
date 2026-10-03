@@ -3,7 +3,7 @@ import { Text, StyleSheet } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList, BrowseKind } from "../types";
 import { ParagraphSegment } from "../data/grammar";
-import { findSearchEntry } from "../utils/searchIndex";
+import { openLinkedWord } from "../utils/linkNavigation";
 import { theme } from "../utils/theme";
 
 // Generic nav handle usable from ANY screen in the stack (not tied to one
@@ -25,13 +25,11 @@ export type AppNav = NativeStackNavigationProp<RootStackParamList>;
 // САМЕ на BrowseCard, коли клікабельне слово веде на ІНШУ картку слова В ТОМУ
 // САМОМУ розділі (напр. видові партнери дієслів, aby↔kdyby) — інакше тап
 // туди-сюди між двома картками нескінченно роздував би стек навігації.
-// mode="crossKind" — коли ціль з ІНШОГО розділу (інший kind, напр. când у
-// "Службові слова" → kdy у "Питальні слова"): звичайний replace лишив би
-// СПИСОК під карткою від СТАРОГО розділу, і "назад" відкривав би список не
-// того розділу, що показана картка. Замість цього — той самий 3-кроковий
-// push (parentScreen → BrowseList → BrowseCard), що вже дає перехід з
-// пошуку (openSearchResult, WordsPartOfSpeechScreen.tsx) — "назад" тоді веде
-// туди ж, куди привів би звичайний тап по категорії цілі.
+// Вибір між push, replace і перебудовою стека робить НЕ цей компонент, а
+// resolveLinkAction (utils/linkNavigation.ts) за фактичним станом стека: ціль в іншому
+// СПИСКУ (інший розділ чи інша підкатегорія, напр. létat V клас ↔ letět IV клас) дає
+// ланцюжок «меню → розділ → список → картка», картка з тренування чи граматики завжди
+// робить replace (назад → тренування/граматика).
 export function ClickableWord({
   word,
   wordId,
@@ -43,22 +41,10 @@ export function ClickableWord({
   wordId: string;
   kind: BrowseKind;
   navigation: AppNav;
-  mode?: "push" | "replace" | "crossKind";
+  mode?: "push" | "replace";
 }) {
   function onPress() {
-    const entry = findSearchEntry(wordId, kind);
-    if (!entry) return; // wordId не знайдено в словнику — тихо ігноруємо тап
-    const initialIndex = Math.max(0, entry.entryIds.indexOf(entry.id));
-    const params = { kind: entry.kind, entryIds: entry.entryIds, initialIndex, title: entry.title };
-    if (mode === "crossKind") {
-      navigation.push(entry.parentScreen);
-      navigation.push("BrowseList", { kind: entry.kind, entryIds: entry.entryIds, title: entry.title });
-      navigation.push("BrowseCard", params);
-    } else if (mode === "replace") {
-      navigation.replace("BrowseCard", params);
-    } else {
-      navigation.push("BrowseCard", params);
-    }
+    openLinkedWord(navigation, mode, wordId, kind);
   }
 
   return (

@@ -969,6 +969,10 @@ export const VERBS: VerbEntry[] = [
     pastParticiple: { m: "znal", f: "znala", n: "znalo", manim_pl: "znali", other_pl: "znaly" },
     imperative: { ty: "znej", vy: "znejte", my: "znejme" },
     aspectPairNote: "знати особу/місце; знати факт — vědět, вміти — umět",
+    noteLinks: [
+      { word: "vědět", wordId: "vedet", kind: "verbs" },
+      { word: "umět", wordId: "umet", kind: "verbs" },
+    ],
     examples: {
       present: { cz: "Znám toho člověka.", uk: "Я знаю цю людину." },
       past: { cz: "Znal jsem toho člověka.", uk: "Я знав цю людину." },
@@ -1096,6 +1100,9 @@ export const VERBS: VerbEntry[] = [
     pastParticiple: { m: "věděl", f: "věděla", n: "vědělo", manim_pl: "věděli", other_pl: "věděly" },
     imperative: { ty: "věz", vy: "vězte", my: "vězme" },
     aspectPairNote: "нерегулярне («вони» — vědí!); знати факт, а бути знайомим — znát. Майбутній складений: budu vědět…",
+    noteLinks: [
+      { word: "znát", wordId: "znat", kind: "verbs" },
+    ],
     examples: {
       present: { cz: "Vím, kde bydlíš.", uk: "Я знаю, де ти живеш." },
       past: { cz: "Věděl jsem, kde bydlíš.", uk: "Я знав, де ти живеш." },
@@ -1160,6 +1167,10 @@ export const VERBS: VerbEntry[] = [
     pastParticiple: { m: "uměl", f: "uměla", n: "umělo", manim_pl: "uměli", other_pl: "uměly" },
     imperative: { ty: "uměj", vy: "umějte", my: "umějme" },
     aspectPairNote: "модальне; вміти щось робити (знати — znát, vědět)",
+    noteLinks: [
+      { word: "znát", wordId: "znat", kind: "verbs" },
+      { word: "vědět", wordId: "vedet", kind: "verbs" },
+    ],
     examples: {
       present: { cz: "Umím plavat.", uk: "Я вмію плавати." },
       past: { cz: "Uměl jsem plavat.", uk: "Я вмів плавати." },
@@ -2254,6 +2265,9 @@ export const VERBS: VerbEntry[] = [
     pastParticiple: { m: "poznal", f: "poznala", n: "poznalo", manim_pl: "poznali", other_pl: "poznaly" },
     imperative: { ty: "poznej", vy: "poznejte", my: "poznejme" },
     aspectPairNote: "недоконаний партнер: poznávat (впізнавати); вже знати, без набуття — znát",
+    noteLinks: [
+      { word: "znát", wordId: "znat", kind: "verbs" },
+    ],
     aspectPairId: "poznavat",
     examples: {
       past: { cz: "Poznal jsem nového kolegu.", uk: "Я познайомився з новим колегою." },
@@ -2360,6 +2374,9 @@ export const VERBS: VerbEntry[] = [
     pastParticiple: { m: "bydlel", f: "bydlela", n: "bydlelo", manim_pl: "bydleli", other_pl: "bydlely" },
     imperative: { ty: "bydli", vy: "bydlete", my: "bydleme" },
     aspectPairNote: "самостійне (без пари); bydlet — саме мешкати десь, а жити загалом — žít",
+    noteLinks: [
+      { word: "žít", wordId: "zit", kind: "verbs" },
+    ],
     examples: {
       present: { cz: "Bydlím v Praze.", uk: "Я живу в Празі." },
       past: { cz: "Bydlel jsem v Praze.", uk: "Я жив у Празі." },
@@ -2991,6 +3008,31 @@ export const VERBS: VerbEntry[] = [
       past: { cz: "Každé ráno jsem běhal v parku.", uk: "Щоранку я бігав у парку." },
       future: { cz: "Budu běhat v parku.", uk: "Я бігатиму в парку." },
       imperative: { cz: "Běhej každé ráno!", uk: "Бігай щоранку!" },
+    },
+  },
+
+
+  // žít — «жити загалом»; пара з bydlet (мешкати десь). Форми звірено: MorfFlex (UniMorph ces) + IJP-схема,
+  // як у pít: нейтральні -iji/-ijí у таблиці, розмовні -iju/-ijou — у registerNote.
+  {
+    id: "zit",
+    uk: "жити",
+    cz: "žít",
+    aspect: "imperfective",
+    verbClass: "III",
+    present: { ja: "žiji", ty: "žiješ", on: "žije", my: "žijeme", vy: "žijete", oni: "žijí" },
+    pastParticiple: { m: "žil", f: "žila", n: "žilo", manim_pl: "žili", other_pl: "žily" },
+    imperative: { ty: "žij", vy: "žijte", my: "žijme" },
+    registerNote: "я / вони: žiji / žijí (нейтральні) або žiju / žijou (розмовні). Обидва варіанти правильні.",
+    aspectPairNote: "самостійне (без пари); žít — жити загалом, а bydlet — саме мешкати десь",
+    noteLinks: [
+      { word: "bydlet", wordId: "bydlet", kind: "verbs" },
+    ],
+    examples: {
+      present: { cz: "Žiji v Praze.", uk: "Я живу в Празі." },
+      past: { cz: "Žil jsem dlouho v Praze.", uk: "Я довго жив у Празі." },
+      future: { cz: "Budu žít v Praze.", uk: "Я житиму в Празі." },
+      imperative: { cz: "Žij svůj život!", uk: "Живи своїм життям!" },
     },
   },
 

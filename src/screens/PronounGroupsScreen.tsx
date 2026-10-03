@@ -121,7 +121,7 @@ export function PronounGroupsScreen({ navigation }: Props) {
           <PosEmoji name="bustInSilhouette" size={26} />
           <View style={{ flex: 1 }}>
             <Text style={styles.catTitle}>Неозначені та заперечні</Text>
-            <Text style={styles.catHint}>někdo, nikdo, něco, nic, nějaký, žádný, každý</Text>
+            <Text style={styles.catHint}>někdo, nikdo, něco, nic, nějaký, žádný, každý, všechen</Text>
             <Text style={styles.catSub}>
               {INDEFINITE_ALL.length} {plural(INDEFINITE_ALL.length, "слово", "слова", "слів")}
             </Text>

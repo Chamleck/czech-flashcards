@@ -17,11 +17,10 @@ import { ConditionalParticleCard } from "../components/ConditionalParticleCard";
 import { ADJECTIVES } from "../data/adjectives";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
-import { INDEFINITE_ALL } from "../data/indefinitePronouns";
 import { CARDINALS } from "../data/cardinals";
 import { NOUNS } from "../data/nouns";
 import { resolveNumeral } from "../utils/numeralEntries";
-import { resolvePronoun } from "../utils/pronounEntries";
+import { resolvePronoun, ALL_PRONOUN_ENTRIES } from "../utils/pronounEntries";
 import { INTERROGATIVE_ALL } from "../data/interrogativePronouns";
 import { INTERROGATIVE_ADVERBS } from "../data/interrogativeAdverbs";
 import { INTERROGATIVE_MISC } from "../data/interrogativeMisc";
@@ -81,7 +80,7 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       : isMixed
       ? [...CARDINALS, ...ADJECTIVES, ...NOUNS]
       : isPronounMixed
-      ? [...PRONOUNS, ...PERSONAL_PRONOUNS, ...INDEFINITE_ALL]
+      ? ALL_PRONOUN_ENTRIES
       : isInterrogative
       ? [...INTERROGATIVE_ALL, ...INTERROGATIVE_ADVERBS, ...INTERROGATIVE_MISC]
       : isServiceWord

@@ -22,21 +22,22 @@ export interface ResolvedPronoun {
   entry: unknown;
 }
 
-export const ALL_PRONOUN_MIXED_IDS: string[] = [
-  ...PRONOUNS.map((p) => p.id),
-  ...PERSONAL_PRONOUNS.map((p) => p.id),
-  ...INDEFINITE_CORE.map((p) => p.id),
-  ...INDEFINITE_ADJ.map((p) => p.id),
-];
+// Дві форми запису (і дві картки): «без родів» (PersonalPronounCard) та «з табами роду» (AdjPronounCard).
+const CORE_PRONOUNS = [...PERSONAL_PRONOUNS, ...INDEFINITE_CORE];
+const ADJ_PRONOUNS = [...PRONOUNS, ...INDEFINITE_ADJ];
+
+// Усі займенники розділу «Займенники» (три групи) — ЄДИНЕ місце, де вони зібрані докупи
+// (перегляд, тренування, пошук і лічильники помилок беруть список звідси).
+export const ALL_PRONOUN_ENTRIES = [...ADJ_PRONOUNS, ...CORE_PRONOUNS];
+export const ALL_PRONOUN_MIXED_IDS: string[] = ALL_PRONOUN_ENTRIES.map((p) => p.id);
 
 // Неозначені/заперечні (група «Неозначені та заперечні»): někdo/nikdo/něco/nic — без роду,
 // та сама картка, що в особових (PersonalPronounCard); nějaký/žádný/každý — з табами роду,
 // та сама картка, що в присвійних (AdjPronounCard). Дві форми запису, один розділ.
 export function pronounCardType(id: string): PronounCardType | null {
   if (id.startsWith("pp-")) return "personal";
-  if (INDEFINITE_CORE.some((p) => p.id === id)) return "personal";
-  if (PRONOUNS.some((p) => p.id === id)) return "pronoun";
-  if (INDEFINITE_ADJ.some((p) => p.id === id)) return "pronoun";
+  if (CORE_PRONOUNS.some((p) => p.id === id)) return "personal";
+  if (ADJ_PRONOUNS.some((p) => p.id === id)) return "pronoun";
   return null;
 }
 
@@ -45,8 +46,8 @@ export function resolvePronoun(id: string): ResolvedPronoun | null {
   if (!cardType) return null;
   const entry =
     cardType === "personal"
-      ? [...PERSONAL_PRONOUNS, ...INDEFINITE_CORE].find((p) => p.id === id)
-      : [...PRONOUNS, ...INDEFINITE_ADJ].find((p) => p.id === id);
+      ? CORE_PRONOUNS.find((p) => p.id === id)
+      : ADJ_PRONOUNS.find((p) => p.id === id);
   if (!entry) return null;
   return { id, cardType, entry };
 }
