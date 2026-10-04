@@ -80,7 +80,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
               { word: "student", wordId: "student", kind: "nouns" },
               { text: " → studenti, " },
               { word: "pán", wordId: "muz-pan", kind: "nouns" },
-              { text: " → páni. Знахідний однини = родовий однини (бо істота): «vidím studenta»." },
+              { text: " → páni. Знахідний однини = родовий однини (бо істота): «vidím studenta» (бачу студента)." },
             ],
           },
           {
@@ -91,7 +91,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
               { word: "hrad", wordId: "hrad", kind: "nouns" },
               { text: " → hrady, " },
               { word: "stůl", wordId: "stul", kind: "nouns" },
-              { text: " → stoly. Знахідний однини = називний однини (бо неістота): «vidím hrad»." },
+              { text: " → stoly. Знахідний однини = називний однини (бо неістота): «vidím hrad» (бачу замок)." },
             ],
           },
           {
@@ -136,9 +136,9 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-tip",
         segments: [
-          { text: "Щоб визначити рід незнайомого слова — дивись на закінчення називного відмінка й перевіряй за словником. Рід у чеській та українській часто збігається, але не завжди (наприклад чеське 'to " },
+          { text: "Щоб визначити рід незнайомого слова — дивись на закінчення називного відмінка й перевіряй за словником. Рід у чеській та українській часто збігається, але не завжди (наприклад чеське «to " },
           { word: "auto", wordId: "auto", kind: "nouns" },
-          { text: "' — середній рід)." },
+          { text: "» — середній рід)." },
         ],
       },
     ],
@@ -164,12 +164,12 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "rich-list",
         items: [
-          { term: [{ text: "1. Називний" }], note: [{ text: "підмет («хто? що?») і іменна частина присудка після být: Ten pán je učitel." }] },
+          { term: [{ text: "1. Називний" }], note: [{ text: "підмет (хто? що?) і іменна частина присудка після být: Ten pán je učitel (той чоловік — вчитель)." }] },
           { term: [{ text: "2. Родовий" }], note: [{ text: "належність і частина цілого: dům otce (дім батька). Також після числівників 5 і більше (pět studentů) та багатьох прийменників: bez, do, od, z, u." }] },
-          { term: [{ text: "3. Давальний" }], note: [{ text: "кому адресована дія: Dám knihu studentovi. Також після прийменників k, díky, kvůli, proti." }] },
-          { term: [{ text: "4. Знахідний" }], note: [{ text: "прямий додаток («кого? що?»): Vidím psa. Також після pro, přes, skrz і після прийменників руху на питання «куди?»." }] },
-          { term: [{ text: "5. Кличний" }], note: [{ text: "звертання: Pane! Petře! (докладніше нижче)." }] },
-          { term: [{ text: "6. Місцевий" }], note: [{ text: "«де?» і «про що?», завжди з прийменником: Kniha je na stole. Mluvím o práci." }] },
+          { term: [{ text: "3. Давальний" }], note: [{ text: "кому адресована дія: Dám knihu studentovi (дам книгу студентові). Також після прийменників k, díky, kvůli, proti." }] },
+          { term: [{ text: "4. Знахідний" }], note: [{ text: "прямий додаток (кого? що?): Vidím psa (бачу пса). Також після pro, přes, skrz і після прийменників руху на питання «куди?»." }] },
+          { term: [{ text: "5. Кличний" }], note: [{ text: "звертання: Pane! Petře! (пане! Петре!)" }] },
+          { term: [{ text: "6. Місцевий" }], note: [{ text: "«де?» і «про що?», завжди з прийменником: Kniha je na stole (книга на столі). Mluvím o práci (говорю про роботу)." }] },
           { term: [{ text: "7. Орудний" }], note: [{ text: "засіб і супровід: Jedu autem (їду автомобілем). Mluvím s tím mužem (розмовляю з ним)." }] },
         ],
       },
@@ -179,9 +179,9 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           { text: "Прийменник не вимагає ні називного, ні кличного, а місцевий без прийменника не вживається взагалі: форма 6-го відмінка завжди має перед собою v, na, o, po або při." },
           {
             segments: [
-              { text: "Кличний відмінок (5.) в українській теж є (мамо, Петре) — використовується при звертанні. У чеській він активний у щоденному мовленні: '" },
+              { text: "Кличний відмінок (5.) в українській теж є (мамо, Петре) — використовується при звертанні. У чеській він активний у щоденному мовленні: «" },
               { word: "Pane", wordId: "muz-pan", kind: "nouns" },
-              { text: "!', 'Petře!'." },
+              { text: "!», «Petře!»." },
             ],
           },
         ],
@@ -196,27 +196,27 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         items: [
           {
             term: [{ word: "děkovat", wordId: "dekovat", kind: "verbs" }, { text: " + давальний (za + знахідний)" }],
-            note: [{ text: "дякувати кому за що: Děkuji učiteli za pomoc." }],
+            note: [{ text: "дякувати кому за що: Děkuji učiteli za pomoc (дякую вчителеві за допомогу)." }],
           },
           {
             term: [{ word: "pomáhat", wordId: "pomahat", kind: "verbs" }, { text: " + давальний" }],
-            note: [{ text: "допомагати кому: Pomáhám matce." }],
+            note: [{ text: "допомагати кому: Pomáhám matce (допомагаю мамі)." }],
           },
           {
             term: [{ word: "líbit se", wordId: "libit-se", kind: "verbs" }, { text: " + давальний" }],
-            note: [{ text: "подобатися кому: Líbí se mi to auto. Особа — у давальному (mi), річ — підмет." }],
+            note: [{ text: "подобатися кому: Líbí se mi to auto (мені подобається це авто). Особа — у давальному (mi), річ — підмет." }],
           },
           {
             term: [{ word: "čekat", wordId: "cekat", kind: "verbs" }, { text: " + na + знахідний" }],
-            note: [{ text: "чекати на кого/що: Čekám na matku." }],
+            note: [{ text: "чекати на кого/що: Čekám na matku (чекаю на маму)." }],
           },
           {
             term: [{ word: "bát se", wordId: "bat-se", kind: "verbs" }, { text: " + родовий" }],
-            note: [{ text: "боятися кого/чого: Bojím se psa." }],
+            note: [{ text: "боятися кого/чого: Bojím se psa (боюся пса)." }],
           },
           {
             term: [{ word: "ptát se", wordId: "ptat-se", kind: "verbs" }, { text: " koho (родовий) + na + знахідний" }],
-            note: [{ text: "питати кого про що: Ptám se učitele na cestu." }],
+            note: [{ text: "питати кого про що: Ptám se učitele na cestu (питаю вчителя про дорогу)." }],
           },
         ],
       },
@@ -522,7 +522,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       { type: "heading", text: "Кличний відмінок" },
       {
         type: "rich-paragraph",
-        segments: [{ text: "У прикметника кличний відмінок (5.) завжди збігається з називним: «" }, { word: "milý", wordId: "mily", kind: "adjectives" }, { text: " " }, { word: "pane", wordId: "muz-pan", kind: "nouns" }, { text: "!» (milý — як у називному). Окремої форми, як в іменника (pan → pane), прикметник не має: при звертанні змінюється лише сам іменник." }],
+        segments: [{ text: "У прикметника кличний відмінок (5.) завжди збігається з називним: «" }, { word: "milý", wordId: "mily", kind: "adjectives" }, { text: " " }, { word: "pane", wordId: "muz-pan", kind: "nouns" }, { text: "!» (шановний пане!; milý — як у називному). Окремої форми, як в іменника (pan → pane), прикметник не має: при звертанні змінюється лише сам іменник." }],
       },
       {
         type: "rich-tip",
@@ -562,7 +562,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             text: "Порівняння з ніж передається сполучником než: «Praha je větší než Brno» (Прага більша, ніж Брно). Найвищий часто йде з прийменником z/ze: «nejlepší z nás» (найкращий з нас).",
           },
           {
-            segments: [{ text: "Перед суфіксом -ší (і рідше -ější) кінцевий приголосний основи часто чергується — той самий принцип, що й у називному множини чол. істот. (про це вище): k→č (" }, { word: "hezký", wordId: "hezky", kind: "adjectives" }, { text: "→hezčí, " }, { word: "měkký", wordId: "mekky", kind: "adjectives" }, { text: "→měkčí), h→ž (" }, { word: "drahý", wordId: "drahy", kind: "adjectives" }, { text: "→dražší, " }, { word: "ubohý", wordId: "ubohy", kind: "adjectives" }, { text: "→ubožejší), ch→š (" }, { word: "tichý", wordId: "tichy", kind: "adjectives" }, { text: "→tišší). Якщо основа закінчується на -tý/-dý/-ný — приголосний зазвичай не чергується (" }, { word: "mladý", wordId: "mlady", kind: "adjectives" }, { text: "→mladší)." }],
+            segments: [{ text: "Перед суфіксом -ší (і рідше -ější) кінцевий приголосний основи часто чергується — той самий принцип, що й у називному множини чол. істот.: k→č (" }, { word: "hezký", wordId: "hezky", kind: "adjectives" }, { text: "→hezčí, " }, { word: "měkký", wordId: "mekky", kind: "adjectives" }, { text: "→měkčí), h→ž (" }, { word: "drahý", wordId: "drahy", kind: "adjectives" }, { text: "→dražší, " }, { word: "ubohý", wordId: "ubohy", kind: "adjectives" }, { text: "→ubožejší), ch→š (" }, { word: "tichý", wordId: "tichy", kind: "adjectives" }, { text: "→tišší). Якщо основа закінчується на -tý/-dý/-ný — приголосний зазвичай не чергується (" }, { word: "mladý", wordId: "mlady", kind: "adjectives" }, { text: "→mladší)." }],
           },
           {
             text: "Форми вищого й найвищого ступенів самі відмінюються за родами й відмінками (novější → novějšího → novějšímu…) — як звичайний м'який прикметник. Тут ми відпрацьовуємо відмінювання у звичайному ступені; картки на відмінювання ступенів порівняння додамо згодом окремо.",
@@ -665,11 +665,11 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         items: [
           {
             term: [{ word: "nemocný", wordId: "nemocny", kind: "adjectives" }],
-            note: [{ text: "хворий: Doktor mluví s nemocným. Znám tu nemocnou. (Жін. рід: nemocná, nemocné, nemocnou…)" }],
+            note: [{ text: "хворий: Doktor mluví s nemocným (лікар розмовляє з хворим). Znám tu nemocnou (знаю ту хвору). Жіночий рід: nemocná, nemocné, nemocnou…" }],
           },
           {
             term: [{ word: "vedoucí", wordId: "vedouci", kind: "adjectives" }],
-            note: [{ text: "керівник / керівниця: Ptám se vedoucího. Znám novou vedoucí. Відмінюється за м'яким зразком, як jarní." }],
+            note: [{ text: "керівник / керівниця: Ptám se vedoucího (питаю керівника). Znám novou vedoucí (знаю нову керівницю). Відмінюється за м'яким зразком, як jarní." }],
           },
         ],
       },
@@ -807,30 +807,30 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       { type: "heading", text: "Модальні дієслова" },
       {
         type: "paragraph",
-        text: "Модальні дієслова виражають бажання, обов'язок, можливість чи дозвіл і йдуть з інфінітивом: Chci pracovat. Musím pracovat. Může pracovat.",
+        text: "Модальні дієслова виражають бажання, обов'язок, можливість чи дозвіл і йдуть з інфінітивом:",
       },
       {
         type: "rich-list",
         items: [
           {
             term: [{ word: "chtít", wordId: "chtit", kind: "verbs" }],
-            note: [{ text: "хотіти: Chci pracovat. Може мати й додаток у знахідному: Chci nové auto." }],
+            note: [{ text: "хотіти: Chci pracovat (хочу працювати). Може мати й додаток у знахідному: Chci nové auto (хочу нове авто)." }],
           },
           {
             term: [{ word: "muset", wordId: "muset", kind: "verbs" }],
-            note: [{ text: "мусити, бути змушеним: Musím pracovat." }],
+            note: [{ text: "мусити, бути змушеним: Musím pracovat (мушу працювати)." }],
           },
           {
             term: [{ word: "moci", wordId: "moci", kind: "verbs" }],
-            note: [{ text: "могти, мати можливість: Může přijít zítra." }],
+            note: [{ text: "могти, мати можливість: Může přijít zítra (може прийти завтра)." }],
           },
           {
             term: [{ word: "smět", wordId: "smet", kind: "verbs" }],
-            note: [{ text: "мати дозвіл: Smím otevřít okno?" }],
+            note: [{ text: "мати дозвіл: Smím otevřít okno? (чи можна мені відкрити вікно?)" }],
           },
           {
             term: [{ word: "umět", wordId: "umet", kind: "verbs" }],
-            note: [{ text: "уміти, володіти навичкою чи мовою: Umím plavat. Umíte anglicky?" }],
+            note: [{ text: "уміти, володіти навичкою чи мовою: Umím plavat (вмію плавати). Umíte anglicky? (чи володієте ви англійською?)" }],
           },
           {
             term: [{ word: "mít", wordId: "mit", kind: "verbs" }],
@@ -883,11 +883,11 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         items: [
           {
             term: [{ word: "jít", wordId: "jit", kind: "verbs" }, { text: " — " }, { word: "chodit", wordId: "chodit", kind: "verbs" }],
-            note: [{ text: "іти пішки: Jdu domů. (зараз) — Chodím do školy pěšky. (регулярно)" }],
+            note: [{ text: "іти пішки: Jdu domů (іду додому, зараз) — Chodím do školy pěšky (ходжу до школи пішки, регулярно)" }],
           },
           {
             term: [{ word: "jet", wordId: "jet", kind: "verbs" }, { text: " — " }, { word: "jezdit", wordId: "jezdit", kind: "verbs" }],
-            note: [{ text: "їхати транспортом: Jedu do Prahy. (зараз) — Jezdím do Prahy každý týden. (регулярно)" }],
+            note: [{ text: "їхати транспортом: Jedu do Prahy (їду до Праги, зараз) — Jezdím do Prahy každý týden (їжджу до Праги щотижня, регулярно)" }],
           },
           {
             term: [{ text: "Так само" }],
@@ -903,7 +903,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
               { word: "běžet", wordId: "bezet", kind: "verbs" },
               { text: " — " },
               { word: "běhat", wordId: "behat", kind: "verbs" },
-              { text: " (бігти)." },
+              { text: " (бігти)" },
             ],
           },
         ],
@@ -1009,7 +1009,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           {
             term: [{ text: "Творення" }],
             note: [
-              { text: "від основи 3-ї особи множини: dělají → dělej!, prosí → pros!, kupují → kupuj!. Після d/t/n відбувається пом'якшення: vrátit → vrať!, " },
+              { text: "від основи 3-ї особи множини: dělají → dělej!, prosí → pros!, kupují → kupuj! Після d/t/n відбувається пом'якшення: vrátit → vrať!, " },
               { word: "zapomenout", wordId: "zapomenout", kind: "verbs" },
               { text: " → zapomeň!, " },
               { word: "chodit", wordId: "chodit", kind: "verbs" },
@@ -1127,7 +1127,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             note: [
               { text: "відмінюється як прикметник " },
               { word: "jarní", wordId: "jarni", kind: "adjectives" },
-              { text: " (м'який зразок, докладніше в темі «Прикметники»): jejího, jejímu, jejím, jejích. Форма змінюється за відмінком, хоч і схожа на незмінну." },
+              { text: " (м'який зразок): jejího, jejímu, jejím, jejích. Форма змінюється за відмінком, хоч і схожа на незмінну." },
             ],
           },
           {
@@ -1191,7 +1191,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           {
             segments: [
               { word: "svůj", wordId: "svuj", kind: "pronouns" },
-              { text: " (свій) вживають, коли присвійність стосується підмета речення: «Mám rád svůj pokoj» = люблю свою (власну) кімнату. Якщо сказати «můj pokoj», акцент просто на приналежності, без зв'язку з підметом — тому в багатьох реченнях природніше svůj." },
+              { text: " (свій) вживають, коли присвійність стосується підмета речення: «Mám rád svůj pokoj» (люблю свою власну кімнату). Якщо сказати «můj pokoj» (моя кімната), акцент просто на приналежності, без зв'язку з підметом — тому в багатьох реченнях природніше svůj." },
             ],
           },
           {
@@ -1199,7 +1199,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
               { word: "váš", wordId: "vas", kind: "pronouns" },
               { text: " / " },
               { word: "vy", wordId: "pp-vy", kind: "pronouns" },
-              { text: " — це не лише «ваш» до кількох людей, а й ввічливе звертання до однієї особи (як укр. «Ви»): «Je to váš kufr, pane?». Тому váš чуєш і там, де йдеться про одну людину, до якої звертаються шанобливо." },
+              { text: " — це не лише «ваш» до кількох людей, а й ввічливе звертання до однієї особи (як укр. «Ви»): «Je to váš kufr, pane?» (це ваша валіза, пане?). Тому váš чуєш і там, де йдеться про одну людину, до якої звертаються шанобливо." },
             ],
           },
         ],
@@ -1251,11 +1251,11 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           },
           {
             term: [{ word: "ji", wordId: "pp-on", kind: "pronouns" }, { text: " vs " }, { word: "jí", wordId: "pp-on", kind: "pronouns" }, { text: " (вона)" }],
-            note: [{ text: "Знахідний — ji (короткий i): Vidím ji. Решта відмінків (родовий/давальний/місцевий/орудний) — jí (довгий í): bez ní, s ní. Після прийменника скрізь ní." }],
+            note: [{ text: "Знахідний — ji (короткий i): Vidím ji (бачу її). Решта відмінків (родовий/давальний/місцевий/орудний) — jí (довгий í): bez ní, s ní. Після прийменника скрізь ní." }],
           },
           {
             term: [{ text: "Зворотний " }, { word: "se/si", wordId: "pp-se", kind: "pronouns" }],
-            note: [{ text: "Не має називного відмінка (1.) взагалі. se — знахідний (myji se), si — давальний (koupím si). Стосується підмета: Dívám se = дивлюсь на себе/просто дивлюся." }],
+            note: [{ text: "Не має називного відмінка (1.) взагалі. se — знахідний (myji se), si — давальний (koupím si). Стосується підмета: Dívám se (дивлюсь на себе, просто дивлюся)." }],
           },
           {
             term: [
@@ -1278,7 +1278,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       { type: "heading", text: "Неозначені й заперечні — хтось, ніхто" },
       {
         type: "paragraph",
-        text: "Від питальних слів kdo, co утворюються пари з приставками ně- («хтось, щось») і ni- («ніхто, нічого»). Основа відмінюється як у питального слова:",
+        text: "Від питальних слів kdo, co утворюються пари з приставками ně- (хтось, щось) і ni- (ніхто, нічого). Основа відмінюється як у питального слова:",
       },
       {
         type: "rich-list",
@@ -1319,7 +1319,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         items: [
           {
             term: [{ word: "který", wordId: "ktery-int", kind: "interrogative" }],
-            note: [{ text: "який, котрий: Muž, kterého jsem viděl (чоловік, якого я бачив). Žena, se kterou jsem mluvil. Studenti, kteří bydlí v Praze. У книжних текстах трапляється й jenž — він теж змінюється за родом, числом і відмінком." }],
+            note: [{ text: "який, котрий: Muž, kterého jsem viděl (чоловік, якого я бачив). Žena, se kterou jsem mluvil (жінка, з якою я розмовляв). Studenti, kteří bydlí v Praze (студенти, які живуть у Празі). У книжних текстах трапляється й jenž — він теж змінюється за родом, числом і відмінком." }],
           },
           {
             term: [{ word: "co", wordId: "co-int", kind: "interrogative" }],
@@ -1327,11 +1327,11 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           },
           {
             term: [{ word: "to", wordId: "ten", kind: "pronouns" }, { text: ", " }, { word: "co", wordId: "co-int", kind: "interrogative" }, { text: " / " }, { word: "všechno", wordId: "vsechen-ind", kind: "pronouns" }, { text: ", " }, { word: "co", wordId: "co-int", kind: "interrogative" }],
-            note: [{ text: "те, що / все, що: Není všechno zlato, co se třpytí." }],
+            note: [{ text: "те, що / все, що: Není všechno zlato, co se třpytí (не все те золото, що блищить)." }],
           },
           {
             term: [{ word: "ten", wordId: "ten", kind: "pronouns" }, { text: ", " }, { word: "kdo", wordId: "kdo-int", kind: "interrogative" }, { text: " / " }, { word: "kdo", wordId: "kdo-int", kind: "interrogative" }],
-            note: [{ text: "той, хто: Kdo pozdě chodí, sám sobě škodí." }],
+            note: [{ text: "той, хто: Kdo pozdě chodí, sám sobě škodí (хто спізнюється, сам собі шкодить)." }],
           },
         ],
       },
@@ -1376,7 +1376,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         items: [
           { term: "1 → називний однини", note: "jeden dům, jedna žena, jedno auto — узгоджується в роді." },
           { term: "2, 3, 4 → називний множини", note: "dva domy, tři ženy, čtyři auta — іменник у звичайній множині." },
-          { term: "5 і більше → родовий множини", note: "pět domů, šest žen, sedm aut — іменник у родовому множини («numerativ»)." },
+          { term: "5 і більше → родовий множини", note: "pět domů, šest žen, sedm aut — іменник у родовому множини (numerativ)." },
         ],
       },
       {
@@ -1477,15 +1477,15 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         type: "list",
         items: [
           { term: "134", note: "sto třicet čtyři (сто + тридцять + чотири)" },
-          { term: "256", note: "dvě stě padesát šest" },
-          { term: "3 421", note: "tři tisíce čtyři sta dvacet jedna" },
-          { term: "2 000 000", note: "dva miliony" },
-          { term: "8 000 000 000", note: "osm miliard" },
+          { term: "256", note: "dvě stě padesát šest (двісті + п'ятдесят + шість)" },
+          { term: "3 421", note: "tři tisíce čtyři sta dvacet jedna (три тисячі + чотириста + двадцять один)" },
+          { term: "2 000 000", note: "dva miliony (два мільйони)" },
+          { term: "8 000 000 000", note: "osm miliard (вісім мільярдів)" },
         ],
       },
       {
         type: "tip",
-        text: "Кожен шматок (тисячі → сотні → десятки-одиниці) просто йде по черзі своєю формою — не треба узгоджувати їх між собою. Складне лише саме число сотень/тисяч перед іменником, який рахують (про це вище).",
+        text: "Кожен шматок (тисячі → сотні → десятки-одиниці) просто йде по черзі своєю формою — не треба узгоджувати їх між собою. Складне лише саме число сотень/тисяч перед іменником, який рахують.",
       },
       { type: "heading", text: "Вік: je mi … let" },
       {
@@ -1497,15 +1497,15 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         items: [
           {
             term: [{ text: "Kolik je ti let?" }],
-            note: [{ text: "скільки тобі років? Je mi dvacet pět let. А ввічливо: Kolik je vám let?" }],
+            note: [{ text: "скільки тобі років? Je mi dvacet pět let (мені двадцять п'ять років). А ввічливо: Kolik je vám let? (скільки вам років?)" }],
           },
           {
             term: [{ text: "Je mu / jí …" }],
-            note: [{ text: "йому / їй: Je mu deset let. Je jí třicet let." }],
+            note: [{ text: "йому / їй: Je mu deset let (йому десять років). Je jí třicet let (їй тридцять років)." }],
           },
           {
             term: [{ text: "Минулий і майбутній час" }],
-            note: [{ text: "Bylo mi deset let. Bude mi třicet." }],
+            note: [{ text: "Bylo mi deset let (мені було десять років). Bude mi třicet (мені буде тридцять)." }],
           },
         ],
       },
@@ -1518,33 +1518,33 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         items: [
           {
             term: [{ text: "1" }],
-            note: [{ word: "rok", wordId: "rok", kind: "nouns" }, { text: " — Synovi je rok. (синові рік)" }],
+            note: [{ word: "rok", wordId: "rok", kind: "nouns" }, { text: " — Synovi je rok (синові рік)." }],
           },
           {
             term: [{ text: "2, 3, 4" }],
-            note: [{ text: "roky, дієслово у множині: Naší dceři jsou tři roky." }],
+            note: [{ text: "roky, дієслово у множині: Naší dceři jsou tři roky (нашій доньці три роки)." }],
           },
           {
             term: [{ text: "5 і більше" }],
-            note: [{ text: "let, а не roků: Je mi pět let. Це окрема форма (родовий множини від " }, { word: "léto", wordId: "leto", kind: "nouns" }, { text: "), її треба запам'ятати." }],
+            note: [{ text: "let, а не roků: Je mi pět let (мені п'ять років). Це окрема форма (родовий множини від " }, { word: "léto", wordId: "leto", kind: "nouns" }, { text: "), її треба запам'ятати." }],
           },
         ],
       },
       { type: "heading", text: "Гроші й ціни" },
       {
         type: "paragraph",
-        text: "Ціну питають так: Kolik to stojí? Відповідь: Stojí to sto korun. Валюти рахуються за загальним правилом чисел (1 / 2–4 / 5 і більше):",
+        text: "Ціну питають так: Kolik to stojí? (скільки це коштує?) Відповідь: Stojí to sto korun (це коштує сто крон). Валюти рахуються за загальним правилом чисел (1 / 2–4 / 5 і більше):",
       },
       {
         type: "rich-list",
         items: [
           {
             term: [{ word: "koruna", wordId: "koruna", kind: "nouns" }],
-            note: [{ text: "1 koruna, 2–4 koruny, 5 і більше — korun (родовий множини): Stojí to dvacet korun." }],
+            note: [{ text: "1 koruna, 2–4 koruny, 5 і більше — korun (родовий множини): Stojí to dvacet korun (це коштує двадцять крон)." }],
           },
           {
             term: [{ word: "euro", wordId: "euro", kind: "nouns" }],
-            note: [{ text: "середній рід: 1 euro, 2–4 eura, 5 і більше — eur: Stojí to deset eur." }],
+            note: [{ text: "середній рід: 1 euro, 2–4 eura, 5 і більше — eur: Stojí to deset eur (це коштує десять євро)." }],
           },
         ],
       },
@@ -1558,11 +1558,11 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         items: [
           {
             term: [{ text: "Поверхи" }],
-            note: [{ text: "Перший поверх на рівні землі — " }, { word: "přízemí", wordId: "prizemi", kind: "nouns" }, { text: " (нульовий), далі 1. " }, { word: "patro", wordId: "patro", kind: "nouns" }, { text: ", 2. patro… Тобто 1. patro — це другий поверх за українським рахунком: Bydlím v prvním patře. Obchod je v druhém patře." }],
+            note: [{ text: "Перший поверх на рівні землі — " }, { word: "přízemí", wordId: "prizemi", kind: "nouns" }, { text: " (нульовий), далі 1. " }, { word: "patro", wordId: "patro", kind: "nouns" }, { text: ", 2. patro… Тобто 1. patro — це другий поверх за українським рахунком: Bydlím v prvním patře (я живу на другому поверсі). Obchod je v druhém patře (магазин на третьому поверсі)." }],
           },
           {
             term: [{ text: "Місце" }],
-            note: [{ text: "Je na prvním místě. (Він на першому місці.)" }],
+            note: [{ text: "Je na prvním místě (він на першому місці)." }],
           },
         ],
       },
@@ -1662,7 +1662,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       { type: "heading", text: "Котра година: офіційно" },
       {
         type: "rich-paragraph",
-        segments: [{ text: "У формальному контексті (розклади, радіо, вокзал) — 24-годинна система: просто «година хвилина» без слова " }, { word: "hodina", wordId: "hodina", kind: "nouns" }, { text: ". «Je patnáct dvacet» (15:20). Ціла година: «Je patnáct " }, { word: "hodin", wordId: "hodina", kind: "nouns" }, { text: "»." }],
+        segments: [{ text: "У формальному контексті (розклади, радіо, вокзал) — 24-годинна система: просто «година хвилина» без слова " }, { word: "hodina", wordId: "hodina", kind: "nouns" }, { text: ". «Je patnáct dvacet» (15:20). Ціла година: «Je patnáct " }, { word: "hodin", wordId: "hodina", kind: "nouns" }, { text: "» (15:00)." }],
       },
       { type: "heading", text: "Котра година: розмовно" },
       {
@@ -1683,13 +1683,13 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "paragraph",
-        text: "Проміжні хвилини — через «za X minut <опорна точка>»: «za pět minut půl druhé» (за 5 хв пів другої, тобто 1:25), «za deset minut tři čtvrtě na dvě» (1:35).",
+        text: "Проміжні хвилини — через «za X minut <опорна точка>»: «za pět minut půl druhé» (1:25), «za deset minut tři čtvrtě na dvě» (1:35).",
       },
       {
         type: "rich-list",
         items: [
           { term: [{ word: "poledne", wordId: "poledne", kind: "nouns" }, { text: " / " }, { word: "půlnoc", wordId: "pulnoc", kind: "nouns" }], note: [{ text: "v " }, { word: "poledne", wordId: "poledne", kind: "nouns" }, { text: " (опівдні) — але o " }, { word: "půlnoci", wordId: "pulnoc", kind: "nouns" }, { text: " (опівночі): різні прийменники" }] },
-          { term: [{ text: "цілі 2-4" }], note: [{ text: "«Jsou dvě " }, { word: "hodiny", wordId: "hodina", kind: "nouns" }, { text: "», «Jsou tři hodiny» — дієслово в множині; для 1 і 5+ — «Je»" }] },
+          { term: [{ text: "цілі 2-4" }], note: [{ text: "«Jsou dvě " }, { word: "hodiny", wordId: "hodina", kind: "nouns" }, { text: "» (дві години), «Jsou tři hodiny» (три години) — дієслово в множині; для 1 і 5+ — «Je»" }] },
         ],
       },
       { type: "heading", text: "Уточнення: ранок, день чи вечір?" },
@@ -1723,7 +1723,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           },
           {
             term: [{ word: "loni", wordId: "adv-loni", kind: "service-word" }, { text: " / " }, { word: "letos", wordId: "adv-letos", kind: "service-word" }],
-            note: [{ text: "торік / цього року: Letos jedeme na hory." }],
+            note: [{ text: "торік / цього року: Letos jedeme na hory (цього року ми їдемо в гори)." }],
           },
         ],
       },
@@ -1736,15 +1736,15 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         items: [
           {
             term: [{ text: "minulý / příští + " }, { word: "týden", wordId: "tyden", kind: "nouns" }],
-            note: [{ text: "без прийменника, у знахідному: Minulý týden jsem byl v Praze. Příští týden jedeme na hory. Так само: tento týden, příští " }, { word: "měsíc", wordId: "mesic", kind: "nouns" }, { text: ", příští " }, { word: "rok", wordId: "rok", kind: "nouns" }, { text: "." }],
+            note: [{ text: "без прийменника, у знахідному: Minulý týden jsem byl v Praze (минулого тижня я був у Празі). Příští týden jedeme na hory (наступного тижня ми їдемо в гори). Так само: tento týden, příští " }, { word: "měsíc", wordId: "mesic", kind: "nouns" }, { text: ", příští " }, { word: "rok", wordId: "rok", kind: "nouns" }, { text: "." }],
           },
           {
             term: [{ text: "za + знахідний" }],
-            note: [{ text: "через (рахуючи від цього моменту): Za týden mám zkoušku. Vlak odjíždí za pět minut." }],
+            note: [{ text: "через (рахуючи від цього моменту): Za týden mám zkoušku (за тиждень у мене іспит). Vlak odjíždí za pět minut (потяг відправляється за п'ять хвилин)." }],
           },
           {
             term: [{ text: "před + орудний" }],
-            note: [{ text: "тому (назад): Před týdnem jsem byla nemocná. Před třemi roky." }],
+            note: [{ text: "тому (назад): Před týdnem jsem byla nemocná (тиждень тому я хворіла). Před třemi roky (три роки тому)." }],
           },
         ],
       },
@@ -1758,23 +1758,23 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         items: [
           {
             term: [{ word: "vždy", wordId: "adv-vzdy", kind: "service-word" }, { text: " / " }, { word: "vždycky", wordId: "adv-vzdycky", kind: "service-word" }],
-            note: [{ text: "завжди (vždycky — розмовніше)." }],
+            note: [{ text: "завжди (vždycky — розмовніше)" }],
           },
           {
             term: [{ word: "často", wordId: "adv-casto", kind: "service-word" }],
-            note: [{ text: "часто." }],
+            note: [{ text: "часто" }],
           },
           {
             term: [{ word: "obvykle", wordId: "adv-obvykle", kind: "service-word" }],
-            note: [{ text: "зазвичай." }],
+            note: [{ text: "зазвичай" }],
           },
           {
             term: [{ word: "někdy", wordId: "adv-nekdy", kind: "service-word" }],
-            note: [{ text: "іноді." }],
+            note: [{ text: "іноді" }],
           },
           {
             term: [{ word: "nikdy", wordId: "adv-nikdy", kind: "service-word" }],
-            note: [{ text: "ніколи. Дієслово при ньому в запереченні: Nikdy to nedělám." }],
+            note: [{ text: "ніколи; дієслово при ньому — у запереченні: Nikdy to nedělám (я цього ніколи не роблю)." }],
           },
         ],
       },
@@ -1806,39 +1806,39 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           },
           {
             term: [{ word: "do", wordId: "prep-do", kind: "prepositions" }],
-            note: [{ text: "до (всередину/до часу) — «jdu do školy»" }],
+            note: [{ text: "до (всередину/до часу) — «jdu do školy» (йду до школи)" }],
           },
           {
             term: [{ word: "od", wordId: "prep-od", kind: "prepositions" }],
-            note: [{ text: "від — «dopis od kamaráda»" }],
+            note: [{ text: "від — «dopis od kamaráda» (лист від друга)" }],
           },
           {
             term: [{ word: "z / ze", wordId: "prep-z", kind: "prepositions" }],
-            note: [{ text: "з (звідкись) — «vracím se z práce»" }],
+            note: [{ text: "з (звідкись) — «vracím se z práce» (повертаюсь з роботи)" }],
           },
           {
             term: [{ word: "u", wordId: "prep-u", kind: "prepositions" }],
-            note: [{ text: "біля / у когось — «bydlím u nádraží»" }],
+            note: [{ text: "біля / у когось — «bydlím u nádraží» (живу біля вокзалу)" }],
           },
           {
             term: [{ word: "vedle", wordId: "prep-vedle", kind: "prepositions" }],
-            note: [{ text: "поряд — «vedle okna»" }],
+            note: [{ text: "поряд — «vedle okna» (поряд з вікном)" }],
           },
           {
             term: [{ word: "kolem", wordId: "prep-kolem", kind: "prepositions" }],
-            note: [{ text: "навколо / повз — «kolem domu»" }],
+            note: [{ text: "навколо / повз — «kolem domu» (навколо будинку)" }],
           },
           {
             term: [{ word: "kromě", wordId: "prep-kromě", kind: "prepositions" }],
-            note: [{ text: "крім — «všichni kromě Petra»" }],
+            note: [{ text: "крім — «všichni kromě Petra» (всі, крім Петра)" }],
           },
           {
             term: [{ word: "místo", wordId: "prep-misto", kind: "prepositions" }],
-            note: [{ text: "замість — «místo tebe»" }],
+            note: [{ text: "замість — «místo tebe» (замість тебе)" }],
           },
           {
             term: [{ word: "podle", wordId: "prep-podle", kind: "prepositions" }],
-            note: [{ text: "згідно з — «podle návodu»" }],
+            note: [{ text: "згідно з — «podle návodu» (за інструкцією)" }],
           },
         ],
       },
@@ -1848,19 +1848,19 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         items: [
           {
             term: [{ word: "k / ke", wordId: "prep-k", kind: "prepositions" }],
-            note: [{ text: "до (у напрямку) — «jdu k lékaři»" }],
+            note: [{ text: "до (у напрямку) — «jdu k lékaři» (йду до лікаря)" }],
           },
           {
             term: [{ word: "kvůli", wordId: "prep-kvuli", kind: "prepositions" }],
-            note: [{ text: "через (причина) — «kvůli nemoci»" }],
+            note: [{ text: "через (причина) — «kvůli nemoci» (через хворобу)" }],
           },
           {
             term: [{ word: "díky", wordId: "prep-diky", kind: "prepositions" }],
-            note: [{ text: "завдяки — «díky tobě»" }],
+            note: [{ text: "завдяки — «díky tobě» (завдяки тобі)" }],
           },
           {
             term: [{ word: "proti", wordId: "prep-proti", kind: "prepositions" }],
-            note: [{ text: "проти / навпроти — «proti návrhu»" }],
+            note: [{ text: "проти / навпроти — «proti návrhu» (проти пропозиції)" }],
           },
         ],
       },
@@ -1870,19 +1870,19 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         items: [
           {
             term: [{ word: "pro", wordId: "prep-pro", kind: "prepositions" }],
-            note: [{ text: "для / за (піти по когось) — «pro tebe»" }],
+            note: [{ text: "для / за (піти по когось) — «pro tebe» (для тебе)" }],
           },
           {
             term: [{ word: "přes", wordId: "prep-pres", kind: "prepositions" }],
-            note: [{ text: "через (поперек) / понад — «přes most»" }],
+            note: [{ text: "через (поперек) / понад — «přes most» (через міст)" }],
           },
           {
             term: [{ word: "skrz", wordId: "prep-skrz", kind: "prepositions" }],
-            note: [{ text: "крізь — «skrz dav»" }],
+            note: [{ text: "крізь — «skrz dav» (крізь натовп)" }],
           },
           {
             term: [{ word: "mimo", wordId: "prep-mimo", kind: "prepositions" }],
-            note: [{ text: "поза / окрім — «mimo město»" }],
+            note: [{ text: "поза / окрім — «mimo město» (поза містом)" }],
           },
         ],
       },
@@ -1892,7 +1892,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         items: [
           {
             term: [{ word: "při", wordId: "prep-pri", kind: "prepositions" }],
-            note: [{ text: "при / під час — «při práci»" }],
+            note: [{ text: "при / під час — «při práci» (під час роботи)" }],
           },
         ],
       },
@@ -1902,7 +1902,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         items: [
           {
             term: [{ word: "s / se", wordId: "prep-s", kind: "prepositions" }],
-            note: [{ text: "з (разом із) — «s kamarádem»" }],
+            note: [{ text: "з (разом із) — «s kamarádem» (з другом)" }],
           },
         ],
       },
@@ -1926,7 +1926,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             segments: [
               { text: "Не плутай: деякі слова бувають і прийменником, і прислівником. «Stál " },
               { word: "vedle", wordId: "prep-vedle", kind: "prepositions" },
-              { text: " mě» (прийменник + іменник) проти «stál vedle» (прислівник, сам по собі). Прийменник завжди тягне за собою слово в потрібному відмінку." },
+              { text: " mě» (прийменник + іменник) проти «Stál vedle» (прислівник, сам по собі). Прийменник завжди тягне за собою слово в потрібному відмінку." },
             ],
           },
         ],
@@ -1948,8 +1948,8 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "list",
         items: [
-          { term: "куди? → знахідний", note: "Jdu na poštu. Dal boty pod postel. Schoval se za dveře." },
-          { term: "де? → місцевий / орудний", note: "Jsem na poště. Boty jsou pod postelí. Stojí za dveřmi." },
+          { term: "куди? → знахідний", note: "Jdu na poštu (йду на пошту). Dal boty pod postel (поставив черевики під ліжко). Schoval se za dveře (сховався за двері)." },
+          { term: "де? → місцевий / орудний", note: "Jsem na poště (я на пошті). Boty jsou pod postelí (черевики під ліжком). Stojí za dveřmi (стоїть за дверима)." },
         ],
       },
       { type: "heading", text: "Дві групи" },
@@ -1970,7 +1970,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
               { text: ", " },
               { word: "v", wordId: "prep-v", kind: "prepositions" },
             ],
-            note: [{ text: "куди → знахідний (4., akuzativ), де → місцевий (6., lokál): na stůl / na stole" }],
+            note: [{ text: "куди → знахідний (4., akuzativ), де → місцевий (6., lokál): na stůl (на стіл) / na stole (на столі)" }],
           },
           {
             term: [
@@ -1984,7 +1984,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
               { text: ", " },
               { word: "mezi", wordId: "prep-mezi", kind: "prepositions" },
             ],
-            note: [{ text: "куди → знахідний (4., akuzativ), де → орудний (7., instrumentál): pod stůl / pod stolem" }],
+            note: [{ text: "куди → знахідний (4., akuzativ), де → орудний (7., instrumentál): pod stůl (під стіл) / pod stolem (під столом)" }],
           },
         ],
       },
@@ -2010,32 +2010,32 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       { type: "heading", text: "v чи na: яке слово обрати?" },
       {
         type: "paragraph",
-        text: "Простого правила, коли брати v/ve, а коли na, немає — вибір часто задає традиція, тому зручніше запам'ятовувати сполуки. Пари «де? → куди?» такі: v/ve + місцевий ↔ do + родовий, а na + місцевий ↔ na + знахідний.",
+        text: "Простого правила, коли брати v/ve, а коли na, немає — вибір часто задає традиція, тому зручніше запам'ятовувати сполуки. На питання «де?» відповідає v/ve або na + місцевий, а на «куди?» — do + родовий (замість v/ve) або na + знахідний (замість na).",
       },
       {
         type: "rich-list",
         items: [
           {
             term: [{ text: "Країни: здебільшого v — do" }],
-            note: [{ text: "v Itálii — do Itálie, v Polsku — do Polska, v Ukrajině — do Ukrajiny, ve Slovinsku — do Slovinska. Винятки: na Slovensku — na Slovensko, na Moravě — na Moravu." }],
+            note: [{ text: "v Itálii — do Itálie (в Італії — до Італії), v Polsku — do Polska (у Польщі — до Польщі), v Ukrajině — do Ukrajiny (в Україні — до України), ve Slovinsku — do Slovinska (у Словенії — до Словенії). Винятки: na Slovensku — na Slovensko (у Словаччині — до Словаччини), na Moravě — na Moravu (на Мораві — до Моравії)." }],
           },
           {
             term: [{ text: "Гори: здебільшого v — do" }],
-            note: [{ text: "v Jeseníkách — do Jeseníků, v Alpách. Виняток: na Šumavě — na Šumavu." }],
+            note: [{ text: "v Jeseníkách — do Jeseníků (в Єсеніках — до Єсеників), v Alpách (в Альпах). Виняток: na Šumavě — na Šumavu (на Шумаві — на Шумаву)." }],
           },
           {
             term: [{ text: "Пори року" }],
-            note: [{ text: "v " }, { word: "létě", wordId: "leto", kind: "nouns" }, { text: ", v " }, { word: "zimě", wordId: "zima", kind: "nouns" }, { text: " — але na " }, { word: "jaře", wordId: "jaro", kind: "nouns" }, { text: ", na " }, { word: "podzim", wordId: "podzim", kind: "nouns" }, { text: "." }],
+            note: [{ text: "v " }, { word: "létě", wordId: "leto", kind: "nouns" }, { text: " (влітку), v " }, { word: "zimě", wordId: "zima", kind: "nouns" }, { text: " (взимку) — але na " }, { word: "jaře", wordId: "jaro", kind: "nouns" }, { text: " (навесні), na " }, { word: "podzim", wordId: "podzim", kind: "nouns" }, { text: " (восени)." }],
           },
           {
             term: [{ text: "Будівлі й місця" }],
-            note: [{ text: "v " }, { word: "obchodě", wordId: "obchod", kind: "nouns" }, { text: ", ve " }, { word: "škole", wordId: "skola", kind: "nouns" }, { text: ", v " }, { word: "hotelu", wordId: "hotel", kind: "nouns" }, { text: "; na " }, { word: "poště", wordId: "posta", kind: "nouns" }, { text: ", na " }, { word: "nádraží", wordId: "nadrazi", kind: "nouns" }, { text: ", na " }, { word: "úřadě", wordId: "urad", kind: "nouns" }, { text: " (державна установа)." }],
+            note: [{ text: "v " }, { word: "obchodě", wordId: "obchod", kind: "nouns" }, { text: " (у магазині), ve " }, { word: "škole", wordId: "skola", kind: "nouns" }, { text: " (у школі), v " }, { word: "hotelu", wordId: "hotel", kind: "nouns" }, { text: " (у готелі); na " }, { word: "poště", wordId: "posta", kind: "nouns" }, { text: " (на пошті), na " }, { word: "nádraží", wordId: "nadrazi", kind: "nouns" }, { text: " (на вокзалі), na " }, { word: "úřadě", wordId: "urad", kind: "nouns" }, { text: " (в установі)." }],
           },
         ],
       },
       {
         type: "tip",
-        text: "Україна: v Ukrajině / do Ukrajiny — коректна форма, і її вживають дедалі частіше. Традиційно в чеській казали й na Ukrajině / na Ukrajinu: прийменник na тут не має зневажливого відтінку (так пояснює Інститут чеської мови, ÚJČ), це просто усталена звичка мови, тому почути можна обидва варіанти.",
+        text: "Україна: v Ukrajině / do Ukrajiny — коректна форма, і її вживають дедалі частіше. Традиційно в чеській казали й na Ukrajině / na Ukrajinu: прийменник na тут не має зневажливого відтінку (так пояснює Інститут чеської мови), це просто усталена звичка мови, тому почути можна обидва варіанти.",
       },
       { type: "heading", text: "Особливий випадок: za" },
       {
@@ -2214,7 +2214,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
     blocks: [
       {
         type: "paragraph",
-        text: "Чеські питальні слова — це не одна частина мови, а ціла родина \"k-слів\" (за czechency.org — zájmena tázací і zájmenná příslovce tázací), об'єднана функцією: усі вони запитують. Для того, як ставити запитання, зручніше вчити їх разом, ніж розкидати за формальними частинами мови.",
+        text: "Чеські питальні слова — це не одна частина мови, а ціла родина «k-слів» (zájmena tázací і zájmenná příslovce tázací), об'єднана функцією: усі вони запитують. Для того, як ставити запитання, зручніше вчити їх разом, ніж розкидати за формальними частинами мови.",
       },
       { type: "heading", text: "Займенникові — про особу/предмет/ознаку" },
       {
@@ -2264,7 +2264,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           { word: "odkud", wordId: "int-odkud", kind: "interrogative" },
           { text: " (звідки?), " },
           { word: "kudy", wordId: "int-kudy", kind: "interrogative" },
-          { text: " (кудою?, яким шляхом). Детальніше про відповіді на ці питання (vlevo/tam тощо) — розділ «Прислівники місця»." },
+          { text: " (кудою?, яким шляхом). Детальніше про відповіді на ці питання (vlevo, tam) — розділ «Прислівники місця»." },
         ],
       },
       { type: "heading", text: "Інші" },
@@ -2285,7 +2285,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           },
           {
             term: [{ word: "kolik", wordId: "int-kolik", kind: "interrogative" }],
-            note: [{ text: "скільки? — про кількість." }],
+            note: [{ text: "скільки? — про кількість: «Kolik to stojí?» (Скільки це коштує?)" }],
           },
         ],
       },
@@ -2301,7 +2301,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             ],
           },
           {
-            text: "kdy/jak/proč — прозорі відповідники «коли/як/чому», тому окремого квізу для них немає: досить словника і кількох прикладів. А от kde/kam/odkud/kudy тренуються в Флеш-картках («Прислівники місця») — там треба РОЗРІЗНЯТИ, яке питання підходить до конкретного речення.",
+            text: "kdy/jak/proč — прозорі відповідники «коли/як/чому», тому окремого квізу для них немає: досить словника і кількох прикладів. А от kde/kam/odkud/kudy тренуються в Флеш-картках, у розділі «Прислівники місця» — там треба РОЗРІЗНЯТИ, яке питання підходить до конкретного речення.",
           },
         ],
       },
@@ -2324,7 +2324,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
         segments: [
           { word: "pokud", wordId: "conj-pokud", kind: "service-word" },
           {
-            text: " — нейтральний, універсальний вибір «якщо»: працює і в мові, і на письмі, а ще має ДОДАТКОВЕ значення «оскільки, за умови, що» («Budeš zdravá, pokud budeš sportovat»), якого в ",
+            text: " — нейтральний, універсальний вибір «якщо»: працює і в мові, і на письмі, а ще має ДОДАТКОВЕ значення «оскільки, за умови, що» (наприклад «Budeš zdravá, pokud budeš sportovat» — будеш здорова, якщо будеш займатися спортом), якого в ",
           },
           { word: "jestli", wordId: "conj-jestli", kind: "service-word" },
           { text: " немає." },
@@ -2351,7 +2351,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           { text: " і " },
           { word: "přesto", wordId: "adv-presto", kind: "service-word" },
           {
-            text: " — справжні синоніми («проте, однак»): nicméně трохи книжніше/писемне, přesto — нейтральне, однаково природне і в мові, і на письмі. Обидва зазвичай стоять після коми: «Pršelo, přesto jsme šli ven».",
+            text: " — справжні синоніми (проте, однак): nicméně трохи книжніше/писемне, přesto — нейтральне, однаково природне і в мові, і на письмі. Обидва зазвичай стоять після коми: «Pršelo, přesto jsme šli ven» (йшов дощ, проте ми вийшли надвір).",
           },
         ],
       },
@@ -2362,11 +2362,11 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           { text: " і " },
           { word: "přestože", wordId: "conj-prestoze", kind: "service-word" },
           {
-            text: " («хоча») — теж дуже близькі синоніми: за корпусними даними в ~98% випадків виконують ту саму функцію, чіткої стилістичної різниці немає. Практична порада: ačkoli — безпечний нейтральний вибір завжди; головне — не плутати přestože з ",
+            text: " (хоча) — теж дуже близькі синоніми: за корпусними даними майже в 98% випадків виконують ту саму функцію, чіткої стилістичної різниці немає. Практична порада: ačkoli — безпечний нейтральний вибір завжди; головне — не плутати přestože з ",
           },
           { word: "přesto", wordId: "adv-presto", kind: "service-word" },
           {
-            text: " (той самий корінь, різна роль: přestože вводить підрядне речення «хоча...», а přesto — самостійне слово в головному реченні).",
+            text: " (той самий корінь, різна роль: přestože вводить підрядне речення «хоча…», а přesto — самостійне слово в головному реченні).",
           },
         ],
       },
@@ -2389,7 +2389,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             term: [{ word: "aby", wordId: "conj-aby", kind: "service-word" }],
             note: [
               {
-                text: "мета/бажання («щоб»): «Přišel jsem, abych ti pomohl» (Я прийшов, щоб тобі допомогти).",
+                text: "мета/бажання (щоб): «Přišel jsem, abych ti pomohl» (Я прийшов, щоб тобі допомогти).",
               },
             ],
           },
@@ -2397,7 +2397,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
             term: [{ word: "kdyby", wordId: "conj-kdyby", kind: "service-word" }],
             note: [
               {
-                text: "гіпотетична умова («якби»): «Kdybych měl čas, pomohl bych ti» (Якби я мав час, я б тобі допоміг).",
+                text: "гіпотетична умова (якби): «Kdybych měl čas, pomohl bych ti» (Якби я мав час, я б тобі допоміг).",
               },
             ],
           },
@@ -2405,7 +2405,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       },
       {
         type: "tip",
-        text: "Після aby/kdyby-форми дієслово стоїть у дієприкметниковій формі на -l (те саме дієслово, що й у звичайному минулому часі/кондиціоналі, наприклад dělal, pomohl, měl): abych pomohl, kdybych měl тощо. Якщо підмет обох частин речення той самий — простіше вжити інфінітив: «Přišel jsem pomoct» замість «abych pomohl».",
+        text: "Після aby/kdyby-форми дієслово стоїть у дієприкметниковій формі на -l (як у минулому часі й кондиціоналі: dělal, pomohl, měl): abych pomohl, kdybych měl тощо. Якщо підмет обох частин речення той самий — простіше вжити інфінітив: «Přišel jsem pomoct» (я прийшов допомогти) замість «abych pomohl» (щоб допомогти).",
       },
     ],
   },

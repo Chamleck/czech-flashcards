@@ -2,22 +2,32 @@ import { CzechCase, NounEntry, PrepositionEntry, CASE_LABELS, GrammaticalNumber 
 import { PREPOSITIONS } from "../data/prepositions";
 import { NOUNS } from "../data/nouns";
 import { nounUsableAsPartner } from "../data/categories";
+import { validateNounSem } from "../data/nounTags";
+import { CONFUSABLE_PREP_PAIRS, DUAL_FRAMES, DualFrame, EXCHANGE_FRAMES, FIXED_EXCLUDE, FIXED_NEEDS, Needs } from "../data/prepositionPartners";
+import { acceptedForms, candidateNumbers, disjoint, formOf, matchesNeeds, vocalizedPrep } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
 
 // ─────────────────────────── Квіз «Прийменники» ───────────────────────────
 // Одна категорія «Флеш-картки», кілька механік (як «Числівники» / «Час і дата»):
-//   • fixed-noun     — прийменник видно, обери ФОРМУ іменника-партнера (відмінок,
-//                      яким керує прийменник). Дистрактор — інший відмінок партнера.
-//   • fixed-prep     — переклад видно, обери сам ПРИЙМЕННИК. Дистрактор — «сусід
-//                      по відмінку» (той самий відмінок, інше значення) з усіх 29.
-//   • dual           — прийменник видно + taskText явно каже РУХ чи СПОКІЙ; обери
-//                      форму партнера у правильному з двох відмінків. Дистрактор —
-//                      той самий партнер в ІНШОМУ з двох відмінків (плутанина рух/спокій).
-//   • za-exchange    — «za» у сенсі обмін/ціна (знахідний); окремі питання.
+//   • fixed-noun     — прийменник видно, обери ФОРМУ іменника-партнера (відмінок, яким керує прийменник).
+//   • fixed-prep     — переклад видно, обери сам ПРИЙМЕННИК. Дистрактор — «сусід по відмінку» з іншим значенням.
+//   • dual           — прийменник видно + taskText каже НАПРЯМОК/ЦІЛЬ чи СПОКІЙ; обери форму партнера у правильному з
+//                      двох відмінків. Дистрактор — той самий партнер в ІНШОМУ з двох відмінків.
+//   • za-exchange    — «za» у сенсі обмін/ціна (знахідний).
+//
+// ПАРТНЕР (іменник у фразі) підбирається за СМИСЛОВИМИ ТЕГАМИ (data/nounTags.ts), а не навмання з усього
+// словника: фрази природні («Jsem v škole», «Jdu na poštu», «Polož to na stůl»), а новий іменник з правильними
+// тегами потрапляє в усі підхожі фрази автоматично. Вимоги фреймів — data/prepositionPartners.ts.
+//
+// Гарантії кожного питання (перевіряє dev-прогін, див. validate нижче):
+//   1. правильна відповідь і дистрактор — різні форми, жодна прийнятна форма правильної клітинки (дублети,
+//      variants) не стоїть серед дистракторів;
+//   2. вокалізація прийменника (ve/ke/se/ze) класифікована, інакше слово у фразу не береться;
+//   3. слово з множиною лише там, де вона природна; слова лише з множиною (peníze) беруть множину.
 //
 // Контракт питання — спільний із рештою рушіїв: рівно [correct, distractor],
 // comboId = id комбо в пулі НАПРЯМУ (безпечний патерн verb/declension рушіїв,
-// не перерахунок — саме перерахунок ламав ваги в numeral).
+// не перерахунок — саме перерахунок ламав ваги в numeral). Набір комбо й квоти не змінювались.
 
 export interface PrepQuestion {
   comboId: string;
@@ -39,29 +49,15 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-function firstForm(s: string): string {
-  return s.split(" / ")[0];
-}
-
 function collapseVowelLength(s: string): string {
   return s
     .replace(/á/g, "a").replace(/í/g, "i").replace(/é/g, "e").replace(/ó/g, "o")
     .replace(/ú/g, "u").replace(/ů/g, "u").replace(/ý/g, "y").toLowerCase();
 }
 
+// Дистрактор не має відрізнятися від правильної форми лише довжиною голосного (занадто дрібно для вибору).
 function isUsable(correct: string, d: string | null | undefined): d is string {
   return !!d && d !== "—" && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
-}
-
-// Вокалізація прийменника перед словом-партнером (лише безвиняткові випадки).
-function vocalize(prep: string, vocalized: string | undefined, next: string): string {
-  if (!vocalized) return prep;
-  const n = next.toLowerCase();
-  if (prep === "k" && /^[kg]/.test(n)) return vocalized;
-  if (prep === "s" && /^[szšž]/.test(n)) return vocalized;
-  if (prep === "z" && /^[szšž]/.test(n)) return vocalized;
-  if (prep === "v" && /^[fv]/.test(n)) return vocalized;
-  return prep;
 }
 
 const CASES: CzechCase[] = ["nominativ", "genitiv", "dativ", "akuzativ", "lokal", "instrumental"];
@@ -75,98 +71,135 @@ function caseTail(c: CzechCase, n: GrammaticalNumber): string {
   return `${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${NUMBER_LABEL[n]}`;
 }
 
-// Партнер-пул: ті самі фільтри, що в numeral (не декоративні категорії).
-// Незлічувані лишаємо — для прийменників «bez másla» цілком нормально (на відміну
-// від «osm mas» у числівниках), тому НЕ виключаємо uncountable.
+// ─────────────── Пули партнерів ───────────────
+// Партнер-пул: ті самі фільтри, що в numeral (не декоративні категорії: дні, місяці, числівники).
+// Незлічувані лишаємо — «bez másla» цілком нормально (на відміну від «osm mas» у числівниках).
 const PARTNER_POOL = NOUNS.filter((n) => nounUsableAsPartner(n.category));
 
-function randomPartner(): NounEntry {
-  return PARTNER_POOL[Math.floor(Math.random() * PARTNER_POOL.length)];
-}
-
-// Пул злічуваних партнерів (для «mezi» — незлічувані не годяться семантично).
-const COUNTABLE_POOL = PARTNER_POOL.filter(
-  (n) => !(n as unknown as { uncountable?: boolean }).uncountable
-);
-function randomCountablePartner(): NounEntry {
-  return COUNTABLE_POOL[Math.floor(Math.random() * COUNTABLE_POOL.length)];
-}
-
-// Форма партнера в заданому відмінку І числі.
-function partnerFormN(noun: NounEntry, c: CzechCase, n: GrammaticalNumber): string {
-  return firstForm(noun.declension[c][n]);
-}
-
-// Чи можна брати партнера в множині: uncountable (káva, maso…) — тільки однина
-// (множина «másla/vody» як лічильна звучить неприродно, той самий принцип, що в
-// numeral). Решта — можна і множину.
-function pickNumber(noun: NounEntry, forcePlural: boolean): GrammaticalNumber {
-  if (forcePlural) return "pl";
-  // Pluralia tantum (peníze, brýle, kalhoty, ústa) не мають однини: клітинка "—" у відповіді
-  // давала питання «___ —». Те саме навпаки — лише однина.
-  const nom = noun.declension.nominativ;
-  if (nom.sg === "—") return "pl";
-  if (nom.pl === "—") return "sg";
-  if ((noun as unknown as { uncountable?: boolean }).uncountable) return "sg";
-  return Math.random() < 0.5 ? "sg" : "pl";
-}
-
-// Дистрактор у ТОМУ Ж числі, що й correct (щоб тестувався відмінок, а не число):
-// той самий партнер в іншому відмінку. preferCase — «інший з двох» для dual.
-function nounDistractorN(
-  noun: NounEntry,
-  correctCase: CzechCase,
-  n: GrammaticalNumber,
-  correct: string,
-  preferCase?: CzechCase
-): string | null {
-  if (preferCase) {
-    const f = partnerFormN(noun, preferCase, n);
-    if (isUsable(correct, f)) return f;
+const needsPools = new Map<string, NounEntry[]>();
+function poolForNeeds(key: string, needs: Needs): NounEntry[] {
+  let p = needsPools.get(key);
+  if (!p) {
+    p = PARTNER_POOL.filter((n) => matchesNeeds(n, needs));
+    needsPools.set(key, p);
   }
-  // Виключаємо nominativ і vokativ: жоден прийменник ними не керує, тому голий
-  // називний («hrad», «klíč») як дистрактор надто очевидно неправильний після
-  // прийменника. Беремо лише відмінки, якими прийменники реально керують —
-  // так дистрактор правдоподібний (різниця саме у відмінковому закінченні).
-  const distractorCases = CASES.filter(
-    (c) => c !== correctCase && c !== "vokativ" && c !== "nominativ"
-  );
-  for (const cc of shuffle(distractorCases)) {
-    const alt = partnerFormN(noun, cc, n);
-    if (isUsable(correct, alt)) return alt;
+  return p;
+}
+
+// Партнери фіксованого прийменника: «вузькі» — за тегами (FIXED_NEEDS), «широкі» — увесь пул без виключених класів.
+function fixedPool(prepId: string): NounEntry[] {
+  const needs = FIXED_NEEDS[prepId];
+  if (needs) return poolForNeeds(`fixed:${prepId}`, needs);
+  let p = needsPools.get(`fixed:${prepId}`);
+  if (!p) {
+    const banned = FIXED_EXCLUDE[prepId] ?? [];
+    p = PARTNER_POOL.filter((n) => !(n.sem ?? []).some((t) => banned.includes(t)));
+    needsPools.set(`fixed:${prepId}`, p);
+  }
+  return p;
+}
+
+function framePool(prepId: string, kind: string, f: DualFrame): NounEntry[] {
+  return poolForNeeds(`frame:${prepId}:${kind}:${f.text}`, f);
+}
+
+// Слова, придатні хоча б до одного фрейму комбо (прийменник × сенс). Добір іде від СЛОВА, а не від фрейму: слово,
+// що підходить до двадцяти фреймів (most, dům), інакше з'являлося б у двадцять разів частіше за слово з одним.
+const unionPools = new Map<string, NounEntry[]>();
+function unionPool(prepId: string, kind: string, frames: DualFrame[]): NounEntry[] {
+  const key = `${prepId}:${kind}`;
+  let u = unionPools.get(key);
+  if (!u) {
+    const seen = new Set<string>();
+    u = [];
+    for (const f of frames) for (const n of framePool(prepId, kind, f)) if (!seen.has(n.id)) { seen.add(n.id); u.push(n); }
+    unionPools.set(key, u);
+  }
+  return u;
+}
+
+// Перший придатний кандидат у ВИПАДКОВОМУ порядку: рівномірний серед придатних і повний (знаходить, якщо
+// хоч один є — питання не губиться через невдалу вибірку).
+function firstValid<T>(cands: NounEntry[], tryOne: (n: NounEntry) => T | null): T | null {
+  for (const n of shuffle(cands)) {
+    const r = tryOne(n);
+    if (r) return r;
   }
   return null;
+}
+
+// Дистрактор до фіксованого прийменника / обміну: той самий партнер в іншому відмінку, у ТОМУ Ж числі.
+// Виключаємо nominativ і vokativ (жоден прийменник ними не керує — надто очевидно) та будь-який відмінок,
+// форма якого збігається з прийнятою формою правильної клітинки (дублет чи variants).
+function nounDistractor(noun: NounEntry, correctCase: CzechCase, n: GrammaticalNumber, correct: string): string | null {
+  const target = acceptedForms(noun, correctCase, n);
+  for (const cc of shuffle(CASES.filter((c) => c !== correctCase && c !== "nominativ"))) {
+    const f = formOf(noun, cc, n);
+    if (!isUsable(correct, f)) continue;
+    if (!disjoint(target, acceptedForms(noun, cc, n))) continue;
+    return f;
+  }
+  return null;
+}
+
+// Дистрактор для dual: форма ІНШОГО з двох відмінків (рух ↔ спокій). Якщо вона збігається з правильною або
+// відрізняється лише довжиною голосного (restauraci / restaurací — саме те, що учень має розрізняти, але вибір
+// «лише за довжиною» не годиться для питання), беремо будь-який інший відмінок, як і раніше.
+function dualDistractor(noun: NounEntry, c: CzechCase, otherCase: CzechCase, num: GrammaticalNumber, correct: string): string | null {
+  const other = formOf(noun, otherCase, num);
+  if (isUsable(correct, other) && disjoint(acceptedForms(noun, c, num), acceptedForms(noun, otherCase, num))) return other;
+  return nounDistractor(noun, c, num, correct);
 }
 
 // ─────────────── Підтип fixed-noun ───────────────
 function buildFixedNoun(prep: PrepositionEntry): PrepQuestion | null {
   const c = prep.govCase;
-  const noun = randomPartner();
-  const n = pickNumber(noun, false);
-  const correct = partnerFormN(noun, c, n);
-  const distractor = nounDistractorN(noun, c, n, correct);
-  if (!isUsable(correct, distractor)) return null;
-
-  const prepShown = vocalize(prep.cz, prep.vocalized, correct);
+  const pick = firstValid(fixedPool(prep.id), (noun) => {
+    for (const num of candidateNumbers(noun, "any")) {
+      const correct = formOf(noun, c, num);
+      if (!correct) continue;
+      const shown = vocalizedPrep(prep, correct);
+      if (shown === null) continue;
+      const distractor = nounDistractor(noun, c, num, correct);
+      if (distractor) return { num, correct, distractor, shown };
+    }
+    return null;
+  });
+  if (!pick) return null;
   return {
     comboId: comboId(prep.id, "fixnoun", c),
     promptWord: prep.cz,
     promptUk: prep.uk,
     promptLabel: "прийменник",
-    taskText: `Оберіть форму іменника після «${prep.cz}»: ${caseTail(c, n)}`,
-    contextPhrase: `${prepShown} ___`,
-    correct,
-    options: shuffle([correct, distractor]),
+    taskText: `Оберіть форму іменника після «${prep.cz}»: ${caseTail(c, pick.num)}`,
+    contextPhrase: `${pick.shown} ___`,
+    correct: pick.correct,
+    options: shuffle([pick.correct, pick.distractor]),
   };
 }
 
 // ─────────────── Підтип fixed-prep ───────────────
-// Дистрактор — інший прийменник ТОГО САМОГО відмінка (з усіх 29: fixed за govCase,
-// dual за релевантним сенсом), щоб тестувати значення, а не вгадування за формою.
+// Дистрактор — інший прийменник ТОГО САМОГО відмінка (з усіх: fixed за govCase, dual за релевантним сенсом),
+// щоб тестувати значення, а не вгадування за формою.
+function glossWords(uk: string): Set<string> {
+  return new Set(uk.toLowerCase().split(/[^а-яіїєґ']+/).filter(Boolean));
+}
+
+// «Сусід» не має ділити жодного слова з українським значенням правильного: інакше обидві відповіді підходять
+// за змістом (u «біля / у (когось)» ↔ vedle «поряд із / біля»: «Bydlím u/vedle nádraží»).
+function sharesMeaning(a: PrepositionEntry, b: PrepositionEntry): boolean {
+  const wa = glossWords(a.uk);
+  for (const w of glossWords(b.uk)) if (wa.has(w)) return true;
+  return false;
+}
+
 function prepsGoverning(c: CzechCase, exceptId: string): PrepositionEntry[] {
   const out: PrepositionEntry[] = [];
+  const self = PREPOSITIONS.find((x) => x.id === exceptId);
   for (const p of PREPOSITIONS) {
     if (p.id === exceptId) continue;
+    if (self && sharesMeaning(self, p)) continue;
+    if (CONFUSABLE_PREP_PAIRS.some(([x, y]) => (x === exceptId && y === p.id) || (y === exceptId && x === p.id))) continue;
     if (p.type === "fixed") {
       if (p.govCase === c) out.push(p);
     } else if (p.dual) {
@@ -178,77 +211,37 @@ function prepsGoverning(c: CzechCase, exceptId: string): PrepositionEntry[] {
 
 function buildFixedPrep(prep: PrepositionEntry): PrepQuestion | null {
   const c = prep.govCase;
-  const neighbors = prepsGoverning(c, prep.id);
-  if (neighbors.length === 0) return null;
-  const distractorPrep = neighbors[Math.floor(Math.random() * neighbors.length)];
-  const noun = randomPartner();
-  const n = pickNumber(noun, false);
-  const correctForm = partnerFormN(noun, c, n);
-
-  const correct = prep.cz;
-  const distractor = distractorPrep.cz;
-  if (correct === distractor) return null;
-
-  return {
-    comboId: comboId(prep.id, "fixprep", c),
-    promptWord: prep.uk,
-    promptUk: "",
-    promptLabel: "прийменник",
-    taskText: `Який прийменник підходить за змістом? Керує відмінком ${caseTail(c, n)}`,
-    contextPhrase: `___ ${correctForm}`,
-    correct,
-    options: shuffle([correct, distractor]),
-  };
+  // Партнер береться за правилами ПРАВИЛЬНОГО прийменника; обидва варіанти відповіді показуємо з вокалізацією
+  // перед цим словом («ke klukům», а не «k klukům»), тому слово має бути класифіковане для обох.
+  for (const nb of shuffle(prepsGoverning(c, prep.id))) {
+    const pick = firstValid(fixedPool(prep.id), (noun) => {
+      for (const num of candidateNumbers(noun, "any")) {
+        const form = formOf(noun, c, num);
+        if (!form) continue;
+        const a = vocalizedPrep(prep, form);
+        const b = vocalizedPrep(nb, form);
+        if (a !== null && b !== null && a !== b) return { num, form, a, b };
+      }
+      return null;
+    });
+    if (pick) {
+      return {
+        comboId: comboId(prep.id, "fixprep", c),
+        promptWord: prep.uk,
+        promptUk: "",
+        promptLabel: "прийменник",
+        taskText: `Який прийменник підходить за змістом? Керує відмінком ${caseTail(c, pick.num)}`,
+        contextPhrase: `___ ${pick.form}`,
+        correct: pick.a,
+        options: shuffle([pick.a, pick.b]),
+      };
+    }
+  }
+  return null;
 }
 
-// ─────────────── Підтип dual (рух/спокій) ───────────────
+// ─────────────── Підтип dual (напрямок/спокій) ───────────────
 type DualSense = "motion" | "location";
-
-// Фрейми під квіз для КОЖНОГО з 9 дуальних прийменників окремо (не один спільний
-// на всі — узькі значення o/po/v не узагальнюються довільним дієсловом). Виведені
-// з уже звірених прикладів у prepositions.ts: беремо дієслівну частину, іменник
-// замінюємо на пропуск. По 2 фрейми на сенс для різноманітності. Партнер
-// підставляється генеративно з PARTNER_POOL — словник іменників так само
-// продовжить розширювати варіативність (той самий патерн, що adj-pron/numeral).
-// "{p}" — місце прийменника (з урахуванням вокалізації), "___" — пропуск партнера.
-const DUAL_FRAMES: Record<string, { motion: string[]; location: string[] }> = {
-  "prep-na": {
-    motion: ["Jdu {p} ___", "Polož to {p} ___", "Čekám {p} ___"],
-    location: ["Jsem {p} ___", "Kniha leží {p} ___", "Sedím {p} ___"],
-  },
-  "prep-o": {
-    motion: ["Opřel to {p} ___", "Zakopl {p} ___", "Požádal {p} ___"],
-    location: ["Mluvíme {p} ___", "Přemýšlím {p} ___", "Vím {p} ___"],
-  },
-  "prep-po": {
-    motion: ["Voda sahá {p} ___", "Čekej {p} ___", "Bylo mu to {p} ___"],
-    location: ["Chodím {p} ___", "Přijdu {p} ___", "Šel {p} ___"],
-  },
-  "prep-v": {
-    motion: ["Věřím {p} ___", "Proměnil se {p} ___", "Doufám {p} ___"],
-    location: ["Jsem {p} ___", "Bydlím {p} ___", "Pracuji {p} ___"],
-  },
-  "prep-nad": {
-    motion: ["Pověsil to {p} ___", "Vzlétl {p} ___", "Přišel {p} ___"],
-    location: ["Obraz visí {p} ___", "Slunce je {p} ___", "Bydlím {p} ___"],
-  },
-  "prep-pod": {
-    motion: ["Dal to {p} ___", "Vlezl {p} ___", "Přišel {p} ___"],
-    location: ["Boty jsou {p} ___", "Spí {p} ___", "Najdeš to {p} ___"],
-  },
-  "prep-pred": {
-    motion: ["Postavil to {p} ___", "Předstoupil {p} ___", "Přišel {p} ___"],
-    location: ["Auto stojí {p} ___", "Čekám {p} ___", "Zaparkoval {p} ___"],
-  },
-  "prep-za": {
-    motion: ["Schoval se {p} ___", "Zašel {p} ___", "Přišel {p} ___"],
-    location: ["Stojí {p} ___", "Zahrada je {p} ___", "Bydlí {p} ___"],
-  },
-  "prep-mezi": {
-    motion: ["Sedl si {p} ___", "Vložil to {p} ___", "Přišel {p} ___"],
-    location: ["Sedí {p} ___", "Je to {p} ___", "Bydlím {p} ___"],
-  },
-};
 
 function buildDual(prep: PrepositionEntry, sense: DualSense): PrepQuestion | null {
   if (!prep.dual) return null;
@@ -256,34 +249,38 @@ function buildDual(prep: PrepositionEntry, sense: DualSense): PrepQuestion | nul
   const otherData = sense === "motion" ? prep.dual.location : prep.dual.motion;
   const c = senseData.govCase;
   const otherCase = otherData.govCase;
+  const frames = DUAL_FRAMES[prep.id]?.[sense];
+  if (!frames || frames.length === 0) return null;
 
-  // «mezi» семантично вимагає МНОЖИНИ партнера («між будинками», не «між
-  // будинком») — єдиний виняток з 9; решта беруть однину.
-  // «mezi» семантично вимагає МНОЖИНИ («між будинками», не «між будинком») і
-  // НЕ працює з незлічуваними («mezi vodami/másly» — і множина, і зміст абсурдні),
-  // тому для mezi беремо злічуваного партнера; решта — будь-який, sg/pl випадково.
-  const forceMezi = prep.cz === "mezi";
-  const noun = forceMezi ? randomCountablePartner() : randomPartner();
-  const num = pickNumber(noun, forceMezi);
-  const correct = partnerFormN(noun, c, num);
-  // Дистрактор — той самий партнер у ТОМУ Ж числі, але в ІНШОМУ з двох відмінків.
-  const distractor = nounDistractorN(noun, c, num, correct, otherCase);
-  if (!isUsable(correct, distractor)) return null;
+  // Слово — рівномірно серед придатних до комбо (а не фрейм-першим: див. unionPool); фрейм — рівномірно
+  // серед тих, куди слово підходить і де вийшла коректна пара форм.
+  const pick = firstValid(unionPool(prep.id, sense, frames), (noun) => {
+    for (const frame of shuffle(frames.filter((f) => matchesNeeds(noun, f)))) {
+      for (const num of candidateNumbers(noun, frame.num ?? "sg")) {
+        const correct = formOf(noun, c, num);
+        if (!correct) continue;
+        const shown = vocalizedPrep(prep, correct);
+        if (shown === null) continue;
+        const distractor = dualDistractor(noun, c, otherCase, num, correct);
+        if (distractor) return { frame, num, correct, distractor, shown };
+      }
+    }
+    return null;
+  });
+  if (!pick) return null;
 
-  const prepShown = vocalize(prep.cz, prep.vocalized, correct);
-  const frames = DUAL_FRAMES[prep.id]?.[sense] ?? ["{p} ___"];
-  const frame = frames[Math.floor(Math.random() * frames.length)];
-  const contextPhrase = frame.replace("{p}", prepShown);
-  const senseUk = sense === "motion" ? "рух — куди?" : "спокій / дія без напрямку — де?";
+  // Знахідний = напрямок/ціль (рух АБО об'єкт дії: «Věřím v tebe», «Čekám na autobus»): «рух — куди?» було б
+  // хибним для таких фреймів.
+  const senseUk = sense === "motion" ? "напрямок / ціль — куди? у що?" : "спокій / дія без напрямку — де?";
   return {
     comboId: comboId(prep.id, `dual-${sense}`, c),
     promptWord: prep.cz,
     promptUk: prep.uk,
     promptLabel: "прийменник",
-    taskText: `«${prep.cz}» — ${senseUk} Оберіть форму: ${caseTail(c, num)}`,
-    contextPhrase,
-    correct,
-    options: shuffle([correct, distractor]),
+    taskText: `«${prep.cz}» — ${senseUk} Оберіть форму: ${caseTail(c, pick.num)}`,
+    contextPhrase: pick.frame.text.replace("{p}", pick.shown),
+    correct: pick.correct,
+    options: shuffle([pick.correct, pick.distractor]),
   };
 }
 
@@ -291,23 +288,45 @@ function buildDual(prep: PrepositionEntry, sense: DualSense): PrepQuestion | nul
 function buildZaExchange(prep: PrepositionEntry): PrepQuestion | null {
   if (!prep.dual?.exchange) return null;
   const c = prep.dual.exchange.govCase; // akuzativ
-  const noun = randomPartner();
-  const n = pickNumber(noun, false);
-  const correct = partnerFormN(noun, c, n);
-  const distractor = nounDistractorN(noun, c, n, correct);
-  if (!isUsable(correct, distractor)) return null;
-
+  const frame = EXCHANGE_FRAMES[Math.floor(Math.random() * EXCHANGE_FRAMES.length)];
+  const pick = firstValid(framePool(prep.id, "exchange", frame), (noun) => {
+    for (const num of candidateNumbers(noun, frame.num ?? "sg")) {
+      const correct = formOf(noun, c, num);
+      if (!correct) continue;
+      const distractor = nounDistractor(noun, c, num, correct);
+      if (distractor) return { num, correct, distractor };
+    }
+    return null;
+  });
+  if (!pick) return null;
   return {
     comboId: comboId(prep.id, "za-exchange", c),
     promptWord: prep.cz,
     promptUk: "за (обмін / ціна)",
     promptLabel: "прийменник",
-    taskText: `«za» — обмін / ціна (скільки заплатив). Оберіть форму: ${caseTail(c, n)}`,
-    contextPhrase: `Zaplatil jsem za ___`,
-    correct,
-    options: shuffle([correct, distractor]),
+    taskText: `«za» — обмін / ціна (скільки заплатив). Оберіть форму: ${caseTail(c, pick.num)}`,
+    contextPhrase: frame.text.replace("{p}", prep.cz),
+    correct: pick.correct,
+    options: shuffle([pick.correct, pick.distractor]),
   };
 }
+
+// ─────────────── Dev-перевірка даних (лише у dev-збірці, нічого не блокує) ───────────────
+// Попереджає, коли додане слово чи фрейм ламає припущення: порожні/суперечливі теги, фрейм із замалим пулом,
+// слово, яке не береться у фрази з v/k/s/z через неописану початкову групу приголосних.
+function devCheckData(): void {
+  const issues: string[] = [];
+  for (const n of NOUNS) issues.push(...validateNounSem(n));
+  const small = (label: string, n: number, min: number) => {
+    if (n < min) issues.push(`пул «${label}» має лише ${n} слів (потрібно ≥ ${min})`);
+  };
+  for (const [pid, f] of Object.entries(DUAL_FRAMES)) {
+    for (const sense of ["motion", "location"] as DualSense[]) for (const fr of f[sense]) small(`${pid}.${sense} «${fr.text}»`, framePool(pid, sense, fr).length, 3);
+  }
+  for (const pid of Object.keys(FIXED_NEEDS)) small(`${pid} (вузький)`, fixedPool(pid).length, 8);
+  if (issues.length > 0) console.warn(`prepositionQuiz: ${issues.length} зауваж.:\n  ` + issues.slice(0, 25).join("\n  "));
+}
+if (typeof __DEV__ !== "undefined" && __DEV__) devCheckData();
 
 // ─────────────── Пул комбінацій ───────────────
 type PrepKind = "fixnoun" | "fixprep" | "dual" | "exchange";

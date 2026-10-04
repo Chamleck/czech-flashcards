@@ -7,7 +7,29 @@ import { NounEntry } from "../types";
 //
 // УВАГА: варіантні форми (напр. dativ pánovi/pánu) подано через "/". Це нормативні
 // дублети сучасної чеської. Рекомендована звірка з носієм перед фінальним релізом.
-
+//
+// ПРАВИЛА ДОДАВАННЯ ІМЕННИКІВ
+//  1. Усі 14 клітинок (7 відмінків × 2 числа) заповнені; «—» лише для pluralia / singularia tantum
+//     (вся форма одного числа): peníze, brýle, kalhoty, ústa — без однини. Рушії квізу самі обирають число.
+//     Дублети через « / »: перша форма — та, яку показуємо як правильну.
+//  2. category — з data/categories.ts. Дні й місяці/пори року (unsuitableAsPartner) у «чужі» речення
+//     не підставляються.
+//  3. sem — ОБОВ'ЯЗКОВЕ поле: смислові теги з data/nounTags.ts (кожен тег має пояснення й приклади в
+//     NOUN_TAG_DOC). Без sem проєкт не збереться. За тегами квіз «Прийменники» САМ вирішує, у які фрази
+//     слово підходить («Jsem v ___» — placeV, «Polož to na ___» — surface, «Čekám na ___» — person…):
+//     список фраз не редагуємо. Правила:
+//       • став лише ті теги, про які можеш сказати «так» без вагань; зайвий тег = неприродна фраза в квізі,
+//         бракуючий тег = слово просто рідше з'являється (безпечно);
+//       • місце ЗАВЖДИ має рівно один із placeV (в школі) чи placeNa (на пошті) — це лексична властивість
+//         слова; перевір за словником, а не за відчуттям;
+//       • особа, тварина, їжа, час, погода, гроші, документ, тіло — «самотні» теги (без інших);
+//       • dev-збірка пише в консоль, якщо набір тегів суперечливий (validateNounSem).
+//  4. variants (необов'язково) — прийнятні, але НЕ показані на картці форми клітинки, що збігаються з формою
+//     ІНШОГО відмінка цього слова (родовий kostel: kostela, але вживають і kostelu = давальний). Квіз не подасть
+//     таку форму як помилкову відповідь. Знайти такі випадки можна звіркою зі словником форм (MorfFlex).
+//  5. Початкова група приголосних слова, якої ще немає в CLUSTER_RULES (data/prepositionPartners.ts), не дає
+//     взяти слово у фрази з v/k/s/z (ve/ke/se/ze неочевидні): додай рядок у CLUSTER_RULES, якщо знаєш правило.
+//
 export const NOUNS: NounEntry[] = [
   // ─────────────── pán (чол. істот., твердий) ───────────────
   {
@@ -17,6 +39,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "people",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "pán", pl: "páni / pánové" },
       genitiv: { sg: "pána", pl: "pánů" },
@@ -36,6 +59,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "people",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "student", pl: "studenti / studentové" },
       genitiv: { sg: "studenta", pl: "studentů" },
@@ -57,6 +81,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "muz",
     category: "people",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "muž", pl: "muži / mužové" },
       genitiv: { sg: "muže", pl: "mužů" },
@@ -76,6 +101,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "muz",
     category: "work",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "učitel", pl: "učitelé" },
       genitiv: { sg: "učitele", pl: "učitelů" },
@@ -97,6 +123,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "city",
+    sem: ["building", "placeNa", "outdoor"],
     declension: {
       nominativ: { sg: "hrad", pl: "hrady" },
       genitiv: { sg: "hradu", pl: "hradů" },
@@ -116,6 +143,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
+    sem: ["surface", "space", "support", "furniture"],
     declension: {
       nominativ: { sg: "stůl", pl: "stoly" },
       genitiv: { sg: "stolu", pl: "stolů" },
@@ -137,6 +165,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "home",
+    sem: ["item", "support"],
     declension: {
       nominativ: { sg: "stroj", pl: "stroje" },
       genitiv: { sg: "stroje", pl: "strojů" },
@@ -156,6 +185,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "home",
+    sem: ["placeV", "residence"],
     declension: {
       nominativ: { sg: "pokoj", pl: "pokoje" },
       genitiv: { sg: "pokoje", pl: "pokojů" },
@@ -177,6 +207,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "people",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "žena", pl: "ženy" },
       genitiv: { sg: "ženy", pl: "žen" },
@@ -196,6 +227,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "food",
+    sem: ["food"],
     uncountable: true,
     declension: {
       nominativ: { sg: "káva", pl: "kávy" },
@@ -218,6 +250,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "nature",
+    sem: ["nature"],
     declension: {
       nominativ: { sg: "růže", pl: "růže" },
       genitiv: { sg: "růže", pl: "růží" },
@@ -237,6 +270,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "city",
+    sem: ["building", "placeV", "workplace"],
     declension: {
       nominativ: { sg: "restaurace", pl: "restaurace" },
       genitiv: { sg: "restaurace", pl: "restaurací" },
@@ -258,6 +292,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "kost",
     category: "body",
+    sem: ["body"],
     declension: {
       nominativ: { sg: "kost", pl: "kosti" },
       genitiv: { sg: "kosti", pl: "kostí" },
@@ -277,6 +312,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "kost",
     category: "home",
+    sem: ["item"],
     declension: {
       nominativ: { sg: "věc", pl: "věci" },
       genitiv: { sg: "věci", pl: "věcí" },
@@ -298,6 +334,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "city",
+    sem: ["placeV", "outdoor", "residence", "path"],
     declension: {
       nominativ: { sg: "město", pl: "města" },
       genitiv: { sg: "města", pl: "měst" },
@@ -317,6 +354,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "transport",
+    sem: ["vehicle", "container", "space", "support"],
     declension: {
       nominativ: { sg: "auto", pl: "auta" },
       genitiv: { sg: "auta", pl: "aut" },
@@ -338,6 +376,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "nature",
+    sem: ["placeNa", "outdoor"],
     declension: {
       nominativ: { sg: "moře", pl: "moře" },
       genitiv: { sg: "moře", pl: "moří" },
@@ -359,6 +398,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "kure",
     category: "food",
+    sem: ["food"],
     declension: {
       nominativ: { sg: "kuře", pl: "kuřata" },
       genitiv: { sg: "kuřete", pl: "kuřat" },
@@ -380,6 +420,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "stavani",
     category: "transport",
+    sem: ["building", "placeNa", "workplace"],
     declension: {
       nominativ: { sg: "nádraží", pl: "nádraží" },
       genitiv: { sg: "nádraží", pl: "nádraží" },
@@ -405,6 +446,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "people",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "syn", pl: "synové / syni" },
       genitiv: { sg: "syna", pl: "synů" },
@@ -424,6 +466,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "people",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "bratr", pl: "bratři" },
       genitiv: { sg: "bratra", pl: "bratrů" },
@@ -443,6 +486,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "people",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "kluk", pl: "kluci" },
       genitiv: { sg: "kluka", pl: "kluků" },
@@ -462,6 +506,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "people",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "žák", pl: "žáci" },
       genitiv: { sg: "žáka", pl: "žáků" },
@@ -481,6 +526,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "muz",
     category: "work",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "lékař", pl: "lékaři / lékařové" },
       genitiv: { sg: "lékaře", pl: "lékařů" },
@@ -500,6 +546,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "people",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "kamarád", pl: "kamarádi" },
       genitiv: { sg: "kamaráda", pl: "kamarádů" },
@@ -519,6 +566,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "people",
+    sem: ["person"],
     declension: {
       // біглий -e-: otec → otc-
       nominativ: { sg: "otec", pl: "otcové" },
@@ -539,6 +587,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "muz",
     category: "people",
+    sem: ["person"],
     declension: {
       // множина нерегулярна: основа přátel-
       nominativ: { sg: "přítel", pl: "přátelé" },
@@ -559,6 +608,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "people",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "dcera", pl: "dcery" },
       genitiv: { sg: "dcery", pl: "dcer" },
@@ -578,6 +628,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "people",
+    sem: ["person"],
     declension: {
       // чергування k→c перед -e (dat./lok. sg): matce
       nominativ: { sg: "matka", pl: "matky" },
@@ -598,6 +649,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "people",
+    sem: ["person"],
     declension: {
       // чергування k→c: dívce
       nominativ: { sg: "dívka", pl: "dívky" },
@@ -618,6 +670,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "kure",
     category: "people",
+    sem: ["person"],
     declension: {
       // sg за зразком "kuře", множина нерегулярна (děti, за зразком "kost", ж.р.)
       nominativ: { sg: "dítě", pl: "děti" },
@@ -640,6 +693,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "home",
+    sem: ["opening", "surface", "support"],
     declension: {
       nominativ: { sg: "okno", pl: "okna" },
       genitiv: { sg: "okna", pl: "oken" },
@@ -659,6 +713,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "home",
+    sem: ["placeV"],
     declension: {
       nominativ: { sg: "kuchyně", pl: "kuchyně" },
       genitiv: { sg: "kuchyně", pl: "kuchyní" },
@@ -678,6 +733,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "home",
+    sem: ["surface", "seat", "space", "support", "furniture"],
     declension: {
       nominativ: { sg: "židle", pl: "židle" },
       genitiv: { sg: "židle", pl: "židlí" },
@@ -697,6 +753,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "kost",
     category: "home",
+    sem: ["surface", "seat", "space", "furniture"],
     declension: {
       nominativ: { sg: "postel", pl: "postele" },
       genitiv: { sg: "postele", pl: "postelí" },
@@ -716,6 +773,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "kost",
     category: "home",
+    sem: ["surface", "space", "support", "container", "furniture"],
     declension: {
       nominativ: { sg: "skříň", pl: "skříně" },
       genitiv: { sg: "skříně", pl: "skříní" },
@@ -735,6 +793,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
+    sem: ["item"],
     declension: {
       nominativ: { sg: "lampa", pl: "lampy" },
       genitiv: { sg: "lampy", pl: "lamp" },
@@ -754,6 +813,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "home",
+    sem: ["item"],
     declension: {
       nominativ: { sg: "klíč", pl: "klíče" },
       genitiv: { sg: "klíče", pl: "klíčů" },
@@ -773,6 +833,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
+    sem: ["item"],
     declension: {
       // чергування h→z перед -e (dat./lok. sg): knize
       nominativ: { sg: "kniha", pl: "knihy" },
@@ -793,6 +854,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "home",
+    sem: ["item", "surface", "container"],
     declension: {
       nominativ: { sg: "talíř", pl: "talíře" },
       genitiv: { sg: "talíře", pl: "talířů" },
@@ -812,6 +874,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "home",
+    sem: ["item"],
     declension: {
       // ů→o в непрямих відмінках: nůž → nož-
       nominativ: { sg: "nůž", pl: "nože" },
@@ -832,6 +895,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
+    sem: ["building", "placeV", "residence", "support"],
     declension: {
       // ů→o в непрямих відмінках: dům → dom-
       nominativ: { sg: "dům", pl: "domy" },
@@ -854,6 +918,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "food",
+    sem: ["food"],
     declension: {
       nominativ: { sg: "jablko", pl: "jablka" },
       genitiv: { sg: "jablka", pl: "jablek" },
@@ -873,6 +938,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "food",
+    sem: ["food"],
     uncountable: true,
     declension: {
       nominativ: { sg: "maso", pl: "masa" },
@@ -893,6 +959,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "food",
+    sem: ["food"],
     declension: {
       nominativ: { sg: "pivo", pl: "piva" },
       genitiv: { sg: "piva", pl: "piv" },
@@ -912,6 +979,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "food",
+    sem: ["food"],
     uncountable: true,
     declension: {
       nominativ: { sg: "máslo", pl: "másla" },
@@ -932,6 +1000,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "food",
+    sem: ["food"],
     uncountable: true,
     declension: {
       nominativ: { sg: "voda", pl: "vody" },
@@ -952,6 +1021,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "food",
+    sem: ["food"],
     declension: {
       nominativ: { sg: "čaj", pl: "čaje" },
       genitiv: { sg: "čaje", pl: "čajů" },
@@ -971,9 +1041,10 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "food",
+    sem: ["food"],
     declension: {
       nominativ: { sg: "sýr", pl: "sýry" },
-      genitiv: { sg: "sýra", pl: "sýrů" },
+      genitiv: { sg: "sýra / sýru", pl: "sýrů" },
       dativ: { sg: "sýru", pl: "sýrům" },
       akuzativ: { sg: "sýr", pl: "sýry" },
       vokativ: { sg: "sýre", pl: "sýry" },
@@ -990,6 +1061,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "food",
+    sem: ["food"],
     declension: {
       // чергування k→c: polévce
       nominativ: { sg: "polévka", pl: "polévky" },
@@ -1010,6 +1082,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "food",
+    sem: ["food"],
     uncountable: true,
     declension: {
       nominativ: { sg: "rýže", pl: "rýže" },
@@ -1030,6 +1103,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "food",
+    sem: ["food"],
     declension: {
       // é→e в непрямих відмінках; розм. основа chleb-
       nominativ: { sg: "chléb", pl: "chleby" },
@@ -1040,6 +1114,7 @@ export const NOUNS: NounEntry[] = [
       lokal: { sg: "chlebu / chlebě", pl: "chlebech" },
       instrumental: { sg: "chlebem", pl: "chleby" },
     },
+    variants: { akuzativ: { sg: ["chleba"] } },
     exampleSentenceCz: "Koupím chléb.",
     exampleSentenceUk: "Я куплю хліб.",
   },
@@ -1052,6 +1127,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "city",
+    sem: ["placeNa", "outdoor", "path"],
     declension: {
       nominativ: { sg: "ulice", pl: "ulice" },
       genitiv: { sg: "ulice", pl: "ulic" },
@@ -1071,6 +1147,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "stavani",
     category: "city",
+    sem: ["placeNa", "outdoor", "path", "residence"],
     declension: {
       nominativ: { sg: "náměstí", pl: "náměstí" },
       genitiv: { sg: "náměstí", pl: "náměstí" },
@@ -1090,6 +1167,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "city",
+    sem: ["building", "placeV", "workplace"],
     declension: {
       nominativ: { sg: "obchod", pl: "obchody" },
       genitiv: { sg: "obchodu", pl: "obchodů" },
@@ -1109,6 +1187,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "city",
+    sem: ["building", "placeV", "workplace", "activity"],
     declension: {
       nominativ: { sg: "škola", pl: "školy" },
       genitiv: { sg: "školy", pl: "škol" },
@@ -1128,6 +1207,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "city",
+    sem: ["placeV", "outdoor", "path"],
     declension: {
       nominativ: { sg: "park", pl: "parky" },
       genitiv: { sg: "parku", pl: "parků" },
@@ -1147,6 +1227,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "city",
+    sem: ["building", "placeNa", "path", "space", "support"],
     declension: {
       nominativ: { sg: "most", pl: "mosty" },
       genitiv: { sg: "mostu", pl: "mostů" },
@@ -1166,6 +1247,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "city",
+    sem: ["building", "placeV", "workplace"],
     declension: {
       // чергування k→c: bance
       nominativ: { sg: "banka", pl: "banky" },
@@ -1186,6 +1268,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "city",
+    sem: ["building", "placeV", "workplace"],
     declension: {
       nominativ: { sg: "nemocnice", pl: "nemocnice" },
       genitiv: { sg: "nemocnice", pl: "nemocnic" },
@@ -1205,6 +1288,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "city",
+    sem: ["building", "placeV", "workplace"],
     declension: {
       nominativ: { sg: "divadlo", pl: "divadla" },
       genitiv: { sg: "divadla", pl: "divadel" },
@@ -1224,6 +1308,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "city",
+    sem: ["building", "placeV", "workplace"],
     declension: {
       nominativ: { sg: "knihovna", pl: "knihovny" },
       genitiv: { sg: "knihovny", pl: "knihoven" },
@@ -1245,6 +1330,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "transport",
+    sem: ["vehicle", "container"],
     declension: {
       nominativ: { sg: "vlak", pl: "vlaky" },
       genitiv: { sg: "vlaku", pl: "vlaků" },
@@ -1264,6 +1350,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "transport",
+    sem: ["vehicle", "container"],
     declension: {
       nominativ: { sg: "autobus", pl: "autobusy" },
       genitiv: { sg: "autobusu", pl: "autobusů" },
@@ -1283,6 +1370,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "transport",
+    sem: ["vehicle"],
     declension: {
       nominativ: { sg: "kolo", pl: "kola" },
       genitiv: { sg: "kola", pl: "kol" },
@@ -1302,6 +1390,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "transport",
+    sem: ["vehicle", "container"],
     declension: {
       nominativ: { sg: "letadlo", pl: "letadla" },
       genitiv: { sg: "letadla", pl: "letadel" },
@@ -1321,6 +1410,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "transport",
+    sem: ["vehicle", "container", "placeV"],
     declension: {
       nominativ: { sg: "metro", pl: "metra" },
       genitiv: { sg: "metra", pl: "meter" },
@@ -1340,6 +1430,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "transport",
+    sem: ["placeNa", "path", "outdoor"],
     declension: {
       nominativ: { sg: "silnice", pl: "silnice" },
       genitiv: { sg: "silnice", pl: "silnic" },
@@ -1359,6 +1450,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "transport",
+    sem: ["placeNa", "path", "activity"],
     declension: {
       nominativ: { sg: "cesta", pl: "cesty" },
       genitiv: { sg: "cesty", pl: "cest" },
@@ -1380,6 +1472,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "nature",
+    sem: ["space", "support", "nature"],
     declension: {
       nominativ: { sg: "strom", pl: "stromy" },
       genitiv: { sg: "stromu", pl: "stromů" },
@@ -1399,6 +1492,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "nature",
+    sem: ["placeV", "outdoor", "path"],
     declension: {
       nominativ: { sg: "les", pl: "lesy" },
       genitiv: { sg: "lesa", pl: "lesů" },
@@ -1418,6 +1512,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "nature",
+    sem: ["nature"],
     declension: {
       nominativ: { sg: "květina", pl: "květiny" },
       genitiv: { sg: "květiny", pl: "květin" },
@@ -1437,6 +1532,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "nature",
+    sem: ["nature"],
     declension: {
       nominativ: { sg: "hvězda", pl: "hvězdy" },
       genitiv: { sg: "hvězdy", pl: "hvězd" },
@@ -1456,6 +1552,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "nature",
+    sem: ["placeNa", "outdoor"],
     declension: {
       // чергування k→c: řece
       nominativ: { sg: "řeka", pl: "řeky" },
@@ -1476,6 +1573,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "nature",
+    sem: ["placeNa", "outdoor", "path"],
     declension: {
       // чергування r→ř: hoře
       nominativ: { sg: "hora", pl: "hory" },
@@ -1496,6 +1594,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "nature",
+    sem: ["placeNa", "outdoor", "path"],
     declension: {
       nominativ: { sg: "zahrada", pl: "zahrady" },
       genitiv: { sg: "zahrady", pl: "zahrad" },
@@ -1515,6 +1614,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "nature",
+    sem: ["placeNa", "outdoor", "path"],
     declension: {
       nominativ: { sg: "pole", pl: "pole" },
       genitiv: { sg: "pole", pl: "polí" },
@@ -1534,6 +1634,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "kure",
     category: "nature",
+    sem: ["animal"],
     declension: {
       nominativ: { sg: "zvíře", pl: "zvířata" },
       genitiv: { sg: "zvířete", pl: "zvířat" },
@@ -1555,6 +1656,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "animals",
+    sem: ["animal"],
     declension: {
       // чергування k→c: kočce
       nominativ: { sg: "kočka", pl: "kočky" },
@@ -1575,6 +1677,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "animals",
+    sem: ["animal"],
     declension: {
       // біглий -e-: pes → ps-
       nominativ: { sg: "pes", pl: "psi" },
@@ -1595,6 +1698,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "animals",
+    sem: ["animal"],
     declension: {
       nominativ: { sg: "ryba", pl: "ryby" },
       genitiv: { sg: "ryby", pl: "ryb" },
@@ -1614,6 +1718,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "animals",
+    sem: ["animal"],
     declension: {
       // чергування k→c у Npl/Lpl: ptáci, ptácích
       nominativ: { sg: "pták", pl: "ptáci" },
@@ -1634,6 +1739,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "animals",
+    sem: ["animal"],
     declension: {
       nominativ: { sg: "had", pl: "hadi" },
       genitiv: { sg: "hada", pl: "hadů" },
@@ -1653,6 +1759,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "animals",
+    sem: ["animal"],
     declension: {
       nominativ: { sg: "medvěd", pl: "medvědi" },
       genitiv: { sg: "medvěda", pl: "medvědů" },
@@ -1672,6 +1779,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "kost",
     category: "animals",
+    sem: ["animal"],
     declension: {
       nominativ: { sg: "myš", pl: "myši" },
       genitiv: { sg: "myši", pl: "myší" },
@@ -1691,6 +1799,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "animals",
+    sem: ["animal"],
     declension: {
       // krátí se á→a v Gpl: krav
       nominativ: { sg: "kráva", pl: "krávy" },
@@ -1711,6 +1820,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "muz",
     category: "animals",
+    sem: ["animal"],
     declension: {
       // ů→o в основі; множина частково за старим зразком (koní, koňmi)
       nominativ: { sg: "kůň", pl: "koně" },
@@ -1739,6 +1849,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "stavani",
     category: "days",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "pondělí", pl: "pondělí" },
       genitiv: { sg: "pondělí", pl: "pondělí" },
@@ -1758,6 +1869,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "stavani",
     category: "days",
+    sem: ["time"],
     declension: {
       // Незмінне в однині так само, як pondělí — хоч і закінчується на -ý, не -í.
       nominativ: { sg: "úterý", pl: "úterý" },
@@ -1778,6 +1890,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "days",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "středa", pl: "středy" },
       genitiv: { sg: "středy", pl: "střed" },
@@ -1797,6 +1910,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "days",
+    sem: ["time"],
     declension: {
       // Родовий "čtvrtka" — архаїчний виняток зразка hrad (звірено з ÚJČ), не "čtvrtku".
       nominativ: { sg: "čtvrtek", pl: "čtvrtky" },
@@ -1817,6 +1931,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "days",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "pátek", pl: "pátky" },
       genitiv: { sg: "pátku", pl: "pátků" },
@@ -1836,6 +1951,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "days",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "sobota", pl: "soboty" },
       genitiv: { sg: "soboty", pl: "sobot" },
@@ -1855,6 +1971,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "days",
+    sem: ["time"],
     declension: {
       // Родовий множини "neděl" — нерегулярний виняток зразка růže (мало б бути "nedělí").
       nominativ: { sg: "neděle", pl: "neděle" },
@@ -1884,6 +2001,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "leden", pl: "ledny" },
       genitiv: { sg: "ledna", pl: "lednů" },
@@ -1903,6 +2021,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "únor", pl: "únory" },
       genitiv: { sg: "února", pl: "únorů" },
@@ -1922,6 +2041,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "březen", pl: "březny" },
       genitiv: { sg: "března", pl: "březnů" },
@@ -1941,6 +2061,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "duben", pl: "dubny" },
       genitiv: { sg: "dubna", pl: "dubnů" },
@@ -1960,6 +2081,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "květen", pl: "květny" },
       genitiv: { sg: "května", pl: "květnů" },
@@ -1979,6 +2101,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "červen", pl: "červny" },
       genitiv: { sg: "června", pl: "červnů" },
@@ -1998,6 +2121,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "months",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "červenec", pl: "července" },
       genitiv: { sg: "července", pl: "červenců" },
@@ -2017,6 +2141,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "srpen", pl: "srpny" },
       genitiv: { sg: "srpna", pl: "srpnů" },
@@ -2036,6 +2161,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "stavani",
     category: "months",
+    sem: ["time"],
     declension: {
       // Повністю незмінне в однині — так само, як pondělí/nádraží.
       nominativ: { sg: "září", pl: "září" },
@@ -2056,6 +2182,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "říjen", pl: "říjny" },
       genitiv: { sg: "října", pl: "říjnů" },
@@ -2075,6 +2202,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    sem: ["time"],
     declension: {
       // Єдиний місяць БЕЗ архаїчного -a у родовому — тут звичайний -u (17. listopadu).
       nominativ: { sg: "listopad", pl: "listopady" },
@@ -2095,6 +2223,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "months",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "prosinec", pl: "prosince" },
       genitiv: { sg: "prosince", pl: "prosinců" },
@@ -2121,6 +2250,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "numbers",
+    sem: ["abstract"],
     declension: {
       // Родовий множини "set" — виняток (епентетичне -e-, як okno→oken).
       nominativ: { sg: "sto", pl: "sta" },
@@ -2141,6 +2271,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "numbers",
+    sem: ["abstract"],
     declension: {
       // Родовий множини: "tisíc" (старобильна форма без закінчення) і новіша
       // "tisíců" — обидві нормативні (звірено з ÚJČ). Показуємо обидві.
@@ -2162,6 +2293,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "numbers",
+    sem: ["abstract"],
     declension: {
       // Повністю регулярний зразок hrad (на відміну від sto/tisíc — жодних винятків).
       nominativ: { sg: "milion", pl: "miliony" },
@@ -2182,6 +2314,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "numbers",
+    sem: ["abstract"],
     declension: {
       // Повністю регулярний зразок žena.
       nominativ: { sg: "miliarda", pl: "miliardy" },
@@ -2207,6 +2340,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "time",
+    sem: ["time", "timeUnit"],
     declension: {
       nominativ: { sg: "hodina", pl: "hodiny" },
       genitiv: { sg: "hodiny", pl: "hodin" },
@@ -2226,6 +2360,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "time",
+    sem: ["time", "timeUnit"],
     declension: {
       nominativ: { sg: "minuta", pl: "minuty" },
       genitiv: { sg: "minuty", pl: "minut" },
@@ -2249,6 +2384,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "time",
+    sem: ["time", "timeUnit"],
     declension: {
       // Нерегулярне: gen "dne" (не "denu"), gen.pl "dní" (НЕ "dnů" — застаріла/
       // нормативно неправильна форма, звірено окремою статтею ÚJČ).
@@ -2270,6 +2406,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "time",
+    sem: ["time", "timeUnit"],
     declension: {
       // Вок.од. "roku" (не "roce"): основа на -k має в 5. п. закінчення -u — IJP (?id=225).
     // Нерегулярне: лок. sg "roce" (дублет з "roku", беремо сучасніший),
@@ -2282,6 +2419,7 @@ export const NOUNS: NounEntry[] = [
       lokal: { sg: "roce", pl: "rocích" },
       instrumental: { sg: "rokem", pl: "roky" },
     },
+    variants: { lokal: { sg: ["roku"] } },
     exampleSentenceCz: "Tento rok je dobrý.",
     exampleSentenceUk: "Цей рік хороший.",
   },
@@ -2292,6 +2430,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "time",
+    sem: ["time", "timeUnit"],
     declension: {
       // Нерегулярне лише в однині (gen "týdne", dat/lok "týdni"); множина —
       // ПОВНІСТЮ регулярна за зразком hrad (týdnů, не *týdní — на відміну
@@ -2314,6 +2453,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "body",
+    sem: ["body"],
     declension: {
       nominativ: { sg: "hlava", pl: "hlavy" },
       genitiv: { sg: "hlavy", pl: "hlav" },
@@ -2333,6 +2473,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "body",
+    sem: ["body"],
     declension: {
       // Множина — залишки ДУАЛУ (частина тіла): nom "ruce" (НЕ "ruky"!),
       // gen/лок "rukou", ор. "rukama" (НЕ regular "-ami"). Звірено ÚJČ +
@@ -2356,6 +2497,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "body",
+    sem: ["body"],
     declension: {
       // На відміну від ruka: nom.pl лишається РЕГУЛЯРНИМ "nohy" (не міняється
       // на щось на кшталт "*noce"). Лише gen/лок.pl "nohou" і instr.pl
@@ -2378,6 +2520,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "body",
+    sem: ["body", "bodyLevel"],
     declension: {
       // Однина — повністю регулярний mesto-тип. Множина — СУПЛЕТИВНА
       // (залишок ДВОЙНОГО числа): "oči", не "*oka" (те використовується лише
@@ -2401,6 +2544,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "body",
+    sem: ["body"],
     declension: {
       nominativ: { sg: "srdce", pl: "srdce" },
       genitiv: { sg: "srdce", pl: "srdcí" },
@@ -2420,6 +2564,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "work",
+    sem: ["activity", "placeV"],
     declension: {
       nominativ: { sg: "práce", pl: "práce" },
       genitiv: { sg: "práce", pl: "prací" },
@@ -2439,6 +2584,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "people",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "rodina", pl: "rodiny" },
       genitiv: { sg: "rodiny", pl: "rodin" },
@@ -2458,6 +2604,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "stavani",
     category: "nature",
+    sem: ["nature"],
     uncountable: true,
     declension: {
       nominativ: { sg: "počasí", pl: "počasí" },
@@ -2478,6 +2625,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "nature",
+    sem: ["weather"],
     declension: {
       nominativ: { sg: "slunce", pl: "slunce" },
       genitiv: { sg: "slunce", pl: "sluncí" },
@@ -2497,6 +2645,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "city",
+    sem: ["money"],
     declension: {
       // Pluralia tantum — однини НЕМАЄ взагалі ("—" у кожній клітинці sg,
       // рушій квизу (flashcardEngine.ts) явно навчений пропускати такі
@@ -2525,6 +2674,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "people",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "babička", pl: "babičky" },
       genitiv: { sg: "babičky", pl: "babiček" },
@@ -2544,6 +2694,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "people",
+    sem: ["person"],
     declension: {
       // Множина — дублети (dědečkové/dědečci), звірено напряму dobryslovnik.cz.
       nominativ: { sg: "dědeček", pl: "dědečkové" },
@@ -2564,6 +2715,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "muz",
     category: "people",
+    sem: ["person"],
     declension: {
       // Nom.pl "manželé" — звірено ÚJČ прямо (той самий клас, що andělé).
       nominativ: { sg: "manžel", pl: "manželé" },
@@ -2584,6 +2736,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "people",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "manželka", pl: "manželky" },
       genitiv: { sg: "manželky", pl: "manželek" },
@@ -2603,6 +2756,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "people",
+    sem: ["person"],
     declension: {
       nominativ: { sg: "host", pl: "hosté" },
       genitiv: { sg: "hosta", pl: "hostů" },
@@ -2622,6 +2776,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "pan",
     category: "people",
+    sem: ["person"],
     declension: {
       // Nom.pl "sousedi" — звірено ÚJČ як основну (частішу) форму, "sousedé" —
       // рівноцінний дублет.
@@ -2643,6 +2798,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "body",
+    sem: ["body", "bodyLevel"],
     declension: {
       // Той самий залишок дуалу, що й oko: множина суплетивна "uši" (НЕ
       // "*ucha" — те для нетілесного значення, вушка глечика тощо). Повна
@@ -2665,6 +2821,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
+    sem: ["item"],
     declension: {
       nominativ: { sg: "telefon", pl: "telefony" },
       genitiv: { sg: "telefonu", pl: "telefonů" },
@@ -2684,6 +2841,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
+    sem: ["document"],
     declension: {
       nominativ: { sg: "adresa", pl: "adresy" },
       genitiv: { sg: "adresy", pl: "adres" },
@@ -2703,6 +2861,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "city",
+    sem: ["abstract"],
     declension: {
       nominativ: { sg: "cena", pl: "ceny" },
       genitiv: { sg: "ceny", pl: "cen" },
@@ -2730,6 +2889,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "food",
+    sem: ["meal"],
     declension: {
       nominativ: { sg: "snídaně", pl: "snídaně" },
       genitiv: { sg: "snídaně", pl: "snídaní" },
@@ -2749,6 +2909,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "food",
+    sem: ["meal"],
     declension: {
       nominativ: { sg: "oběd", pl: "obědy" },
       genitiv: { sg: "oběda", pl: "obědů" },
@@ -2758,6 +2919,7 @@ export const NOUNS: NounEntry[] = [
       lokal: { sg: "obědě", pl: "obědech" },
       instrumental: { sg: "obědem", pl: "obědy" },
     },
+    variants: { genitiv: { sg: ["obědu"] } },
     exampleSentenceCz: "Jdeme na oběd.",
     exampleSentenceUk: "Ми йдемо на обід.",
   },
@@ -2768,6 +2930,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "food",
+    sem: ["meal"],
     declension: {
       nominativ: { sg: "večeře", pl: "večeře" },
       genitiv: { sg: "večeře", pl: "večeří" },
@@ -2787,13 +2950,14 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "body",
+    sem: ["body"],
     declension: {
       nominativ: { sg: "nos", pl: "nosy" },
       genitiv: { sg: "nosu", pl: "nosů" },
       dativ: { sg: "nosu", pl: "nosům" },
       akuzativ: { sg: "nos", pl: "nosy" },
       vokativ: { sg: "nose", pl: "nosy" },
-      lokal: { sg: "nosu", pl: "nosech" },
+      lokal: { sg: "nose / nosu", pl: "nosech" },
       instrumental: { sg: "nosem", pl: "nosy" },
     },
     exampleSentenceCz: "Bolí mě nos.",
@@ -2806,6 +2970,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "body",
+    sem: ["body"],
     declension: {
       // Pluralia tantum — однини НЕМАЄ ("—", той самий підхід, що й peníze). Джерело
       // прямо: SLOVNÍ TVARY ústa~úst~ústech~ústům~ústy (pravidla.cz + Nechybujte.cz).
@@ -2827,6 +2992,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "body",
+    sem: ["body"],
     declension: {
       nominativ: { sg: "zub", pl: "zuby" },
       genitiv: { sg: "zubu", pl: "zubů" },
@@ -2846,6 +3012,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "kost",
     category: "people",
+    sem: ["person"],
     declension: {
       // АДЄКТИВНЕ відмінювання (зразок "jarní") — унікальний випадок, жоден з 11
       // patterns не описує це точно; pattern="kost" — лише організаційна мітка,
@@ -2869,6 +3036,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "stavani",
     category: "home",
+    sem: ["item"],
     uncountable: true,
     declension: {
       nominativ: { sg: "oblečení", pl: "oblečení" },
@@ -2889,6 +3057,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "nature",
+    sem: ["weather"],
     declension: {
       // Довге é лише в nom./akuz., усі непрямі відмінки — коротке e (deště, dešti).
       // Звірено Naše řeč (журнал ÚJČ): "ve všech nepřímých pádech základovou
@@ -2911,6 +3080,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "nature",
+    sem: ["weather"],
     uncountable: true,
     declension: {
       // Довге í лише в nom./akuz., непрямі відмінки — коротке e (sněhu, sněhem).
@@ -2934,6 +3104,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "nature",
+    sem: ["weather"],
     uncountable: true,
     declension: {
       // Довге í лише в nom./akuz., непрямі відмінки — коротке e (větru, větrem),
@@ -2956,6 +3127,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "nature",
+    sem: ["nature"],
     uncountable: true,
     declension: {
       // Регулярний more-тип (як moře/srdce). УВАГА: множина "nebesa" — ОКРЕМЕ слово
@@ -2979,6 +3151,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "transport",
+    sem: ["building", "placeNa", "workplace"],
     declension: {
       nominativ: { sg: "letiště", pl: "letiště" },
       genitiv: { sg: "letiště", pl: "letišť" },
@@ -2998,6 +3171,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "city",
+    sem: ["building", "placeV"],
     declension: {
       nominativ: { sg: "kostel", pl: "kostely" },
       genitiv: { sg: "kostela", pl: "kostelů" },
@@ -3007,6 +3181,7 @@ export const NOUNS: NounEntry[] = [
       lokal: { sg: "kostele", pl: "kostelech" },
       instrumental: { sg: "kostelem", pl: "kostely" },
     },
+    variants: { genitiv: { sg: ["kostelu"] }, lokal: { sg: ["kostelu"] } },
     exampleSentenceCz: "Jdeme do kostela.",
     exampleSentenceUk: "Ми йдемо до церкви.",
   },
@@ -3017,6 +3192,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "home",
+    sem: ["item"],
     declension: {
       nominativ: { sg: "počítač", pl: "počítače" },
       genitiv: { sg: "počítače", pl: "počítačů" },
@@ -3043,6 +3219,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "home",
+    sem: ["item"],
     declension: {
       nominativ: { sg: "lžíce", pl: "lžíce" },
       genitiv: { sg: "lžíce", pl: "lžic" },
@@ -3062,6 +3239,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
+    sem: ["item"],
     declension: {
       nominativ: { sg: "vidlička", pl: "vidličky" },
       genitiv: { sg: "vidličky", pl: "vidliček" },
@@ -3081,6 +3259,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
+    sem: ["item", "container"],
     declension: {
       nominativ: { sg: "hrnek", pl: "hrnky" },
       genitiv: { sg: "hrnku", pl: "hrnků" },
@@ -3100,6 +3279,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "home",
+    sem: ["item", "container"],
     declension: {
       // Той самий "підзразок ulice", що й lžíce: gen.pl "sklenic" (не "sklenicí"!).
       nominativ: { sg: "sklenice", pl: "sklenice" },
@@ -3120,6 +3300,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "home",
+    sem: ["item", "surface", "furniture"],
     declension: {
       nominativ: { sg: "televize", pl: "televize" },
       genitiv: { sg: "televize", pl: "televizí" },
@@ -3139,6 +3320,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
+    sem: ["surface", "container", "support", "space", "furniture"],
     declension: {
       nominativ: { sg: "lednička", pl: "ledničky" },
       genitiv: { sg: "ledničky", pl: "ledniček" },
@@ -3158,6 +3340,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
+    sem: ["placeV"],
     declension: {
       nominativ: { sg: "sprcha", pl: "sprchy" },
       genitiv: { sg: "sprchy", pl: "sprch" },
@@ -3177,6 +3360,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
+    sem: ["placeV"],
     declension: {
       nominativ: { sg: "koupelna", pl: "koupelny" },
       genitiv: { sg: "koupelny", pl: "koupelen" },
@@ -3196,6 +3380,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "home",
+    sem: ["item", "surface", "seat", "space"],
     declension: {
       nominativ: { sg: "polštář", pl: "polštáře" },
       genitiv: { sg: "polštáře", pl: "polštářů" },
@@ -3215,6 +3400,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
+    sem: ["item"],
     declension: {
       nominativ: { sg: "ručník", pl: "ručníky" },
       genitiv: { sg: "ručníku", pl: "ručníků" },
@@ -3234,6 +3420,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "home",
+    sem: ["item"],
     declension: {
       nominativ: { sg: "zrcadlo", pl: "zrcadla" },
       genitiv: { sg: "zrcadla", pl: "zrcadel" },
@@ -3253,6 +3440,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
+    sem: ["item"],
     declension: {
       nominativ: { sg: "deštník", pl: "deštníky" },
       genitiv: { sg: "deštníku", pl: "deštníků" },
@@ -3272,6 +3460,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "home",
+    sem: ["item"],
     declension: {
       // Pluralia tantum — однини немає ("—", той самий підхід, що й peníze/usta).
       // Повна парадигма звірена напряму dobryslovnik.cz.
@@ -3293,6 +3482,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
+    sem: ["item", "container"],
     declension: {
       nominativ: { sg: "taška", pl: "tašky" },
       genitiv: { sg: "tašky", pl: "tašek" },
@@ -3312,6 +3502,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "home",
+    sem: ["surface", "seat", "space"],
     declension: {
       nominativ: { sg: "koberec", pl: "koberce" },
       genitiv: { sg: "koberce", pl: "koberců" },
@@ -3340,6 +3531,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "home",
+    sem: ["item"],
     declension: {
       nominativ: { sg: "košile", pl: "košile" },
       genitiv: { sg: "košile", pl: "košil" },
@@ -3359,6 +3551,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
+    sem: ["item"],
     declension: {
       // Pluralia tantum — однини немає ("—", той самий підхід, що й peníze/usta/bryle).
       // Підтверджено в одному переліку з dveře/nůžky/játra/housle (шкільний ключ відповідей).
@@ -3380,6 +3573,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
+    sem: ["item"],
     declension: {
       // На відміну від kalhoty — ЗВИЧАЙНИЙ іменник з повною однини (ÚJČ-афілійований
       // шкільний ключ прямо: не pluralia tantum, лише переважає вживання в множині).
@@ -3401,13 +3595,14 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
+    sem: ["item", "container"],
     declension: {
       nominativ: { sg: "kabát", pl: "kabáty" },
       genitiv: { sg: "kabátu", pl: "kabátů" },
       dativ: { sg: "kabátu", pl: "kabátům" },
       akuzativ: { sg: "kabát", pl: "kabáty" },
       vokativ: { sg: "kabáte", pl: "kabáty" },
-      lokal: { sg: "kabátu", pl: "kabátech" },
+      lokal: { sg: "kabátě / kabátu", pl: "kabátech" },
       instrumental: { sg: "kabátem", pl: "kabáty" },
     },
     exampleSentenceCz: "Oblékni si kabát.",
@@ -3420,6 +3615,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
+    sem: ["item"],
     declension: {
       nominativ: { sg: "svetr", pl: "svetry" },
       genitiv: { sg: "svetru", pl: "svetrů" },
@@ -3439,6 +3635,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
+    sem: ["item"],
     declension: {
       nominativ: { sg: "ponožka", pl: "ponožky" },
       genitiv: { sg: "ponožky", pl: "ponožek" },
@@ -3458,13 +3655,14 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
+    sem: ["document"],
     declension: {
       nominativ: { sg: "pas", pl: "pasy" },
       genitiv: { sg: "pasu", pl: "pasů" },
       dativ: { sg: "pasu", pl: "pasům" },
       akuzativ: { sg: "pas", pl: "pasy" },
       vokativ: { sg: "pase", pl: "pasy" },
-      lokal: { sg: "pasu", pl: "pasech" },
+      lokal: { sg: "pase / pasu", pl: "pasech" },
       instrumental: { sg: "pasem", pl: "pasy" },
     },
     exampleSentenceCz: "Ztratil jsem pas.",
@@ -3477,13 +3675,14 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
+    sem: ["document"],
     declension: {
       nominativ: { sg: "doklad", pl: "doklady" },
       genitiv: { sg: "dokladu", pl: "dokladů" },
       dativ: { sg: "dokladu", pl: "dokladům" },
       akuzativ: { sg: "doklad", pl: "doklady" },
       vokativ: { sg: "doklade", pl: "doklady" },
-      lokal: { sg: "dokladu", pl: "dokladech" },
+      lokal: { sg: "dokladě / dokladu", pl: "dokladech" },
       instrumental: { sg: "dokladem", pl: "doklady" },
     },
     exampleSentenceCz: "Potřebuji doklad totožnosti.",
@@ -3496,6 +3695,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "city",
+    sem: ["document"],
     declension: {
       nominativ: { sg: "účet", pl: "účty" },
       genitiv: { sg: "účtu", pl: "účtů" },
@@ -3515,6 +3715,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "food",
+    sem: ["food"],
     declension: {
       // Gen.pl "vajec" — виняток (звичайний more-тип дав би "vejcí"). Підтверджено
       // багатократно в корпусних прикладах ("100 g vajec", "velikost vajec").
@@ -3536,6 +3737,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "food",
+    sem: ["food"],
     uncountable: true,
     declension: {
       nominativ: { sg: "zelenina", pl: "zeleniny" },
@@ -3556,6 +3758,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "food",
+    sem: ["food"],
     uncountable: true,
     declension: {
       nominativ: { sg: "ovoce", pl: "ovoce" },
@@ -3576,6 +3779,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "city",
+    sem: ["building", "placeV", "workplace"],
     declension: {
       nominativ: { sg: "kavárna", pl: "kavárny" },
       genitiv: { sg: "kavárny", pl: "kaváren" },
@@ -3595,6 +3799,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "body",
+    sem: ["body", "bodyLevel"],
     declension: {
       // Залишок ДВОЙНОГО числа: gen.pl/лок.pl "ramenou" (звірено ÚJČ прямо), АЛЕ
       // ор.pl РЕГУЛЯРНИЙ "rameny" (НЕ "-ma"!) — на відміну від ruka/noha. Дублет
@@ -3617,6 +3822,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "body",
+    sem: ["body", "bodyLevel"],
     declension: {
       // Той самий тип, що rameno: gen.pl/лок.pl "kolenou", ор.pl регулярний "koleny".
       nominativ: { sg: "koleno", pl: "kolena" },
@@ -3637,6 +3843,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "stavani",
     category: "city",
+    sem: ["building", "placeV", "residence"],
     // Сам зразок відмінювання (vzor) для типу "stavani" — раніше в словнику був
     // лише представник цього типу (nádraží), а не саме слово-зразок. Парадигма
     // ідентична nádraží (перевірено: той самий тип, звірено з prirucka.ujc.cas.cz
@@ -3661,6 +3868,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "kost",
     category: "time",
+    sem: ["time", "timeUnit"],
     declension: {
       nominativ: { sg: "noc", pl: "noci" },
       genitiv: { sg: "noci", pl: "nocí" },
@@ -3680,6 +3888,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "kost",
     category: "time",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "půlnoc", pl: "půlnoci" },
       genitiv: { sg: "půlnoci", pl: "půlnocí" },
@@ -3699,6 +3908,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "time",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "poledne", pl: "poledne" },
       genitiv: { sg: "poledne", pl: "polední" },
@@ -3718,6 +3928,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "time",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "dopoledne", pl: "dopoledne" },
       genitiv: { sg: "dopoledne", pl: "dopolední" },
@@ -3737,6 +3948,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "time",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "odpoledne", pl: "odpoledne" },
       genitiv: { sg: "odpoledne", pl: "odpolední" },
@@ -3756,6 +3968,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "time",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "ráno", pl: "rána" },
       genitiv: { sg: "rána", pl: "rán" },
@@ -3775,6 +3988,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "time",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "večer", pl: "večery" },
       genitiv: { sg: "večera", pl: "večerů" },
@@ -3784,6 +3998,7 @@ export const NOUNS: NounEntry[] = [
       lokal: { sg: "večeru", pl: "večerech" },
       instrumental: { sg: "večerem", pl: "večery" },
     },
+    variants: { genitiv: { sg: ["večeru"] } },
     exampleSentenceCz: "Večer čtu knihu.",
     exampleSentenceUk: "Ввечері я читаю книгу.",
   },
@@ -3797,6 +4012,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "city",
+    sem: ["money"],
     declension: {
       nominativ: { sg: "koruna", pl: "koruny" },
       genitiv: { sg: "koruny", pl: "korun" },
@@ -3817,6 +4033,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "city",
+    sem: ["money"],
     declension: {
       // пл. 2. п. «eur» (нульове закінчення), як «měst»
       nominativ: { sg: "euro", pl: "eura" },
@@ -3838,6 +4055,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "city",
+    sem: ["building", "placeNa", "workplace"],
     declension: {
       nominativ: { sg: "pošta", pl: "pošty" },
       genitiv: { sg: "pošty", pl: "pošt" },
@@ -3858,6 +4076,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "city",
+    sem: ["building", "placeV", "workplace", "residence"],
     declension: {
       nominativ: { sg: "hotel", pl: "hotely" },
       genitiv: { sg: "hotelu", pl: "hotelů" },
@@ -3878,6 +4097,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "city",
+    sem: ["building", "placeNa", "workplace"],
     declension: {
       nominativ: { sg: "úřad", pl: "úřady" },
       genitiv: { sg: "úřadu", pl: "úřadů" },
@@ -3898,6 +4118,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "stavani",
     category: "home",
+    sem: ["placeV", "residence"],
     declension: {
       nominativ: { sg: "přízemí", pl: "přízemí" },
       genitiv: { sg: "přízemí", pl: "přízemí" },
@@ -3918,6 +4139,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "home",
+    sem: ["placeV", "residence"],
     declension: {
       // пл. 2. п. «pater» — вставне -e- (як «sester»); 1. patro = другий поверх за українським рахунком
       nominativ: { sg: "patro", pl: "patra" },
@@ -3939,6 +4161,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "months",
+    sem: ["time"],
     declension: {
       // пл. 2. п. «let» — та сама форма, що в «pět let» (роки)
       nominativ: { sg: "léto", pl: "léta" },
@@ -3960,6 +4183,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "months",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "zima", pl: "zimy" },
       genitiv: { sg: "zimy", pl: "zim" },
@@ -3980,6 +4204,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "months",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "jaro", pl: "jara" },
       genitiv: { sg: "jara", pl: "jar" },
@@ -4000,6 +4225,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    sem: ["time"],
     declension: {
       nominativ: { sg: "podzim", pl: "podzimy" },
       genitiv: { sg: "podzimu", pl: "podzimů" },
@@ -4020,6 +4246,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "time",
+    sem: ["time", "timeUnit"],
     declension: {
       nominativ: { sg: "měsíc", pl: "měsíce" },
       genitiv: { sg: "měsíce", pl: "měsíců" },

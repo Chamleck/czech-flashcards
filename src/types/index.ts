@@ -1,3 +1,4 @@
+import type { NounTag } from "../data/nounTags";
 // Чеські відмінки (7 відмінків)
 export type CzechCase =
   | "nominativ" // 1. Kdo? Co?
@@ -79,6 +80,14 @@ export interface NounEntry {
   // квизі узгодження числівників («osm mas» безглузде). Відмінюється й тестується
   // як звичайний іменник, лише виключене з ролі лічильникового партнера.
   uncountable?: boolean;
+  // Смислові теги (data/nounTags.ts): за ними квіз «Прийменники» підбирає слово у фрази, де воно природне
+  // («Jsem v ___» — placeV, «Polož to na ___» — surface). ОБОВ'язкове поле: без нього новий іменник
+  // не збереться, а нічим не позначене слово не потрапляло б у змістовні фрази.
+  sem: NounTag[];
+  // Прийнятні (розмовні чи рідкісні) форми клітинки, які НЕ показуємо на картці, але які квіз не має права
+  // подавати як ПОМИЛКОВУ відповідь (напр. родовий kostel — kostela, але й kostelu вживають). Лише там, де
+  // така форма збігається з формою іншого відмінка того ж слова.
+  variants?: Partial<Record<CzechCase, Partial<Record<GrammaticalNumber, string[]>>>>;
 }
 
 export interface CardProgress {
