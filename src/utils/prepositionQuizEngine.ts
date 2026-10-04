@@ -3,7 +3,7 @@ import { PREPOSITIONS } from "../data/prepositions";
 import { NOUNS } from "../data/nouns";
 import { nounUsableAsPartner } from "../data/categories";
 import { validateNounSem } from "../data/nounTags";
-import { CONFUSABLE_PREP_PAIRS, DUAL_FRAMES, DualFrame, EXCHANGE_FRAMES, FIXED_EXCLUDE, FIXED_NEEDS, Needs } from "../data/prepositionPartners";
+import { CONFUSABLE_PREP_PAIRS, DUAL_FRAMES, EXCHANGE_FRAMES, FIXED_FRAMES, Frame, Needs } from "../data/prepositionPartners";
 import { acceptedForms, candidateNumbers, disjoint, formOf, matchesNeeds, vocalizedPrep } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
 
@@ -16,14 +16,17 @@ import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcard
 //   • za-exchange    — «za» у сенсі обмін/ціна (знахідний).
 //
 // ПАРТНЕР (іменник у фразі) підбирається за СМИСЛОВИМИ ТЕГАМИ (data/nounTags.ts), а не навмання з усього
-// словника: фрази природні («Jsem v škole», «Jdu na poštu», «Polož to na stůl»), а новий іменник з правильними
-// тегами потрапляє в усі підхожі фрази автоматично. Вимоги фреймів — data/prepositionPartners.ts.
+// словника: фрази природні («Jsem ve škole», «Jdu na poštu», «Mám dopis od kamaráda»), а новий іменник з
+// правильними тегами потрапляє в усі підхожі фрази автоматично. Фрейми всіх прийменників (двоїстих, фіксованих,
+// «za» обміну) — дані одного типу Frame у data/prepositionPartners.ts, добір слова — одна функція pickPartner.
 //
 // Гарантії кожного питання (перевіряє dev-прогін, див. validate нижче):
 //   1. правильна відповідь і дистрактор — різні форми, жодна прийнятна форма правильної клітинки (дублети,
 //      variants) не стоїть серед дистракторів;
 //   2. вокалізація прийменника (ve/ke/se/ze) класифікована, інакше слово у фразу не береться;
-//   3. слово з множиною лише там, де вона природна; слова лише з множиною (peníze) беруть множину.
+//   3. слово з множиною лише там, де вона природна; слова лише з множиною (peníze) беруть множину;
+//   4. в одному раунді іменник не повторюється (якщо для комбо є інше придатне слово), а слово, що підходить
+//      до багатьох комбо (most, dům), не домінує: вага слова = 1 / (кількість пулів, де воно є).
 //
 // Контракт питання — спільний із рештою рушіїв: рівно [correct, distractor],
 // comboId = id комбо в пулі НАПРЯМУ (безпечний патерн verb/declension рушіїв,
@@ -86,27 +89,15 @@ function poolForNeeds(key: string, needs: Needs): NounEntry[] {
   return p;
 }
 
-// Партнери фіксованого прийменника: «вузькі» — за тегами (FIXED_NEEDS), «широкі» — увесь пул без виключених класів.
-function fixedPool(prepId: string): NounEntry[] {
-  const needs = FIXED_NEEDS[prepId];
-  if (needs) return poolForNeeds(`fixed:${prepId}`, needs);
-  let p = needsPools.get(`fixed:${prepId}`);
-  if (!p) {
-    const banned = FIXED_EXCLUDE[prepId] ?? [];
-    p = PARTNER_POOL.filter((n) => !(n.sem ?? []).some((t) => banned.includes(t)));
-    needsPools.set(`fixed:${prepId}`, p);
-  }
-  return p;
+function framePool(prepId: string, kind: string, f: Frame): NounEntry[] {
+  // ключ — текст І вимоги: два фрейми з однаковим текстом, але різними тегами не ділять кеш
+  return poolForNeeds(`frame:${prepId}:${kind}:${f.text}:${JSON.stringify([f.any, f.all, f.none])}`, f);
 }
 
-function framePool(prepId: string, kind: string, f: DualFrame): NounEntry[] {
-  return poolForNeeds(`frame:${prepId}:${kind}:${f.text}`, f);
-}
-
-// Слова, придатні хоча б до одного фрейму комбо (прийменник × сенс). Добір іде від СЛОВА, а не від фрейму: слово,
-// що підходить до двадцяти фреймів (most, dům), інакше з'являлося б у двадцять разів частіше за слово з одним.
+// Слова, придатні хоча б до одного фрейму пулу (прийменник × сенс). Добір іде від СЛОВА, а не від фрейму: слово,
+// що підходить до двадцяти фреймів, інакше з'являлося б у двадцять разів частіше за слово з одним.
 const unionPools = new Map<string, NounEntry[]>();
-function unionPool(prepId: string, kind: string, frames: DualFrame[]): NounEntry[] {
+function unionPool(prepId: string, kind: string, frames: Frame[]): NounEntry[] {
   const key = `${prepId}:${kind}`;
   let u = unionPools.get(key);
   if (!u) {
@@ -118,14 +109,81 @@ function unionPool(prepId: string, kind: string, frames: DualFrame[]): NounEntry
   return u;
 }
 
-// Перший придатний кандидат у ВИПАДКОВОМУ порядку: рівномірний серед придатних і повний (знаходить, якщо
-// хоч один є — питання не губиться через невдалу вибірку).
-function firstValid<T>(cands: NounEntry[], tryOne: (n: NounEntry) => T | null): T | null {
-  for (const n of shuffle(cands)) {
-    const r = tryOne(n);
-    if (r) return r;
+type DualSense = "motion" | "location";
+const SENSES: DualSense[] = ["motion", "location"];
+
+// Усі пули квізу (ключ — як в unionPool): один на фіксований прийменник, по одному на сенс двоїстого, обмін «za».
+function allPools(): NounEntry[][] {
+  const out: NounEntry[][] = [];
+  for (const p of PREPOSITIONS) {
+    if (p.type === "fixed") {
+      const fr = FIXED_FRAMES[p.id];
+      if (fr) out.push(unionPool(p.id, "fixed", fr));
+    } else if (p.dual) {
+      for (const sense of SENSES) {
+        const fr = DUAL_FRAMES[p.id]?.[sense];
+        if (fr) out.push(unionPool(p.id, sense, fr));
+      }
+      if (p.dual.exchange) out.push(unionPool(p.id, "exchange", EXCHANGE_FRAMES));
+    }
+  }
+  return out;
+}
+
+// У скількох пулах є слово. most чи dům підходять до більшості просторових фраз і без поправки займали б помітну
+// частку всіх питань; вага 1 / fit вирівнює частку слова у квізі. Рахується з даних, тож нові слова й фрейми
+// враховуються самі.
+let fitCache: Map<string, number> | null = null;
+function fitCount(nounId: string): number {
+  if (!fitCache) {
+    const m = new Map<string, number>();
+    for (const pool of allPools()) for (const n of pool) m.set(n.id, (m.get(n.id) ?? 0) + 1);
+    fitCache = m;
+  }
+  return fitCache.get(nounId) ?? 1;
+}
+
+// Порядок перебору кандидатів: спершу слова, яких ще не було в раунді, всередині — зважена випадкова вибірка без
+// повернень (ключ u^fit, Efraimidis–Spirakis), тож імовірність бути першим ∝ 1 / fit. Перебір повний: якщо в комбо
+// придатні лише вже використані слова, береться одне з них — питання (зокрема зарезервоване під помилку) не губиться.
+function partnerOrder(cands: NounEntry[], used: ReadonlySet<string>): NounEntry[] {
+  return cands
+    .map((n) => ({ n, fresh: used.has(n.id) ? 0 : 1, key: Math.random() ** fitCount(n.id) }))
+    .sort((a, b) => b.fresh - a.fresh || b.key - a.key)
+    .map((x) => x.n);
+}
+
+interface PartnerPick<T> {
+  noun: NounEntry;
+  frame: Frame;
+  num: GrammaticalNumber;
+  data: T;
+}
+
+// Єдиний добір партнера для всіх типів питань: слово (див. partnerOrder) → фрейм, куди воно підходить (навмання)
+// → число за політикою фрейму; `tryForm` перевіряє форми й повертає дані питання або null (тоді пробуємо далі).
+function pickPartner<T>(
+  prepId: string,
+  kind: string,
+  frames: Frame[],
+  used: ReadonlySet<string>,
+  tryForm: (noun: NounEntry, num: GrammaticalNumber) => T | null
+): PartnerPick<T> | null {
+  for (const noun of partnerOrder(unionPool(prepId, kind, frames), used)) {
+    for (const frame of shuffle(frames.filter((f) => matchesNeeds(noun, f)))) {
+      for (const num of candidateNumbers(noun, frame.num ?? "sg")) {
+        const data = tryForm(noun, num);
+        if (data) return { noun, frame, num, data };
+      }
+    }
   }
   return null;
+}
+
+// Питання + id іменника (рушій веде облік слів раунду).
+interface Built {
+  q: PrepQuestion;
+  nounId: string;
 }
 
 // Дистрактор до фіксованого прийменника / обміну: той самий партнер в іншому відмінку, у ТОМУ Ж числі.
@@ -152,29 +210,32 @@ function dualDistractor(noun: NounEntry, c: CzechCase, otherCase: CzechCase, num
 }
 
 // ─────────────── Підтип fixed-noun ───────────────
-function buildFixedNoun(prep: PrepositionEntry): PrepQuestion | null {
+function buildFixedNoun(prep: PrepositionEntry, used: ReadonlySet<string>): Built | null {
   const c = prep.govCase;
-  const pick = firstValid(fixedPool(prep.id), (noun) => {
-    for (const num of candidateNumbers(noun, "any")) {
-      const correct = formOf(noun, c, num);
-      if (!correct) continue;
-      const shown = vocalizedPrep(prep, correct);
-      if (shown === null) continue;
-      const distractor = nounDistractor(noun, c, num, correct);
-      if (distractor) return { num, correct, distractor, shown };
-    }
-    return null;
+  const frames = FIXED_FRAMES[prep.id];
+  if (!frames) return null;
+  const pick = pickPartner(prep.id, "fixed", frames, used, (noun, num) => {
+    const correct = formOf(noun, c, num);
+    if (!correct) return null;
+    const shown = vocalizedPrep(prep, correct);
+    if (shown === null) return null;
+    const distractor = nounDistractor(noun, c, num, correct);
+    return distractor ? { correct, distractor, shown } : null;
   });
   if (!pick) return null;
+  const { correct, distractor, shown } = pick.data;
   return {
-    comboId: comboId(prep.id, "fixnoun", c),
-    promptWord: prep.cz,
-    promptUk: prep.uk,
-    promptLabel: "прийменник",
-    taskText: `Оберіть форму іменника після «${prep.cz}»: ${caseTail(c, pick.num)}`,
-    contextPhrase: `${pick.shown} ___`,
-    correct: pick.correct,
-    options: shuffle([pick.correct, pick.distractor]),
+    nounId: pick.noun.id,
+    q: {
+      comboId: comboId(prep.id, "fixnoun", c),
+      promptWord: prep.cz,
+      promptUk: prep.uk,
+      promptLabel: "прийменник",
+      taskText: `Оберіть форму іменника після «${prep.cz}»: ${caseTail(c, pick.num)}`,
+      contextPhrase: pick.frame.text.replace("{p}", shown),
+      correct,
+      options: shuffle([correct, distractor]),
+    },
   };
 }
 
@@ -209,31 +270,35 @@ function prepsGoverning(c: CzechCase, exceptId: string): PrepositionEntry[] {
   return out;
 }
 
-function buildFixedPrep(prep: PrepositionEntry): PrepQuestion | null {
+function buildFixedPrep(prep: PrepositionEntry, used: ReadonlySet<string>): Built | null {
   const c = prep.govCase;
-  // Партнер береться за правилами ПРАВИЛЬНОГО прийменника; обидва варіанти відповіді показуємо з вокалізацією
+  const frames = FIXED_FRAMES[prep.id];
+  if (!frames) return null;
+  // Партнер і фрейм — за правилами ПРАВИЛЬНОГО прийменника; обидва варіанти відповіді показуємо з вокалізацією
   // перед цим словом («ke klukům», а не «k klukům»), тому слово має бути класифіковане для обох.
   for (const nb of shuffle(prepsGoverning(c, prep.id))) {
-    const pick = firstValid(fixedPool(prep.id), (noun) => {
-      for (const num of candidateNumbers(noun, "any")) {
-        const form = formOf(noun, c, num);
-        if (!form) continue;
-        const a = vocalizedPrep(prep, form);
-        const b = vocalizedPrep(nb, form);
-        if (a !== null && b !== null && a !== b) return { num, form, a, b };
-      }
-      return null;
+    const pick = pickPartner(prep.id, "fixed", frames, used, (noun, num) => {
+      const form = formOf(noun, c, num);
+      if (!form) return null;
+      const a = vocalizedPrep(prep, form);
+      const b = vocalizedPrep(nb, form);
+      return a !== null && b !== null && a !== b ? { form, a, b } : null;
     });
     if (pick) {
+      const { form, a, b } = pick.data;
       return {
-        comboId: comboId(prep.id, "fixprep", c),
-        promptWord: prep.uk,
-        promptUk: "",
-        promptLabel: "прийменник",
-        taskText: `Який прийменник підходить за змістом? Керує відмінком ${caseTail(c, pick.num)}`,
-        contextPhrase: `___ ${pick.form}`,
-        correct: pick.a,
-        options: shuffle([pick.a, pick.b]),
+        nounId: pick.noun.id,
+        q: {
+          comboId: comboId(prep.id, "fixprep", c),
+          promptWord: prep.uk,
+          promptUk: "",
+          promptLabel: "прийменник",
+          taskText: `Який прийменник підходить за змістом? Керує відмінком ${caseTail(c, pick.num)}`,
+          // спершу форма іменника на місце «___», потім пропуск на місце прийменника
+          contextPhrase: pick.frame.text.replace("___", form).replace("{p}", "___"),
+          correct: a,
+          options: shuffle([a, b]),
+        },
       };
     }
   }
@@ -241,9 +306,7 @@ function buildFixedPrep(prep: PrepositionEntry): PrepQuestion | null {
 }
 
 // ─────────────── Підтип dual (напрямок/спокій) ───────────────
-type DualSense = "motion" | "location";
-
-function buildDual(prep: PrepositionEntry, sense: DualSense): PrepQuestion | null {
+function buildDual(prep: PrepositionEntry, sense: DualSense, used: ReadonlySet<string>): Built | null {
   if (!prep.dual) return null;
   const senseData = sense === "motion" ? prep.dual.motion : prep.dual.location;
   const otherData = sense === "motion" ? prep.dual.location : prep.dual.motion;
@@ -252,68 +315,65 @@ function buildDual(prep: PrepositionEntry, sense: DualSense): PrepQuestion | nul
   const frames = DUAL_FRAMES[prep.id]?.[sense];
   if (!frames || frames.length === 0) return null;
 
-  // Слово — рівномірно серед придатних до комбо (а не фрейм-першим: див. unionPool); фрейм — рівномірно
-  // серед тих, куди слово підходить і де вийшла коректна пара форм.
-  const pick = firstValid(unionPool(prep.id, sense, frames), (noun) => {
-    for (const frame of shuffle(frames.filter((f) => matchesNeeds(noun, f)))) {
-      for (const num of candidateNumbers(noun, frame.num ?? "sg")) {
-        const correct = formOf(noun, c, num);
-        if (!correct) continue;
-        const shown = vocalizedPrep(prep, correct);
-        if (shown === null) continue;
-        const distractor = dualDistractor(noun, c, otherCase, num, correct);
-        if (distractor) return { frame, num, correct, distractor, shown };
-      }
-    }
-    return null;
+  const pick = pickPartner(prep.id, sense, frames, used, (noun, num) => {
+    const correct = formOf(noun, c, num);
+    if (!correct) return null;
+    const shown = vocalizedPrep(prep, correct);
+    if (shown === null) return null;
+    const distractor = dualDistractor(noun, c, otherCase, num, correct);
+    return distractor ? { correct, distractor, shown } : null;
   });
   if (!pick) return null;
+  const { correct, distractor, shown } = pick.data;
 
   // Знахідний = напрямок/ціль (рух АБО об'єкт дії: «Věřím v tebe», «Čekám na autobus»): «рух — куди?» було б
   // хибним для таких фреймів.
   const senseUk = sense === "motion" ? "напрямок / ціль — куди? у що?" : "спокій / дія без напрямку — де?";
   return {
-    comboId: comboId(prep.id, `dual-${sense}`, c),
-    promptWord: prep.cz,
-    promptUk: prep.uk,
-    promptLabel: "прийменник",
-    taskText: `«${prep.cz}» — ${senseUk} Оберіть форму: ${caseTail(c, pick.num)}`,
-    contextPhrase: pick.frame.text.replace("{p}", pick.shown),
-    correct: pick.correct,
-    options: shuffle([pick.correct, pick.distractor]),
+    nounId: pick.noun.id,
+    q: {
+      comboId: comboId(prep.id, `dual-${sense}`, c),
+      promptWord: prep.cz,
+      promptUk: prep.uk,
+      promptLabel: "прийменник",
+      taskText: `«${prep.cz}» — ${senseUk} Оберіть форму: ${caseTail(c, pick.num)}`,
+      contextPhrase: pick.frame.text.replace("{p}", shown),
+      correct,
+      options: shuffle([correct, distractor]),
+    },
   };
 }
 
 // ─────────────── Підтип za-exchange ───────────────
-function buildZaExchange(prep: PrepositionEntry): PrepQuestion | null {
+function buildZaExchange(prep: PrepositionEntry, used: ReadonlySet<string>): Built | null {
   if (!prep.dual?.exchange) return null;
   const c = prep.dual.exchange.govCase; // akuzativ
-  const frame = EXCHANGE_FRAMES[Math.floor(Math.random() * EXCHANGE_FRAMES.length)];
-  const pick = firstValid(framePool(prep.id, "exchange", frame), (noun) => {
-    for (const num of candidateNumbers(noun, frame.num ?? "sg")) {
-      const correct = formOf(noun, c, num);
-      if (!correct) continue;
-      const distractor = nounDistractor(noun, c, num, correct);
-      if (distractor) return { num, correct, distractor };
-    }
-    return null;
+  const pick = pickPartner(prep.id, "exchange", EXCHANGE_FRAMES, used, (noun, num) => {
+    const correct = formOf(noun, c, num);
+    if (!correct) return null;
+    const distractor = nounDistractor(noun, c, num, correct);
+    return distractor ? { correct, distractor } : null;
   });
   if (!pick) return null;
+  const { correct, distractor } = pick.data;
   return {
-    comboId: comboId(prep.id, "za-exchange", c),
-    promptWord: prep.cz,
-    promptUk: "за (обмін / ціна)",
-    promptLabel: "прийменник",
-    taskText: `«za» — обмін / ціна (скільки заплатив). Оберіть форму: ${caseTail(c, pick.num)}`,
-    contextPhrase: frame.text.replace("{p}", prep.cz),
-    correct: pick.correct,
-    options: shuffle([pick.correct, pick.distractor]),
+    nounId: pick.noun.id,
+    q: {
+      comboId: comboId(prep.id, "za-exchange", c),
+      promptWord: prep.cz,
+      promptUk: "за (обмін / ціна)",
+      promptLabel: "прийменник",
+      taskText: `«za» — обмін / ціна (скільки заплатив). Оберіть форму: ${caseTail(c, pick.num)}`,
+      contextPhrase: pick.frame.text.replace("{p}", prep.cz),
+      correct,
+      options: shuffle([correct, distractor]),
+    },
   };
 }
 
 // ─────────────── Dev-перевірка даних (лише у dev-збірці, нічого не блокує) ───────────────
 // Попереджає, коли додане слово чи фрейм ламає припущення: порожні/суперечливі теги, фрейм із замалим пулом,
-// слово, яке не береться у фрази з v/k/s/z через неописану початкову групу приголосних.
+// фіксований прийменник без фреймів (він тоді не потрапляє у квіз).
 function devCheckData(): void {
   const issues: string[] = [];
   for (const n of NOUNS) issues.push(...validateNounSem(n));
@@ -321,9 +381,14 @@ function devCheckData(): void {
     if (n < min) issues.push(`пул «${label}» має лише ${n} слів (потрібно ≥ ${min})`);
   };
   for (const [pid, f] of Object.entries(DUAL_FRAMES)) {
-    for (const sense of ["motion", "location"] as DualSense[]) for (const fr of f[sense]) small(`${pid}.${sense} «${fr.text}»`, framePool(pid, sense, fr).length, 3);
+    for (const sense of SENSES) for (const fr of f[sense]) small(`${pid}.${sense} «${fr.text}»`, framePool(pid, sense, fr).length, 3);
   }
-  for (const pid of Object.keys(FIXED_NEEDS)) small(`${pid} (вузький)`, fixedPool(pid).length, 8);
+  for (const p of PREPOSITIONS) {
+    if (p.type !== "fixed") continue;
+    const frames = FIXED_FRAMES[p.id];
+    if (!frames) issues.push(`${p.id}: немає FIXED_FRAMES — прийменник не потрапляє у квіз`);
+    else for (const fr of frames) small(`${p.id} «${fr.text}»`, framePool(p.id, "fixed", fr).length, 3);
+  }
   if (issues.length > 0) console.warn(`prepositionQuiz: ${issues.length} зауваж.:\n  ` + issues.slice(0, 25).join("\n  "));
 }
 if (typeof __DEV__ !== "undefined" && __DEV__) devCheckData();
@@ -335,18 +400,19 @@ interface Combo {
   id: string;
   wordId: string;
   kind: PrepKind;
-  make: () => PrepQuestion | null;
+  make: (used: ReadonlySet<string>) => Built | null;
 }
 
 function enumerateCombos(): Combo[] {
   const combos: Combo[] = [];
   for (const p of PREPOSITIONS) {
     if (p.type === "fixed") {
+      if (!FIXED_FRAMES[p.id]) continue; // без фреймів немає партнерів (dev-перевірка про це попереджає)
       combos.push({
         id: comboId(p.id, "fixnoun", p.govCase),
         wordId: p.id,
         kind: "fixnoun",
-        make: () => buildFixedNoun(p),
+        make: (used) => buildFixedNoun(p, used),
       });
       // fixed-prep лише якщо є «сусід по відмінку» (інакше немає дистрактора)
       if (prepsGoverning(p.govCase, p.id).length > 0) {
@@ -354,17 +420,17 @@ function enumerateCombos(): Combo[] {
           id: comboId(p.id, "fixprep", p.govCase),
           wordId: p.id,
           kind: "fixprep",
-          make: () => buildFixedPrep(p),
+          make: (used) => buildFixedPrep(p, used),
         });
       }
     } else if (p.dual) {
-      for (const sense of ["motion", "location"] as DualSense[]) {
+      for (const sense of SENSES) {
         const sd = sense === "motion" ? p.dual.motion : p.dual.location;
         combos.push({
           id: comboId(p.id, `dual-${sense}`, sd.govCase),
           wordId: p.id,
           kind: "dual",
-          make: () => buildDual(p, sense),
+          make: (used) => buildDual(p, sense, used),
         });
       }
       if (p.dual.exchange) {
@@ -372,7 +438,7 @@ function enumerateCombos(): Combo[] {
           id: comboId(p.id, "za-exchange", p.dual.exchange.govCase),
           wordId: p.id,
           kind: "exchange",
-          make: () => buildZaExchange(p),
+          make: (used) => buildZaExchange(p, used),
         });
       }
     }
@@ -398,16 +464,19 @@ export function generatePrepositionSession(
 ): PrepQuestion[] {
   const chosen = selectRoundCombos(pool, mistakes, count, (c) => c.wordId, undefined, PREP_KIND_QUOTA);
   const questions: PrepQuestion[] = [];
-  for (const c of chosen) {
-    const q = c.make();
-    if (q) questions.push(q);
-  }
+  const used = new Set<string>(); // іменники цього раунду
+  const take = (c: Combo) => {
+    const b = c.make(used);
+    if (!b) return;
+    used.add(b.nounId);
+    questions.push(b.q);
+  };
+  for (const c of chosen) take(c);
   // Добір, якщо якісь make() повернули null (дистрактор збігся).
   if (questions.length < count) {
     for (const c of shuffle(pool)) {
       if (questions.length >= count) break;
-      const q = c.make();
-      if (q && !questions.some((x) => x.comboId === q.comboId)) questions.push(q);
+      if (!questions.some((x) => x.comboId === c.id)) take(c);
     }
   }
   return questions;

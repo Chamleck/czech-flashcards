@@ -22,13 +22,18 @@ import { NounEntry } from "../types";
 //         бракуючий тег = слово просто рідше з'являється (безпечно);
 //       • місце ЗАВЖДИ має рівно один із placeV (в школі) чи placeNa (на пошті) — це лексична властивість
 //         слова; перевір за словником, а не за відчуттям;
-//       • особа, тварина, їжа, час, погода, гроші, документ, тіло — «самотні» теги (без інших);
+//       • особа, тварина, їжа, час, погода, гроші, документ, тіло — «самотні» теги (без інших; винятки:
+//         тіло + bodyLevel, час + timeUnit, документ + carried — pas, doklad);
 //       • dev-збірка пише в консоль, якщо набір тегів суперечливий (validateNounSem).
 //  4. variants (необов'язково) — прийнятні, але НЕ показані на картці форми клітинки, що збігаються з формою
 //     ІНШОГО відмінка цього слова (родовий kostel: kostela, але вживають і kostelu = давальний). Квіз не подасть
 //     таку форму як помилкову відповідь. Знайти такі випадки можна звіркою зі словником форм (MorfFlex).
 //  5. Початкова група приголосних слова, якої ще немає в CLUSTER_RULES (data/prepositionPartners.ts), не дає
-//     взяти слово у фрази з v/k/s/z (ve/ke/se/ze неочевидні): додай рядок у CLUSTER_RULES, якщо знаєш правило.
+//     взяти слово у фрази з v/k/s/z (ve/ke/se/ze неочевидні): додай рядок у CLUSTER_RULES за правилом IJP
+//     («Vokalizace předložek»). Де IJP фіксує коливання (обидві форми вживані), прийменник у рядку НЕ пишемо —
+//     квіз таку фразу свідомо не ставить.
+//  6. Нове слово само потрапляє в усі фрази квізу, чиї теги збігаються (FIXED_FRAMES, DUAL_FRAMES). Після
+//     додавання прочитай фрази, куди воно потрапило (кожен фрейм + це слово): тег, що дає безглузду фразу, прибери.
 //
 export const NOUNS: NounEntry[] = [
   // ─────────────── pán (чол. істот., твердий) ───────────────
@@ -813,7 +818,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "home",
-    sem: ["item"],
+    sem: ["item", "carried"],
     declension: {
       nominativ: { sg: "klíč", pl: "klíče" },
       genitiv: { sg: "klíče", pl: "klíčů" },
@@ -833,7 +838,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
-    sem: ["item"],
+    sem: ["item", "carried"],
     declension: {
       // чергування h→z перед -e (dat./lok. sg): knize
       nominativ: { sg: "kniha", pl: "knihy" },
@@ -1044,13 +1049,14 @@ export const NOUNS: NounEntry[] = [
     sem: ["food"],
     declension: {
       nominativ: { sg: "sýr", pl: "sýry" },
-      genitiv: { sg: "sýra / sýru", pl: "sýrů" },
+      genitiv: { sg: "sýra", pl: "sýrů" },
       dativ: { sg: "sýru", pl: "sýrům" },
       akuzativ: { sg: "sýr", pl: "sýry" },
       vokativ: { sg: "sýre", pl: "sýry" },
       lokal: { sg: "sýru", pl: "sýrech" },
       instrumental: { sg: "sýrem", pl: "sýry" },
     },
+    variants: { genitiv: { sg: ["sýru"] } },
     exampleSentenceCz: "Mám rád sýr.",
     exampleSentenceUk: "Я люблю сир.",
   },
@@ -2584,7 +2590,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "people",
-    sem: ["person"],
+    sem: ["person", "collective"],
     declension: {
       nominativ: { sg: "rodina", pl: "rodiny" },
       genitiv: { sg: "rodiny", pl: "rodin" },
@@ -2821,7 +2827,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
-    sem: ["item"],
+    sem: ["item", "carried"],
     declension: {
       nominativ: { sg: "telefon", pl: "telefony" },
       genitiv: { sg: "telefonu", pl: "telefonů" },
@@ -2957,7 +2963,7 @@ export const NOUNS: NounEntry[] = [
       dativ: { sg: "nosu", pl: "nosům" },
       akuzativ: { sg: "nos", pl: "nosy" },
       vokativ: { sg: "nose", pl: "nosy" },
-      lokal: { sg: "nose / nosu", pl: "nosech" },
+      lokal: { sg: "nosu", pl: "nosech" },
       instrumental: { sg: "nosem", pl: "nosy" },
     },
     exampleSentenceCz: "Bolí mě nos.",
@@ -3036,7 +3042,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "stavani",
     category: "home",
-    sem: ["item"],
+    sem: ["item", "clothes"],
     uncountable: true,
     declension: {
       nominativ: { sg: "oblečení", pl: "oblečení" },
@@ -3440,7 +3446,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
-    sem: ["item"],
+    sem: ["item", "carried"],
     declension: {
       nominativ: { sg: "deštník", pl: "deštníky" },
       genitiv: { sg: "deštníku", pl: "deštníků" },
@@ -3460,7 +3466,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "home",
-    sem: ["item"],
+    sem: ["item", "carried"],
     declension: {
       // Pluralia tantum — однини немає ("—", той самий підхід, що й peníze/usta).
       // Повна парадигма звірена напряму dobryslovnik.cz.
@@ -3482,7 +3488,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
-    sem: ["item", "container"],
+    sem: ["item", "container", "carried"],
     declension: {
       nominativ: { sg: "taška", pl: "tašky" },
       genitiv: { sg: "tašky", pl: "tašek" },
@@ -3531,7 +3537,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "home",
-    sem: ["item"],
+    sem: ["item", "clothes"],
     declension: {
       nominativ: { sg: "košile", pl: "košile" },
       genitiv: { sg: "košile", pl: "košil" },
@@ -3551,7 +3557,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
-    sem: ["item"],
+    sem: ["item", "clothes"],
     declension: {
       // Pluralia tantum — однини немає ("—", той самий підхід, що й peníze/usta/bryle).
       // Підтверджено в одному переліку з dveře/nůžky/játra/housle (шкільний ключ відповідей).
@@ -3573,7 +3579,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
-    sem: ["item"],
+    sem: ["item", "clothes", "paired"],
     declension: {
       // На відміну від kalhoty — ЗВИЧАЙНИЙ іменник з повною однини (ÚJČ-афілійований
       // шкільний ключ прямо: не pluralia tantum, лише переважає вживання в множині).
@@ -3595,14 +3601,14 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
-    sem: ["item", "container"],
+    sem: ["item", "container", "clothes"],
     declension: {
       nominativ: { sg: "kabát", pl: "kabáty" },
       genitiv: { sg: "kabátu", pl: "kabátů" },
       dativ: { sg: "kabátu", pl: "kabátům" },
       akuzativ: { sg: "kabát", pl: "kabáty" },
       vokativ: { sg: "kabáte", pl: "kabáty" },
-      lokal: { sg: "kabátě / kabátu", pl: "kabátech" },
+      lokal: { sg: "kabátu", pl: "kabátech" },
       instrumental: { sg: "kabátem", pl: "kabáty" },
     },
     exampleSentenceCz: "Oblékni si kabát.",
@@ -3615,7 +3621,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
-    sem: ["item"],
+    sem: ["item", "clothes"],
     declension: {
       nominativ: { sg: "svetr", pl: "svetry" },
       genitiv: { sg: "svetru", pl: "svetrů" },
@@ -3635,7 +3641,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
-    sem: ["item"],
+    sem: ["item", "clothes", "paired"],
     declension: {
       nominativ: { sg: "ponožka", pl: "ponožky" },
       genitiv: { sg: "ponožky", pl: "ponožek" },
@@ -3655,14 +3661,14 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
-    sem: ["document"],
+    sem: ["document", "carried"],
     declension: {
       nominativ: { sg: "pas", pl: "pasy" },
       genitiv: { sg: "pasu", pl: "pasů" },
       dativ: { sg: "pasu", pl: "pasům" },
       akuzativ: { sg: "pas", pl: "pasy" },
       vokativ: { sg: "pase", pl: "pasy" },
-      lokal: { sg: "pase / pasu", pl: "pasech" },
+      lokal: { sg: "pasu", pl: "pasech" },
       instrumental: { sg: "pasem", pl: "pasy" },
     },
     exampleSentenceCz: "Ztratil jsem pas.",
@@ -3675,14 +3681,14 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
-    sem: ["document"],
+    sem: ["document", "carried"],
     declension: {
       nominativ: { sg: "doklad", pl: "doklady" },
       genitiv: { sg: "dokladu", pl: "dokladů" },
       dativ: { sg: "dokladu", pl: "dokladům" },
       akuzativ: { sg: "doklad", pl: "doklady" },
       vokativ: { sg: "doklade", pl: "doklady" },
-      lokal: { sg: "dokladě / dokladu", pl: "dokladech" },
+      lokal: { sg: "dokladu", pl: "dokladech" },
       instrumental: { sg: "dokladem", pl: "doklady" },
     },
     exampleSentenceCz: "Potřebuji doklad totožnosti.",

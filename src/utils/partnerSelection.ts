@@ -5,16 +5,18 @@ import { CLUSTER_RULES, MEST_RULE, Needs, NumberPolicy, VocalDecision, VocalPrep
 // ─────────────── Чисті допоміжні функції добору партнерів (без випадковості, крім candidateNumbers) ───────────────
 // Дані — data/prepositionPartners.ts, теги — data/nounTags.ts, квіз — prepositionQuizEngine.ts.
 
-// Чи підходить слово під вимогу фрейму (any — хоча б один тег, all — усі; порожня вимога — будь-яке слово).
+// Чи підходить слово під вимогу фрейму (any — хоча б один тег, all — усі, none — жодного; порожня вимога —
+// будь-яке слово).
 export function matchesNeeds(n: NounEntry, needs: Needs): boolean {
   const sem = n.sem ?? [];
+  if (needs.none && needs.none.some((t) => sem.includes(t))) return false;
   if (needs.all && !needs.all.every((t) => sem.includes(t))) return false;
   if (needs.any && !needs.any.some((t) => sem.includes(t))) return false;
   return true;
 }
 
-// Множина природна не завжди: «po obědech», «při deštích», «do týdnů» звучать дивно.
-const SINGULAR_ONLY: NounTag[] = ["meal", "weather", "activity", "time"];
+// Множина природна не завжди: «po obědech», «při deštích», «do týdnů», «od rodin» звучать дивно.
+const SINGULAR_ONLY: NounTag[] = ["meal", "weather", "activity", "time", "collective"];
 export function pluralNatural(n: NounEntry): boolean {
   return !n.uncountable && !(n.sem ?? []).some((t) => SINGULAR_ONLY.includes(t));
 }
@@ -23,12 +25,13 @@ const hasNumber = (n: NounEntry, num: GrammaticalNumber) => n.declension.nominat
 
 // Які числа можна взяти для слова за політикою фрейму, у ВИПАДКОВОМУ порядку (перебирає той, хто викликає:
 // якщо перше число не дає контрасту форм, пробуємо друге — слово не карається за невдалий жереб).
-// Слово лише з множиною (peníze, brýle) бере множину навіть у «sg»-фреймі; слово без множини у «pl»-фреймі непридатне.
+// Слово лише з множиною (peníze, brýle) і парна річ (boty, ponožky — тег paired) беруть множину навіть у «sg»-фреймі;
+// у «pl»-фреймі непридатне слово без множини або з неприродною множиною (pluralNatural).
 export function candidateNumbers(n: NounEntry, policy: NumberPolicy, rnd: () => number = Math.random): GrammaticalNumber[] {
   const sg = hasNumber(n, "sg");
   const pl = hasNumber(n, "pl");
-  if (policy === "pl") return pl ? ["pl"] : [];
-  if (!sg) return pl ? ["pl"] : [];
+  if (policy === "pl") return pl && (pluralNatural(n) || !sg) ? ["pl"] : []; // не «mezi rodinami», не «mezi oblečeními»
+  if (!sg || (pl && (n.sem ?? []).includes("paired"))) return pl ? ["pl"] : [];
   if (policy === "sg" || !pl || !pluralNatural(n)) return ["sg"];
   return rnd() < 0.5 ? ["sg", "pl"] : ["pl", "sg"];
 }

@@ -29,6 +29,10 @@ export type NounTag =
   | "space"
   | "support"
   | "item"
+  | "carried"
+  | "clothes"
+  | "paired"
+  | "collective"
   | "document"
   | "money"
   | "food"
@@ -62,6 +66,10 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
   space: "під чим є місце (залізти, покласти): stůl, postel, skříň, auto, most, strom",
   support: "до чого можна притулитися: dům, strom, skříň, stůl, okno",
   item: "невеликий предмет: kniha, klíč, telefon, bota, taška, hrnek",
+  carried: "те, що беруть із собою з дому й можуть забути («Odešel bez klíče», «Jdu pro tašku»): klíč, telefon, deštník, brýle, taška, pas (НЕ hrnek, lžíce, televize)",
+  clothes: "одяг і взуття («Odešel bez kabátu», «Poznal jsem ho podle kabátu»): košile, kalhoty, kabát, svetr, bota, ponožka",
+  paired: "річ, яку зазвичай уживають парою, тож у фразах квізу береться множина («bez ponožek», не «bez ponožky»): bota, ponožka",
+  collective: "збірна назва групи людей, множина якої у фразах неприродна («od rodin»): rodina (разом з person)",
   document: "документ чи реквізит: pas, doklad, adresa, účet",
   money: "гроші, валюта: peníze, koruna, euro",
   food: "їжа чи напій: chléb, káva, maso, voda",
@@ -81,7 +89,8 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
 };
 
 // Теги-«самоцілі»: слово з таким тегом не має жодних інших (особа не буває будівлею, їжа — місцем тощо).
-// Виняток: body разом з bodyLevel.
+// Винятки: body разом з bodyLevel, time разом з timeUnit, document разом з carried (pas, doklad),
+// person разом з collective (rodina).
 const SOLO: NounTag[] = ["person", "animal", "money", "food", "meal", "time", "weather", "abstract", "document", "body"];
 // Теги, що ВИМАГАЮТЬ супутнього: (тег → хоча б один з переліку).
 const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
@@ -100,7 +109,8 @@ export function validateNounSem(n: Pick<NounEntry, "id" | "sem">): string[] {
   for (const t of sem) if (!(t in NOUN_TAG_DOC)) out.push(`${n.id}: невідомий тег «${t}»`);
   for (const solo of SOLO) {
     if (!sem.includes(solo)) continue;
-    const allowed: NounTag[] = solo === "body" ? ["body", "bodyLevel"] : solo === "time" ? ["time", "timeUnit"] : [solo];
+    const allowed: NounTag[] =
+      solo === "body" ? ["body", "bodyLevel"] : solo === "time" ? ["time", "timeUnit"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : [solo];
     const extra = sem.filter((t) => !allowed.includes(t));
     if (extra.length > 0) out.push(`${n.id}: тег «${solo}» не сполучається з ${extra.join(", ")}`);
   }

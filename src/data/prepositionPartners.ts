@@ -8,23 +8,27 @@ import type { NounTag } from "./nounTags";
 //
 // Вимога фрейму (Needs):
 //   any: [...] — слово має ХОЧА Б ОДИН з тегів;      all: [...] — слово має ВСІ теги;
-//   обидва поля порожні — без обмежень (будь-який іменник з пулу).
+//   none: [...] — слово НЕ має жодного з тегів (od rána, але не «od hodiny»);
+//   усі поля порожні — без обмежень (будь-який іменник з пулу).
 
 export interface Needs {
   any?: NounTag[];
   all?: NounTag[];
+  none?: NounTag[];
 }
 
 // Яке число: "sg" — однина (слово лише з множиною — peníze, brýle — береться в множині); "pl" — лише множина
 // (mezi, «po kolena»); "any" — однина або множина навмання, але множина лише там, де вона природна.
 export type NumberPolicy = "sg" | "pl" | "any";
 
-export interface DualFrame extends Needs {
+// Фрейм — фраза квізу. Один тип для ВСІХ прийменників (двоїстих, фіксованих, «za» обміну): рушій бере слово
+// з тегами, що підходять, і підставляє його форму в «___».
+export interface Frame extends Needs {
   text: string; // «{p}» — місце прийменника (з вокалізацією), «___» — пропуск для форми іменника
   num?: NumberPolicy; // за замовчуванням "sg"
 }
 
-type Frames = { motion: DualFrame[]; location: DualFrame[] };
+type Frames = { motion: Frame[]; location: Frame[] };
 
 // Знахідний = напрямок/ціль (рух АБО об'єкт дії: «Jdu na poštu», «Čekám na autobus», «Věřím v tebe»);
 // місцевий/орудний = спокій / дія без напрямку. Кожна фраза природна для ВСІХ слів, що підпадають під її теги.
@@ -45,7 +49,7 @@ export const DUAL_FRAMES: Record<string, Frames> = {
   "prep-o": {
     motion: [
       { text: "Opřel to {p} ___", any: ["support"], num: "any" },
-      { text: "Zakopl {p} ___", any: ["surface", "item"], num: "any" },
+      { text: "Zakopl {p} ___", any: ["surface", "item"], none: ["opening"], num: "any" }, // не «o okno»
       { text: "Požádal {p} ___", any: ["food", "money", "document", "item"] },
     ],
     location: [
@@ -142,30 +146,67 @@ export const DUAL_FRAMES: Record<string, Frames> = {
 };
 
 // «za» = обмін / ціна (знахідний): те, за що реально платять.
-export const EXCHANGE_FRAMES: DualFrame[] = [{ text: "Zaplatil jsem {p} ___", any: ["food", "meal", "item", "vehicle"], num: "any" }];
+export const EXCHANGE_FRAMES: Frame[] = [{ text: "Zaplatil jsem {p} ___", any: ["food", "meal", "item", "vehicle"], num: "any" }];
 
 // ─────────── Фіксовані прийменники ───────────
-// «Вузькі» (значення залежить від типу іменника): партнер — лише зі слів з потрібними тегами.
-export const FIXED_NEEDS: Record<string, Needs> = {
-  "prep-do": { any: ["placeV", "container", "time", "meal", "activity"] }, // do školy, do tašky, do večera
-  "prep-z": { any: ["placeV", "container"] }, // ze školy, z tašky
-  "prep-u": { any: ["building", "person", "surface", "opening", "outdoor", "support"] }, // u nádraží, u lékaře, u okna
-  "prep-vedle": { any: ["building", "person", "surface", "opening", "outdoor", "support"] },
-  "prep-kolem": { any: ["building", "outdoor", "support"] },
-  "prep-k": { any: ["person", "building", "placeV", "placeNa", "outdoor", "meal"] }, // k lékaři, k nádraží, k obědu
-  "prep-mimo": { any: ["placeV", "placeNa", "building", "outdoor"] }, // mimo město
-  "prep-pres": { any: ["path", "outdoor", "furniture", "opening", "timeUnit"] }, // přes most, přes týden
-  "prep-skrz": { any: ["opening", "outdoor", "weather", "timeUnit", "building"] }, // skrz okno, skrz noc
-  "prep-pri": { any: ["activity", "meal", "weather"] }, // při práci, při obědě, při dešti
-};
-// «Широкі» (bez, od, kromě, místo, podle, proti, kvůli, díky, pro, s): будь-який іменник з пулу, крім класів,
-// після яких вони безглузді.
-export const FIXED_EXCLUDE: Record<string, NounTag[]> = {
-  "prep-podle": ["time", "body"],
-  "prep-proti": ["time"],
-  "prep-kvuli": ["time"],
-  "prep-diky": ["time"],
-  "prep-s": ["time"],
+// Кожен фіксований прийменник має свої фрейми (той самий механізм, що й у двоїстих). «Вузькі» (do, z, u, k…)
+// — коротка фраза «{p} ___»: значення задає тип іменника (do školy, z tašky, k lékaři). «Широкі» (bez, od,
+// místo, podle, proti, kvůli, díky, pro, s) — речення, яке задає СМИСЛ («Mám dopis od ___», «Přišel pozdě
+// kvůli ___»): гола фраза «kvůli ___» з будь-яким словом давала граматичні, але безглузді «kvůli lžíci».
+// kromě — «{p} ___» без обмежень: «крім» природне з будь-яким словом.
+// Нове слово з тегами потрапляє у фрази САМЕ; слово без жодного підхожого фрейму з прийменником просто не
+// з'являється (безпечно). Новий фрейм — один рядок; dev-збірка попереджає, якщо в ньому < 3 слів.
+export const FIXED_FRAMES: Record<string, Frame[]> = {
+  // ── вузькі ──
+  "prep-do": [{ text: "{p} ___", any: ["placeV", "container", "time", "meal", "activity"], num: "any" }], // do školy, do tašky, do večera
+  "prep-z": [{ text: "{p} ___", any: ["placeV", "container"], num: "any" }], // ze školy, z tašky
+  "prep-u": [{ text: "{p} ___", any: ["building", "person", "surface", "opening", "outdoor", "support"], num: "any" }], // u nádraží, u lékaře, u okna
+  "prep-vedle": [{ text: "{p} ___", any: ["building", "person", "surface", "opening", "outdoor", "support"], num: "any" }],
+  "prep-kolem": [{ text: "{p} ___", any: ["building", "outdoor", "support"], num: "any" }],
+  "prep-k": [{ text: "{p} ___", any: ["person", "building", "placeV", "placeNa", "outdoor", "meal"], num: "any" }], // k lékaři, k nádraží, k obědu
+  "prep-mimo": [{ text: "{p} ___", any: ["placeV", "placeNa", "building", "outdoor"], num: "any" }], // mimo město
+  "prep-pres": [{ text: "{p} ___", any: ["path", "outdoor", "furniture", "opening", "timeUnit"], num: "any" }], // přes most, přes týden
+  "prep-skrz": [{ text: "{p} ___", any: ["opening", "outdoor", "weather", "building"], num: "any" }], // skrz okno, skrz déšť (НЕ час: «skrz minutu» — ні)
+  "prep-pri": [{ text: "{p} ___", any: ["activity", "meal", "weather"], num: "any" }], // při práci, při obědě, při dešti
+  // ── широкі ──
+  "prep-bez": [
+    { text: "Odešel {p} ___", any: ["carried", "clothes", "money"] }, // bez klíče, bez kabátu, bez peněz
+    { text: "Jsem tady {p} ___", any: ["person"], num: "any" }, // bez kamaráda, bez dětí
+  ],
+  "prep-od": [
+    { text: "Mám dopis {p} ___", any: ["person"], num: "any" }, // od mámy, od kamarádů
+    { text: "Bydlím kousek {p} ___", any: ["building", "outdoor"] }, // od nádraží, od lesa
+    { text: "Čekám tady {p} ___", any: ["time"], none: ["timeUnit"] }, // od rána, od poledne
+  ],
+  "prep-kromě": [{ text: "{p} ___", num: "any" }],
+  "prep-misto": [
+    { text: "Přišel {p} ___", any: ["person"] }, // místo otce
+    { text: "Vezmi si tohle {p} ___", any: ["clothes", "carried"] }, // místo kabátu, místo tašky
+  ],
+  "prep-podle": [
+    { text: "Řídím se {p} ___", any: ["person"] }, // podle lékaře
+    { text: "Poznal jsem ho {p} ___", any: ["clothes"] }, // podle kabátu
+  ],
+  "prep-proti": [
+    { text: "Hraje {p} ___", any: ["person"], num: "any" }, // proti bratrovi, proti klukům
+    { text: "Nemám nic {p} ___", any: ["person"], num: "any" }, // proti sousedovi
+  ],
+  "prep-kvuli": [
+    { text: "Přišel pozdě {p} ___", any: ["person", "vehicle"], num: "any" }, // kvůli kamarádovi, kvůli autobusu
+    { text: "Zůstal doma {p} ___", any: ["weather", "person"], num: "any" }, // kvůli dešti, kvůli dítěti
+  ],
+  "prep-diky": [
+    { text: "Všechno zvládl {p} ___", any: ["person"], num: "any" }, // díky kamarádovi
+    { text: "Dorazil včas {p} ___", any: ["vehicle"] }, // díky metru
+  ],
+  "prep-pro": [
+    { text: "Mám dárek {p} ___", any: ["person"], num: "any" }, // pro mámu, pro děti
+    { text: "Jdu {p} ___", any: ["food", "carried"] }, // pro chléb, pro klíč (сходити по щось)
+  ],
+  "prep-s": [
+    { text: "Jdu tam {p} ___", any: ["person"], num: "any" }, // s kamarádem, se ženou, s dětmi
+    { text: "Přišel {p} ___", any: ["carried"] }, // s deštníkem, s taškou
+  ],
 };
 
 // ─────────── Вокалізація v→ve, k→ke, s→se, z→ze ───────────
@@ -190,19 +231,25 @@ export const CLUSTER_RULES: Record<string, Partial<Record<VocalPrep, VocalDecisi
   skl: ALL_VOCAL, skř: ALL_VOCAL, šk: ALL_VOCAL, zrc: ALL_VOCAL, zv: ALL_VOCAL,
   // v srdci (без вокалізації), але ke srdci, se srdcem, ze srdce
   srdc: { v: "plain", k: "vocal", s: "vocal", z: "vocal" },
-  sprch: { k: "vocal", s: "vocal", z: "vocal" }, // «ve sprše» не класифіковано → у фразі з v слово пропускається
-  sprš: { k: "vocal", s: "vocal", z: "vocal" },
+  // група з трьох приголосних — вокалізація звичайна (IJP): ve sprše, ke sprše, se sprchou, ze sprchy
+  sprch: ALL_VOCAL,
+  sprš: ALL_VOCAL,
   // den: ve dni, ke dni, se dnem, ze dne
   dn: ALL_VOCAL,
-  // dcera: v dceři, s dcerou, z dcery (ke dceři/k dceři коливається → пропуск)
+  // КОЛИВАННЯ (IJP: вокалізація «není jev ustálený»): прийменник без запису в рядку = обидві форми вживані,
+  // квіз таку фразу НЕ ставить (не можна перевіряти форму, де правильні обидві). Свідомо, не прогалина.
+  // dcera: v dceři, s dcerou, z dcery; ke dceři / k dceři коливається
   dc: { v: "plain", s: "plain", z: "plain" },
-  // pes: ke psu, se psem, ze psa (ve psu/v psu коливається → пропуск)
+  // pes: ke psu, se psem, ze psa; ve psu / v psu коливається
   ps: { k: "vocal", s: "vocal", z: "vocal" },
+  // pták: v/ve, k/ke, s/se, z/ze ptákovi… коливаються всі чотири
+  pt: {},
   // tř-: ve třídě, ke třem, se třemi, ze třídy
   tř: ALL_VOCAL,
 };
-// Слова на měst- (město): ve městě, ke městu, z města; «se městem» не класифіковано.
-export const MEST_RULE: Partial<Record<VocalPrep, VocalDecision>> = { v: "vocal", k: "vocal", z: "plain" };
+// Слова на měst- (město): ve městě, ke městu — усталені винятки; s městem, z města — за загальним правилом
+// (один приголосний перед голосним — без вокалізації, IJP).
+export const MEST_RULE: Partial<Record<VocalPrep, VocalDecision>> = { v: "vocal", k: "vocal", s: "plain", z: "plain" };
 
 // ─────────── Пари прийменників, що не можуть бути дистракторами одне одному ───────────
 // У питанні «обери прийменник за значенням» видно лише переклад і форму слова, без речення. Коли значення двох
