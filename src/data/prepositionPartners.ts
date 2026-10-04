@@ -242,10 +242,10 @@ const ALL_VOCAL: Partial<Record<VocalPrep, VocalDecision>> = { v: "vocal", k: "v
 const K_VOCAL: Partial<Record<VocalPrep, VocalDecision>> = { v: "plain", k: "vocal", s: "plain", z: "plain" }; // kn-, kl-, kr-, kv-
 export const CLUSTER_RULES: Record<string, Partial<Record<VocalPrep, VocalDecision>>> = {
   // ніколи не вокалізуються
-  br: ALL_PLAIN, bř: ALL_PLAIN, bl: ALL_PLAIN, dr: ALL_PLAIN, hl: ALL_PLAIN, hr: ALL_PLAIN, hrn: ALL_PLAIN,
-  hv: ALL_PLAIN, chl: ALL_PLAIN, chr: ALL_PLAIN, lž: ALL_PLAIN, pl: ALL_PLAIN, pr: ALL_PLAIN, př: ALL_PLAIN, tr: ALL_PLAIN,
+  br: ALL_PLAIN, bř: ALL_PLAIN, bl: ALL_PLAIN, dr: ALL_PLAIN, hl: ALL_PLAIN, hr: ALL_PLAIN,
+  chl: ALL_PLAIN, chr: ALL_PLAIN, pl: ALL_PLAIN, pr: ALL_PLAIN, př: ALL_PLAIN, tr: ALL_PLAIN,
   // k + k-подібні: ke knize, ke květině; v/s/z — без вокалізації (v knize, s knihou)
-  kn: K_VOCAL, kl: K_VOCAL, kr: K_VOCAL, kv: K_VOCAL,
+  kn: K_VOCAL, kl: K_VOCAL, kr: K_VOCAL, // kn: «s knihou» (IJP, id=111)
   // v + v-: ve vlaku
   vl: { v: "vocal", k: "plain", s: "plain", z: "plain" },
   // s-/š-/z-/ž- + приголосний: ve škole, ke stolu, se sněhem, ze sklenice
@@ -260,8 +260,12 @@ export const CLUSTER_RULES: Record<string, Partial<Record<VocalPrep, VocalDecisi
   dn: ALL_VOCAL,
   // КОЛИВАННЯ (IJP: вокалізація «není jev ustálený»): прийменник без запису в рядку = обидві форми вживані,
   // квіз таку фразу НЕ ставить (не можна перевіряти форму, де правильні обидві). Свідомо, не прогалина.
-  // dcera: v dceři, s dcerou, z dcery; ke dceři / k dceři коливається
-  dc: { v: "plain", s: "plain", z: "plain" },
+  // Друга приголосна не r/l — IJP: «ve prospěch vokalizace svědčí úzus», але вжиток коливається:
+  dc: {}, // dcera: s dcerou / se dcerou, k dceři / ke dceři
+  hv: {}, // hvězda: s hvězdou / se hvězdou
+  lž: {}, // lžíce: s lžící / se lžící
+  kv: { k: "vocal" }, // květina: ke květině (k + k — завжди); v/s/z коливаються
+  hrn: {}, // hrnek: три приголосні — IJP «většinou vokalizujeme», у вжитку й v hrnku
   // pes: ke psu, se psem, ze psa; ve psu / v psu коливається
   ps: { k: "vocal", s: "vocal", z: "vocal" },
   // pták: v/ve, k/ke, s/se, z/ze ptákovi… коливаються всі чотири
@@ -269,9 +273,9 @@ export const CLUSTER_RULES: Record<string, Partial<Record<VocalPrep, VocalDecisi
   // tř-: ve třídě, ke třem, se třemi, ze třídy
   tř: ALL_VOCAL,
 };
-// Слова на měst- (město): ve městě, ke městu — усталені винятки; s městem, z města — за загальним правилом
-// (один приголосний перед голосним — без вокалізації, IJP).
-export const MEST_RULE: Partial<Record<VocalPrep, VocalDecision>> = { v: "vocal", k: "vocal", s: "plain", z: "plain" };
+// Слова на měst- (město): ve městě — усталений виняток; s městem, z města — за загальним правилом (один
+// приголосний перед голосним — без вокалізації, IJP); k městu / ke městu коливається → не тестуємо.
+export const MEST_RULE: Partial<Record<VocalPrep, VocalDecision>> = { v: "vocal", s: "plain", z: "plain" };
 
 // ─────────── Пари прийменників, що не можуть бути дистракторами одне одному ───────────
 // У питанні «обери прийменник за значенням» видно лише переклад і форму слова, без речення. Коли значення двох
