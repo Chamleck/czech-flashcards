@@ -10,7 +10,9 @@ import { PersonalPronounEntry, PersonalDeclension, Gender } from "../types";
 // Вокатив в особових відсутній → скрізь "—".
 
 const COLS_SL = { a: "короткий", b: "довгий" };
-const COLS_NP = { a: "без прийм.", b: "після прийм." };
+// Експортовано для квізу «Прийменники»: займенники з цими колонками (on/ona/ono, oni) мають окрему форму
+// ПІСЛЯ прийменника (k němu, s ní), і квіз перевіряє саме її (utils/prepositionQuizEngine.ts).
+export const COLS_NP = { a: "без прийм.", b: "після прийм." };
 const COLS_ONE = { a: "форма", b: "—" };
 
 const d = (a: string, b: string) => ({ a, b });

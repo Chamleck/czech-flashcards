@@ -23,7 +23,7 @@ import { NounEntry } from "../types";
 //       • місце ЗАВЖДИ має рівно один із placeV (в школі) чи placeNa (на пошті) — це лексична властивість
 //         слова; перевір за словником, а не за відчуттям;
 //       • особа, тварина, їжа, час, погода, гроші, документ, тіло — «самотні» теги (без інших; винятки:
-//         тіло + bodyLevel, час + timeUnit, документ + carried — pas, doklad);
+//         тіло + bodyLevel, час + timeUnit / dayPart, документ + carried — pas, doklad);
 //       • dev-збірка пише в консоль, якщо набір тегів суперечливий (validateNounSem).
 //  4. variants (необов'язково) — прийнятні, але НЕ показані на картці форми клітинки, що збігаються з формою
 //     ІНШОГО відмінка цього слова (родовий kostel: kostela, але вживають і kostelu = давальний). Квіз не подасть
@@ -2390,7 +2390,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "time",
-    sem: ["time", "timeUnit"],
+    sem: ["time", "timeUnit", "dayPart"],
     declension: {
       // Нерегулярне: gen "dne" (не "denu"), gen.pl "dní" (НЕ "dnů" — застаріла/
       // нормативно неправильна форма, звірено окремою статтею ÚJČ).
@@ -3874,7 +3874,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "kost",
     category: "time",
-    sem: ["time", "timeUnit"],
+    sem: ["time", "timeUnit", "dayPart"],
     declension: {
       nominativ: { sg: "noc", pl: "noci" },
       genitiv: { sg: "noci", pl: "nocí" },
@@ -3894,7 +3894,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "kost",
     category: "time",
-    sem: ["time"],
+    sem: ["time", "dayPart"],
     declension: {
       nominativ: { sg: "půlnoc", pl: "půlnoci" },
       genitiv: { sg: "půlnoci", pl: "půlnocí" },
@@ -3914,7 +3914,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "time",
-    sem: ["time"],
+    sem: ["time", "dayPart"],
     declension: {
       nominativ: { sg: "poledne", pl: "poledne" },
       genitiv: { sg: "poledne", pl: "polední" },
@@ -3934,7 +3934,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "time",
-    sem: ["time"],
+    sem: ["time", "dayPart"],
     declension: {
       nominativ: { sg: "dopoledne", pl: "dopoledne" },
       genitiv: { sg: "dopoledne", pl: "dopolední" },
@@ -3954,7 +3954,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "time",
-    sem: ["time"],
+    sem: ["time", "dayPart"],
     declension: {
       nominativ: { sg: "odpoledne", pl: "odpoledne" },
       genitiv: { sg: "odpoledne", pl: "odpolední" },
@@ -3974,7 +3974,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "time",
-    sem: ["time"],
+    sem: ["time", "dayPart"],
     declension: {
       nominativ: { sg: "ráno", pl: "rána" },
       genitiv: { sg: "rána", pl: "rán" },
@@ -3994,7 +3994,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "time",
-    sem: ["time"],
+    sem: ["time", "dayPart"],
     declension: {
       nominativ: { sg: "večer", pl: "večery" },
       genitiv: { sg: "večera", pl: "večerů" },

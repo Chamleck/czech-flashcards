@@ -1,9 +1,10 @@
-import { CzechCase, NounEntry, PrepositionEntry, CASE_LABELS, GrammaticalNumber } from "../types";
+import { CzechCase, NounEntry, PrepositionEntry, CASE_LABELS, GrammaticalNumber, Gender, PersonalDeclension, PersonalPronounEntry } from "../types";
 import { PREPOSITIONS } from "../data/prepositions";
 import { NOUNS } from "../data/nouns";
+import { COLS_NP, PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { nounUsableAsPartner } from "../data/categories";
 import { validateNounSem } from "../data/nounTags";
-import { CONFUSABLE_PREP_PAIRS, DUAL_FRAMES, EXCHANGE_FRAMES, FIXED_FRAMES, Frame, Needs } from "../data/prepositionPartners";
+import { CONFUSABLE_PREP_PAIRS, DUAL_FRAMES, EXCHANGE_FRAMES, FIXED_FRAMES, Frame, Needs, PRONOUN_FRAMES } from "../data/prepositionPartners";
 import { acceptedForms, candidateNumbers, disjoint, formOf, matchesNeeds, vocalizedPrep } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
 
@@ -14,6 +15,8 @@ import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcard
 //   • dual           — прийменник видно + taskText каже НАПРЯМОК/ЦІЛЬ чи СПОКІЙ; обери форму партнера у правильному з
 //                      двох відмінків. Дистрактор — той самий партнер в ІНШОМУ з двох відмінків.
 //   • za-exchange    — «za» у сенсі обмін/ціна (знахідний).
+//   • pronoun        — прийменник + особовий займенник 3-ї особи: обери форму після прийменника (k němu, а не
+//                      k jemu). Дистрактор — форма «без прийменника» того ж займенника й відмінка.
 //
 // ПАРТНЕР (іменник у фразі) підбирається за СМИСЛОВИМИ ТЕГАМИ (data/nounTags.ts), а не навмання з усього
 // словника: фрази природні («Jsem ve škole», «Jdu na poštu», «Mám dopis od kamaráda»), а новий іменник з
@@ -371,6 +374,90 @@ function buildZaExchange(prep: PrepositionEntry, used: ReadonlySet<string>): Bui
   };
 }
 
+// ─────────────── Підтип pronoun (прийменник + займенник) ───────────────
+// Беремо лише займенники з колонками «без прийм. / після прийм.» (COLS_NP: on/ona/ono, oni): для них друга колонка —
+// саме форма після прийменника. Роди з однаковими формами (masc_anim/masc_inan; усі роди «oni» поза називним)
+// зливаються в одну групу, тож одна й та сама таблиця не дублюється.
+interface PronounGroup {
+  pron: PersonalPronounEntry;
+  key: string; // рід-представник групи або "all" — частина comboId
+  promptCz: string;
+  promptUk: string;
+  decl: PersonalDeclension;
+}
+
+const splitForms = (cell: string): string[] => (cell === "—" ? [] : cell.split(" / ").map((x) => x.trim()));
+
+function pronounGroups(): PronounGroup[] {
+  const out: PronounGroup[] = [];
+  for (const pron of PERSONAL_PRONOUNS) {
+    if (pron.columns !== COLS_NP) continue;
+    if (!pron.gendered) {
+      out.push({ pron, key: "all", promptCz: pron.cz, promptUk: pron.uk, decl: pron.declension });
+      continue;
+    }
+    const groups: { genders: Gender[]; decl: PersonalDeclension }[] = [];
+    const sig = (d: PersonalDeclension) => JSON.stringify(CASES.filter((c) => c !== "nominativ").map((c) => d[c]));
+    for (const g of Object.keys(pron.declension) as Gender[]) {
+      const d = pron.declension[g];
+      const hit = groups.find((x) => sig(x.decl) === sig(d));
+      if (hit) hit.genders.push(g);
+      else groups.push({ genders: [g], decl: d });
+    }
+    const czAll = pron.cz.split(" / ");
+    const ukAll = pron.uk.split(" / ");
+    for (const grp of groups) {
+      const noms = [...new Set(grp.genders.map((g) => pron.declension[g].nominativ.a))];
+      const whole = noms.length === czAll.length || ukAll.length !== czAll.length;
+      out.push({
+        pron,
+        key: grp.genders[0],
+        promptCz: whole ? pron.cz : noms.join(" / "),
+        promptUk: whole ? pron.uk : noms.map((n) => ukAll[czAll.indexOf(n)] ?? pron.uk).join(" / "),
+        decl: grp.decl,
+      });
+    }
+  }
+  return out;
+}
+
+const PREP_BY_ID = new Map(PREPOSITIONS.map((p) => [p.id, p]));
+
+// Комірка придатна, якщо є обидві колонки й форма «без прийменника» не є прийнятною формою «після прийменника».
+function pronounPair(decl: PersonalDeclension, c: CzechCase): { correct: string; plain: string } | null {
+  const after = splitForms(decl[c].b);
+  const plain = splitForms(decl[c].a)[0];
+  if (after.length === 0 || !plain || after.includes(plain) || !isUsable(after[0], plain)) return null;
+  return { correct: after[0], plain };
+}
+
+function buildPronoun(grp: PronounGroup, c: CzechCase, used: ReadonlySet<string>): Built | null {
+  const pair = pronounPair(grp.decl, c);
+  const frames = PRONOUN_FRAMES[c];
+  if (!pair || !frames) return null;
+  for (const frame of shuffle(frames)) {
+    const prep = PREP_BY_ID.get(frame.prepId);
+    if (!prep) continue;
+    const shown = vocalizedPrep(prep, pair.correct);
+    if (shown === null) continue;
+    const lbl = CASE_LABELS[c];
+    return {
+      nounId: `pron:${grp.pron.id}:${grp.key}`,
+      q: {
+        comboId: comboId(grp.pron.id, `prep-${grp.key}`, c),
+        promptWord: grp.promptCz,
+        promptUk: grp.promptUk,
+        promptLabel: "займенник",
+        taskText: `Оберіть форму займенника після «${prep.cz}»: ${lbl.uk} (${lbl.cz}) — ${lbl.question}`,
+        contextPhrase: frame.text.replace("{p}", shown),
+        correct: pair.correct,
+        options: shuffle([pair.correct, pair.plain]),
+      },
+    };
+  }
+  return null;
+}
+
 // ─────────────── Dev-перевірка даних (лише у dev-збірці, нічого не блокує) ───────────────
 // Попереджає, коли додане слово чи фрейм ламає припущення: порожні/суперечливі теги, фрейм із замалим пулом,
 // фіксований прийменник без фреймів (він тоді не потрапляє у квіз).
@@ -389,12 +476,13 @@ function devCheckData(): void {
     if (!frames) issues.push(`${p.id}: немає FIXED_FRAMES — прийменник не потрапляє у квіз`);
     else for (const fr of frames) small(`${p.id} «${fr.text}»`, framePool(p.id, "fixed", fr).length, 3);
   }
+  for (const fr of Object.values(PRONOUN_FRAMES).flat()) if (fr && !PREP_BY_ID.has(fr.prepId)) issues.push(`PRONOUN_FRAMES: невідомий прийменник ${fr.prepId}`);
   if (issues.length > 0) console.warn(`prepositionQuiz: ${issues.length} зауваж.:\n  ` + issues.slice(0, 25).join("\n  "));
 }
 if (typeof __DEV__ !== "undefined" && __DEV__) devCheckData();
 
 // ─────────────── Пул комбінацій ───────────────
-type PrepKind = "fixnoun" | "fixprep" | "dual" | "exchange";
+type PrepKind = "fixnoun" | "fixprep" | "dual" | "exchange" | "pronoun";
 
 interface Combo {
   id: string;
@@ -443,6 +531,17 @@ function enumerateCombos(): Combo[] {
       }
     }
   }
+  for (const grp of pronounGroups()) {
+    for (const c of CASES) {
+      if (!PRONOUN_FRAMES[c] || !pronounPair(grp.decl, c)) continue;
+      combos.push({
+        id: comboId(grp.pron.id, `prep-${grp.key}`, c),
+        wordId: grp.pron.id,
+        kind: "pronoun",
+        make: (used) => buildPronoun(grp, c, used),
+      });
+    }
+  }
   return combos;
 }
 
@@ -454,7 +553,9 @@ const PREP_KIND_QUOTA: KindQuota<PrepKind> = {
   // в застосунку не тестується вибір САМОГО прийменника, тоді як відмінювання
   // іменника (fixnoun) частково перетинається з окремим квізом «Відмінки».
   // Тому fixprep пріоритетніший — вищий мінімум, ніж fixnoun.
-  minSlots: { fixnoun: 3, fixprep: 4, dual: 3, exchange: 1 },
+  // pronoun (k němu, s ní) — окремий навик, якого немає в жодному іншому квізі: гарантований 1 слот із 12; місце
+  // для нього звільнене з fixnoun (3 → 2), бо відмінювання іменників тренує ще й квіз «Відмінки».
+  minSlots: { fixnoun: 2, fixprep: 4, dual: 3, exchange: 1, pronoun: 1 },
 };
 
 export function generatePrepositionSession(

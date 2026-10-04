@@ -1,3 +1,4 @@
+import type { CzechCase } from "../types";
 import type { NounTag } from "./nounTags";
 
 // ─────────────────────────── ФРЕЙМИ Й ПАРТНЕРИ КВІЗУ «ПРИЙМЕННИКИ» ───────────────────────────
@@ -67,7 +68,7 @@ export const DUAL_FRAMES: Record<string, Frames> = {
     ],
     location: [
       { text: "Chodím {p} ___", any: ["path", "building"], num: "any" },
-      { text: "Přijdu {p} ___", any: ["meal", "activity", "timeUnit"] },
+      { text: "Odešel {p} ___", any: ["meal", "activity", "timeUnit"], none: ["dayPart"] }, // po obědě, po hodině; не «po dni / po noci»
       { text: "Šel {p} ___", any: ["path"], num: "any" },
     ],
   },
@@ -159,13 +160,13 @@ export const EXCHANGE_FRAMES: Frame[] = [{ text: "Zaplatil jsem {p} ___", any: [
 export const FIXED_FRAMES: Record<string, Frame[]> = {
   // ── вузькі ──
   "prep-do": [{ text: "{p} ___", any: ["placeV", "container", "time", "meal", "activity"], num: "any" }], // do školy, do tašky, do večera
-  "prep-z": [{ text: "{p} ___", any: ["placeV", "container"], num: "any" }], // ze školy, z tašky
-  "prep-u": [{ text: "{p} ___", any: ["building", "person", "surface", "opening", "outdoor", "support"], num: "any" }], // u nádraží, u lékaře, u okna
+  "prep-z": [{ text: "{p} ___", any: ["placeV", "placeNa", "container"], num: "any" }], // ze školy, z pošty (na poštu → z pošty), z tašky
+  "prep-u": [{ text: "{p} ___", any: ["building", "person", "furniture", "opening", "outdoor", "support"], num: "any" }], // u nádraží, u lékaře, u okna, u stolu (не «u polštáře»)
   "prep-vedle": [{ text: "{p} ___", any: ["building", "person", "surface", "opening", "outdoor", "support"], num: "any" }],
   "prep-kolem": [{ text: "{p} ___", any: ["building", "outdoor", "support"], num: "any" }],
   "prep-k": [{ text: "{p} ___", any: ["person", "building", "placeV", "placeNa", "outdoor", "meal"], num: "any" }], // k lékaři, k nádraží, k obědu
-  "prep-mimo": [{ text: "{p} ___", any: ["placeV", "placeNa", "building", "outdoor"], num: "any" }], // mimo město
-  "prep-pres": [{ text: "{p} ___", any: ["path", "outdoor", "furniture", "opening", "timeUnit"], num: "any" }], // přes most, přes týden
+  "prep-mimo": [{ text: "{p} ___", any: ["building", "outdoor"] }], // mimo město, mimo školu (не кімнати: «mimo sprchu»)
+  "prep-pres": [{ text: "{p} ___", any: ["path", "outdoor", "opening", "timeUnit"], num: "any" }], // přes most, přes týden (не «přes televizi»)
   "prep-skrz": [{ text: "{p} ___", any: ["opening", "outdoor", "weather", "building"], num: "any" }], // skrz okno, skrz déšť (НЕ час: «skrz minutu» — ні)
   "prep-pri": [{ text: "{p} ___", any: ["activity", "meal", "weather"], num: "any" }], // při práci, při obědě, při dešti
   // ── широкі ──
@@ -207,6 +208,27 @@ export const FIXED_FRAMES: Record<string, Frame[]> = {
     { text: "Jdu tam {p} ___", any: ["person"], num: "any" }, // s kamarádem, se ženou, s dětmi
     { text: "Přišel {p} ___", any: ["carried"] }, // s deštníkem, s taškou
   ],
+};
+
+// ─────────── Прийменник + особовий займенник (k němu, s ní, bez nich) ───────────
+// Після прийменника 3-тя особа бере форму на n- (jemu → k němu, jí → s ní, je → pro ně). Квіз показує фразу з
+// прийменником і дає вибрати між формою «після прийм.» (правильна) і формою «без прийм.» того ж займенника —
+// обидві з таблиці займенника (data/personalPronouns.ts), нічого не вигадується. Новий відмінок — новий рядок тут.
+export interface PronounFrame {
+  text: string; // «{p}» — прийменник (з вокалізацією), «___» — форма займенника
+  prepId: string; // прийменник, що керує цим відмінком
+}
+export const PRONOUN_FRAMES: Partial<Record<CzechCase, PronounFrame[]>> = {
+  genitiv: [
+    { text: "Nepůjdu tam {p} ___", prepId: "prep-bez" }, // bez něho, bez ní, bez nich
+    { text: "Mám dopis {p} ___", prepId: "prep-od" }, // od něj, od ní
+  ],
+  dativ: [{ text: "Jdu {p} ___", prepId: "prep-k" }], // k němu, k ní, k nim
+  akuzativ: [
+    { text: "Mám dárek {p} ___", prepId: "prep-pro" }, // pro něj, pro ni, pro ně
+    { text: "Čekám {p} ___", prepId: "prep-na" }, // na něj, na ni, na ně
+  ],
+  instrumental: [{ text: "Jdu tam {p} ___", prepId: "prep-s" }], // s ním, s ní, s nimi
 };
 
 // ─────────── Вокалізація v→ve, k→ke, s→se, z→ze ───────────
