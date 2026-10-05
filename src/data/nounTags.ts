@@ -49,7 +49,8 @@ export type NounTag =
   | "container"
   | "opening"
   | "abstract"
-  | "nature";
+  | "nature"
+  | "landform";
 
 // Запис для КОЖНОГО тегу обов'язковий (Record): додав тег до NounTag — компілятор вимагає пояснення.
 export const NOUN_TAG_DOC: Record<NounTag, string> = {
@@ -88,6 +89,7 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
   opening: "отвір, крізь який дивляться чи проходять: okno",
   abstract: "абстракція чи слово без природних просторових фраз: cena, sto, milion",
   nature: "рослина, світило, природний об'єкт без власної фрази: růže, květina, hvězda, strom",
+  landform: "природний ландшафт, не створений людиною: moře, řeka, hora, les, pole — «staré / nové moře» неприродне (разом з outdoor)",
 };
 
 // Теги-«самоцілі»: слово з таким тегом не має жодних інших (особа не буває будівлею, їжа — місцем тощо).
@@ -100,6 +102,7 @@ const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
   workplace: ["placeV", "placeNa"],
   bodyLevel: ["body"],
   timeUnit: ["time"],
+  landform: ["outdoor"],
 };
 
 // Перевірка набору тегів одного слова: список проблем (порожній — усе гаразд). Використовується у

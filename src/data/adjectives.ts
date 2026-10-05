@@ -31,7 +31,7 @@ const HEIGHT: NounFilter = { any: ["person", "building", "furniture", "abstract"
 const LENGTH: NounFilter = { any: ["timeUnit", "clothes", "path"], none: ["outdoor"] }; // dlouhý den, kabát, dlouhá cesta, most
 const WIDTH: NounFilter = { any: ["furniture", "clothes", "path"], none: ["outdoor"] }; // široká postel, úzké kalhoty, široká cesta
 const DEPTH: NounFilter = { any: ["container"], none: ["vehicle", "clothes"] }; // hluboký talíř, hrnek, hluboká skříň
-const AGE: NounFilter = { none: ["time", "weather", "meal", "activity", "abstract", "body", "food", "nature"] };
+const AGE: NounFilter = { none: ["time", "weather", "meal", "activity", "abstract", "body", "food", "nature", "landform"] }; // не «staré moře»
 const LOOKS: NounFilter = { none: ["abstract", "document", "money", "activity", "meal", "food"] };
 const COLOR: NounFilter = { any: ["item", "clothes", "vehicle", "furniture"] };
 const COLOR_NEUTRAL: NounFilter = { any: ["item", "clothes", "vehicle", "furniture", "animal"] }; // černý pes, bílá kočka (не будівлі: «černá banka»)
@@ -738,7 +738,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "nový",
     pattern: "tvrdy",
     category: "quality",
-    fits: { none: ["time", "weather", "meal", "activity", "abstract", "body", "food", "nature", "person"] },
+    fits: { none: ["time", "weather", "meal", "activity", "abstract", "body", "food", "nature", "landform", "person"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {

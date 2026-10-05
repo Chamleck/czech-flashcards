@@ -385,7 +385,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "nature",
-    sem: ["placeNa", "outdoor"],
+    sem: ["placeNa", "outdoor", "landform"],
     declension: {
       nominativ: { sg: "moře", pl: "moře" },
       genitiv: { sg: "moře", pl: "moří" },
@@ -1503,7 +1503,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "nature",
-    sem: ["placeV", "outdoor", "path"],
+    sem: ["placeV", "outdoor", "path", "landform"],
     declension: {
       nominativ: { sg: "les", pl: "lesy" },
       genitiv: { sg: "lesa", pl: "lesů" },
@@ -1563,7 +1563,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "nature",
-    sem: ["placeNa", "outdoor"],
+    sem: ["placeNa", "outdoor", "landform"],
     declension: {
       // чергування k→c: řece
       nominativ: { sg: "řeka", pl: "řeky" },
@@ -1584,7 +1584,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "nature",
-    sem: ["placeNa", "outdoor", "path"],
+    sem: ["placeNa", "outdoor", "path", "landform"],
     declension: {
       // чергування r→ř: hoře
       nominativ: { sg: "hora", pl: "hory" },
@@ -1625,7 +1625,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "nature",
-    sem: ["placeNa", "outdoor", "path"],
+    sem: ["placeNa", "outdoor", "path", "landform"],
     declension: {
       nominativ: { sg: "pole", pl: "pole" },
       genitiv: { sg: "pole", pl: "polí" },
