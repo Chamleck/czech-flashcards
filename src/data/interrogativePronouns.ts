@@ -21,6 +21,7 @@ export const INTERROGATIVE_ADJ: PronounEntry[] = [
     subtype: "interrogative",
     declinable: true,
     vzorLabel: "як mladý",
+    quiz: { role: "question", partner: false },
     declension: {
       masc_anim: {
         nominativ: { sg: "jaký", pl: "jací" },
@@ -72,6 +73,7 @@ export const INTERROGATIVE_ADJ: PronounEntry[] = [
     subtype: "interrogative",
     declinable: true,
     vzorLabel: "як mladý",
+    quiz: { role: "question", partner: false },
     declension: {
       masc_anim: {
         nominativ: { sg: "který", pl: "kteří" },
@@ -123,6 +125,7 @@ export const INTERROGATIVE_ADJ: PronounEntry[] = [
     subtype: "interrogative",
     declinable: true,
     vzorLabel: "як jarní",
+    quiz: { role: "question", partner: false, fits: { none: ["time", "weather", "abstract", "nature", "activity", "meal", "body", "food"] } },
     declension: {
       masc_anim: {
         nominativ: { sg: "čí", pl: "čí" },
@@ -173,8 +176,8 @@ export const INTERROGATIVE_ADJ: PronounEntry[] = [
     cz: "kolikátý",
     subtype: "interrogative",
     declinable: true,
-    noQuiz: true,
     vzorLabel: "як mladý",
+    quiz: { role: "order", partner: false, num: "sg", fits: { any: ["timeUnit"] } },
     declension: {
       masc_anim: {
         nominativ: { sg: "kolikátý", pl: "kolikátí" },
@@ -254,6 +257,14 @@ export const INTERROGATIVE_CORE: PersonalPronounEntry[] = [
     uk: "хто",
     cz: "kdo",
     patternLabel: "питальний займенник · нерегулярне відмінювання",
+    quizFrames: {
+      // «vyhýbat se komu» — давальне керування (MUNI, дисертація з валентності дієслів, is.muni.cz/th/ds5eg)
+      genitiv: ["___ se bojíš?", "___ sis všiml?"],
+      dativ: ["Věříš ___?", "___ se vyhýbáš?"],
+      akuzativ: ["___ vidíš?", "___ hledáš?"],
+      lokal: ["O ___ jste mluvili?", "O ___ přemýšlíš?"],
+      instrumental: ["S ___ jedeš?", "S ___ ses bavil?"], // s kým — супровід (з прийменником)
+    },
     columns: COLS_ONE,
     gendered: false,
     declension: KDO,
@@ -265,6 +276,13 @@ export const INTERROGATIVE_CORE: PersonalPronounEntry[] = [
     uk: "що",
     cz: "co",
     patternLabel: "питальний займенник · нерегулярне відмінювання",
+    quizFrames: {
+      genitiv: ["___ se bojíš?", "___ sis všiml?"],
+      dativ: ["Věříš ___?", "___ se vyhýbáš?"],
+      akuzativ: ["___ vidíš?", "___ hledáš?"],
+      lokal: ["O ___ jste mluvili?", "O ___ přemýšlíš?"],
+      instrumental: ["___ píšeš?", "___ to otevřeš?"], // čím — знаряддя (без прийменника)
+    },
     columns: COLS_ONE,
     gendered: false,
     declension: CO,

@@ -5,7 +5,7 @@ import { COLS_NP, PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { nounUsableAsPartner } from "../data/categories";
 import { validateNounSem } from "../data/nounTags";
 import { CONFUSABLE_PREP_PAIRS, DUAL_FRAMES, EXCHANGE_FRAMES, FIXED_FRAMES, Frame, Needs, PRONOUN_FRAMES } from "../data/prepositionPartners";
-import { acceptedForms, candidateNumbers, disjoint, formOf, matchesNeeds, vocalizedPrep } from "./partnerSelection";
+import { acceptedForms, candidateNumbers, disjoint, formOf, freshWeightedOrder, matchesNeeds, vocalizedPrep } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
 
 // ─────────────────────────── Квіз «Прийменники» ───────────────────────────
@@ -146,14 +146,11 @@ function fitCount(nounId: string): number {
   return fitCache.get(nounId) ?? 1;
 }
 
-// Порядок перебору кандидатів: спершу слова, яких ще не було в раунді, всередині — зважена випадкова вибірка без
-// повернень (ключ u^fit, Efraimidis–Spirakis), тож імовірність бути першим ∝ 1 / fit. Перебір повний: якщо в комбо
-// придатні лише вже використані слова, береться одне з них — питання (зокрема зарезервоване під помилку) не губиться.
+// Порядок перебору кандидатів: спершу слова, яких ще не було в раунді, всередині вага 1 / fit (freshWeightedOrder).
+// Перебір повний: якщо в комбо придатні лише вже використані слова, береться одне з них — питання (зокрема
+// зарезервоване під помилку) не губиться.
 function partnerOrder(cands: NounEntry[], used: ReadonlySet<string>): NounEntry[] {
-  return cands
-    .map((n) => ({ n, fresh: used.has(n.id) ? 0 : 1, key: Math.random() ** fitCount(n.id) }))
-    .sort((a, b) => b.fresh - a.fresh || b.key - a.key)
-    .map((x) => x.n);
+  return freshWeightedOrder(cands, (n) => used.has(n.id), (n) => fitCount(n.id));
 }
 
 interface PartnerPick<T> {

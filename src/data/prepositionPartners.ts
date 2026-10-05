@@ -240,6 +240,7 @@ export type VocalDecision = "plain" | "vocal";
 const ALL_PLAIN: Partial<Record<VocalPrep, VocalDecision>> = { v: "plain", k: "plain", s: "plain", z: "plain" };
 const ALL_VOCAL: Partial<Record<VocalPrep, VocalDecision>> = { v: "vocal", k: "vocal", s: "vocal", z: "vocal" };
 const K_VOCAL: Partial<Record<VocalPrep, VocalDecision>> = { v: "plain", k: "vocal", s: "plain", z: "plain" }; // kn-, kl-, kr-, kv-
+const S_Z_VOCAL: Partial<Record<VocalPrep, VocalDecision>> = { s: "vocal", z: "vocal" }; // šp-, sm-, zd-…: v/k коливаються
 export const CLUSTER_RULES: Record<string, Partial<Record<VocalPrep, VocalDecision>>> = {
   // ніколи не вокалізуються
   br: ALL_PLAIN, bř: ALL_PLAIN, bl: ALL_PLAIN, dr: ALL_PLAIN, hl: ALL_PLAIN, hr: ALL_PLAIN,
@@ -272,6 +273,19 @@ export const CLUSTER_RULES: Record<string, Partial<Record<VocalPrep, VocalDecisi
   pt: {},
   // tř-: ve třídě, ke třem, se třemi, ze třídy
   tř: ALL_VOCAL,
+  // ── Групи з прикметників і займенників (квіз «Прикметники та займенники»), за тими самими правилами IJP id=770 ──
+  // друга приголосна l — «předložka se většinou nevokalizuje»: v mladém, k dlouhému, s tlustým, z mladého
+  ml: ALL_PLAIN, dl: ALL_PLAIN, tl: ALL_PLAIN,
+  // s/z перед š-, ž-, s-, z- — «silná tendence» / та сама приголосна: se špatným, ze žlutého, se smutným, ze zdravého;
+  // v/k перед ними — лише тенденція, вжиток коливається → не тестуємо (рядок без v/k)
+  šp: S_Z_VOCAL, št: S_Z_VOCAL, šť: S_Z_VOCAL, sm: S_Z_VOCAL, sp: S_Z_VOCAL, zd: S_Z_VOCAL, zk: S_Z_VOCAL,
+  žl: { v: "plain", k: "plain", s: "vocal", z: "vocal" }, // ž + l: s/z — схожа приголосна, v/k — друга l
+  // та сама приголосна — «vokalizujeme vždy»: ke kterému, ve všem; решта коливається («v/ve kterém», «se/s všemi»)
+  kt: { k: "vocal" },
+  vš: { v: "vocal" },
+  // коливання: «v tváři» vedle «ve tváři» (Naše řeč, nase-rec.ujc.cas.cz, стаття 6494); hn- — друга не r/l, лише тенденція
+  tv: {},
+  hn: {},
 };
 // Слова на měst- (město): ve městě — усталений виняток; s městem, z města — за загальним правилом (один
 // приголосний перед голосним — без вокалізації, IJP); k městu / ke městu коливається → не тестуємо.

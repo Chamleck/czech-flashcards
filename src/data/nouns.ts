@@ -34,6 +34,10 @@ import { NounEntry } from "../types";
 //     квіз таку фразу свідомо не ставить.
 //  6. Нове слово само потрапляє в усі фрази квізу, чиї теги збігаються (FIXED_FRAMES, DUAL_FRAMES). Після
 //     додавання прочитай фрази, куди воно потрапило (кожен фрейм + це слово): тег, що дає безглузду фразу, прибери.
+//  7. plGender — якщо в множині прикметники узгоджуються з іншим родом, ніж в однині (děti, oči, uši — як жіночий:
+//     «malé děti», «modré oči»). Без цього квіз «Прикметники та займенники» склав би «ta malá děti».
+//  8. Квіз «Прикметники та займенники» теж бере іменник за тегами: у фрази (data/declensionFrames.ts) і в пари з
+//     прикметниками (поле fits у data/adjectives.ts). Після додавання прочитай і ці фрази та пари.
 //
 export const NOUNS: NounEntry[] = [
   // ─────────────── pán (чол. істот., твердий) ───────────────
@@ -673,6 +677,7 @@ export const NOUNS: NounEntry[] = [
     uk: "дитина",
     cz: "dítě",
     gender: "neut",
+    plGender: "fem", // děti / oči / uši: «ty malé děti», «modré oči» — узгодження як у жіночого роду
     pattern: "kure",
     category: "people",
     sem: ["person"],
@@ -2524,6 +2529,7 @@ export const NOUNS: NounEntry[] = [
     uk: "око",
     cz: "oko",
     gender: "neut",
+    plGender: "fem", // děti / oči / uši: «ty malé děti», «modré oči» — узгодження як у жіночого роду
     pattern: "mesto",
     category: "body",
     sem: ["body", "bodyLevel"],
@@ -2802,6 +2808,7 @@ export const NOUNS: NounEntry[] = [
     uk: "вухо",
     cz: "ucho",
     gender: "neut",
+    plGender: "fem", // děti / oči / uši: «ty malé děti», «modré oči» — узгодження як у жіночого роду
     pattern: "mesto",
     category: "body",
     sem: ["body", "bodyLevel"],

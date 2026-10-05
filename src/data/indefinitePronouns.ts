@@ -6,8 +6,13 @@ import { PersonalPronounEntry, PronounEntry } from "../types";
 // všechen — власна парадигма (cs.wiktionary + en.wiktionary + dl1.cuni.cz/CJV MUNI, усі збігаються).
 // Вокатива в займенників немає — "—".
 //
-// БЕЗ КВІЗУ: група лише для перегляду й карткового тренування. У квізи «Прикметники та займенники»
-// ці слова не входять (рішення про квіз — окремий крок плану).
+// КВІЗ «Прикметники та займенники»: nějaký/žádný/každý/všechen — через фрейми з іменною групою (data/declensionFrames.ts):
+// nějaký — лише у фразах, де «якийсь» природний (some), žádný — у фразах із запереченням (neg), každý і všechen — у
+// фразах-узагальненнях (every: «Každý student to ví», «Cvičím každý den», «Koupil jsem všechen chléb»);
+// їхні лексичні обмеження — у полі quiz (звірено: žádný — лише із запереченим дієсловом, подвійне заперечення;
+// každý — однина, множина лише з числівником «každé dva dny» (elon.io, «Each and every: každý»); všechen в однині —
+// лише з незлічуваними «všechen chléb, všechna voda», злічувані — у множині, «celý den» (SSJČ: «zprav. jen v mn. č.»;
+// elon.io, «All and whole»). někdo/nikdo/něco/nic — власні речення у quizFrames (як kdo/co).
 //
 // Дві форми запису, як у питальних слів: někdo/nikdo/něco/nic — PersonalPronounEntry (без роду,
 // одна колонка); nějaký/žádný/každý — PronounEntry (таби роду). Картку вибирає резолвер
@@ -22,6 +27,13 @@ export const INDEFINITE_CORE: PersonalPronounEntry[] = [
     uk: "хтось",
     cz: "někdo",
     patternLabel: "неозначений займенник · відмінюється як kdo",
+    quizFrames: {
+      genitiv: ["Bojíš se ___?", "Ptal ses ___?"],
+      dativ: ["Věříš ___?", "Zavolal jsi ___?"],
+      akuzativ: ["Hledáš ___?", "Vidíš tam ___?"],
+      lokal: ["Mluvili jste o ___?", "Přemýšlíš o ___?"],
+      instrumental: ["Mluvil jsi s ___?", "Jdeš tam s ___?"],
+    },
     columns: COLS_ONE,
     gendered: false,
     declension: {
@@ -41,6 +53,14 @@ export const INDEFINITE_CORE: PersonalPronounEntry[] = [
     uk: "ніхто",
     cz: "nikdo",
     patternLabel: "заперечний займенник · відмінюється як kdo",
+    quizFrames: {
+      // nikdo — лише із запереченим дієсловом (подвійне заперечення)
+      genitiv: ["Nebojím se ___.", "Neptal jsem se ___."],
+      dativ: ["Nevěřím ___.", "Nezavolal jsem ___."],
+      akuzativ: ["Nevidím ___.", "Nehledám ___."],
+      lokal: ["Nemluvili jsme o ___.", "Nepřemýšlím o ___."],
+      instrumental: ["Nemluvil jsem s ___.", "Nejdu tam s ___."],
+    },
     columns: COLS_ONE,
     gendered: false,
     declension: {
@@ -60,6 +80,13 @@ export const INDEFINITE_CORE: PersonalPronounEntry[] = [
     uk: "щось",
     cz: "něco",
     patternLabel: "неозначений займенник · відмінюється як co",
+    quizFrames: {
+      genitiv: ["Bojíš se ___?", "Napiješ se ___?"],
+      dativ: ["Věříš ___?", "Rozumíš ___?"],
+      akuzativ: ["Hledáš ___?", "Chceš ___?"],
+      lokal: ["Mluvili jste o ___?", "Přemýšlíš o ___?"],
+      instrumental: ["Píšeš ___?", "Můžu ti pomoct s ___?"],
+    },
     columns: COLS_ONE,
     gendered: false,
     declension: {
@@ -79,6 +106,14 @@ export const INDEFINITE_CORE: PersonalPronounEntry[] = [
     uk: "ніщо (нічого)",
     cz: "nic",
     patternLabel: "заперечний займенник · відмінюється як co",
+    quizFrames: {
+      // nic — лише із запереченим дієсловом (подвійне заперечення)
+      genitiv: ["Nebojím se ___.", "Nenapiju se ___."],
+      dativ: ["Nevěřím ___.", "Nerozumím ___."],
+      akuzativ: ["Nehledám ___.", "Nechci ___."],
+      lokal: ["Nemluvili jsme o ___.", "Nepřemýšlím o ___."],
+      instrumental: ["Nemůžu ti pomoct s ___.", "Nejsem spokojený s ___."],
+    },
     columns: COLS_ONE,
     gendered: false,
     declension: {
@@ -103,6 +138,7 @@ export const INDEFINITE_ADJ: PronounEntry[] = [
     subtype: "indefinite",
     declinable: true,
     vzorLabel: "як mladý",
+    quiz: { role: "some" },
     declension: {
       masc_anim: {
         nominativ: { sg: "nějaký", pl: "nějací" },
@@ -155,6 +191,7 @@ export const INDEFINITE_ADJ: PronounEntry[] = [
     subtype: "indefinite",
     declinable: true,
     vzorLabel: "як mladý",
+    quiz: { role: "neg", partner: false },
     declension: {
       masc_anim: {
         nominativ: { sg: "žádný", pl: "žádní" },
@@ -207,6 +244,7 @@ export const INDEFINITE_ADJ: PronounEntry[] = [
     subtype: "indefinite",
     declinable: true,
     vzorLabel: "як mladý",
+    quiz: { role: "every", num: "sg", fits: { countable: true, none: ["food", "weather", "abstract"] } },
     declension: {
       masc_anim: {
         nominativ: { sg: "každý", pl: "každí" },
@@ -259,6 +297,7 @@ export const INDEFINITE_ADJ: PronounEntry[] = [
     subtype: "indefinite",
     declinable: true,
     vzorLabel: "власний зразок (м'який -e-: všeho, všemu)",
+    quiz: { role: "every", massSg: true },
     declension: {
       masc_anim: {
         nominativ: { sg: "všechen", pl: "všichni" },

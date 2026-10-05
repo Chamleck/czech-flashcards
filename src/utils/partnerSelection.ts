@@ -1,4 +1,4 @@
-import { CzechCase, GrammaticalNumber, NounEntry } from "../types";
+import { CzechCase, Gender, GrammaticalNumber, NounEntry, NounFilter } from "../types";
 import type { NounTag } from "../data/nounTags";
 import { CLUSTER_RULES, MEST_RULE, Needs, NumberPolicy, VocalDecision, VocalPrep } from "../data/prepositionPartners";
 
@@ -13,6 +13,27 @@ export function matchesNeeds(n: NounEntry, needs: Needs): boolean {
   if (needs.all && !needs.all.every((t) => sem.includes(t))) return false;
   if (needs.any && !needs.any.some((t) => sem.includes(t))) return false;
   return true;
+}
+
+// Те саме для вимоги квізу «Прикметники та займенники» (NounFilter): теги + countable (лише злічувані іменники).
+export function matchesFilter(n: NounEntry, f: NounFilter): boolean {
+  if (f.countable && n.uncountable) return false;
+  return matchesNeeds(n, f);
+}
+
+// Рід, з яким узгоджуються прикметник і займенник: у множині děti / oči / uši — жіночий (plGender), інакше рід слова.
+export function agreementGender(n: NounEntry, num: GrammaticalNumber): Gender {
+  return num === "pl" && n.plGender ? n.plGender : n.gender;
+}
+
+// Порядок перебору кандидатів (спільний для квізів): спершу ті, кого ще не було в раунді, всередині — зважена
+// випадкова вибірка без повернень (ключ u^fit, Efraimidis–Spirakis), тож імовірність бути першим ∝ 1 / fit. Перебір
+// повний: якщо придатні лише вже використані, береться один із них — питання не губиться.
+export function freshWeightedOrder<T>(items: T[], isUsed: (t: T) => boolean, fitOf: (t: T) => number): T[] {
+  return items
+    .map((t) => ({ t, fresh: isUsed(t) ? 0 : 1, key: Math.random() ** fitOf(t) }))
+    .sort((a, b) => b.fresh - a.fresh || b.key - a.key)
+    .map((x) => x.t);
 }
 
 // Множина природна не завжди: «po obědech», «při deštích», «do týdnů», «od rodin» звучать дивно.

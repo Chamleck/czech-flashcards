@@ -88,6 +88,20 @@ export interface NounEntry {
   // подавати як ПОМИЛКОВУ відповідь (напр. родовий kostel — kostela, але й kostelu вживають). Лише там, де
   // така форма збігається з формою іншого відмінка того ж слова.
   variants?: Partial<Record<CzechCase, Partial<Record<GrammaticalNumber, string[]>>>>;
+  // Рід, за яким із цим словом узгоджуються прикметники й займенники В МНОЖИНІ, коли він інший, ніж в однині:
+  // děti, oči, uši узгоджуються як жіночий рід («ty malé děti», «modré oči»), хоча dítě / oko / ucho — середній.
+  // Квіз «Прикметники та займенники» інакше склав би «ta malá děti». Для решти слів поле відсутнє.
+  plGender?: Gender;
+}
+
+// Вимога до іменника-партнера (квіз «Прикметники та займенники»): ті самі смислові теги, що у фреймах квізу
+// «Прийменники» (any — хоча б один тег, all — усі, none — жодного), плюс countable: true — лише злічувані
+// іменники (не voda, rýže, sníh: «velká rýže» безглузде). Порожня вимога — будь-який іменник.
+export interface NounFilter {
+  any?: NounTag[];
+  all?: NounTag[];
+  none?: NounTag[];
+  countable?: boolean;
 }
 
 export interface CardProgress {
@@ -135,6 +149,10 @@ export interface AdjectiveEntry {
   category: AdjectiveCategory;
   // true → у чол. істот. Npl/Vpl чергується приголосний (velký→velcí, starý→staří)
   hasConsonantAlternation: boolean;
+  // З якими іменниками прикметник природний (за смисловими тегами іменників, data/nounTags.ts). ОБОВ'ЯЗКОВЕ:
+  // квіз «Прикметники та займенники» бере партнера лише з цього кола («hladový pes», а не «hladový stůl»).
+  // Ступені порівняння беруть ту саму вимогу. Правила — у шапці data/adjectives.ts.
+  fits: NounFilter;
   declension: FullDeclension;
   // Приклади для кожного роду — показуються під відповідним табом.
   examples: GenderExamples;
@@ -147,6 +165,10 @@ export interface AdjectiveEntry {
   // Ступені порівняння (вищий/найвищий) — лише в градуйованих прикметників.
   // Відносні (jarní, cizí, poslední, domácí) ступенів не мають → поле відсутнє.
   // Обидва ступені відмінюються за зразком jarní (м'який).
+  // false → ступені є на картці (форма правильна), але у квізі «Прикметники та займенники» їх не питаємо: у живому
+  // мовленні вищий ступінь цього слова рідкісний чи дивний («červenější vlak», «nejvyděšenější lékař»). Кольори,
+  // стани (vyděšený, překvapený, zklamaný, zaneprázdněný), otevřený/zavřený, plný/prázdný, volný, ubohý.
+  quizDegrees?: false;
   degrees?: {
     comparative: { cz: string; uk: string; declension: FullDeclension };
     superlative: { cz: string; uk: string; declension: FullDeclension };
@@ -168,12 +190,30 @@ interface PronounBase {
 export interface DeclinablePronoun extends PronounBase {
   declinable: true;
   vzorLabel: string; // короткий підпис зразка для картки/граматики
-  // true → слово є в словнику й на картці, але НЕ береться тестованим у квізі займенників:
-  // у шаблонах «___ + прикметник + іменник» воно дає безглузді фрази (kolikátý — порядкове
-  // питання: «Kolikátými bílými přáteli?»). Нове слово такого роду перевіряти за цим тестом.
-  noQuiz?: boolean;
+  // Лексичні властивості для квізу «Прикметники та займенники» (див. PronounQuiz). Відсутнє поле = звичайний
+  // займенник: годиться до будь-якого іменника, у будь-якому числі й відмінку, може бути словом-партнером.
+  quiz?: PronounQuiz;
   declension: FullDeclension;
   examples: GenderExamples; // приклад на кожен рід (як у прикметників)
+}
+
+// Лексичні властивості займенника, які квіз «Прикметники та займенники» мусить знати, щоб фраза була правильною.
+// Кожне поле — факт про слово (звірений за джерелами), а не команда рушію. Правила — у шапці data/pronouns.ts.
+export interface PronounQuiz {
+  fits?: NounFilter; // з якими іменниками слово природне (čí — лише з тим, що можна мати; kolikátý — з одиницями часу)
+  partner?: false; // не підставляти як слово-партнер у чуже питання (sám, tentýž, žádný, питальні)
+  nominative?: false; // не ставити в називний (sám: «Tady je sám učitel» неприродне)
+  needsOwner?: true; // лише у фразі з підметом-особою, якому річ належить (svůj: «Hledám svůj klíč»); не в називному і не
+  // у фразах без такого підмета («Je tu hodně…», «Za … je zahrada» — DeclFrame.ownerless)
+  num?: GrammaticalNumber; // лише це число (každý — однина: «každé dva dny» лише з числівником)
+  massSg?: true; // однина лише з незлічуваним іменником: všechen chléb, všechna voda, але всі злічувані — у множині
+  role?: "neg" | "question" | "order" | "some" | "every"; // neg — лише у фразах із запереченням (žádný); question —
+  // питальний (jaký, který, čí: фрейми-питання); order — питання про порядок (kolikátý: питання + власні фрейми
+  // «Kolikátý den už čekáš?»); some — неозначений «якийсь» (nějaký: лише фрази, де він природний, — «Hledám nějaký
+  // hotel», але не «Mám rád nějaké studenty»); every — узагальнення «кожен / усі» (každý, všechen: власні фрази
+  // «Každý student to ví», «Cvičím každý den», «Koupil jsem všechen chléb»). Слово з role не буває словом-партнером.
+  skip?: true; // у квізі не питаємо (sám: його непрямі форми в ролі означення — «samého bratra» — у мовленні заступає
+  // samotný, а природні речення з sám предикативні: «Jsem sám»)
 }
 
 // Незмінний займенник: jeho, jejich — одна форма на всі відмінки,
@@ -181,6 +221,7 @@ export interface DeclinablePronoun extends PronounBase {
 export interface IndeclinablePronoun extends PronounBase {
   declinable: false;
   invariantForm: string;
+  quiz?: PronounQuiz; // лише fits: з якими іменниками природний як слово-партнер (jeho / jejich — не з погодою й часом)
   exampleSentenceCz?: string;
   exampleSentenceUk?: string;
 }
@@ -213,6 +254,9 @@ interface PersonalPronounBase {
   // слова (особові, питальні kdo/co, неозначені někdo…) — тихий дефолт підписував би «особовий»
   // кожне нове слово, а компілятор тепер не дає його пропустити.
   patternLabel: string;
+  // Фрази квізу «Прикметники та займенники» для слів без роду й числа (kdo, co, někdo, nikdo, něco, nic): на кожен
+  // відмінок 2+ речення з пропуском «___». Слово з цим полем потрапляє у квіз саме; без нього — лише картка.
+  quizFrames?: Partial<Record<CzechCase, string[]>>;
 }
 
 // Без роду: já, ty, my, vy, se — одна парадигма, без табів.

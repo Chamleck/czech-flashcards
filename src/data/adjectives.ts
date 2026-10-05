@@ -1,10 +1,40 @@
-import { AdjectiveEntry } from "../types";
+import { AdjectiveEntry, NounFilter } from "../types";
 
 // Прикметники: 2 зразки відмінювання — твердий (mladý) і м'який (jarní).
 // Повна парадигма: 4 роди × 7 відмінків × 2 числа (56 форм на слово).
 // Дані згенеровано детерміновано з основи та зразка; для 8 слів із чергуванням
 // приголосного (velcí, staří, drazí…) чол.істот. Npl/Vpl взято з м'якої основи.
 // Приклади — предикативні, з фіксованим носієм на кожен рід у межах категорії.
+
+// ПРАВИЛА ДОДАВАННЯ ПРИКМЕТНИКІВ (квіз «Прикметники та займенники»)
+//  1. fits — ОБОВ'ЯЗКОВЕ поле: з якими іменниками прикметник природний, за смисловими тегами іменників
+//     (data/nounTags.ts, пояснення кожного тегу — NOUN_TAG_DOC). Квіз бере в партнери лише іменники з цього кола:
+//     «hladový pes», «teplá polévka», «široká cesta», але не «hladový stůl» чи «modrá polévka». Нове слово САМЕ
+//     потрапляє до всіх підхожих іменників, а новий іменник — до всіх підхожих прикметників; списків не редагуємо.
+//  2. Став лише ті теги, де фраза природна для КОЖНОГО іменника з тегом. Тег надто широкий (наприклад, food містить і
+//     воду, і хліб: «tvrdý chléb» добре, «tvrdá káva» — ні) — краще не став: слово просто рідше з'явиться (безпечно),
+//     а неприродних фраз не буде. countable: true відсіює незлічувані (voda, rýže, sníh).
+//  3. Прикметник лише про неістот (кольори, широкий, глибокий) не має партнерів чол. істот. роду, тож його форми
+//     «чол. іст.» квіз не тестує — це свідома ціна природності, ці форми тренують інші прикметники того ж зразка.
+//  4. quizDegrees: false — ступені на картці є, але у квізі їх не питаємо, коли вищий ступінь слова в мовленні
+//     рідкісний чи дивний (кольори: «červenější vlak»; стани: «nejvyděšenější lékař»). Звичайне градуйоване слово — без поля.
+//  5. Після додавання прочитай пари «прикметник × іменник», куди слово потрапило (див. шапку
+//     data/declensionFrames.ts): тег, що дає безглузду пару, прибери.
+const ANY: NounFilter = {};
+const ANIMATE: NounFilter = { any: ["person", "animal"] };
+const PERSON: NounFilter = { any: ["person"] };
+const SIZE: NounFilter = {
+  any: ["item", "clothes", "vehicle", "furniture", "container", "building", "outdoor", "placeV", "animal", "person", "body", "food"],
+  countable: true,
+} as const;
+const HEIGHT: NounFilter = { any: ["person", "building", "furniture", "abstract"], none: ["workplace", "collective"] }; // vysoký muž, dům, skříň, vysoká cena
+const LENGTH: NounFilter = { any: ["timeUnit", "clothes", "path"], none: ["outdoor"] }; // dlouhý den, kabát, dlouhá cesta, most
+const WIDTH: NounFilter = { any: ["furniture", "clothes", "path"], none: ["outdoor"] }; // široká postel, úzké kalhoty, široká cesta
+const DEPTH: NounFilter = { any: ["container"], none: ["vehicle", "clothes"] }; // hluboký talíř, hrnek, hluboká skříň
+const AGE: NounFilter = { none: ["time", "weather", "meal", "activity", "abstract", "body", "food", "nature"] };
+const LOOKS: NounFilter = { none: ["abstract", "document", "money", "activity", "meal", "food"] };
+const COLOR: NounFilter = { any: ["item", "clothes", "vehicle", "furniture"] };
+const COLOR_NEUTRAL: NounFilter = { any: ["item", "clothes", "vehicle", "furniture", "animal"] }; // černý pes, bílá kočka (не будівлі: «černá banka»)
 
 export const ADJECTIVES: AdjectiveEntry[] = [
   {
@@ -13,6 +43,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "velký",
     pattern: "tvrdy",
     category: "size",
+    fits: SIZE,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -151,6 +182,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "malý",
     pattern: "tvrdy",
     category: "size",
+    fits: SIZE,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -289,6 +321,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "vysoký",
     pattern: "tvrdy",
     category: "size",
+    fits: HEIGHT,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -427,6 +460,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "nízký",
     pattern: "tvrdy",
     category: "size",
+    fits: HEIGHT,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -565,6 +599,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "starý",
     pattern: "tvrdy",
     category: "quality",
+    fits: AGE,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -703,6 +738,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "nový",
     pattern: "tvrdy",
     category: "quality",
+    fits: { none: ["time", "weather", "meal", "activity", "abstract", "body", "food", "nature", "person"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -841,6 +877,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "mladý",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANIMATE,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -979,6 +1016,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "dobrý",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANY,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -1117,6 +1155,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "špatný",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANY,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -1255,6 +1294,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "hezký",
     pattern: "tvrdy",
     category: "quality",
+    fits: LOOKS,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -1393,6 +1433,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "drahý",
     pattern: "tvrdy",
     category: "measure",
+    fits: { any: ["item", "clothes", "vehicle", "food", "meal", "furniture"] },
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -1531,6 +1572,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "levný",
     pattern: "tvrdy",
     category: "measure",
+    fits: { any: ["item", "clothes", "vehicle", "food", "meal", "furniture"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -1669,6 +1711,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "rychlý",
     pattern: "tvrdy",
     category: "measure",
+    fits: { any: ["vehicle", "animal", "person", "meal"], none: ["collective"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -1807,6 +1850,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "teplý",
     pattern: "tvrdy",
     category: "measure",
+    fits: { any: ["food", "meal", "weather", "dayPart", "clothes"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -1945,6 +1989,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "studený",
     pattern: "tvrdy",
     category: "measure",
+    fits: { any: ["food", "meal", "weather", "dayPart"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -2083,6 +2128,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "černý",
     pattern: "tvrdy",
     category: "colors",
+    fits: COLOR_NEUTRAL,
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -2221,6 +2268,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "bílý",
     pattern: "tvrdy",
     category: "colors",
+    fits: COLOR_NEUTRAL,
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -2359,6 +2408,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "červený",
     pattern: "tvrdy",
     category: "colors",
+    fits: COLOR,
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -2497,6 +2548,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "modrý",
     pattern: "tvrdy",
     category: "colors",
+    fits: COLOR,
+    quizDegrees: false,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -2635,6 +2688,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "zelený",
     pattern: "tvrdy",
     category: "colors",
+    fits: COLOR,
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -2773,6 +2828,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "žlutý",
     pattern: "tvrdy",
     category: "colors",
+    fits: COLOR,
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -2911,6 +2968,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "jarní",
     pattern: "mekky",
     category: "soft",
+    fits: { any: ["dayPart", "weather", "clothes"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -2963,6 +3021,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "cizí",
     pattern: "mekky",
     category: "soft",
+    fits: { any: ["person", "animal", "carried", "document", "money", "vehicle", "clothes"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3015,6 +3074,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "poslední",
     pattern: "mekky",
     category: "soft",
+    fits: { countable: true, none: ["body"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3067,6 +3127,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "domácí",
     pattern: "mekky",
     category: "soft",
+    fits: { any: ["food", "meal"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3125,6 +3186,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "první",
     pattern: "mekky",
     category: "ordinal",
+    fits: ANY,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3177,6 +3239,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "druhý",
     pattern: "tvrdy",
     category: "ordinal",
+    fits: ANY,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -3229,6 +3292,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "třetí",
     pattern: "mekky",
     category: "ordinal",
+    fits: ANY,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3281,6 +3345,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "čtvrtý",
     pattern: "tvrdy",
     category: "ordinal",
+    fits: ANY,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3333,6 +3398,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "pátý",
     pattern: "tvrdy",
     category: "ordinal",
+    fits: ANY,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3385,6 +3451,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "šestý",
     pattern: "tvrdy",
     category: "ordinal",
+    fits: ANY,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3437,6 +3504,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "sedmý",
     pattern: "tvrdy",
     category: "ordinal",
+    fits: ANY,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3489,6 +3557,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "osmý",
     pattern: "tvrdy",
     category: "ordinal",
+    fits: ANY,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3541,6 +3610,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "devátý",
     pattern: "tvrdy",
     category: "ordinal",
+    fits: ANY,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3593,6 +3663,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "desátý",
     pattern: "tvrdy",
     category: "ordinal",
+    fits: ANY,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3645,6 +3716,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "jedenáctý",
     pattern: "tvrdy",
     category: "ordinal",
+    fits: ANY,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3697,6 +3769,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "dvanáctý",
     pattern: "tvrdy",
     category: "ordinal",
+    fits: ANY,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3749,6 +3822,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "tvrdý",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["seat"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3887,6 +3961,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "dlouhý",
     pattern: "tvrdy",
     category: "size",
+    fits: LENGTH,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -4025,6 +4100,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "tichý",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["person", "animal", "placeV", "outdoor", "dayPart", "vehicle", "building"] },
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -4163,6 +4239,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "měkký",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["seat", "clothes"] },
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -4301,6 +4378,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "ubohý",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANIMATE,
+    quizDegrees: false,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -4439,6 +4518,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "milý",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANIMATE,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -4577,6 +4657,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "široký",
     pattern: "tvrdy",
     category: "size",
+    fits: WIDTH,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -4715,6 +4796,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "úzký",
     pattern: "tvrdy",
     category: "size",
+    fits: WIDTH,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -4853,6 +4935,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "hluboký",
     pattern: "tvrdy",
     category: "size",
+    fits: DEPTH,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -4991,6 +5074,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "mělký",
     pattern: "tvrdy",
     category: "size",
+    fits: DEPTH,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -5129,6 +5213,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "silný",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["person", "animal", "weather"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -5267,6 +5352,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "slabý",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["person", "animal", "weather"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -5405,6 +5491,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "chytrý",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["person", "animal"], none: ["collective"] },
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -5543,6 +5630,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "hloupý",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["person", "animal"], none: ["collective"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -5681,6 +5769,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "čistý",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["item", "clothes", "vehicle", "furniture", "container", "placeV", "outdoor", "body", "building", "animal", "person"], none: ["activity"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -5819,6 +5908,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "špinavý",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["item", "clothes", "vehicle", "furniture", "container", "placeV", "outdoor", "body", "building", "animal", "person"], none: ["activity"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -5957,6 +6047,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "těžký",
     pattern: "tvrdy",
     category: "measure",
+    fits: { any: ["item", "furniture", "clothes", "container", "meal", "activity"] },
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -6105,6 +6196,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "lehký",
     pattern: "tvrdy",
     category: "measure",
+    fits: { any: ["item", "furniture", "clothes", "container", "meal", "activity"] },
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -6253,6 +6345,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "moderní",
     pattern: "mekky",
     category: "soft",
+    fits: { any: ["building", "item", "vehicle", "furniture", "clothes", "placeV"], none: ["activity", "outdoor"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -6391,6 +6484,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "svěží",
     pattern: "mekky",
     category: "soft",
+    fits: { any: ["weather"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -6529,6 +6623,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "šedý",
     pattern: "tvrdy",
     category: "colors",
+    fits: COLOR_NEUTRAL,
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -6667,6 +6763,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "hnědý",
     pattern: "tvrdy",
     category: "colors",
+    fits: COLOR_NEUTRAL,
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -6805,6 +6903,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "fialový",
     pattern: "tvrdy",
     category: "colors",
+    fits: COLOR,
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -6943,6 +7043,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "oranžový",
     pattern: "tvrdy",
     category: "colors",
+    fits: COLOR,
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -7081,6 +7183,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "růžový",
     pattern: "tvrdy",
     category: "colors",
+    fits: COLOR,
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -7219,6 +7323,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "tenký",
     pattern: "tvrdy",
     category: "size",
+    fits: { any: ["clothes", "item"] },
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -7357,6 +7462,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "tlustý",
     pattern: "tvrdy",
     category: "size",
+    fits: { any: ["clothes", "item", "animal", "person"], none: ["collective"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -7495,6 +7601,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "plný",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["container", "placeV", "building", "vehicle"], none: ["clothes", "activity"] },
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -7633,6 +7741,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "prázdný",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["container", "placeV", "building", "vehicle"], none: ["clothes", "activity"] },
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -7771,6 +7881,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "šťastný",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANIMATE,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -7919,6 +8030,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "bohatý",
     pattern: "tvrdy",
     category: "quality",
+    fits: PERSON,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -8067,6 +8179,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "chudý",
     pattern: "tvrdy",
     category: "quality",
+    fits: PERSON,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -8215,6 +8328,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "smutný",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANIMATE,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -8353,6 +8467,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "krátký",
     pattern: "tvrdy",
     category: "size",
+    fits: LENGTH,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -8491,6 +8606,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "zajímavý",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["person", "activity", "timeUnit"], none: ["collective"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -8629,6 +8745,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "nudný",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["person", "activity", "timeUnit"], none: ["collective"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -8767,6 +8884,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "zdravý",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["person", "animal", "body"], none: ["collective"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -8905,6 +9023,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "nemocný",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["person", "animal", "body"], none: ["collective"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -9043,6 +9162,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "unavený",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANIMATE,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -9181,6 +9301,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "hladový",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANIMATE,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -9319,6 +9440,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "žíznivý",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANIMATE,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -9457,6 +9579,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "veselý",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANIMATE,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -9595,6 +9718,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "pilný",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["person"], none: ["collective"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -9733,6 +9857,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "líný",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["person", "animal"], none: ["collective"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -9871,6 +9996,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "krásný",
     pattern: "tvrdy",
     category: "quality",
+    fits: LOOKS,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -10009,6 +10135,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "důležitý",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["person", "document", "activity", "timeUnit", "meal"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -10147,6 +10274,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "jednoduchý",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["activity", "meal"] },
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -10285,6 +10413,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "složitý",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["activity", "meal"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -10423,6 +10552,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "bezpečný",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["vehicle", "outdoor", "path"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -10561,6 +10691,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "nebezpečný",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["vehicle", "outdoor", "path", "animal", "person"], none: ["collective"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -10699,6 +10830,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "otevřený",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["building", "opening", "container"], none: ["vehicle", "item"] },
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -10837,6 +10970,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "zavřený",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["building", "opening", "container"], none: ["vehicle", "item"] },
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -10975,6 +11110,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "populární",
     pattern: "mekky",
     category: "soft",
+    fits: { any: ["person"], none: ["collective"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -11113,6 +11249,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "naštvaný",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANIMATE,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -11251,6 +11388,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "spokojený",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANIMATE,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -11389,6 +11527,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "pomalý",
     pattern: "tvrdy",
     category: "measure",
+    fits: { any: ["vehicle", "animal", "person", "meal"], none: ["collective"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -11527,6 +11666,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "štíhlý",
     pattern: "tvrdy",
     category: "size",
+    fits: { any: ["person", "animal"], none: ["collective"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -11665,6 +11805,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "hlavní",
     pattern: "mekky",
     category: "soft",
+    fits: { any: ["building"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -11717,6 +11858,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "celý",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["timeUnit", "dayPart", "outdoor", "building", "placeV", "collective", "meal"], none: ["vehicle"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -11769,6 +11911,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "stejný",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANY,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -11821,6 +11964,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "jiný",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANY,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -11873,6 +12017,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "volný",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["seat", "dayPart"] },
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -12011,6 +12157,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "zaneprázdněný",
     pattern: "tvrdy",
     category: "quality",
+    fits: { any: ["person"], none: ["collective"] },
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -12149,6 +12297,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "vyděšený",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANIMATE,
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -12287,6 +12437,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "překvapený",
     pattern: "tvrdy",
     category: "quality",
+    fits: ANIMATE,
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -12425,6 +12577,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "zklamaný",
     pattern: "tvrdy",
     category: "quality",
+    fits: PERSON,
+    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -12563,6 +12717,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "hrdý",
     pattern: "tvrdy",
     category: "quality",
+    fits: PERSON,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -12705,6 +12860,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "vedoucí",
     pattern: "mekky",
     category: "soft",
+    fits: { any: ["workplace"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
