@@ -146,6 +146,9 @@ export interface KindQuota<K extends string> {
   kindWeight?: Partial<Record<K, number>>;
 }
 
+// Тестоване слово (wordIdOf) не повторюється в раунді, поки є комбо інших слів; якщо їх не лишилося (малий пул,
+// квота типу) — повтор дозволено, раунд не коротшає. Зарезервовані під помилки слоти правило не обмежує: дві
+// помилки на одному слові повертаються обидві.
 export function selectRoundCombos<C extends { id: string }>(
   combos: C[],
   store: MistakeStore,
@@ -158,6 +161,17 @@ export function selectRoundCombos<C extends { id: string }>(
   const chosen: C[] = [];
   const kindWeight = kindQuota?.kindWeight;
   const poolWeight = kindWeight ? (c: C) => kindWeight[kindQuota.kindOf(c)] ?? 1 : undefined;
+  const usedWords = new Set<string>();
+  // Вибір із пулу: спершу лише слова, яких ще не було в раунді; якщо таких немає — будь-яке.
+  const pick = (source: C[]): C | null => {
+    const fresh = source.filter((c) => !usedWords.has(wordIdOf(c)));
+    return pickWeighted(fresh, usedIds, store, poolWeight) ?? pickWeighted(source, usedIds, store, poolWeight);
+  };
+  const take = (c: C) => {
+    usedIds.add(c.id);
+    usedWords.add(wordIdOf(c));
+    chosen.push(c);
+  };
 
   // 1. Зарезервовані слоти під активні помилки (гарантований показ).
   const mistakePool = combos.filter((c) => c.id in store);
@@ -165,8 +179,7 @@ export function selectRoundCombos<C extends { id: string }>(
   for (let i = 0; i < reserve; i++) {
     const c = pickWeighted(mistakePool, usedIds, store);
     if (!c) break;
-    usedIds.add(c.id);
-    chosen.push(c);
+    take(c);
   }
 
   // 2. Баланс за типом (якщо заданий): гарантуємо мінімум слотів під рідкісні
@@ -184,10 +197,9 @@ export function selectRoundCombos<C extends { id: string }>(
       let need = Math.min(want - (already[kind] ?? 0), roundSize - chosen.length);
       const kindPool = combos.filter((c) => kindQuota.kindOf(c) === kind);
       while (need > 0) {
-        const c = pickWeighted(kindPool, usedIds, store, poolWeight);
+        const c = pick(kindPool);
         if (!c) break;
-        usedIds.add(c.id);
-        chosen.push(c);
+        take(c);
         need--;
       }
     }
@@ -197,10 +209,9 @@ export function selectRoundCombos<C extends { id: string }>(
   let guard = 0;
   while (chosen.length < roundSize && guard < roundSize * 40) {
     guard++;
-    const c = pickWeighted(combos, usedIds, store, poolWeight);
+    const c = pick(combos);
     if (!c) break;
-    usedIds.add(c.id);
-    chosen.push(c);
+    take(c);
   }
 
   // 4. Впорядкування: не те саме слово поспіль, помилки розсіяні.

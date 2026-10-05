@@ -7,28 +7,39 @@ import {
 } from "../types";
 import { NOUNS } from "../data/nouns";
 import { nounQuizTestable } from "../data/categories";
+import { NOUN_FRAMES, NounFrame } from "../data/nounFrames";
+import type { NounTag } from "../data/nounTags";
+import type { VocalPrep } from "../data/prepositionPartners";
+import { matchesNeeds, acceptedForms, vocalDecision, freshWeightedOrder } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
 
+// ─────────────────── Квіз «Іменники»: форма іменника за відмінком і числом ───────────────────
+// Атомарна одиниця — «слово + відмінок + число» (comboId). Питання — речення з data/nounFrames.ts, де пропуск —
+// сам іменник («Bojím se ___» → psa); фразу рушій бере за смисловими тегами слова. Якщо під теги не підійшла
+// жодна фраза — питання без речення (форма + підпис), щоб жодна форма парадигми не випадала з квізу.
+// Не питаємо: словникову форму (заголовок картки — називний однини, у слів лише з множиною — називний множини)
+// і кличний речей (звертаються лише до осіб і тварин).
+// Відповідь завжди одна: на кнопці одна форма (з дублета «a / b» — перша, як на картці), дистрактор — справжня форма того самого
+// слова, що НЕ входить у прийнятні форми клітинки (усі дублети + variants).
+
 export interface Question {
-  entry: NounEntry;
-  targetCase: CzechCase;
-  targetNumber: GrammaticalNumber;
   comboId: string; // атомарна одиниця "слово+відмінок+число" для трекінгу помилок
-  promptWord: string; // базова форма (називний однини)
+  promptWord: string; // словникова форма (заголовок)
   promptUk: string; // українською
   promptLabel: string; // заголовок-підпис: частина мови основного слова ("іменник")
   taskText: string; // що зробити
+  contextPhrase?: string; // речення з пропуском; немає — питання без речення
   correct: string; // правильна форма
   options: string[]; // [правильна, дистрактор] — вже перемішані
-  distractorKind: "number" | "case";
 }
 
 const NUMBER_LABEL: Record<GrammaticalNumber, string> = {
   sg: "однина",
   pl: "множина",
 };
+const NUMBERS: GrammaticalNumber[] = ["sg", "pl"];
 
-function shuffle<T>(arr: T[]): T[] {
+function shuffle<T>(arr: readonly T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -38,6 +49,9 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 const other = (n: GrammaticalNumber): GrammaticalNumber => (n === "sg" ? "pl" : "sg");
+const split = (s: string): string[] => s.split(" / ").map((x) => x.trim());
+const hasNumber = (n: NounEntry, num: GrammaticalNumber) => n.declension.nominativ[num] !== "—";
+const pluralOnly = (n: NounEntry) => !hasNumber(n, "sg") && hasNumber(n, "pl");
 
 // Дві форми, що різняться ЛИШЕ довготою голосної (i/í, u/ů, e/é, a/á, o/ó, y/ý),
 // на малому екрані виглядають майже однаково (růži vs růží). Формально це різні
@@ -55,91 +69,137 @@ function collapseVowelLength(s: string): string {
     .toLowerCase();
 }
 
-// Дистрактор придатний, якщо він не збігається з правильною формою і не є візуально
-// невідрізнюваним від неї (різниця лише в довготі голосної). "—" (форма не існує,
-// напр. однина pluralia tantum — peníze) НІКОЛИ не придатний дистрактор.
-function isUsableDistractor(correct: string, d: string | null | undefined): d is string {
-  return !!d && d !== "—" && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
+// ─────────────────── Які клітинки питаємо ───────────────────
+// Заголовок картки: називний однини, а для слів лише з множиною (peníze) — називний множини.
+function headlineNumber(n: NounEntry): GrammaticalNumber {
+  return hasNumber(n, "sg") ? "sg" : "pl";
 }
 
-// Дистрактор = РЕАЛЬНА форма з парадигми того ж слова, але не та, що питають.
-// Тип "number": той самий відмінок, інше число.
-// Тип "case": інший відмінок, те саме число.
-// Якщо форма збігається з правильною (у чеській частина форм тотожна) —
-// шукаємо будь-яку іншу реальну форму, щоб варіанти ніколи не дублювалися.
-function buildDistractor(
-  entry: NounEntry,
-  targetCase: CzechCase,
-  targetNumber: GrammaticalNumber,
+const ADDRESSABLE: NounTag[] = ["person", "animal"];
+
+function asked(n: NounEntry, c: CzechCase, num: GrammaticalNumber): boolean {
+  const cell = n.declension[c][num];
+  if (!cell || cell === "—") return false; // форма не існує (однина peníze)
+  if (c === "nominativ" && num === headlineNumber(n)) return false; // відповідь стояла б у заголовку
+  if (c === "vokativ" && !n.sem.some((t) => ADDRESSABLE.includes(t))) return false; // «stole!» — не звертання
+  return true;
+}
+
+// ─────────────────── Фрази ───────────────────
+// Множина у фразі: не для незлічуваних (vody, masa) і збірних (rodiny), крім слів лише з множиною.
+function pluralFits(n: NounEntry): boolean {
+  return pluralOnly(n) || (!n.uncountable && !n.sem.includes("collective"));
+}
+
+// Чи годиться фраза для слова в цьому числі (правило 1 у шапці data/nounFrames.ts).
+function frameFits(f: NounFrame, n: NounEntry, num: GrammaticalNumber): boolean {
+  if (!matchesNeeds(n, f)) return false;
+  const policy = f.num ?? "sg";
+  if (num === "sg") return policy !== "pl";
+  if (!pluralFits(n)) return false;
+  return policy !== "sg" || pluralOnly(n) || n.sem.includes("paired");
+}
+
+const PREP_SLOT = /\{([vksz])\} ___/;
+
+// Речення з формою у пропуску; null — прийменник перед пропуском вокалізується по-різному для двох кнопок
+// або вокалізацію не класифіковано (правило 4 у шапці data/nounFrames.ts).
+function render(f: NounFrame, correct: string, distractor: string): string | null {
+  const m = PREP_SLOT.exec(f.text);
+  if (!m) return f.text;
+  const prep = m[1] as VocalPrep;
+  const d = vocalDecision(prep, correct);
+  if (d === null || vocalDecision(prep, distractor) !== d) return null;
+  return f.text.replace(`{${prep}} `, d === "vocal" ? `${prep}e ` : `${prep} `);
+}
+
+// ─────────────────── Дистрактор ───────────────────
+// Кандидати за пріоритетом: тип "number" — той самий відмінок, інше число; тип "case" — інший відмінок, те саме
+// число; далі — інший тип і будь-яка форма парадигми. Кожна форма дублета — окремий кандидат.
+function distractorCandidates(
+  n: NounEntry,
+  c: CzechCase,
+  num: GrammaticalNumber,
   correct: string,
+  accepted: string[],
   kind: "number" | "case"
-): string | null {
-  const tryNumber = () => {
-    const form = entry.declension[targetCase][other(targetNumber)];
-    return isUsableDistractor(correct, form) ? form : null;
-  };
-  const tryCase = () => {
-    const cases = shuffle(CASE_ORDER.filter((c) => c !== targetCase));
-    for (const c of cases) {
-      const form = entry.declension[c][targetNumber];
-      if (isUsableDistractor(correct, form)) return form;
-    }
-    return null;
-  };
-
-  let d = kind === "number" ? tryNumber() : tryCase();
-  if (d) return d;
-
-  // fallback: інший тип
-  d = kind === "number" ? tryCase() : tryNumber();
-  if (d) return d;
-
-  // остаточний fallback: будь-яка реальна форма з усієї парадигми,
-  // що відрізняється від правильної не лише як рядок, а й візуально
-  for (const c of CASE_ORDER) {
-    for (const num of ["sg", "pl"] as GrammaticalNumber[]) {
-      const form = entry.declension[c][num];
-      if (isUsableDistractor(correct, form)) return form;
+): string[] {
+  const numberCells: [CzechCase, GrammaticalNumber][] = [[c, other(num)]];
+  const caseCells = shuffle(CASE_ORDER.filter((x) => x !== c)).map((x): [CzechCase, GrammaticalNumber] => [x, num]);
+  const rest: [CzechCase, GrammaticalNumber][] = [];
+  for (const x of CASE_ORDER) for (const y of NUMBERS) rest.push([x, y]);
+  const ordered = kind === "number" ? [...numberCells, ...caseCells, ...rest] : [...caseCells, ...numberCells, ...rest];
+  const target = collapseVowelLength(correct);
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const [x, y] of ordered) {
+    const cell = n.declension[x][y];
+    if (!cell || cell === "—") continue;
+    for (const d of split(cell)) {
+      if (seen.has(d)) continue;
+      seen.add(d);
+      if (accepted.includes(d) || collapseVowelLength(d) === target) continue;
+      out.push(d);
     }
   }
-  return null;
+  return out;
 }
 
-// Будує питання для КОНКРЕТНОЇ комбінації (слово+відмінок+число).
-function makeQuestionForCombo(
-  entry: NounEntry,
-  targetCase: CzechCase,
-  targetNumber: GrammaticalNumber,
-  kind: "number" | "case"
-): Question | null {
-  const correct = entry.declension[targetCase][targetNumber];
-  if (!correct) return null;
+// ─────────────────── Питання ───────────────────
+// Перебір повний: форма клітинки → фраза (ще не бачені в раунді першими) → дистрактор із тією самою вокалізацією.
+// Без жодної придатної фрази — питання без речення. null — лише якщо в парадигмі немає жодного дистрактора
+// (така комбінація відсіюється при переліченні).
+interface Built {
+  q: Question;
+  frame: string | null; // текст фрази з data/nounFrames.ts; null — питання без речення
+}
 
-  const distractor = buildDistractor(entry, targetCase, targetNumber, correct, kind);
-  if (!distractor) return null; // немає візуально-різного дистрактора — комбінацію пропускаємо
-
-  const lbl = CASE_LABELS[targetCase];
-  // Headline-слово — зазвичай називний однини, АЛЕ для pluralia tantum
-  // (peníze — однини не існує) це "—"; тоді беремо називний множини —
-  // саме він і є словниковою формою для таких слів.
-  const nomSg = entry.declension.nominativ.sg;
-  const promptWord = nomSg !== "—" ? nomSg : entry.declension.nominativ.pl;
-  return {
-    entry,
-    targetCase,
-    targetNumber,
-    comboId: comboId(entry.id, targetCase, targetNumber),
-    promptWord,
-    promptUk: entry.uk,
-    promptLabel: "іменник",
-    taskText: `Оберіть форму: ${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${NUMBER_LABEL[targetNumber]}`,
-    correct,
-    options: shuffle([correct, distractor]),
-    distractorKind: kind,
+function makeQuestion(
+  n: NounEntry,
+  c: CzechCase,
+  num: GrammaticalNumber,
+  kind: "number" | "case",
+  usedFrames: ReadonlySet<string>
+): Built | null {
+  const accepted = acceptedForms(n, c, num);
+  // Правильною показуємо першу форму клітинки (як на картці); інші форми дублета — лише якщо з першою питання
+  // не будується. Усі вони прийнятні й ніколи не стають дистрактором.
+  const shown = split(n.declension[c][num]);
+  const frames = freshWeightedOrder(
+    NOUN_FRAMES[c].filter((f) => frameFits(f, n, num)),
+    (f) => usedFrames.has(f.text),
+    () => 1
+  );
+  const ask = (correct: string, distractor: string, contextPhrase?: string): Question => {
+    const lbl = CASE_LABELS[c];
+    return {
+      comboId: comboId(n.id, c, num),
+      promptWord: split(n.declension.nominativ[headlineNumber(n)])[0],
+      promptUk: n.uk,
+      promptLabel: "іменник",
+      taskText: `Оберіть форму: ${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${NUMBER_LABEL[num]}`,
+      ...(contextPhrase ? { contextPhrase } : {}),
+      correct,
+      options: shuffle([correct, distractor]),
+    };
   };
+
+  let bare: Built | null = null;
+  for (const correct of shown) {
+    const ds = distractorCandidates(n, c, num, correct, accepted, kind);
+    if (ds.length === 0) continue;
+    bare = bare ?? { q: ask(correct, ds[0]), frame: null };
+    for (const f of frames) {
+      for (const d of ds) {
+        const text = render(f, correct, d);
+        if (text) return { q: ask(correct, d, text), frame: f.text };
+      }
+    }
+  }
+  return bare;
 }
 
-// Усі валідні комбінації пулу (слово × відмінок × число), придатні для питання.
+// ─────────────────── Комбінації ───────────────────
 interface Combo {
   entry: NounEntry;
   targetCase: CzechCase;
@@ -147,18 +207,16 @@ interface Combo {
   id: string;
 }
 
+const NO_FRAMES = new Set<string>();
+
+// Комбо існує, лише якщо для нього будується питання (перевірка один раз під час перелічення).
 function enumerateCombos(pool: NounEntry[]): Combo[] {
   const combos: Combo[] = [];
   for (const entry of pool) {
     for (const c of CASE_ORDER) {
-      for (const n of ["sg", "pl"] as GrammaticalNumber[]) {
-        const correct = entry.declension[c][n];
-        // "—" = форма не існує (pluralia tantum на кшталт peníze не мають
-        // однини) — таку комбінацію не тестуємо взагалі, незалежно від
-        // дистрактора.
-        if (correct === "—") continue;
-        // валідна, якщо існує дистрактор (перевіряємо через побудову з fallback)
-        if (buildDistractor(entry, c, n, correct, "case")) {
+      for (const n of NUMBERS) {
+        if (!asked(entry, c, n)) continue;
+        if (makeQuestion(entry, c, n, "case", NO_FRAMES)) {
           combos.push({ entry, targetCase: c, targetNumber: n, id: comboId(entry.id, c, n) });
         }
       }
@@ -167,26 +225,59 @@ function enumerateCombos(pool: NounEntry[]): Combo[] {
   return combos;
 }
 
-// Сесія: count питань. Вибір комбінацій (ваги помилок + зарезервовані слоти під
-// помилки + «не те саме слово поспіль») — спільний selectRoundCombos. Тип питання
-// (число/відмінок) чергується за позицією.
 // Пул за замовчуванням — усі іменники, КРІМ прихованих категорій (сотні/тисячі
 // живуть лише в розділі "Числівники", не тестуються у загальному квізі).
 const DEFAULT_NOUN_POOL = NOUNS.filter((n) => nounQuizTestable(n.category));
 
+let cached: Combo[] | null = null;
+function defaultCombos(): Combo[] {
+  if (!cached) cached = enumerateCombos(DEFAULT_NOUN_POOL);
+  return cached;
+}
+
+// ─────────────── Dev-перевірка даних (лише dev-збірка, нічого не блокує) ───────────────
+function devCheckData(): void {
+  const issues: string[] = [];
+  for (const c of CASE_ORDER)
+    for (const f of NOUN_FRAMES[c]) {
+      const k = DEFAULT_NOUN_POOL.filter((n) => matchesNeeds(n, f)).length;
+      if (k < 3) issues.push(`фраза «${f.text}» (${c}): лише ${k} іменників (потрібно ≥ 3)`);
+    }
+  // Без речення: жодна фраза не підійшла за тегами або всі відпали через вокалізацію (перебір у makeQuestion повний).
+  const bare = defaultCombos()
+    .filter((x) => !makeQuestion(x.entry, x.targetCase, x.targetNumber, "case", NO_FRAMES)?.frame)
+    .map((x) => x.id);
+  if (bare.length > 0) issues.push(`${bare.length} комбінацій без фрази (питання без речення): ${bare.join(", ")}`);
+  if (issues.length > 0) console.warn(`nounQuiz: ${issues.length} зауваж.:\n  ` + issues.join("\n  "));
+}
+if (typeof __DEV__ !== "undefined" && __DEV__) devCheckData();
+
+// ─────────────────── Сесія ───────────────────
+// Вибір комбінацій (ваги помилок + зарезервовані слоти під помилки + одне слово раз на раунд + «не те саме слово
+// поспіль») — спільний selectRoundCombos. Тип дистрактора (число/відмінок) чергується за позицією; фраза
+// не повторюється в раунді, поки є інші.
 export function generateSession(
   count: number,
   pool: NounEntry[] = DEFAULT_NOUN_POOL,
   mistakes: MistakeStore = {}
 ): Question[] {
-  const combos = enumerateCombos(pool);
+  const combos = pool === DEFAULT_NOUN_POOL ? defaultCombos() : enumerateCombos(pool);
   const chosen = selectRoundCombos(combos, mistakes, count, (c) => c.entry.id);
   const questions: Question[] = [];
-  chosen.forEach((c, i) => {
-    // тип питання чергується за позицією (число / відмінок)
-    const kind: "number" | "case" = i % 2 === 0 ? "number" : "case";
-    const q = makeQuestionForCombo(c.entry, c.targetCase, c.targetNumber, kind);
-    if (q) questions.push(q);
-  });
+  const usedFrames = new Set<string>();
+  const take = (c: Combo, kind: "number" | "case") => {
+    const b = makeQuestion(c.entry, c.targetCase, c.targetNumber, kind, usedFrames);
+    if (!b) return;
+    if (b.frame) usedFrames.add(b.frame);
+    questions.push(b.q);
+  };
+  chosen.forEach((c, i) => take(c, i % 2 === 0 ? "number" : "case"));
+  // Добір, якщо make повернув null (не мало б статися: комбо без питань відсіяні при переліченні).
+  if (questions.length < count) {
+    for (const c of shuffle(combos)) {
+      if (questions.length >= count) break;
+      if (!questions.some((x) => x.comboId === c.id)) take(c, questions.length % 2 === 0 ? "number" : "case");
+    }
+  }
   return questions;
 }
