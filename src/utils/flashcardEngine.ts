@@ -12,6 +12,7 @@ import type { NounTag } from "../data/nounTags";
 import type { VocalPrep } from "../data/prepositionPartners";
 import { matchesNeeds, acceptedForms, vocalDecision, freshWeightedOrder } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
+import { formsOf, isUsableDistractor, once, shuffle, splitForms } from "./quizCommon";
 
 // ─────────────────── Квіз «Іменники»: форма іменника за відмінком і числом ───────────────────
 // Атомарна одиниця — «слово + відмінок + число» (comboId). Питання — речення з data/nounFrames.ts, де пропуск —
@@ -39,35 +40,9 @@ const NUMBER_LABEL: Record<GrammaticalNumber, string> = {
 };
 const NUMBERS: GrammaticalNumber[] = ["sg", "pl"];
 
-function shuffle<T>(arr: readonly T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 const other = (n: GrammaticalNumber): GrammaticalNumber => (n === "sg" ? "pl" : "sg");
-const split = (s: string): string[] => s.split(" / ").map((x) => x.trim());
 const hasNumber = (n: NounEntry, num: GrammaticalNumber) => n.declension.nominativ[num] !== "—";
 const pluralOnly = (n: NounEntry) => !hasNumber(n, "sg") && hasNumber(n, "pl");
-
-// Дві форми, що різняться ЛИШЕ довготою голосної (i/í, u/ů, e/é, a/á, o/ó, y/ý),
-// на малому екрані виглядають майже однаково (růži vs růží). Формально це різні
-// форми, але як варіанти квізу вони сприймаються як "два однакових". Тому дистрактор
-// має відрізнятися від правильної відповіді ще й ВІЗУАЛЬНО, а не тільки як рядок.
-function collapseVowelLength(s: string): string {
-  return s
-    .replace(/á/g, "a")
-    .replace(/í/g, "i")
-    .replace(/é/g, "e")
-    .replace(/ó/g, "o")
-    .replace(/ú/g, "u")
-    .replace(/ů/g, "u")
-    .replace(/ý/g, "y")
-    .toLowerCase();
-}
 
 // ─────────────────── Які клітинки питаємо ───────────────────
 // Заголовок картки: називний однини, а для слів лише з множиною (peníze) — називний множини.
@@ -129,20 +104,22 @@ function distractorCandidates(
   const rest: [CzechCase, GrammaticalNumber][] = [];
   for (const x of CASE_ORDER) for (const y of NUMBERS) rest.push([x, y]);
   const ordered = kind === "number" ? [...numberCells, ...caseCells, ...rest] : [...caseCells, ...numberCells, ...rest];
-  const target = collapseVowelLength(correct);
   const seen = new Set<string>();
   const out: string[] = [];
   for (const [x, y] of ordered) {
-    const cell = n.declension[x][y];
-    if (!cell || cell === "—") continue;
-    for (const d of split(cell)) {
+    for (const d of formsOf(n.declension[x][y])) {
       if (seen.has(d)) continue;
       seen.add(d);
-      if (accepted.includes(d) || collapseVowelLength(d) === target) continue;
-      out.push(d);
+      if (isUsableDistractor(correct, d, accepted)) out.push(d);
     }
   }
   return out;
+}
+
+// Чи дасть distractorCandidates хоч один варіант (без випадковості — для переліку комбінацій): та сама перевірка
+// по всіх клітинках парадигми.
+function hasDistractor(n: NounEntry, correct: string, accepted: string[]): boolean {
+  return CASE_ORDER.some((x) => NUMBERS.some((y) => formsOf(n.declension[x][y]).some((d) => isUsableDistractor(correct, d, accepted))));
 }
 
 // ─────────────────── Питання ───────────────────
@@ -164,7 +141,7 @@ function makeQuestion(
   const accepted = acceptedForms(n, c, num);
   // Правильною показуємо першу форму клітинки (як на картці); інші форми дублета — лише якщо з першою питання
   // не будується. Усі вони прийнятні й ніколи не стають дистрактором.
-  const shown = split(n.declension[c][num]);
+  const shown = splitForms(n.declension[c][num]);
   const frames = freshWeightedOrder(
     NOUN_FRAMES[c].filter((f) => frameFits(f, n, num)),
     (f) => usedFrames.has(f.text),
@@ -174,7 +151,7 @@ function makeQuestion(
     const lbl = CASE_LABELS[c];
     return {
       comboId: comboId(n.id, c, num),
-      promptWord: split(n.declension.nominativ[headlineNumber(n)])[0],
+      promptWord: splitForms(n.declension.nominativ[headlineNumber(n)])[0],
       promptUk: n.uk,
       promptLabel: "іменник",
       taskText: `Оберіть форму: ${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${NUMBER_LABEL[num]}`,
@@ -209,14 +186,16 @@ interface Combo {
 
 const NO_FRAMES = new Set<string>();
 
-// Комбо існує, лише якщо для нього будується питання (перевірка один раз під час перелічення).
+// Комбо існує, лише якщо для нього будується питання: makeQuestion повертає null тільки тоді, коли жодна показувана
+// форма клітинки не має дистрактора (без фрази питання будується завжди), — це й перевіряється, без побудови питань.
 function enumerateCombos(pool: NounEntry[]): Combo[] {
   const combos: Combo[] = [];
   for (const entry of pool) {
     for (const c of CASE_ORDER) {
       for (const n of NUMBERS) {
         if (!asked(entry, c, n)) continue;
-        if (makeQuestion(entry, c, n, "case", NO_FRAMES)) {
+        const accepted = acceptedForms(entry, c, n);
+        if (splitForms(entry.declension[c][n]).some((correct) => hasDistractor(entry, correct, accepted))) {
           combos.push({ entry, targetCase: c, targetNumber: n, id: comboId(entry.id, c, n) });
         }
       }
@@ -229,11 +208,8 @@ function enumerateCombos(pool: NounEntry[]): Combo[] {
 // живуть лише в розділі "Числівники", не тестуються у загальному квізі).
 const DEFAULT_NOUN_POOL = NOUNS.filter((n) => nounQuizTestable(n.category));
 
-let cached: Combo[] | null = null;
-function defaultCombos(): Combo[] {
-  if (!cached) cached = enumerateCombos(DEFAULT_NOUN_POOL);
-  return cached;
-}
+// Пул комбінацій залежить лише від даних — будується раз за запуск застосунку.
+const defaultCombos = once(() => enumerateCombos(DEFAULT_NOUN_POOL));
 
 // ─────────────── Dev-перевірка даних (лише dev-збірка, нічого не блокує) ───────────────
 function devCheckData(): void {

@@ -35,6 +35,7 @@ import {
 import type { VocalPrep } from "../data/prepositionPartners";
 import { agreementGender, candidateNumbers, freshWeightedOrder, matchesFilter, vocalDecision } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
+import { collapseVowelLength, formsOf, isUsableDistractor, once, shuffle, splitForms } from "./quizCommon";
 
 // ═══════════════════ КВІЗ «ПРИКМЕТНИКИ ТА ЗАЙМЕННИКИ» ═══════════════════
 // Знання — у даних: смислові теги іменників (data/nounTags.ts), fits прикметників (data/adjectives.ts), лексичні
@@ -75,42 +76,12 @@ const NUMBERS: GrammaticalNumber[] = ["sg", "pl"];
 const NUMBER_LABEL: Record<GrammaticalNumber, string> = { sg: "однина", pl: "множина" };
 const BLANK = "___";
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 function randomOf<T>(arr: T[]): T | null {
   return arr.length === 0 ? null : arr[Math.floor(Math.random() * arr.length)];
 }
 
-// Усі форми клітинки («mé / moje» → [mé, moje]); [] для відсутньої.
-function formsOf(cell: string | undefined): string[] {
-  if (!cell || cell === "—") return [];
-  return cell.split(" / ").map((s) => s.trim());
-}
 function firstForm(cell: string): string {
-  return cell.split(" / ")[0].trim();
-}
-
-function collapseVowelLength(s: string): string {
-  return s
-    .replace(/á/g, "a")
-    .replace(/í/g, "i")
-    .replace(/é/g, "e")
-    .replace(/ó/g, "o")
-    .replace(/ú/g, "u")
-    .replace(/ů/g, "u")
-    .replace(/ý/g, "y")
-    .toLowerCase();
-}
-
-function isUsableDistractor(correct: string, d: string | null | undefined): d is string {
-  return !!d && d !== "—" && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
+  return splitForms(cell)[0];
 }
 
 // Клітинка-дистрактор придатна, якщо ЖОДНА її форма не є прийнятною формою цілі (і не відрізняється лише довжиною
@@ -136,6 +107,20 @@ function distractorCells(decl: FullDeclension, g: Gender, c: QuizCase, n: Gramma
   const out: string[] = [];
   for (const tier of tiers) for (const cell of tier) if (cellUsable(target, cell) && !out.includes(cell)) out.push(cell);
   return out;
+}
+
+// Ті самі клітинки, що дає distractorCells (останній рівень там — будь-яка клітинка парадигми), без пріоритету й
+// без випадковості — для перевірок «чи є хоч одна» під час переліку комбінацій.
+const ALL_CELLS: [Gender, QuizCase, GrammaticalNumber][] = GENDER_ORDER.flatMap((gg) =>
+  QUIZ_CASES.flatMap((cc) => NUMBERS.map((nn): [Gender, QuizCase, GrammaticalNumber] => [gg, cc, nn]))
+);
+function hasDistractorCell(decl: FullDeclension, g: Gender, c: QuizCase, n: GrammaticalNumber): boolean {
+  const target = formsOf(decl[g][c][n]);
+  return ALL_CELLS.some(([gg, cc, nn]) => cellUsable(target, decl[gg][cc][nn]));
+}
+function usableCells(decl: FullDeclension, g: Gender, c: QuizCase, n: GrammaticalNumber): string[] {
+  const target = formsOf(decl[g][c][n]);
+  return [...new Set(ALL_CELLS.map(([gg, cc, nn]) => decl[gg][cc][nn]).filter((cell) => cellUsable(target, cell)))];
 }
 
 // Форма клітинки для показу за індексом дублету (один індекс на питання: обидві кнопки в одному стилі).
@@ -318,10 +303,10 @@ function samePrepDecision(prep: VocalPrep, a: string, b: string): boolean {
 // прийменник перед пропуском не вокалізується однозначно для цього слова (tvůj: «v/ve tvém» коливається), береться
 // лише з займенником-партнером попереду («k té tvrdé…») або не береться зовсім — тож комбо або гарантовано будує
 // питання, або його немає (до цієї перевірки 8 комбо мовчки не будувалися ніколи).
-function frameRenderable(f: DeclFrame, target: string[], dCells: string[]): boolean {
+function frameRenderable(f: DeclFrame, target: string[], dCells: () => string[]): boolean {
   const prep = blankLeadPrep(f);
   if (!prep) return true;
-  return [0, 1].some((idx) => dCells.some((cell) => samePrepDecision(prep, pickForm(target, idx), pickForm(formsOf(cell), idx))));
+  return [0, 1].some((idx) => dCells().some((cell) => samePrepDecision(prep, pickForm(target, idx), pickForm(formsOf(cell), idx))));
 }
 
 // ─────────────── Комбінації з повною парадигмою ───────────────
@@ -340,10 +325,12 @@ function leadPartners(f: DeclFrame, noun: NounEntry, g: Gender, c: QuizCase, n: 
   );
 }
 
-// Іменники й фрейми, у яких слово може стояти в цій клітинці (без партнерів). Порожньо — комбо немає.
-function candidatesFor(t: Tested, g: Gender, c: QuizCase, n: GrammaticalNumber): Candidate[] {
+// Іменники й фрейми, у яких слово може стояти в цій клітинці (без партнерів). Порожньо — комбо немає. firstOnly —
+// лише перевірка «чи є хоч один» (перелік комбінацій): зупиняється на першому іменнику. Без випадковості.
+function candidatesFor(t: Tested, g: Gender, c: QuizCase, n: GrammaticalNumber, firstOnly = false): Candidate[] {
   const target = formsOf(t.decl[g][c][n]);
-  const dCells = distractorCells(t.decl, g, c, n);
+  let cells: string[] | null = null;
+  const dCells = () => (cells ??= usableCells(t.decl, g, c, n));
   const frames = DECL_FRAMES[c].filter((f) => frameFitsWord(f, t, c));
   if (frames.length === 0) return [];
   const out: Candidate[] = [];
@@ -356,7 +343,10 @@ function candidatesFor(t: Tested, g: Gender, c: QuizCase, n: GrammaticalNumber):
       if (frameRenderable(f, target, dCells)) fs.push({ f, needsPartner: false });
       else if (t.head === "adjective" && t.quiz.role !== "order" && leadPartners(f, noun, g, c, n).length > 0) fs.push({ f, needsPartner: true });
     }
-    if (fs.length > 0) out.push({ noun, frames: fs });
+    if (fs.length > 0) {
+      out.push({ noun, frames: fs });
+      if (firstOnly) break;
+    }
   }
   return out;
 }
@@ -475,11 +465,13 @@ function adjLikeUnits(pool: Tested[]): UnitCombo[] {
     for (const g of GENDER_ORDER) {
       for (const c of QUIZ_CASES) {
         for (const n of NUMBERS) {
-          if (formsOf(t.decl[g][c][n]).length === 0 || distractorCells(t.decl, g, c, n).length === 0) continue;
-          const cands = candidatesFor(t, g, c, n);
-          if (cands.length === 0) continue; // немає природної фрази з іменником цього роду — клітинку не питаємо
+          if (formsOf(t.decl[g][c][n]).length === 0 || !hasDistractorCell(t.decl, g, c, n)) continue;
+          // немає природної фрази з іменником цього роду — клітинку не питаємо
+          if (candidatesFor(t, g, c, n, true).length === 0) continue;
           const id = comboId(t.id, `${g}_${c}`, n);
-          units.push({ id, wordId: t.id, kind: t.kind, make: (used) => makeAdjLike(t, g, c, n, cands, id, used) });
+          // Повний список кандидатів — при першому питанні цього комбо, далі з пам'яті.
+          const cands = once(() => candidatesFor(t, g, c, n));
+          units.push({ id, wordId: t.id, kind: t.kind, make: (used) => makeAdjLike(t, g, c, n, cands(), id, used) });
         }
       }
     }
@@ -752,18 +744,13 @@ function devCheckData(): void {
 if (typeof __DEV__ !== "undefined" && __DEV__) devCheckData();
 
 // ─────────────── Сесія ───────────────
-let cachedUnits: UnitCombo[] | null = null;
-function allDeclensionCombos(): UnitCombo[] {
-  if (!cachedUnits) {
-    cachedUnits = [
-      ...adjLikeUnits(buildTestedPool()),
-      ...personalUnits(),
-      ...coreUnits(INTERROGATIVE_CORE, "interrogative-core"),
-      ...coreUnits(INDEFINITE_CORE, "indefinite-core"),
-    ];
-  }
-  return cachedUnits;
-}
+// Пул комбінацій залежить лише від даних — будується раз за запуск застосунку.
+const allDeclensionCombos = once((): UnitCombo[] => [
+  ...adjLikeUnits(buildTestedPool()),
+  ...personalUnits(),
+  ...coreUnits(INTERROGATIVE_CORE, "interrogative-core"),
+  ...coreUnits(INDEFINITE_CORE, "indefinite-core"),
+]);
 
 // Баланс за типом: численний відкритий клас прикметників не має витісняти закриті групи займенників. Кожен тип
 // набирає свій мінімум зі свого пулу; недобір іде в спільний зважений пул. pronoun 3 → 2 звільнило місце для

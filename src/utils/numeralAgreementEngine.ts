@@ -16,6 +16,7 @@ import type { QuizCase } from "../data/declensionFrames";
 import type { VocalPrep } from "../data/prepositionPartners";
 import { matchesNeeds, freshWeightedOrder, acceptedForms, formOf, vocalDecision } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
+import { isUsableDistractor, once, shuffle, splitForms } from "./quizCommon";
 
 // ─────────────────── Узгодження числівник + іменник ───────────────────
 // Тестує ОДНЕ з двох слів групи (числівник або іменник) у реченні з data/numeralFrames.ts; друге слово показане
@@ -46,38 +47,11 @@ export interface AgreementQuestion {
   options: string[];
 }
 
-function shuffle<T>(arr: readonly T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-const split = (s: string): string[] => s.split(" / ").map((x) => x.trim());
 const isDirect = (c: CzechCase) => c === "nominativ" || c === "akuzativ";
 const isMasc = (g: Gender) => g === "masc_anim" || g === "masc_inan";
 const hasNumber = (n: NounEntry, num: GrammaticalNumber) => n.declension.nominativ[num] !== "—";
 const QUIZ_CASES = NUMERAL_CASE_ORDER as QuizCase[];
 const GENDERS: Gender[] = ["masc_anim", "masc_inan", "fem", "neut"];
-
-function collapseVowelLength(s: string): string {
-  return s
-    .replace(/á/g, "a")
-    .replace(/í/g, "i")
-    .replace(/é/g, "e")
-    .replace(/ó/g, "o")
-    .replace(/ú/g, "u")
-    .replace(/ů/g, "u")
-    .replace(/ý/g, "y")
-    .toLowerCase();
-}
-
-// Дистрактор: справжня форма, не прийнятна для клітинки й не та сама форма з іншою довжиною голосного.
-function usable(d: string | null | undefined, accepted: string[], correct: string): d is string {
-  return !!d && d !== "—" && !accepted.includes(d) && collapseVowelLength(d) !== collapseVowelLength(correct);
-}
 
 // ─────────────────── Лічильне слово ───────────────────
 // Усе, що квізу треба знати про числівник: його форми, які клітинки іменника він вимагає і з якими іменниками
@@ -104,19 +78,19 @@ interface Counter {
 }
 
 const otherCases = (c: CzechCase) => shuffle(NUMERAL_CASE_ORDER.filter((x) => x !== c));
-const firstOf = (s: string) => split(s)[0];
+const firstOf = (s: string) => splitForms(s)[0];
 
 // Форма простого числівника для іменника роду g (усі дублети).
 function cardinalForms(card: CardinalEntry, c: CzechCase, g: Gender): string[] {
   switch (card.kind) {
     case "gendered":
-      return split(card.declension[g][c].sg);
+      return splitForms(card.declension[g][c].sg);
     case "twoForm":
-      return split(card.forms[c][isMasc(g) ? "masc" : "femNeut"]);
+      return splitForms(card.forms[c][isMasc(g) ? "masc" : "femNeut"]);
     case "invariantDecl":
-      return split(card.forms[c]);
+      return splitForms(card.forms[c]);
     case "oblique":
-      return isDirect(c) ? [card.direct] : split(card.oblique);
+      return isDirect(c) ? [card.direct] : splitForms(card.oblique);
   }
 }
 
@@ -167,7 +141,7 @@ function simpleCounter(card: CardinalEntry): Counter {
 }
 
 function hundredCounter(h: NounEntry): Counter {
-  const forms = (c: CzechCase) => [...split(h.declension[c].sg), ...(h.uninflectedAsNumeral ? [h.cz] : [])];
+  const forms = (c: CzechCase) => [...splitForms(h.declension[c].sg), ...(h.uninflectedAsNumeral ? [h.cz] : [])];
   return {
     key: `hundred:${h.id}`,
     forms: (c) => forms(c),
@@ -352,48 +326,68 @@ interface Built {
   nounId: string;
 }
 
+type Side = { blank: "numeral"; numeral: NonNullable<Counter["numeral"]> } | { blank: "noun" };
+const sidesOf = (k: Counter): Side[] =>
+  k.numeral ? [{ blank: "numeral", numeral: k.numeral }, { blank: "noun" }] : [{ blank: "noun" }];
+
+// Пара «пропуск + іменник»: показані форми й придатні дистрактори за пріоритетом; null — форми немає.
+interface Prepared {
+  side: Side;
+  noun: NounEntry;
+  cell: Cell;
+  numShown: string;
+  nounShown: string;
+  firstWord: string;
+  correct: string;
+  distractors: string[];
+}
+function prepare(k: Counter, c: QuizCase, side: Side, noun: NounEntry): Prepared | null {
+  const numAcc = k.forms(c, noun.gender);
+  const numShown = numAcc[0];
+  const cell = k.cell(c);
+  const nounShown = formOf(noun, cell.c, cell.n);
+  if (!numShown || numShown.includes("—") || !nounShown) return null;
+  const nounAcc = [cell, ...k.altCells(c)].flatMap((x) => acceptedForms(noun, x.c, x.n));
+  const firstWord = numShown.split(" ")[0];
+  if (side.blank === "numeral") {
+    const distractors = side.numeral.distractors(c, noun.gender).filter((d) => isUsableDistractor(numShown, d, numAcc));
+    return { side, noun, cell, numShown, nounShown, firstWord, correct: numShown, distractors };
+  }
+  const distractors = k
+    .nounDistractorCells(c)
+    .map((x) => formOf(noun, x.c, x.n))
+    .filter((d): d is string => isUsableDistractor(nounShown, d, nounAcc));
+  return { side, noun, cell, numShown, nounShown, firstWord, correct: nounShown, distractors };
+}
+
+// Речення з фрази для підготовленої пари; null — фраза не годиться (немає дистрактора з тією самою вокалізацією
+// прийменника або вокалізацію не класифіковано).
+function tryFrame(k: Counter, p: Prepared, f: NumeralFrame): { distractor: string; text: string } | null {
+  // Прийменник перед пропуском-числівником: обидві кнопки мусять мати те саме ve/v («se ___» — і stem, і sta).
+  const m = PREP_SLOT.exec(f.text);
+  const distractor =
+    p.side.blank === "numeral" && m
+      ? p.distractors.find((d) => vocalDecision(m[1] as VocalPrep, d.split(" ")[0]) === vocalDecision(m[1] as VocalPrep, p.firstWord))
+      : p.distractors[0];
+  if (!distractor) return null;
+  const group = p.side.blank === "numeral" ? `___ ${p.nounShown}` : `${p.numShown} ___`;
+  const text = render(f, k, group, p.firstWord);
+  return text ? { distractor, text } : null;
+}
+
 // Питання для (лічильне слово, відмінок): пропуск → іменник (свіжі першими, вага 1/fit) → фраза. Перебір повний:
 // якщо питання для цієї пари взагалі можливе, воно буде побудоване.
 function build(k: Counter, c: QuizCase, id: string, used: ReadonlySet<string>): Built | null {
   if (k.cases && !k.cases.includes(c)) return null;
   const cands = candidatesFor(k, c);
-  type Side = { blank: "numeral"; numeral: NonNullable<Counter["numeral"]> } | { blank: "noun" };
-  const sides: Side[] = k.numeral ? [{ blank: "numeral", numeral: k.numeral }, { blank: "noun" }] : [{ blank: "noun" }];
-  for (const side of shuffle(sides)) {
-    const blank = side.blank;
+  for (const side of shuffle(sidesOf(k))) {
     for (const { noun, frames } of freshWeightedOrder(cands, (x) => used.has(x.noun.id), (x) => FIT.get(x.noun.id) ?? 1)) {
-      const g = noun.gender;
-      const numAcc = k.forms(c, g);
-      const numShown = numAcc[0];
-      const cell = k.cell(c);
-      const nounShown = formOf(noun, cell.c, cell.n);
-      if (!numShown || numShown.includes("—") || !nounShown) continue;
-      const nounAcc = [cell, ...k.altCells(c)].flatMap((x) => acceptedForms(noun, x.c, x.n));
-      const firstWord = numShown.split(" ")[0];
-
-      let correct: string;
-      let distractors: string[];
-      if (side.blank === "numeral") {
-        correct = numShown;
-        distractors = side.numeral.distractors(c, g).filter((d) => usable(d, numAcc, correct));
-      } else {
-        correct = nounShown;
-        distractors = k
-          .nounDistractorCells(c)
-          .map((x) => formOf(noun, x.c, x.n))
-          .filter((d): d is string => usable(d, nounAcc, correct));
-      }
+      const p = prepare(k, c, side, noun);
+      if (!p) continue;
       for (const f of shuffle(frames)) {
-        // Прийменник перед пропуском-числівником: обидві кнопки мусять мати те саме ve/v («se ___» — і stem, і sta).
-        const m = PREP_SLOT.exec(f.text);
-        const distractor =
-          blank === "numeral" && m
-            ? distractors.find((d) => vocalDecision(m[1] as VocalPrep, d.split(" ")[0]) === vocalDecision(m[1] as VocalPrep, firstWord))
-            : distractors[0];
-        if (!distractor) continue;
-        const group = blank === "numeral" ? `___ ${nounShown}` : `${numShown} ___`;
-        const text = render(f, k, group, firstWord);
-        if (!text) continue;
+        const r = tryFrame(k, p, f);
+        if (!r) continue;
+        const blank = side.blank;
         const lbl = CASE_LABELS[c];
         const tl = CASE_LABELS[k.taskCase(c)];
         return {
@@ -406,10 +400,10 @@ function build(k: Counter, c: QuizCase, id: string, used: ReadonlySet<string>): 
             taskText:
               blank === "numeral"
                 ? `Оберіть числівник: ${lbl.uk} (${lbl.cz}) — ${lbl.question}`
-                : `Оберіть іменник: ${GENDER_UK[g]}, ${tl.uk} (${tl.cz}) — ${tl.question}, ${cell.n === "sg" ? "однина" : "множина"}`,
-            contextPhrase: text,
-            correct,
-            options: shuffle([correct, distractor]),
+                : `Оберіть іменник: ${GENDER_UK[noun.gender]}, ${tl.uk} (${tl.cz}) — ${tl.question}, ${p.cell.n === "sg" ? "однина" : "множина"}`,
+            contextPhrase: r.text,
+            correct: p.correct,
+            options: shuffle([p.correct, r.distractor]),
           },
           nounId: noun.id,
         };
@@ -417,6 +411,19 @@ function build(k: Counter, c: QuizCase, id: string, used: ReadonlySet<string>): 
     }
   }
   return null;
+}
+
+// Чи будується для пари хоч одне питання — той самий перебір, що в build, без випадкового порядку й без складання
+// питання (для переліку комбінацій).
+function buildable(k: Counter, c: QuizCase): boolean {
+  if (k.cases && !k.cases.includes(c)) return false;
+  const cands = candidatesFor(k, c);
+  return sidesOf(k).some((side) =>
+    cands.some(({ noun, frames }) => {
+      const p = prepare(k, c, side, noun);
+      return !!p && frames.some((f) => tryFrame(k, p, f) !== null);
+    })
+  );
 }
 
 // ─────────────────── Комбінації ───────────────────
@@ -427,11 +434,12 @@ interface Combo {
   wordId: string;
   kind: NumKind;
   make: (used: ReadonlySet<string>) => Built | null;
+  buildable: () => boolean; // чи будується хоч одне питання (лише для переліку комбінацій)
 }
 
 // Один відмінок, одне лічильне слово (прості числівники, сотні, jedny / dvoje…).
 function singleCombo(id: string, wordId: string, kind: NumKind, k: Counter, c: QuizCase): Combo {
-  return { id, wordId, kind, make: (used) => build(k, c, id, used) };
+  return { id, wordId, kind, make: (used) => build(k, c, id, used), buildable: () => buildable(k, c) };
 }
 
 // ═══════════════════ СКЛАДЕНІ ЧИСЛА 21–99 ═══════════════════
@@ -472,11 +480,12 @@ function compoundCombo(group: number): Combo {
         }
       return null;
     },
+    buildable: () => QUIZ_CASES.some((c) => counters.some((k) => buildable(k, c))),
   };
 }
 
-// Комбо існує, лише якщо для нього питання будується (перевірка один раз під час перелічення): інакше
-// зарезервоване під помилку комбо мовчки не з'являлося б.
+// Комбо існує, лише якщо для нього питання будується (buildable — той самий перебір, що в make, без побудови
+// питань): інакше зарезервоване під помилку комбо мовчки не з'являлося б.
 function enumerateAll(): { combos: Combo[]; dropped: string[] } {
   const all: Combo[] = [];
   for (const cd of CARDINALS) {
@@ -489,20 +498,17 @@ function enumerateAll(): { combos: Combo[]; dropped: string[] } {
   }
   for (const h of HUNDRED_NOUNS) for (const c of QUIZ_CASES) all.push(singleCombo(comboId(h.id, c, "x"), h.id, "hundreds", hundredCounter(h), c));
   for (const g of [1, 2, 3, 4, 5]) all.push(compoundCombo(g));
-  const combos = all.filter((x) => x.make(new Set()) !== null);
+  const combos = all.filter((x) => x.buildable());
   return { combos, dropped: all.filter((x) => !combos.includes(x)).map((x) => x.id) };
 }
 
-let cached: Combo[] | null = null;
-function allNumeralCombos(): Combo[] {
-  if (!cached) {
-    const { combos, dropped } = enumerateAll();
-    if (dropped.length > 0 && typeof __DEV__ !== "undefined" && __DEV__)
-      console.warn(`numeralQuiz: ${dropped.length} комбінацій без жодного питання: ${dropped.join(", ")}`);
-    cached = combos;
-  }
-  return cached;
-}
+// Пул комбінацій залежить лише від даних — будується раз за запуск застосунку.
+const allNumeralCombos = once((): Combo[] => {
+  const { combos, dropped } = enumerateAll();
+  if (dropped.length > 0 && typeof __DEV__ !== "undefined" && __DEV__)
+    console.warn(`numeralQuiz: ${dropped.length} комбінацій без жодного питання: ${dropped.join(", ")}`);
+  return combos;
+});
 
 // ─────────────── Dev-перевірка даних (лише dev-збірка, нічого не блокує) ───────────────
 function devCheckData(): void {

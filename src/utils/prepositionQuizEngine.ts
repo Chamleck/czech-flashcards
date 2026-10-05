@@ -7,6 +7,7 @@ import { validateNounSem } from "../data/nounTags";
 import { CONFUSABLE_PREP_PAIRS, DUAL_FRAMES, EXCHANGE_FRAMES, FIXED_FRAMES, Frame, Needs, PRONOUN_FRAMES } from "../data/prepositionPartners";
 import { acceptedForms, candidateNumbers, disjoint, formOf, freshWeightedOrder, matchesNeeds, vocalizedPrep } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
+import { formsOf, isUsableDistractor, once, shuffle } from "./quizCommon";
 
 // ─────────────────────────── Квіз «Прийменники» ───────────────────────────
 // Одна категорія «Флеш-картки», кілька механік (як «Числівники» / «Час і дата»):
@@ -44,26 +45,6 @@ export interface PrepQuestion {
   contextPhrase: string; // фраза з пропуском
   correct: string;
   options: string[];
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function collapseVowelLength(s: string): string {
-  return s
-    .replace(/á/g, "a").replace(/í/g, "i").replace(/é/g, "e").replace(/ó/g, "o")
-    .replace(/ú/g, "u").replace(/ů/g, "u").replace(/ý/g, "y").toLowerCase();
-}
-
-// Дистрактор не має відрізнятися від правильної форми лише довжиною голосного (занадто дрібно для вибору).
-function isUsable(correct: string, d: string | null | undefined): d is string {
-  return !!d && d !== "—" && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
 }
 
 const CASES: CzechCase[] = ["nominativ", "genitiv", "dativ", "akuzativ", "lokal", "instrumental"];
@@ -193,7 +174,7 @@ function nounDistractor(noun: NounEntry, correctCase: CzechCase, n: GrammaticalN
   const target = acceptedForms(noun, correctCase, n);
   for (const cc of shuffle(CASES.filter((c) => c !== correctCase && c !== "nominativ"))) {
     const f = formOf(noun, cc, n);
-    if (!isUsable(correct, f)) continue;
+    if (!isUsableDistractor(correct, f)) continue;
     if (!disjoint(target, acceptedForms(noun, cc, n))) continue;
     return f;
   }
@@ -205,7 +186,7 @@ function nounDistractor(noun: NounEntry, correctCase: CzechCase, n: GrammaticalN
 // «лише за довжиною» не годиться для питання), беремо будь-який інший відмінок, як і раніше.
 function dualDistractor(noun: NounEntry, c: CzechCase, otherCase: CzechCase, num: GrammaticalNumber, correct: string): string | null {
   const other = formOf(noun, otherCase, num);
-  if (isUsable(correct, other) && disjoint(acceptedForms(noun, c, num), acceptedForms(noun, otherCase, num))) return other;
+  if (isUsableDistractor(correct, other) && disjoint(acceptedForms(noun, c, num), acceptedForms(noun, otherCase, num))) return other;
   return nounDistractor(noun, c, num, correct);
 }
 
@@ -383,8 +364,6 @@ interface PronounGroup {
   decl: PersonalDeclension;
 }
 
-const splitForms = (cell: string): string[] => (cell === "—" ? [] : cell.split(" / ").map((x) => x.trim()));
-
 function pronounGroups(): PronounGroup[] {
   const out: PronounGroup[] = [];
   for (const pron of PERSONAL_PRONOUNS) {
@@ -422,9 +401,9 @@ const PREP_BY_ID = new Map(PREPOSITIONS.map((p) => [p.id, p]));
 
 // Комірка придатна, якщо є обидві колонки й форма «без прийменника» не є прийнятною формою «після прийменника».
 function pronounPair(decl: PersonalDeclension, c: CzechCase): { correct: string; plain: string } | null {
-  const after = splitForms(decl[c].b);
-  const plain = splitForms(decl[c].a)[0];
-  if (after.length === 0 || !plain || after.includes(plain) || !isUsable(after[0], plain)) return null;
+  const after = formsOf(decl[c].b);
+  const plain = formsOf(decl[c].a)[0];
+  if (after.length === 0 || !plain || after.includes(plain) || !isUsableDistractor(after[0], plain)) return null;
   return { correct: after[0], plain };
 }
 
@@ -542,6 +521,9 @@ function enumerateCombos(): Combo[] {
   return combos;
 }
 
+// Пул комбінацій залежить лише від даних — будується раз за запуск застосунку.
+const defaultCombos = once(enumerateCombos);
+
 // Квота: fixprep і exchange — менші/специфічні пули, гарантуємо їм присутність,
 // щоб пропорційний вибір не витіснив (той самий підхід, що в datetime/adj-pron).
 const PREP_KIND_QUOTA: KindQuota<PrepKind> = {
@@ -557,7 +539,7 @@ const PREP_KIND_QUOTA: KindQuota<PrepKind> = {
 
 export function generatePrepositionSession(
   count: number,
-  pool: Combo[] = enumerateCombos(),
+  pool: Combo[] = defaultCombos(),
   mistakes: MistakeStore = {}
 ): PrepQuestion[] {
   const chosen = selectRoundCombos(pool, mistakes, count, (c) => c.wordId, undefined, PREP_KIND_QUOTA);

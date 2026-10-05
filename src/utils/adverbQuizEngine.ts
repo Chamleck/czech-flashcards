@@ -1,6 +1,7 @@
 import { SpatialAdverbEntry, AdverbSense } from "../types";
 import { ADVERBS } from "../data/adverbs";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
+import { once, shuffle } from "./quizCommon";
 
 // Квиз прислівників місця. ДВА напрями в одному раунді:
 // • forward (як було) — за контекстним реченням із пропуском визначити, яка
@@ -79,15 +80,6 @@ const REV_TASK = "На яке питання відповідає?";
 
 const PROMPT_LABEL = "прислівник";
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 // Замінити форму в реченні на пропуск ___. Потокенно, а НЕ str.replace(form):
 // (1) форма на початку речення пишеться з великої ("Vevnitř je teplo") — простий
 //     replace нижнім регістром її не знайшов би (реальний баг, спійманий harness'ом);
@@ -141,6 +133,9 @@ function enumerateCombos(pool: SpatialAdverbEntry[]): Combo[] {
   }
   return combos;
 }
+
+// Пул комбінацій залежить лише від даних — будується раз за запуск застосунку.
+const defaultCombos = once(() => enumerateCombos(ADVERBS));
 
 function makeForwardQuestion(c: Combo): AdverbQuestion {
   // Фрейм — випадковий приклад цього сенсу (у tam/doma їх 2 → різноманіття).
@@ -229,7 +224,7 @@ export function generateAdverbSession(
   pool: SpatialAdverbEntry[] = ADVERBS,
   mistakes: MistakeStore = {}
 ): AdverbQuestion[] {
-  const combos = enumerateCombos(pool);
+  const combos = pool === ADVERBS ? defaultCombos() : enumerateCombos(pool);
   const chosen = selectRoundCombos(
     combos,
     mistakes,

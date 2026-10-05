@@ -1,6 +1,7 @@
 import { VerbEntry, VerbPerson, PERSON_ORDER, PERSON_LABELS } from "../types";
 import { VERBS } from "../data/verbs";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
+import { isUsableDistractor, once, shuffle } from "./quizCommon";
 import {
   presentForm,
   futureForm,
@@ -41,33 +42,6 @@ const TENSE_LABEL: Record<VerbQuestion["tense"], string> = {
   future: "Майбутній час",
   imperative: "Наказовий спосіб",
 };
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-// Візуальне згортання довготи голосної — той самий принцип, що й у іменників:
-// форми, що різняться лише і/í, u/ů тощо, на екрані виглядають однаково.
-function collapseVowelLength(s: string): string {
-  return s
-    .replace(/á/g, "a")
-    .replace(/í/g, "i")
-    .replace(/é/g, "e")
-    .replace(/ó/g, "o")
-    .replace(/ú/g, "u")
-    .replace(/ů/g, "u")
-    .replace(/ý/g, "y")
-    .toLowerCase();
-}
-
-function isUsableDistractor(correct: string, d: string | null | undefined): d is string {
-  return !!d && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
-}
 
 // Інфінітив для показу (зі зворотною часткою, якщо є).
 function infinitiveOf(v: VerbEntry): string {
@@ -110,6 +84,12 @@ function buildDistractor(v: VerbEntry, tense: VerbQuestion["tense"], correct: st
     if (isUsableDistractor(correct, f)) return f;
   }
   return null;
+}
+
+// Чи знайде buildDistractor хоч щось — ті самі два кроки, без перемішування (для переліку комбінацій).
+function hasDistractor(v: VerbEntry, tense: VerbQuestion["tense"], correct: string): boolean {
+  const ok = (f: string) => isUsableDistractor(correct, f);
+  return allFormsInTense(v, tense).some(ok) || allFormsAllTenses(v).some(ok);
 }
 
 // ═══════════════════ ВИБІР ВИДУ ЗА КОНТЕКСТОМ (aspect) ═══════════════════
@@ -321,7 +301,7 @@ function makeCombo(
   correct: string
 ): Combo | null {
   if (!correct) return null;
-  if (!buildDistractor(v, tense, correct)) return null; // немає придатного дистрактора — пропускаємо
+  if (!hasDistractor(v, tense, correct)) return null; // немає придатного дистрактора — пропускаємо
   return { kind: "conjug", entry: v, tense, personKey, correct, id: comboId(v.id, tense, personKey) };
 }
 
@@ -383,6 +363,9 @@ function enumerateCombos(pool: VerbEntry[]): Combo[] {
   return combos;
 }
 
+// Пул комбінацій залежить лише від даних — будується раз за запуск застосунку.
+const defaultCombos = once(() => enumerateCombos(VERBS));
+
 // Текст завдання: "[Час/спосіб] — [займенник cz] ([займенник uk])".
 // Підпис особи в завданні: «cz (uk)» — завжди ОДНА пара дужок. Вкладені дужки в
 // uk (напр. «ми (закличне)») розплющуються в кому: «my (ми, закличне)». Тому
@@ -440,7 +423,7 @@ export function generateVerbSession(
   pool: VerbEntry[] = VERBS,
   mistakes: MistakeStore = {}
 ): VerbQuestion[] {
-  const combos = enumerateCombos(pool);
+  const combos = pool === VERBS ? defaultCombos() : enumerateCombos(pool);
   const chosen = selectRoundCombos(combos, mistakes, count, (c) => c.entry.id, undefined, VERB_KIND_QUOTA);
   const questions: VerbQuestion[] = [];
   for (const c of chosen) {

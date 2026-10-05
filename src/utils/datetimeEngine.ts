@@ -3,6 +3,7 @@ import { DATE_ORDINALS, MONTHS } from "../data/dates";
 import { NOUNS } from "../data/nouns";
 import { formal24, colloquial12, dayPart, TimePoint } from "../data/timeforms";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
+import { isUsableDistractor, once, shuffle } from "./quizCommon";
 
 // ─────────────── Квіз «Час і дата» ───────────────
 // Дві підкатегорії в одному пулі (як розділ «Числівники» об'єднує різнотипні
@@ -21,15 +22,6 @@ export interface DateTimeQuestion {
   options: string[];
 }
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 function firstForm(s: string): string {
   return s.split(" / ")[0];
 }
@@ -41,22 +33,6 @@ function firstForm(s: string): string {
 function randomForm(s: string): string {
   const forms = s.split(" / ");
   return forms[Math.floor(Math.random() * forms.length)];
-}
-
-function collapseVowelLength(s: string): string {
-  return s
-    .replace(/á/g, "a")
-    .replace(/í/g, "i")
-    .replace(/é/g, "e")
-    .replace(/ó/g, "o")
-    .replace(/ú/g, "u")
-    .replace(/ů/g, "u")
-    .replace(/ý/g, "y")
-    .toLowerCase();
-}
-
-function usable(correct: string, d: string | null | undefined): d is string {
-  return !!d && d !== "—" && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
 }
 
 // ─────────────── Підкатегорія «Дати» ───────────────
@@ -72,7 +48,7 @@ function buildDateQuestion(d: DateOrdinal, month: MonthName, mode: DateMode): Da
   // firstForm() тут ще доречний — варіативність потрібна лише для correct).
   const correct = randomForm(mode === "gen" ? d.gen : d.nom);
   const distractor = firstForm(mode === "gen" ? d.nom : d.gen);
-  if (!usable(correct, distractor)) return null;
+  if (!isUsableDistractor(correct, distractor)) return null;
 
   const monthGen = firstForm(month.gen);
   const monthNom = firstForm(month.nom);
@@ -145,12 +121,12 @@ function buildTimeQuestion(tp: TimePoint, sys: TimeSystem): DateTimeQuestion | n
   let distractor: string | null = null;
   const cand = neighborTime(tp);
   distractor = readTime(cand, sys);
-  if (!usable(correct, distractor)) {
+  if (!isUsableDistractor(correct, distractor)) {
     // запасний: спробувати іншу опорну точку
     const alt = { h24: (tp.h24 + 2) % 24, m: tp.m };
     distractor = readTime(alt, sys);
   }
-  if (!usable(correct, distractor)) return null;
+  if (!isUsableDistractor(correct, distractor)) return null;
 
   const sysLabel = sys === "formal" ? "офіційний стиль (24-год)" : "розмовний стиль";
   return {
@@ -240,7 +216,7 @@ function buildWeekdayWhenQuestion(day: NounEntry): DateTimeQuestion | null {
     const other = others[Math.floor(Math.random() * others.length)];
     distractor = `${WEEKDAY_PREP[other.id]} ${firstForm(other.declension.akuzativ.sg)}`;
   }
-  if (!usable(correct, distractor)) return null;
+  if (!isUsableDistractor(correct, distractor)) return null;
 
   const withDate = Math.random() < 0.5;
   const contextPhrase = withDate
@@ -269,7 +245,7 @@ function buildWeekdayNameQuestion(day: NounEntry): DateTimeQuestion | null {
   const others = WEEKDAYS.filter((d) => d.id !== day.id);
   const other = others[Math.floor(Math.random() * others.length)];
   const distractor = firstForm(other.cz);
-  if (!usable(correct, distractor)) return null;
+  if (!isUsableDistractor(correct, distractor)) return null;
 
   return {
     comboId: comboId("weekday-name", day.id, "x"),
@@ -301,7 +277,7 @@ function buildDayPartQuestion(tp: TimePoint): DateTimeQuestion | null {
 
   const correct = `${bare} ${correctPart}`;
   const distractor = `${bare} ${wrongPart}`;
-  if (!usable(correct, distractor)) return null;
+  if (!isUsableDistractor(correct, distractor)) return null;
 
   return {
     comboId: comboId(`time-daypart-${tp.h24}-${tp.m}`, "daypart", "x"),
@@ -313,7 +289,6 @@ function buildDayPartQuestion(tp: TimePoint): DateTimeQuestion | null {
     options: shuffle([correct, distractor]),
   };
 }
-
 
 type ComboKind = "date-gen" | "date-gen-compound" | "date-nom" | "time" | "daypart" | "weekday-when" | "weekday-name";
 
@@ -451,6 +426,9 @@ function enumerateCombos(): Combo[] {
   return combos;
 }
 
+// Пул комбінацій залежить лише від даних — будується раз за запуск застосунку.
+const defaultCombos = once(enumerateCombos);
+
 // Гарантована квота на раунд (12 карток): дати й уточнення частини доби —
 // значно менші пули за розмовний+формальний час разом, тому без квоти
 // пропорційний зважений вибір їх майже витісняє (реальний баг, знайдений на
@@ -473,7 +451,7 @@ const DATETIME_KIND_QUOTA: KindQuota<ComboKind> = {
 
 export function generateDateTimeSession(
   count: number,
-  pool: Combo[] = enumerateCombos(),
+  pool: Combo[] = defaultCombos(),
   mistakes: MistakeStore = {}
 ): DateTimeQuestion[] {
   const chosen = selectRoundCombos(
