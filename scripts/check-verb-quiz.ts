@@ -62,8 +62,6 @@ for (const v of VERBS) {
   // Правила додавання дієслів (шапка verbs.ts): future/present обов'язкові, без дублетів.
   if (v.aspect === "perfective" && !v.future) err(`${v.id}: доконане без поля future ("budu udělat")`);
   if (v.aspect === "imperfective" && !v.present) err(`${v.id}: недоконане без поля present`);
-  if (v.momentary && v.aspect !== "imperfective") err(`${v.id}: momentary ставиться лише на недоконаному`);
-  if (v.momentary && !v.aspectPairId) warnings.push(`${v.id}: momentary без видової пари не діє (пара потрібна для aspect-питань)`);
   // registerNote показується на табі «своєї» дієвідміни (недоконаний — теперішній,
   // доконаний — майбутній): без таблиці банеру нема де з'явитись. Назву часу в тексті
   // не пишемо — її вже показує активний таб.
@@ -214,9 +212,6 @@ for (const v of VERBS) {
   const strict = p.cz === "po" + v.cz || p.cz === "pro" + v.cz;
   if (strict && !v.delimitativePartner) infos.push(`кандидат у делімітативні (немає delimitativePartner): ${v.cz} → ${p.cz}`);
   if (v.delimitativePartner && !/^(po|pro)/.test(p.cz)) warnings.push(`${v.id}: delimitativePartner, але партнер "${p.cz}" не на po-/pro-`);
-}
-for (const v of VERBS) {
-  if (v.delimitativePartner && v.aspect !== "imperfective") err(`${v.id}: delimitativePartner ставиться лише на недоконаному`);
 }
 
 // ── 7. Вага минулого ──

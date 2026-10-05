@@ -25,16 +25,18 @@ import { VerbEntry } from "../types";
 //  2. Доконане ОБОВ'ЯЗКОВО має future; недоконане — present (виняток: být/jít/jet
 //     мають власне future). Забуте future дало б «budu udělat».
 //  3. Пара видів — двобічна aspectPairId.
-//  4. Партнер-делімітатив (po-/pro-: sedět → posedět, čekat → počkat): delimitativePartner
-//     на недоконаному.
-//  5. Миттєве недоконане (přicházet, začínat, končit, nacházet…): momentary на
-//     недоконаному — тест у коментарі до поля VerbEntry.momentary. Кожне нове
-//     недоконане дієслово з парою перевірити за цим тестом.
+//  4–5. Недоконане з видовою парою ОБОВ'ЯЗКОВО має обидва рішення (без них проєкт не збереться; на доконаному
+//     й на недоконаному без пари їх поставити не можна — тип VerbEntry у types/index.ts):
+//     delimitativePartner — true, якщо доконаний партнер делімітативний (po-/pro-: sedět → posedět, čekat → počkat);
+//     momentary — true для миттєвої зміни стану (přicházet, začínat, končit, nacházet…); тест: «Celou noc jsem ___»
+//     з однією безперервною дією звучить природно? Якщо ні — true.
 
 export const VERBS: VerbEntry[] = [
   // ═══════════════════ I КЛАС (-e/-ě) ═══════════════════
   {
     id: "nest",
+    momentary: false,
+    delimitativePartner: false,
     uk: "нести",
     cz: "nést",
     aspect: "imperfective",
@@ -54,6 +56,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "brat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "брати",
     cz: "brát",
     aspect: "imperfective",
@@ -72,6 +76,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "psat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "писати",
     cz: "psát",
     aspect: "imperfective",
@@ -90,6 +96,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "cist",
+    momentary: false,
+    delimitativePartner: false,
     uk: "читати",
     cz: "číst",
     aspect: "imperfective",
@@ -108,6 +116,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "pect",
+    momentary: false,
+    delimitativePartner: false,
     uk: "пекти",
     cz: "péct",
     aspect: "imperfective",
@@ -126,6 +136,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "pit",
+    momentary: false,
+    delimitativePartner: false,
     uk: "пити",
     cz: "pít",
     aspect: "imperfective",
@@ -145,6 +157,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "myt",
+    momentary: false,
+    delimitativePartner: false,
     uk: "мити",
     cz: "mýt",
     aspect: "imperfective",
@@ -164,6 +178,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vest",
+    momentary: false,
+    delimitativePartner: false,
     uk: "вести",
     cz: "vést",
     aspect: "imperfective",
@@ -182,6 +198,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "rust",
+    momentary: false,
+    delimitativePartner: false,
     uk: "рости",
     cz: "růst",
     aspect: "imperfective",
@@ -322,6 +340,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "tisknout",
+    momentary: false,
+    delimitativePartner: false,
     uk: "тиснути / друкувати",
     cz: "tisknout",
     aspect: "imperfective",
@@ -342,6 +362,8 @@ export const VERBS: VerbEntry[] = [
   // ═══════════════════ III КЛАС (-uje/-je) ═══════════════════
   {
     id: "kupovat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "купувати",
     cz: "kupovat",
     aspect: "imperfective",
@@ -395,6 +417,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "divat-se",
+    momentary: false,
+    delimitativePartner: false,
     uk: "дивитися",
     cz: "dívat",
     aspect: "imperfective",
@@ -432,6 +456,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "kryt",
+    momentary: false,
+    delimitativePartner: false,
     uk: "крити / ховати",
     cz: "krýt",
     aspect: "imperfective",
@@ -468,6 +494,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "dekovat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "дякувати",
     cz: "děkovat",
     aspect: "imperfective",
@@ -504,6 +532,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "opakovat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "повторювати",
     cz: "opakovat",
     aspect: "imperfective",
@@ -525,6 +555,8 @@ export const VERBS: VerbEntry[] = [
   // ═══════════════════ IV КЛАС (-í) ═══════════════════
   {
     id: "prosit",
+    momentary: false,
+    delimitativePartner: false,
     uk: "просити",
     cz: "prosit",
     aspect: "imperfective",
@@ -543,6 +575,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "mluvit",
+    momentary: false,
+    delimitativePartner: true,
     uk: "говорити",
     cz: "mluvit",
     aspect: "imperfective",
@@ -552,7 +586,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "mluv", vy: "mluvte", my: "mluvme" },
     aspectPairNote: "доконаний партнер: promluvit (заговорити)",
     aspectPairId: "promluvit",
-    delimitativePartner: true,
     examples: {
       present: { cz: "Mluvím česky.", uk: "Я говорю чеською." },
       past: { cz: "Mluvil jsem česky.", uk: "Я говорив чеською." },
@@ -562,6 +595,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "videt",
+    momentary: false,
+    delimitativePartner: false,
     uk: "бачити",
     cz: "vidět",
     aspect: "imperfective",
@@ -580,6 +615,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "spat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "спати",
     cz: "spát",
     aspect: "imperfective",
@@ -598,6 +635,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "ucit-se",
+    momentary: false,
+    delimitativePartner: false,
     uk: "вчити / навчатися",
     cz: "učit",
     aspect: "imperfective",
@@ -669,6 +708,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "slyset",
+    momentary: false,
+    delimitativePartner: false,
     uk: "чути",
     cz: "slyšet",
     aspect: "imperfective",
@@ -687,6 +728,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "sedet",
+    momentary: false,
+    delimitativePartner: true,
     uk: "сидіти",
     cz: "sedět",
     aspect: "imperfective",
@@ -696,7 +739,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "seď", vy: "seďte", my: "seďme" },
     aspectPairNote: "доконаний партнер: posedět (посидіти)",
     aspectPairId: "posedet",
-    delimitativePartner: true,
     examples: {
       present: { cz: "Sedím na židli.", uk: "Я сиджу на стільці." },
       past: { cz: "Seděl jsem na židli.", uk: "Я сидів на стільці." },
@@ -706,6 +748,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "lezet",
+    momentary: false,
+    delimitativePartner: true,
     uk: "лежати",
     cz: "ležet",
     aspect: "imperfective",
@@ -715,7 +759,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "lež", vy: "ležte", my: "ležme" },
     aspectPairNote: "доконаний партнер: poležet (полежати)",
     aspectPairId: "polezet",
-    delimitativePartner: true,
     examples: {
       present: { cz: "Kniha leží na stole.", uk: "Книга лежить на столі." },
       past: { cz: "Kniha ležela na stole.", uk: "Книга лежала на столі." },
@@ -759,6 +802,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "platit",
+    momentary: false,
+    delimitativePartner: false,
     uk: "платити",
     cz: "platit",
     aspect: "imperfective",
@@ -779,6 +824,8 @@ export const VERBS: VerbEntry[] = [
   // ═══════════════════ V КЛАС (-á) ═══════════════════
   {
     id: "delat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "робити",
     cz: "dělat",
     aspect: "imperfective",
@@ -814,6 +861,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "cekat",
+    momentary: false,
+    delimitativePartner: true,
     uk: "чекати",
     cz: "čekat",
     aspect: "imperfective",
@@ -823,7 +872,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "čekej", vy: "čekejte", my: "čekejme" },
     aspectPairNote: "доконаний партнер: počkat (почекати)",
     aspectPairId: "pockat",
-    delimitativePartner: true,
     examples: {
       present: { cz: "Čekám na autobus.", uk: "Я чекаю на автобус." },
       past: { cz: "Čekal jsem na autobus.", uk: "Я чекав на автобус." },
@@ -833,6 +881,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "hrat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "грати",
     cz: "hrát",
     aspect: "imperfective",
@@ -852,6 +902,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "ptat-se",
+    momentary: false,
+    delimitativePartner: false,
     uk: "питати",
     cz: "ptát",
     aspect: "imperfective",
@@ -871,6 +923,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "snidat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "снідати",
     cz: "snídat",
     aspect: "imperfective",
@@ -889,6 +943,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "volat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "дзвонити / кликати",
     cz: "volat",
     aspect: "imperfective",
@@ -924,6 +980,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "poslouchat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "слухати",
     cz: "poslouchat",
     aspect: "imperfective",
@@ -942,6 +1000,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vstavat",
+    momentary: true,
+    delimitativePartner: false,
     uk: "вставати",
     cz: "vstávat",
     aspect: "imperfective",
@@ -951,7 +1011,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "vstávej", vy: "vstávejte", my: "vstávejme" },
     aspectPairNote: "доконаний партнер: vstát (встати)",
     aspectPairId: "vstat",
-    momentary: true,
     examples: {
       present: { cz: "Vstávám brzy ráno.", uk: "Я встаю рано вранці." },
       past: { cz: "Vstával jsem brzy ráno.", uk: "Я вставав рано вранці." },
@@ -982,6 +1041,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zpivat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "співати",
     cz: "zpívat",
     aspect: "imperfective",
@@ -1759,6 +1820,8 @@ export const VERBS: VerbEntry[] = [
   // в прикладі йде через budu. Форми звірено з ÚJČ / Wikislovník / dobryslovnik.
   {
     id: "zacinat",
+    momentary: true,
+    delimitativePartner: false,
     uk: "починати",
     cz: "začínat",
     aspect: "imperfective",
@@ -1768,7 +1831,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "začínej", vy: "začínejte", my: "začínejme" },
     aspectPairNote: "доконаний партнер: začít (почати)",
     aspectPairId: "zacit",
-    momentary: true,
     examples: {
       present: { cz: "Každý den začínám v osm.", uk: "Щодня я починаю о восьмій." },
       past: { cz: "Vždycky jsem začínal brzy.", uk: "Я завжди починав рано." },
@@ -1778,6 +1840,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zapominat",
+    momentary: true,
+    delimitativePartner: false,
     uk: "забувати",
     cz: "zapomínat",
     aspect: "imperfective",
@@ -1787,7 +1851,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "zapomínej", vy: "zapomínejte", my: "zapomínejme" },
     aspectPairNote: "доконаний партнер: zapomenout (забути)",
     aspectPairId: "zapomenout",
-    momentary: true,
     examples: {
       present: { cz: "Často zapomínám klíče.", uk: "Я часто забуваю ключі." },
       past: { cz: "Pořád jsem zapomínal jména.", uk: "Я постійно забував імена." },
@@ -1797,6 +1860,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "oblekat-se",
+    momentary: false,
+    delimitativePartner: false,
     uk: "одягатися",
     cz: "oblékat",
     aspect: "imperfective",
@@ -1816,6 +1881,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "sedat-si",
+    momentary: true,
+    delimitativePartner: false,
     uk: "сідати",
     cz: "sedat",
     aspect: "imperfective",
@@ -1826,7 +1893,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "sedej si", vy: "sedejte si", my: "sedejme si" },
     aspectPairNote: "доконаний партнер: sednout si (сісти)",
     aspectPairId: "sednout-si",
-    momentary: true,
     examples: {
       present: { cz: "Sedám si vždycky dopředu.", uk: "Я завжди сідаю спереду." },
       past: { cz: "Sedal si k oknu.", uk: "Він сідав біля вікна." },
@@ -1836,6 +1902,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vzpominat-si",
+    momentary: false,
+    delimitativePartner: false,
     uk: "згадувати",
     cz: "vzpomínat",
     aspect: "imperfective",
@@ -1855,6 +1923,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "padat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "падати",
     cz: "padat",
     aspect: "imperfective",
@@ -1873,6 +1943,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vracet-se",
+    momentary: false,
+    delimitativePartner: false,
     uk: "повертатися",
     cz: "vracet",
     aspect: "imperfective",
@@ -1892,6 +1964,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "stavat-se",
+    momentary: false,
+    delimitativePartner: false,
     uk: "ставати (робитися)",
     cz: "stávat",
     aspect: "imperfective",
@@ -1915,6 +1989,8 @@ export const VERBS: VerbEntry[] = [
   // КОЖНОГО дієслова — урок з uvidět/uslyšet: рідковживаність ≠ відсутність форми).
   {
     id: "rikat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "казати",
     cz: "říkat",
     aspect: "imperfective",
@@ -1950,6 +2026,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "davat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "давати",
     cz: "dávat",
     aspect: "imperfective",
@@ -1985,6 +2063,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "nachazet",
+    momentary: true,
+    delimitativePartner: false,
     uk: "знаходити",
     cz: "nacházet",
     aspect: "imperfective",
@@ -1994,7 +2074,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "nacházej", vy: "nacházejte", my: "nacházejme" },
     aspectPairNote: "доконаний партнер: najít (знайти)",
     aspectPairId: "najit",
-    momentary: true,
     examples: {
       present: { cz: "Nacházím klíče.", uk: "Я знаходжу ключі." },
       past: { cz: "Nacházel jsem klíče.", uk: "Я знаходив ключі." },
@@ -2021,6 +2100,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "pomahat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "допомагати",
     cz: "pomáhat",
     aspect: "imperfective",
@@ -2056,6 +2137,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "oteviret",
+    momentary: true,
+    delimitativePartner: false,
     uk: "відкривати",
     cz: "otevírat",
     aspect: "imperfective",
@@ -2065,7 +2148,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "otevírej", vy: "otevírejte", my: "otevírejme" },
     aspectPairNote: "доконаний партнер: otevřít (відкрити)",
     aspectPairId: "otevrit",
-    momentary: true,
     examples: {
       present: { cz: "Otevírám dveře.", uk: "Я відкриваю двері." },
       past: { cz: "Otevíral jsem dveře.", uk: "Я відкривав двері." },
@@ -2092,6 +2174,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zaviret",
+    momentary: true,
+    delimitativePartner: false,
     uk: "закривати",
     cz: "zavírat",
     aspect: "imperfective",
@@ -2101,7 +2185,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "zavírej", vy: "zavírejte", my: "zavírejme" },
     aspectPairNote: "доконаний партнер: zavřít (закрити)",
     aspectPairId: "zavrit",
-    momentary: true,
     examples: {
       present: { cz: "Zavírám obchod.", uk: "Я закриваю магазин." },
       past: { cz: "Zavíral jsem obchod.", uk: "Я закривав магазин." },
@@ -2128,6 +2211,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "rozumet",
+    momentary: false,
+    delimitativePartner: false,
     uk: "розуміти",
     cz: "rozumět",
     aspect: "imperfective",
@@ -2168,6 +2253,8 @@ export const VERBS: VerbEntry[] = [
   // дієслова); rarity відзначена в примітці, форму НЕ пропущено (урок з uvidět/uslyšet).
   {
     id: "ukazovat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "показувати",
     cz: "ukazovat",
     aspect: "imperfective",
@@ -2204,6 +2291,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zkouset",
+    momentary: false,
+    delimitativePartner: false,
     uk: "пробувати",
     cz: "zkoušet",
     aspect: "imperfective",
@@ -2239,6 +2328,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "poznavat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "впізнавати (знайомитися)",
     cz: "poznávat",
     aspect: "imperfective",
@@ -2277,6 +2368,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "potkavat",
+    momentary: true,
+    delimitativePartner: false,
     uk: "зустрічати",
     cz: "potkávat",
     aspect: "imperfective",
@@ -2286,7 +2379,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "potkávej", vy: "potkávejte", my: "potkávejme" },
     aspectPairNote: "доконаний партнер: potkat (зустріти)",
     aspectPairId: "potkat",
-    momentary: true,
     examples: {
       present: { cz: "Potkávám kamaráda.", uk: "Я зустрічаю друга." },
       past: { cz: "Potkával jsem kamaráda.", uk: "Я зустрічав друга." },
@@ -2313,6 +2405,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "koncit",
+    momentary: true,
+    delimitativePartner: false,
     uk: "закінчувати",
     cz: "končit",
     aspect: "imperfective",
@@ -2322,7 +2416,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "konči", vy: "končete", my: "končeme" },
     aspectPairNote: "доконаний партнер: skončit (закінчити); природна пара-антонім до začínat/začít",
     aspectPairId: "skoncit",
-    momentary: true,
     examples: {
       present: { cz: "Končím práci v pět.", uk: "Я закінчую роботу о п'ятій." },
       past: { cz: "Končil jsem práci v pět.", uk: "Я закінчував роботу о п'ятій." },
@@ -2410,6 +2503,8 @@ export const VERBS: VerbEntry[] = [
   // (як líbit se) — обидва РЕАЛЬНО атестовані (vaď!/stač!), перевірено явно, не припущено.
   {
     id: "dostavat",
+    momentary: true,
+    delimitativePartner: false,
     uk: "отримувати",
     cz: "dostávat",
     aspect: "imperfective",
@@ -2419,7 +2514,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "dostávej", vy: "dostávejte", my: "dostávejme" },
     aspectPairNote: "доконаний партнер: dostat (отримати)",
     aspectPairId: "dostat",
-    momentary: true,
     examples: {
       present: { cz: "Dostávám dopisy.", uk: "Я отримую листи." },
       past: { cz: "Dostával jsem dopisy.", uk: "Я отримував листи." },
@@ -2446,6 +2540,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "posilat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "надсилати",
     cz: "posílat",
     aspect: "imperfective",
@@ -2481,6 +2577,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "rozhodovat-se",
+    momentary: false,
+    delimitativePartner: false,
     uk: "вирішувати",
     cz: "rozhodovat",
     aspect: "imperfective",
@@ -2519,6 +2617,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "omlouvat-se",
+    momentary: false,
+    delimitativePartner: false,
     uk: "вибачатися",
     cz: "omlouvat",
     aspect: "imperfective",
@@ -2556,6 +2656,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "citit",
+    momentary: false,
+    delimitativePartner: false,
     uk: "відчувати",
     cz: "cítit",
     aspect: "imperfective",
@@ -2648,6 +2750,8 @@ export const VERBS: VerbEntry[] = [
   // ОБИДВА окремо, не екстрапольовано з одного на інше.
   {
     id: "varit",
+    momentary: false,
+    delimitativePartner: false,
     uk: "варити",
     cz: "vařit",
     aspect: "imperfective",
@@ -2683,6 +2787,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "prichazet",
+    momentary: true,
+    delimitativePartner: false,
     uk: "приходити",
     cz: "přicházet",
     aspect: "imperfective",
@@ -2692,7 +2798,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "přicházej", vy: "přicházejte", my: "přicházejme" },
     aspectPairNote: "доконаний партнер: přijít (прийти)",
     aspectPairId: "prijit",
-    momentary: true,
     examples: {
       present: { cz: "Přicházím pozdě.", uk: "Я приходжу пізно." },
       past: { cz: "Přicházel jsem pozdě.", uk: "Я приходив пізно." },
@@ -2719,6 +2824,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "odchazet",
+    momentary: true,
+    delimitativePartner: false,
     uk: "відходити (йти геть)",
     cz: "odcházet",
     aspect: "imperfective",
@@ -2728,7 +2835,6 @@ export const VERBS: VerbEntry[] = [
     imperative: { ty: "odcházej", vy: "odcházejte", my: "odcházejme" },
     aspectPairNote: "доконаний партнер: odejít (піти геть)",
     aspectPairId: "odejit",
-    momentary: true,
     examples: {
       present: { cz: "Odcházím z práce.", uk: "Я йду з роботи." },
       past: { cz: "Odcházel jsem z práce.", uk: "Я йшов з роботи." },
@@ -2755,6 +2861,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "uklizet",
+    momentary: false,
+    delimitativePartner: false,
     uk: "прибирати",
     cz: "uklízet",
     aspect: "imperfective",
@@ -2790,6 +2898,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "prodavat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "продавати",
     cz: "prodávat",
     aspect: "imperfective",
@@ -2825,6 +2935,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "stihat",
+    momentary: false,
+    delimitativePartner: false,
     uk: "встигати",
     cz: "stíhat",
     aspect: "imperfective",

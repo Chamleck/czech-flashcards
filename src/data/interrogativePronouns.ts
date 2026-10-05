@@ -260,7 +260,7 @@ export const INTERROGATIVE_CORE: PersonalPronounEntry[] = [
     quizFrames: {
       // «vyhýbat se komu» — давальне керування (MUNI, дисертація з валентності дієслів, is.muni.cz/th/ds5eg)
       genitiv: ["___ se bojíš?", "___ sis všiml?"],
-      dativ: ["Věříš ___?", "___ se vyhýbáš?"],
+      dativ: ["___ věříš?", "___ se vyhýbáš?"],
       akuzativ: ["___ vidíš?", "___ hledáš?"],
       lokal: ["O ___ jste mluvili?", "O ___ přemýšlíš?"],
       instrumental: ["S ___ jedeš?", "S ___ ses bavil?"], // s kým — супровід (з прийменником)
@@ -278,7 +278,7 @@ export const INTERROGATIVE_CORE: PersonalPronounEntry[] = [
     patternLabel: "питальний займенник · нерегулярне відмінювання",
     quizFrames: {
       genitiv: ["___ se bojíš?", "___ sis všiml?"],
-      dativ: ["Věříš ___?", "___ se vyhýbáš?"],
+      dativ: ["___ věříš?", "___ se vyhýbáš?"],
       akuzativ: ["___ vidíš?", "___ hledáš?"],
       lokal: ["O ___ jste mluvili?", "O ___ přemýšlíš?"],
       instrumental: ["___ píšeš?", "___ to otevřeš?"], // čím — знаряддя (без прийменника)

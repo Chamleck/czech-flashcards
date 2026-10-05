@@ -76,10 +76,9 @@ export interface NounEntry {
   declension: DeclensionTable;
   exampleSentenceCz?: string;
   exampleSentenceUk?: string;
-  // true → незлічуване (maso, voda, rýže…): не годиться як лічений предмет у
-  // квизі узгодження числівників («osm mas» безглузде). Відмінюється й тестується
-  // як звичайний іменник, лише виключене з ролі лічильникового партнера.
-  uncountable?: boolean;
+  // ОБОВ'ЯЗКОВЕ рішення: true → незлічуване (maso, voda, rýže, peníze…): у квізі «Числівники» не рахується
+  // («osm mas»), у множинних фразах квізів не стоїть («vody», «masa»); false → звичайний злічуваний іменник.
+  uncountable: boolean;
   // Смислові теги (data/nounTags.ts): за ними квіз «Прийменники» підбирає слово у фрази, де воно природне
   // («Jsem v ___» — placeV, «Polož to na ___» — surface). ОБОВ'язкове поле: без нього новий іменник
   // не збереться, а нічим не позначене слово не потрапляло б у змістовні фрази.
@@ -148,7 +147,7 @@ export type AdjectivePattern = "tvrdy" | "mekky"; // mladý / jarní
 
 export type AdjectiveCategory = "size" | "quality" | "measure" | "colors" | "soft" | "ordinal";
 
-export interface AdjectiveEntry {
+interface AdjectiveBase {
   id: string;
   uk: string;
   cz: string; // називний чол. роду однини (базова форма, напр. mladý)
@@ -169,18 +168,30 @@ export interface AdjectiveEntry {
   // підпис над основним `examples`, задається лише разом із secondSense.
   senseLabel?: string;
   secondSense?: { label: string; examples: GenderExamples };
-  // Ступені порівняння (вищий/найвищий) — лише в градуйованих прикметників.
-  // Відносні (jarní, cizí, poslední, domácí) ступенів не мають → поле відсутнє.
-  // Обидва ступені відмінюються за зразком jarní (м'який).
-  // false → ступені є на картці (форма правильна), але у квізі «Прикметники та займенники» їх не питаємо: у живому
-  // мовленні вищий ступінь цього слова рідкісний чи дивний («červenější vlak», «nejvyděšenější lékař»). Кольори,
-  // стани (vyděšený, překvapený, zklamaný, zaneprázdněný), otevřený/zavřený, plný/prázdný, volný, ubohý.
-  quizDegrees?: false;
-  degrees?: {
-    comparative: { cz: string; uk: string; declension: FullDeclension };
-    superlative: { cz: string; uk: string; declension: FullDeclension };
-  };
 }
+
+// Ступені порівняння (вищий/найвищий); обидва відмінюються за зразком jarní (м'який).
+export interface AdjectiveDegrees {
+  comparative: { cz: string; uk: string; declension: FullDeclension };
+  superlative: { cz: string; uk: string; declension: FullDeclension };
+}
+
+// Смисловий клас прикметника — ОБОВ'ЯЗКОВЕ рішення для кожного слова (без нього проєкт не збереться), бо від
+// нього залежить, у які фрази квізу слово може потрапити. З класу випливає решта, тож кожне рішення записане раз:
+//  • "quality"    — постійна якість (velký, mladý, chytrý): має degrees; quizDegrees — чи питати ступені у квізі
+//                   (false, коли вищий ступінь у мовленні рідкісний чи дивний: кольори «červenější vlak»,
+//                   otevřený/zavřený, plný/prázdný, volný, ubohý — на картці ступені є);
+//  • "state"      — тимчасовий стан істоти, «який зараз», а не «який є» (hladový, unavený, nemocný, naštvaný…):
+//                   має degrees (на картці), але у квізі ступенів не питаємо («nejhladovější kamarád»), і слова
+//                   немає у фразах-оцінках (DeclFrame.evaluative: «Mám rád nemocné koně» безглузде);
+//  • "relational" — відносний, без ступенів (poslední, stejný, cizí, celý, hlavní, jarní, порядкові): не стає
+//                   словом-партнером («nějaké poslední divadlo») і не йде у фрази qualitative.
+export type AdjectiveEntry = AdjectiveBase &
+  (
+    | { semClass: "quality"; degrees: AdjectiveDegrees; quizDegrees: boolean }
+    | { semClass: "state"; degrees: AdjectiveDegrees; quizDegrees?: never }
+    | { semClass: "relational"; degrees?: never; quizDegrees?: never }
+  );
 
 // ── Займенники (присвійні + вказівні) ──
 export type PronounSubtype = "possessive" | "demonstrative" | "interrogative" | "indefinite";
@@ -263,6 +274,8 @@ interface PersonalPronounBase {
   patternLabel: string;
   // Фрази квізу «Прикметники та займенники» для слів без роду й числа (kdo, co, někdo, nikdo, něco, nic): на кожен
   // відмінок 2+ речення з пропуском «___». Слово з цим полем потрапляє у квіз саме; без нього — лише картка.
+  // Питальне слово (kdo, co) стоїть на ПОЧАТКУ питання, перед ним може бути лише прийменник: «Komu věříš?»,
+  // «S kým jedeš?»; «Věříš komu?» — лише перепитування. Неозначені (někdo, něco) — на звичайному місці: «Věříš někomu?».
   quizFrames?: Partial<Record<CzechCase, string[]>>;
 }
 
@@ -546,11 +559,10 @@ export interface PastParticiple {
   other_pl: string; // множина жін. та чол. неістот.: dělaly (сер. множини — форма f: dělala)
 }
 
-export interface VerbEntry {
+interface VerbBase {
   id: string;
   uk: string; // українською (інфінітив-переклад)
   cz: string; // чеський інфінітив (напр. "dělat")
-  aspect: VerbAspect;
   verbClass: VerbClass;
   reflexive?: "se" | "si"; // зворотне дієслово (dívat se)
 
@@ -572,31 +584,6 @@ export interface VerbEntry {
   // У таблиці показана нейтральна форма; назву часу в тексті не пишемо — її вже
   // показує активний таб.
   registerNote?: string;
-  // Структурне посилання на id видового партнера (для квізу «обери вид за
-  // контекстом»): рушій за ним знаходить парну картку з повною парадигмою.
-  // Двонапрямне: обидва дієслова пари вказують одне на одного. Немає лише в
-  // дієслів без чіткої пари (модальні, нерегулярні без партнера).
-  aspectPairId?: string;
-  // Ставиться на НЕДОКОНАНОМУ члені пари, якщо його доконаний партнер може бути
-  // ДЕЛІМІТАТИВНИМ (po-/pro-: poseděl, poležel, počkal, promluvil — «певний час»).
-  // Для такої пари в видових питаннях не використовується фрейм «za + час»
-  // ("Poseděl jsem za minutu" неприродно); фрейми тривалості й завершеності
-  // лишаються — вид там визначає підказка в завданні. Нове дієслово з
-  // делімітативним партнером МАЄ отримати цей прапорець
-  // (scripts/check-verb-quiz.ts підказує кандидатів).
-  delimitativePartner?: boolean;
-  // Ставиться на НЕДОКОНАНОМУ дієслові, що означає МИТТЄВУ зміну стану (прийти, піти,
-  // почати, закінчити, знайти, забути, встати…). Тест: «Celou noc jsem ___» (одна
-  // безперервна дія з одним учасником) звучить природно? Якщо ні — прапорець true.
-  // Недоконаний такого дієслова з обставиною тривалості («celou noc», «dvě hodiny»)
-  // можливий лише як повторюваний («всю ніч приходили»), тож граматично, але
-  // семантично дивно. Для такого дієслова фрейми тривалості в видових питаннях
-  // вимкнено; оскільки інших фреймів недоконаного нема, воно не з'являється як
-  // правильна відповідь «недоконаний» (доконаний бік пари працює як завжди).
-  // Нове дієслово перевіряти за цим тестом ОБОВ'ЯЗКОВО (правило — у шапці verbs.ts;
-  // scripts/check-verb-quiz.ts виводить список позначених і не дозволяє прапорець
-  // на доконаному).
-  momentary?: boolean;
 
   // Теперішній час — ТІЛЬКИ для недоконаного виду (доконаний не має теперішнього).
   present?: PersonForms;
@@ -625,6 +612,25 @@ export interface VerbEntry {
     imperative?: { cz: string; uk: string };
   };
 }
+
+// Вид і видова пара. Для НЕДОКОНАНОГО з видовою парою два рішення про видові питання квізу ОБОВ'ЯЗКОВІ (без них
+// проєкт не збереться), на доконаному й на недоконаному без пари їх поставити не можна:
+//  • aspectPairId — структурне посилання на id видового партнера (для квізу «обери вид за контекстом»):
+//    двонапрямне, обидва дієслова пари вказують одне на одного; немає лише в дієслів без чіткої пари
+//    (модальні, нерегулярні без партнера).
+//  • delimitativePartner — true, якщо доконаний партнер може бути ДЕЛІМІТАТИВНИМ (po-/pro-: poseděl, poležel,
+//    počkal, promluvil — «певний час»): у видових питаннях пари не буде фрейму «za + час» («Poseděl jsem za
+//    minutu» неприродно); фрейми тривалості й завершеності лишаються. Кандидатів підказує scripts/check-verb-quiz.ts.
+//  • momentary — true, якщо дієслово означає МИТТЄВУ зміну стану (přicházet, začínat, končit, nacházet…). Тест:
+//    «Celou noc jsem ___» (одна безперервна дія з одним учасником) звучить природно? Якщо ні — true. Для такого
+//    дієслова фрейми тривалості у видових питаннях вимкнено, тож як правильна відповідь «недоконаний» воно не
+//    з'являється (доконаний бік пари працює як завжди). Правило — і в шапці verbs.ts.
+export type VerbEntry = VerbBase &
+  (
+    | { aspect: "perfective"; aspectPairId?: string; delimitativePartner?: never; momentary?: never }
+    | { aspect: "imperfective"; aspectPairId?: undefined; delimitativePartner?: never; momentary?: never }
+    | { aspect: "imperfective"; aspectPairId: string; delimitativePartner: boolean; momentary: boolean }
+  );
 
 // Параметри навігації (React Navigation, native stack)
 // Частина мови для режиму перегляду. Визначає джерело даних і компонент картки.

@@ -33,6 +33,11 @@ import type { NounTag } from "./nounTags";
 //     some: true на ньому — речення природне й для nějaký («Hledám nějaký hotel»).
 //  5. Після додавання фрази прочитай усі пари «фраза × іменник», що в неї потрапили; тег, що дає безглузду пару, прибери
 //     з вимоги. dev-збірка попереджає про фразу, в яку потрапляє менше 3 іменників.
+//  6. evaluative: true — фраза про ставлення мовця («Mám rád ___», «Líbí se mi ___», «Chybí mi ___», «Věřím ___», «Díky ___ jsem to zvládl»): прикметники-стани
+//     (semClass "state": hladový, nemocný…) у неї не потрапляють — ні як тестоване слово, ні як партнер.
+//     qualitative: true — фраза природна лише з не відносним прикметником (не semClass "relational": celý, hlavní…).
+//  7. У питаннях (role "question") слова-партнера немає: «Za jakým přítelem jdeš?», не «Za jakým starým přítelem…»;
+//     партнер в інших фразах — лише не відносний прикметник (правило 6 у шапці data/adjectives.ts).
 
 export type QuizCase = Exclude<CzechCase, "vokativ">;
 
@@ -43,6 +48,8 @@ export interface DeclFrame extends NounFilter {
   role?: "neg" | "question" | "order" | "every";
   some?: true; // звичайна фраза, де природний і неозначений «nějaký» («Hledám nějaký hotel»; не «Mám rád nějaké studenty»)
   ownerless?: true; // у фразі немає підмета-особи, якому могла б належати річ (Je tu…, Za … je zahrada): svůj сюди не ставимо
+  evaluative?: true; // оцінка / ставлення мовця (Mám rád, Líbí se mi, Chybí mi): без прикметників-станів (AdjectiveEntry.semClass "state")
+  qualitative?: true; // без відносних прикметників (semClass "relational"): «k vysokým skříním», не «k celým domům»
 }
 
 const NOT_THING: NounTag[] = ["time", "weather", "abstract", "activity"];
@@ -55,15 +62,15 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { some: true, text: "Tady jsou ___.", num: "pl", none: NOT_THING },
     { text: "Kde je ___?", num: "sg", countable: true, none: [...NOT_THING, "meal"] },
     { text: "Kde jsou ___?", num: "pl", countable: true, none: [...NOT_THING, "meal"] },
-    { text: "Líbí se mi ___.", num: "any", degrees: true, none: ["time", "abstract", "money", "document"] }, // líbí — і одн., і мн.
-    { text: "Chybí mi ___.", num: "any", any: ["person", "animal", "carried"] },
+    { text: "Líbí se mi ___.", num: "any", degrees: true, evaluative: true, none: ["time", "abstract", "money", "document"] }, // líbí — і одн., і мн.
+    { text: "Chybí mi ___.", num: "any", evaluative: true, any: ["person", "animal", "carried"] },
     // заперечення: «Není tu žádný student», «Nejsou tu žádné knihy» (називний)
     { text: "Není tu ___.", num: "sg", role: "neg", any: ["person", "animal", "item", "vehicle", "food", "furniture", "building"] },
     { text: "Nejsou tu ___.", num: "pl", role: "neg", any: ["person", "animal", "item", "vehicle", "food", "furniture", "building"] },
     // питання
     { text: "___ je to {N}?", num: "sg", role: "question" },
     { text: "___ jsou to {N}?", num: "pl", role: "question" },
-    { text: "___ {N} se ti líbí?", num: "any", role: "question", none: ["time", "abstract", "money", "document"] },
+    { text: "___ {N} se ti líbí?", num: "any", role: "question", evaluative: true, none: ["time", "abstract", "money", "document"] },
     // узагальнення «кожен / усі» (každý, všechen — quiz.role "every")
     { text: "___ to ví.", num: "sg", role: "every", any: ["person"] }, // každý student to ví
     { text: "___ to vědí.", num: "pl", role: "every", any: ["person"] }, // všichni studenti to vědí
@@ -93,14 +100,15 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { text: "Ptám se ___.", num: "any", role: "every", any: ["person"] }, // ptát se koho — родовий
   ],
   dativ: [
-    { text: "Věřím ___.", num: "any", any: ["person"] },
-    { text: "Pomáhám ___.", num: "any", degrees: true, any: ["person", "animal"] },
+    { text: "Věřím ___.", num: "any", evaluative: true, any: ["person"] },
+    { some: true, text: "Pomáhám ___.", num: "any", degrees: true, any: ["person", "animal"] }, // pomáhám nějakým ženám
     { some: true, text: "Jdu {k} ___.", degrees: true, any: ["person", "building"] },
     { text: "Dám to ___.", num: "any", any: ["person", "animal"] },
-    { text: "Díky ___ jsem to zvládl.", num: "any", degrees: true, any: ["person"] },
+    { text: "Díky ___ jsem to zvládl.", num: "any", degrees: true, evaluative: true, any: ["person"] },
     { text: "Zavolám ___.", any: ["person"] },
     { some: true, text: "Kvůli ___ jsem přišel pozdě.", num: "any", degrees: true, any: ["weather", "vehicle", "activity"] }, // kvůli silnému dešti, pomalému vlaku, té práci
-    { some: true, text: "Přistoupil jsem {k} ___.", num: "any", any: ["furniture", "vehicle", "opening"] }, // k tomu stolu, k oknu, k autu
+    { some: true, text: "Přistoupil jsem {k} ___.", any: ["furniture", "vehicle", "opening"] }, // k tomu stolu, k oknu, k autu (однина: «k vlakům» — ні)
+    { text: "Nikdo nechodí {k} ___.", num: "pl", qualitative: true, any: ["furniture", "building", "opening"] }, // k vysokým skříním, k zavřeným oknům
     { text: "Díky ___ to zvládnu.", num: "any", any: ["carried", "vehicle"] }, // díky novému telefonu, díky brýlím
     { text: "Nevěřím ___.", num: "any", role: "neg", any: ["person"] },
     { text: "Nepomáhám ___.", num: "any", role: "neg", any: ["person", "animal"] },
@@ -113,8 +121,8 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
   akuzativ: [
     { some: true, text: "Vidím ___.", num: "any", countable: true, any: ["person", "animal", "item", "clothes", "vehicle", "building", "furniture", "outdoor", "nature"] },
     { some: true, text: "Hledám ___.", num: "any", degrees: true, any: ["person", "animal", "item", "carried", "clothes", "document", "building"] },
-    { text: "Mám rád ___.", num: "any", any: ["person", "animal", "activity", "nature"] },
-    { text: "Mám rád ___.", any: ["food"] }, // їжа — в однині: «studený čaj», не «studené čaje»
+    { text: "Mám rád ___.", num: "any", evaluative: true, any: ["person", "animal", "activity", "nature"] },
+    { text: "Mám rád ___.", evaluative: true, any: ["food"] }, // їжа — в однині: «studený čaj», не «studené čaje»
     { some: true, text: "Koupil jsem ___.", num: "any", degrees: true, any: ["item", "clothes", "furniture"] }, // не vehicle: «koupil jsem vlak»
     { some: true, text: "Koupil jsem ___.", degrees: true, any: ["food"] },
     { text: "Jdu na ___.", any: ["placeNa", "meal"] }, // na poštu, na oběd

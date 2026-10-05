@@ -16,10 +16,17 @@ import { AdjectiveEntry, NounFilter } from "../types";
 //     а неприродних фраз не буде. countable: true відсіює незлічувані (voda, rýže, sníh).
 //  3. Прикметник лише про неістот (кольори, широкий, глибокий) не має партнерів чол. істот. роду, тож його форми
 //     «чол. іст.» квіз не тестує — це свідома ціна природності, ці форми тренують інші прикметники того ж зразка.
-//  4. quizDegrees: false — ступені на картці є, але у квізі їх не питаємо, коли вищий ступінь слова в мовленні
-//     рідкісний чи дивний (кольори: «červenější vlak»; стани: «nejvyděšenější lékař»). Звичайне градуйоване слово — без поля.
+//  4. semClass — ОБОВ'ЯЗКОВЕ рішення (без нього проєкт не збереться; повний опис — тип AdjectiveEntry у types/index.ts):
+//     "quality" — постійна якість, має degrees і обов'язкове quizDegrees: true / false (false, коли вищий ступінь
+//     у мовленні рідкісний чи дивний: кольори «červenější vlak», otevřený/zavřený, plný/prázdný, volný, ubohý);
+//     "state" — тимчасовий стан істоти, «який зараз» (hladový, unavený, nemocný, naštvaný, smutný, spokojený,
+//     vyděšený…), а не постійна якість (mladý, chytrý, veselý): ступені лише на картці, у фразах-оцінках
+//     («Mám rád ___», «Líbí se mi ___») слова немає; "relational" — відносний, без ступенів (poslední, stejný, celý,
+//     cizí, jiný, hlavní, domácí, jarní, vedoucí, порядкові).
 //  5. Після додавання прочитай пари «прикметник × іменник», куди слово потрапило (див. шапку
 //     data/declensionFrames.ts): тег, що дає безглузду пару, прибери.
+//  6. Слово-партнер перед іменником у питанні про займенник — лише не відносний прикметник: відносні суперечать
+//     займеннику («nějaké poslední divadlo», «tvá cizí eura»). Новий "relational" партнером не стане сам.
 const ANY: NounFilter = {};
 const ANIMATE: NounFilter = { any: ["person", "animal"] };
 const PERSON: NounFilter = { any: ["person"] };
@@ -39,6 +46,8 @@ const COLOR_NEUTRAL: NounFilter = { any: ["item", "clothes", "vehicle", "furnitu
 export const ADJECTIVES: AdjectiveEntry[] = [
   {
     id: "velky",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "великий",
     cz: "velký",
     pattern: "tvrdy",
@@ -178,6 +187,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "maly",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "малий",
     cz: "malý",
     pattern: "tvrdy",
@@ -317,6 +328,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "vysoky",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "високий",
     cz: "vysoký",
     pattern: "tvrdy",
@@ -456,6 +469,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "nizky",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "низький",
     cz: "nízký",
     pattern: "tvrdy",
@@ -595,6 +610,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "stary",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "старий",
     cz: "starý",
     pattern: "tvrdy",
@@ -734,6 +751,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "novy",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "новий",
     cz: "nový",
     pattern: "tvrdy",
@@ -873,6 +892,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "mlady",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "молодий",
     cz: "mladý",
     pattern: "tvrdy",
@@ -1012,6 +1033,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "dobry",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "добрий",
     cz: "dobrý",
     pattern: "tvrdy",
@@ -1151,6 +1174,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "spatny",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "поганий",
     cz: "špatný",
     pattern: "tvrdy",
@@ -1290,6 +1315,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "hezky",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "гарний",
     cz: "hezký",
     pattern: "tvrdy",
@@ -1429,6 +1456,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "drahy",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "дорогий",
     cz: "drahý",
     pattern: "tvrdy",
@@ -1568,6 +1597,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "levny",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "дешевий",
     cz: "levný",
     pattern: "tvrdy",
@@ -1707,6 +1738,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "rychly",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "швидкий",
     cz: "rychlý",
     pattern: "tvrdy",
@@ -1846,6 +1879,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "teply",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "теплий",
     cz: "teplý",
     pattern: "tvrdy",
@@ -1985,6 +2020,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "studeny",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "холодний",
     cz: "studený",
     pattern: "tvrdy",
@@ -2124,12 +2161,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "cerny",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "чорний",
     cz: "černý",
     pattern: "tvrdy",
     category: "colors",
     fits: COLOR_NEUTRAL,
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -2264,12 +2302,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "bily",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "білий",
     cz: "bílý",
     pattern: "tvrdy",
     category: "colors",
     fits: COLOR_NEUTRAL,
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -2404,12 +2443,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "cerveny",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "червоний",
     cz: "červený",
     pattern: "tvrdy",
     category: "colors",
     fits: COLOR,
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -2544,12 +2584,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "modry",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "синій",
     cz: "modrý",
     pattern: "tvrdy",
     category: "colors",
     fits: COLOR,
-    quizDegrees: false,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -2684,12 +2725,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "zeleny",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "зелений",
     cz: "zelený",
     pattern: "tvrdy",
     category: "colors",
     fits: COLOR,
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -2824,12 +2866,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "zluty",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "жовтий",
     cz: "žlutý",
     pattern: "tvrdy",
     category: "colors",
     fits: COLOR,
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -2964,6 +3007,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "jarni",
+    semClass: "relational",
     uk: "весняний",
     cz: "jarní",
     pattern: "mekky",
@@ -3017,6 +3061,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "cizi",
+    semClass: "relational",
     uk: "чужий",
     cz: "cizí",
     pattern: "mekky",
@@ -3070,6 +3115,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "posledni",
+    semClass: "relational",
     uk: "останній",
     cz: "poslední",
     pattern: "mekky",
@@ -3123,6 +3169,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "domaci",
+    semClass: "relational",
     uk: "домашній",
     cz: "domácí",
     pattern: "mekky",
@@ -3182,6 +3229,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   // Форми згенеровано детерміновано з тих самих закінчень, що velký/jarní.
   {
     id: "ord-prvni",
+    semClass: "relational",
     uk: "перший",
     cz: "první",
     pattern: "mekky",
@@ -3235,6 +3283,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-druhy",
+    semClass: "relational",
     uk: "другий",
     cz: "druhý",
     pattern: "tvrdy",
@@ -3288,6 +3337,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-treti",
+    semClass: "relational",
     uk: "третій",
     cz: "třetí",
     pattern: "mekky",
@@ -3341,6 +3391,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-ctvrty",
+    semClass: "relational",
     uk: "четвертий",
     cz: "čtvrtý",
     pattern: "tvrdy",
@@ -3394,6 +3445,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-paty",
+    semClass: "relational",
     uk: "п'ятий",
     cz: "pátý",
     pattern: "tvrdy",
@@ -3447,6 +3499,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-sesty",
+    semClass: "relational",
     uk: "шостий",
     cz: "šestý",
     pattern: "tvrdy",
@@ -3500,6 +3553,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-sedmy",
+    semClass: "relational",
     uk: "сьомий",
     cz: "sedmý",
     pattern: "tvrdy",
@@ -3553,6 +3607,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-osmy",
+    semClass: "relational",
     uk: "восьмий",
     cz: "osmý",
     pattern: "tvrdy",
@@ -3606,6 +3661,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-devaty",
+    semClass: "relational",
     uk: "дев'ятий",
     cz: "devátý",
     pattern: "tvrdy",
@@ -3659,6 +3715,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-desaty",
+    semClass: "relational",
     uk: "десятий",
     cz: "desátý",
     pattern: "tvrdy",
@@ -3712,6 +3769,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-jedenacty",
+    semClass: "relational",
     uk: "одинадцятий",
     cz: "jedenáctý",
     pattern: "tvrdy",
@@ -3765,6 +3823,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-dvanacty",
+    semClass: "relational",
     uk: "дванадцятий",
     cz: "dvanáctý",
     pattern: "tvrdy",
@@ -3818,6 +3877,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "tvrdy",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "твердий",
     cz: "tvrdý",
     pattern: "tvrdy",
@@ -3957,6 +4018,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "dlouhy",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "довгий",
     cz: "dlouhý",
     pattern: "tvrdy",
@@ -4096,6 +4159,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "tichy",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "тихий",
     cz: "tichý",
     pattern: "tvrdy",
@@ -4235,6 +4300,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "mekky",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "м'який",
     cz: "měkký",
     pattern: "tvrdy",
@@ -4374,12 +4441,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ubohy",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "жалюгідний",
     cz: "ubohý",
     pattern: "tvrdy",
     category: "quality",
     fits: ANIMATE,
-    quizDegrees: false,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -4514,6 +4582,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "mily",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "милий",
     cz: "milý",
     pattern: "tvrdy",
@@ -4653,6 +4723,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "siroky",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "широкий",
     cz: "široký",
     pattern: "tvrdy",
@@ -4792,6 +4864,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "uzky",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "вузький",
     cz: "úzký",
     pattern: "tvrdy",
@@ -4931,6 +5005,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "hluboky",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "глибокий",
     cz: "hluboký",
     pattern: "tvrdy",
@@ -5070,6 +5146,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "melky",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "мілкий",
     cz: "mělký",
     pattern: "tvrdy",
@@ -5209,6 +5287,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "silny",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "сильний",
     cz: "silný",
     pattern: "tvrdy",
@@ -5348,6 +5428,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "slaby",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "слабкий",
     cz: "slabý",
     pattern: "tvrdy",
@@ -5487,6 +5569,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "chytry",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "розумний",
     cz: "chytrý",
     pattern: "tvrdy",
@@ -5626,6 +5710,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "hloupy",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "дурний",
     cz: "hloupý",
     pattern: "tvrdy",
@@ -5765,6 +5851,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "cisty",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "чистий",
     cz: "čistý",
     pattern: "tvrdy",
@@ -5904,6 +5992,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "spinavy",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "брудний",
     cz: "špinavý",
     pattern: "tvrdy",
@@ -6043,6 +6133,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "tezky",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "важкий",
     cz: "těžký",
     pattern: "tvrdy",
@@ -6192,6 +6284,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "lehky",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "легкий",
     cz: "lehký",
     pattern: "tvrdy",
@@ -6341,6 +6435,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "moderni",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "сучасний",
     cz: "moderní",
     pattern: "mekky",
@@ -6480,6 +6576,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "svezi",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "свіжий",
     cz: "svěží",
     pattern: "mekky",
@@ -6619,12 +6717,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "sedy",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "сірий",
     cz: "šedý",
     pattern: "tvrdy",
     category: "colors",
     fits: COLOR_NEUTRAL,
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -6759,12 +6858,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "hnedy",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "коричневий",
     cz: "hnědý",
     pattern: "tvrdy",
     category: "colors",
     fits: COLOR_NEUTRAL,
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -6899,12 +6999,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "fialovy",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "фіолетовий",
     cz: "fialový",
     pattern: "tvrdy",
     category: "colors",
     fits: COLOR,
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -7039,12 +7140,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "oranzovy",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "помаранчевий",
     cz: "oranžový",
     pattern: "tvrdy",
     category: "colors",
     fits: COLOR,
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -7179,12 +7281,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ruzovy",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "рожевий",
     cz: "růžový",
     pattern: "tvrdy",
     category: "colors",
     fits: COLOR,
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -7319,6 +7422,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "tenky",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "тонкий",
     cz: "tenký",
     pattern: "tvrdy",
@@ -7458,6 +7563,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "tlusty",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "товстий",
     cz: "tlustý",
     pattern: "tvrdy",
@@ -7597,12 +7704,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "plny",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "повний",
     cz: "plný",
     pattern: "tvrdy",
     category: "quality",
     fits: { any: ["container", "placeV", "building", "vehicle"], none: ["clothes", "activity"] },
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -7737,12 +7845,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "prazdny",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "порожній",
     cz: "prázdný",
     pattern: "tvrdy",
     category: "quality",
     fits: { any: ["container", "placeV", "building", "vehicle"], none: ["clothes", "activity"] },
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -7877,6 +7986,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "stastny",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "щасливий",
     cz: "šťastný",
     pattern: "tvrdy",
@@ -8026,6 +8137,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "bohaty",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "багатий",
     cz: "bohatý",
     pattern: "tvrdy",
@@ -8175,6 +8288,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "chudy",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "бідний",
     cz: "chudý",
     pattern: "tvrdy",
@@ -8324,6 +8439,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "smutny",
+    semClass: "state",
     uk: "сумний",
     cz: "smutný",
     pattern: "tvrdy",
@@ -8463,6 +8579,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "kratky",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "короткий",
     cz: "krátký",
     pattern: "tvrdy",
@@ -8602,6 +8720,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "zajimavy",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "цікавий",
     cz: "zajímavý",
     pattern: "tvrdy",
@@ -8741,6 +8861,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "nudny",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "нудний",
     cz: "nudný",
     pattern: "tvrdy",
@@ -8880,6 +9002,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "zdravy",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "здоровий",
     cz: "zdravý",
     pattern: "tvrdy",
@@ -9019,6 +9143,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "nemocny",
+    semClass: "state",
     uk: "хворий",
     cz: "nemocný",
     pattern: "tvrdy",
@@ -9158,6 +9283,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "unaveny",
+    semClass: "state",
     uk: "втомлений",
     cz: "unavený",
     pattern: "tvrdy",
@@ -9297,6 +9423,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "hladovy",
+    semClass: "state",
     uk: "голодний",
     cz: "hladový",
     pattern: "tvrdy",
@@ -9436,6 +9563,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ziznivy",
+    semClass: "state",
     uk: "спраглий",
     cz: "žíznivý",
     pattern: "tvrdy",
@@ -9575,6 +9703,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "vesely",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "веселий",
     cz: "veselý",
     pattern: "tvrdy",
@@ -9714,6 +9844,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "pilny",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "працьовитий",
     cz: "pilný",
     pattern: "tvrdy",
@@ -9853,6 +9985,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "liny",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "лінивий",
     cz: "líný",
     pattern: "tvrdy",
@@ -9992,6 +10126,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "krasny",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "прекрасний",
     cz: "krásný",
     pattern: "tvrdy",
@@ -10131,6 +10267,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "dulezity",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "важливий",
     cz: "důležitý",
     pattern: "tvrdy",
@@ -10270,6 +10408,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "jednoduchy",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "простий",
     cz: "jednoduchý",
     pattern: "tvrdy",
@@ -10409,6 +10549,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "slozity",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "складний",
     cz: "složitý",
     pattern: "tvrdy",
@@ -10548,6 +10690,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "bezpecny",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "безпечний",
     cz: "bezpečný",
     pattern: "tvrdy",
@@ -10687,6 +10831,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "nebezpecny",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "небезпечний",
     cz: "nebezpečný",
     pattern: "tvrdy",
@@ -10826,12 +10972,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "otevreny",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "відкритий",
     cz: "otevřený",
     pattern: "tvrdy",
     category: "quality",
     fits: { any: ["building", "opening", "container"], none: ["vehicle", "item"] },
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -10966,12 +11113,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "zavreny",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "закритий",
     cz: "zavřený",
     pattern: "tvrdy",
     category: "quality",
     fits: { any: ["building", "opening", "container"], none: ["vehicle", "item"] },
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -11106,6 +11254,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "popularni",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "популярний",
     cz: "populární",
     pattern: "mekky",
@@ -11245,6 +11395,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "nastvany",
+    semClass: "state",
     uk: "злий (розлючений)",
     cz: "naštvaný",
     pattern: "tvrdy",
@@ -11384,6 +11535,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "spokojeny",
+    semClass: "state",
     uk: "задоволений",
     cz: "spokojený",
     pattern: "tvrdy",
@@ -11523,6 +11675,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "pomaly",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "повільний",
     cz: "pomalý",
     pattern: "tvrdy",
@@ -11662,6 +11816,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "stihly",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "стрункий",
     cz: "štíhlý",
     pattern: "tvrdy",
@@ -11801,6 +11957,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "hlavni",
+    semClass: "relational",
     uk: "головний",
     cz: "hlavní",
     pattern: "mekky",
@@ -11854,11 +12011,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "cely",
+    semClass: "relational",
     uk: "цілий",
     cz: "celý",
     pattern: "tvrdy",
     category: "quality",
-    fits: { any: ["timeUnit", "dayPart", "outdoor", "building", "placeV", "collective", "meal"], none: ["vehicle"] },
+    fits: { any: ["timeUnit", "dayPart", "collective", "meal"] }, // celý den, celá rodina, celý oběd; не місця («do celého města»)
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -11907,6 +12065,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "stejny",
+    semClass: "relational",
     uk: "однаковий",
     cz: "stejný",
     pattern: "tvrdy",
@@ -11960,6 +12119,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "jiny",
+    semClass: "relational",
     uk: "інший",
     cz: "jiný",
     pattern: "tvrdy",
@@ -12013,12 +12173,13 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "volny",
+    semClass: "quality",
+    quizDegrees: false,
     uk: "вільний",
     cz: "volný",
     pattern: "tvrdy",
     category: "quality",
     fits: { any: ["seat", "dayPart"] },
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -12153,12 +12314,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "zaneprazndeny",
+    semClass: "state",
     uk: "зайнятий",
     cz: "zaneprázdněný",
     pattern: "tvrdy",
     category: "quality",
     fits: { any: ["person"], none: ["collective"] },
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -12293,12 +12454,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "vydeseny",
+    semClass: "state",
     uk: "наляканий",
     cz: "vyděšený",
     pattern: "tvrdy",
     category: "quality",
     fits: ANIMATE,
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -12433,12 +12594,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "prekvapeny",
+    semClass: "state",
     uk: "здивований",
     cz: "překvapený",
     pattern: "tvrdy",
     category: "quality",
     fits: ANIMATE,
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -12573,12 +12734,12 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "zklamany",
+    semClass: "state",
     uk: "розчарований",
     cz: "zklamaný",
     pattern: "tvrdy",
     category: "quality",
     fits: PERSON,
-    quizDegrees: false,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -12713,6 +12874,8 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "hrdy",
+    semClass: "quality",
+    quizDegrees: true,
     uk: "гордий",
     cz: "hrdý",
     pattern: "tvrdy",
@@ -12856,6 +13019,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   // Табі masc_anim і fem показують вживання як іменник, masc_inan і neut — як прикметник.
   {
     id: "vedouci",
+    semClass: "relational",
     uk: "керівний; керівник",
     cz: "vedoucí",
     pattern: "mekky",

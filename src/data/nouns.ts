@@ -38,8 +38,9 @@ import { NounEntry } from "../types";
 //     «malé děti», «modré oči»). Без цього квіз «Прикметники та займенники» склав би «ta malá děti».
 //  8. Квіз «Прикметники та займенники» теж бере іменник за тегами: у фрази (data/declensionFrames.ts) і в пари з
 //     прикметниками (поле fits у data/adjectives.ts). Після додавання прочитай і ці фрази та пари.
-//  9. Квіз «Числівники» теж бере іменник за тегами (data/numeralFrames.ts). uncountable: true — слово не рахують
-//     штуками (voda, rýže, peníze): у цей квіз воно не потрапляє. Слово лише з множиною (вся однина «—») квіз сам
+//  9. Квіз «Числівники» теж бере іменник за тегами (data/numeralFrames.ts). uncountable — ОБОВ'ЯЗКОВЕ рішення (без
+//     нього проєкт не збереться): true — слово не рахують штуками (voda, rýže, peníze), у цей квіз воно не потрапляє,
+//     а в множинних фразах інших квізів не стоїть; false — звичайний злічуваний іменник. Слово лише з множиною (вся однина «—») квіз сам
 //     рахує через jedny / dvoje / troje / čtvery (поле pluralOnly у data/cardinals.ts) і через pět+: окремо нічого
 //     не позначай. Після додавання прочитай фрази цього квізу, куди слово потрапило.
 // 10. Квіз «Іменники» питає саме слово в реченнях з data/nounFrames.ts, теж за тегами. Не питає називний однини
@@ -52,6 +53,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── pán (чол. істот., твердий) ───────────────
   {
     id: "muz-pan",
+    uncountable: false,
     uk: "чоловік (пан)",
     cz: "pán",
     gender: "masc_anim",
@@ -72,6 +74,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "student",
+    uncountable: false,
     uk: "студент",
     cz: "student",
     gender: "masc_anim",
@@ -94,6 +97,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── muž (чол. істот., м'який) ───────────────
   {
     id: "muz-muz",
+    uncountable: false,
     uk: "чоловік",
     cz: "muž",
     gender: "masc_anim",
@@ -114,6 +118,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "ucitel",
+    uncountable: false,
     uk: "вчитель",
     cz: "učitel",
     gender: "masc_anim",
@@ -136,6 +141,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── hrad (чол. неістот., твердий) ───────────────
   {
     id: "hrad",
+    uncountable: false,
     uk: "замок (фортеця)",
     cz: "hrad",
     gender: "masc_inan",
@@ -156,6 +162,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "stul",
+    uncountable: false,
     uk: "стіл",
     cz: "stůl",
     gender: "masc_inan",
@@ -178,6 +185,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── stroj (чол. неістот., м'який) ───────────────
   {
     id: "stroj",
+    uncountable: false,
     uk: "машина (механізм)",
     cz: "stroj",
     gender: "masc_inan",
@@ -198,6 +206,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "pokoj",
+    uncountable: false,
     uk: "кімната",
     cz: "pokoj",
     gender: "masc_inan",
@@ -220,6 +229,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── žena (жін., твердий) ───────────────
   {
     id: "zena",
+    uncountable: false,
     uk: "жінка",
     cz: "žena",
     gender: "fem",
@@ -240,13 +250,13 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "kava",
+    uncountable: true,
     uk: "кава",
     cz: "káva",
     gender: "fem",
     pattern: "zena",
     category: "food",
     sem: ["food"],
-    uncountable: true,
     declension: {
       nominativ: { sg: "káva", pl: "kávy" },
       genitiv: { sg: "kávy", pl: "káv" },
@@ -263,6 +273,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── růže (жін., м'який) ───────────────
   {
     id: "ruze",
+    uncountable: false,
     uk: "троянда",
     cz: "růže",
     gender: "fem",
@@ -283,6 +294,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "restaurace",
+    uncountable: false,
     uk: "ресторан",
     cz: "restaurace",
     gender: "fem",
@@ -305,6 +317,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── kost (жін., i-відміна) ───────────────
   {
     id: "kost",
+    uncountable: false,
     uk: "кістка",
     cz: "kost",
     gender: "fem",
@@ -325,6 +338,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "vec",
+    uncountable: false,
     uk: "річ",
     cz: "věc",
     gender: "fem",
@@ -347,6 +361,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── město (сер., твердий) ───────────────
   {
     id: "mesto",
+    uncountable: false,
     uk: "місто",
     cz: "město",
     gender: "neut",
@@ -367,6 +382,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "auto",
+    uncountable: false,
     uk: "автомобіль",
     cz: "auto",
     gender: "neut",
@@ -389,6 +405,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── moře (сер., м'який) ───────────────
   {
     id: "more",
+    uncountable: false,
     uk: "море",
     cz: "moře",
     gender: "neut",
@@ -411,6 +428,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── kuře (сер., -ete) ───────────────
   {
     id: "kure",
+    uncountable: false,
     uk: "курча",
     cz: "kuře",
     gender: "neut",
@@ -433,6 +451,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── stavení (сер., -í незмінний) ───────────────
   {
     id: "nadrazi",
+    uncountable: false,
     uk: "вокзал",
     cz: "nádraží",
     gender: "neut",
@@ -459,6 +478,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── LIDÉ / ЛЮДИ ───────────────
   {
     id: "syn",
+    uncountable: false,
     uk: "син",
     cz: "syn",
     gender: "masc_anim",
@@ -479,6 +499,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "bratr",
+    uncountable: false,
     uk: "брат",
     cz: "bratr",
     gender: "masc_anim",
@@ -499,6 +520,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "kluk",
+    uncountable: false,
     uk: "хлопець",
     cz: "kluk",
     gender: "masc_anim",
@@ -519,6 +541,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "zak",
+    uncountable: false,
     uk: "учень",
     cz: "žák",
     gender: "masc_anim",
@@ -539,6 +562,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "lekar",
+    uncountable: false,
     uk: "лікар",
     cz: "lékař",
     gender: "masc_anim",
@@ -559,6 +583,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "kamarad",
+    uncountable: false,
     uk: "друг (приятель)",
     cz: "kamarád",
     gender: "masc_anim",
@@ -579,6 +604,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "otec",
+    uncountable: false,
     uk: "батько",
     cz: "otec",
     gender: "masc_anim",
@@ -600,6 +626,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "pritel",
+    uncountable: false,
     uk: "друг",
     cz: "přítel",
     gender: "masc_anim",
@@ -621,6 +648,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "dcera",
+    uncountable: false,
     uk: "дочка",
     cz: "dcera",
     gender: "fem",
@@ -641,6 +669,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "matka",
+    uncountable: false,
     uk: "мати",
     cz: "matka",
     gender: "fem",
@@ -662,6 +691,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "divka",
+    uncountable: false,
     uk: "дівчина",
     cz: "dívka",
     gender: "fem",
@@ -683,6 +713,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "dite",
+    uncountable: false,
     uk: "дитина",
     cz: "dítě",
     gender: "neut",
@@ -707,6 +738,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── DŮM A DOMÁCNOST / ДІМ І ПОБУТ ───────────────
   {
     id: "okno",
+    uncountable: false,
     uk: "вікно",
     cz: "okno",
     gender: "neut",
@@ -727,6 +759,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "kuchyne",
+    uncountable: false,
     uk: "кухня",
     cz: "kuchyně",
     gender: "fem",
@@ -747,6 +780,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "zidle",
+    uncountable: false,
     uk: "стілець",
     cz: "židle",
     gender: "fem",
@@ -767,6 +801,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "postel",
+    uncountable: false,
     uk: "ліжко",
     cz: "postel",
     gender: "fem",
@@ -787,6 +822,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "skrin",
+    uncountable: false,
     uk: "шафа",
     cz: "skříň",
     gender: "fem",
@@ -807,6 +843,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "lampa",
+    uncountable: false,
     uk: "лампа",
     cz: "lampa",
     gender: "fem",
@@ -827,6 +864,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "klic",
+    uncountable: false,
     uk: "ключ",
     cz: "klíč",
     gender: "masc_inan",
@@ -847,6 +885,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "kniha",
+    uncountable: false,
     uk: "книга",
     cz: "kniha",
     gender: "fem",
@@ -868,6 +907,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "talir",
+    uncountable: false,
     uk: "тарілка",
     cz: "talíř",
     gender: "masc_inan",
@@ -888,6 +928,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "stul-nuz",
+    uncountable: false,
     uk: "ніж",
     cz: "nůž",
     gender: "masc_inan",
@@ -909,6 +950,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "dum",
+    uncountable: false,
     uk: "дім",
     cz: "dům",
     gender: "masc_inan",
@@ -932,6 +974,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── JÍDLO A PITÍ / ЇЖА ТА НАПОЇ ───────────────
   {
     id: "jablko",
+    uncountable: false,
     uk: "яблуко",
     cz: "jablko",
     gender: "neut",
@@ -952,13 +995,13 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "maso",
+    uncountable: true,
     uk: "м'ясо",
     cz: "maso",
     gender: "neut",
     pattern: "mesto",
     category: "food",
     sem: ["food"],
-    uncountable: true,
     declension: {
       nominativ: { sg: "maso", pl: "masa" },
       genitiv: { sg: "masa", pl: "mas" },
@@ -973,6 +1016,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "pivo",
+    uncountable: false,
     uk: "пиво",
     cz: "pivo",
     gender: "neut",
@@ -993,13 +1037,13 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "maslo",
+    uncountable: true,
     uk: "масло",
     cz: "máslo",
     gender: "neut",
     pattern: "mesto",
     category: "food",
     sem: ["food"],
-    uncountable: true,
     declension: {
       nominativ: { sg: "máslo", pl: "másla" },
       genitiv: { sg: "másla", pl: "másel" },
@@ -1014,13 +1058,13 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "voda",
+    uncountable: true,
     uk: "вода",
     cz: "voda",
     gender: "fem",
     pattern: "zena",
     category: "food",
     sem: ["food"],
-    uncountable: true,
     declension: {
       nominativ: { sg: "voda", pl: "vody" },
       genitiv: { sg: "vody", pl: "vod" },
@@ -1035,6 +1079,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "caj",
+    uncountable: false,
     uk: "чай",
     cz: "čaj",
     gender: "masc_inan",
@@ -1055,6 +1100,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "syr",
+    uncountable: false,
     uk: "сир",
     cz: "sýr",
     gender: "masc_inan",
@@ -1076,6 +1122,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "polevka",
+    uncountable: false,
     uk: "суп",
     cz: "polévka",
     gender: "fem",
@@ -1097,13 +1144,13 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "ryze",
+    uncountable: true,
     uk: "рис",
     cz: "rýže",
     gender: "fem",
     pattern: "ruze",
     category: "food",
     sem: ["food"],
-    uncountable: true,
     declension: {
       nominativ: { sg: "rýže", pl: "rýže" },
       genitiv: { sg: "rýže", pl: "rýží" },
@@ -1118,6 +1165,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "chleb",
+    uncountable: false,
     uk: "хліб",
     cz: "chléb",
     gender: "masc_inan",
@@ -1142,6 +1190,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── MĚSTO / МІСТО ───────────────
   {
     id: "ulice",
+    uncountable: false,
     uk: "вулиця",
     cz: "ulice",
     gender: "fem",
@@ -1162,6 +1211,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "namesti",
+    uncountable: false,
     uk: "площа",
     cz: "náměstí",
     gender: "neut",
@@ -1182,6 +1232,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "obchod",
+    uncountable: false,
     uk: "магазин",
     cz: "obchod",
     gender: "masc_inan",
@@ -1202,6 +1253,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "skola",
+    uncountable: false,
     uk: "школа",
     cz: "škola",
     gender: "fem",
@@ -1222,6 +1274,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "park",
+    uncountable: false,
     uk: "парк",
     cz: "park",
     gender: "masc_inan",
@@ -1242,6 +1295,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "most",
+    uncountable: false,
     uk: "міст",
     cz: "most",
     gender: "masc_inan",
@@ -1262,6 +1316,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "banka",
+    uncountable: false,
     uk: "банк",
     cz: "banka",
     gender: "fem",
@@ -1283,6 +1338,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "nemocnice",
+    uncountable: false,
     uk: "лікарня",
     cz: "nemocnice",
     gender: "fem",
@@ -1303,6 +1359,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "divadlo",
+    uncountable: false,
     uk: "театр",
     cz: "divadlo",
     gender: "neut",
@@ -1323,6 +1380,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "knihovna",
+    uncountable: false,
     uk: "бібліотека",
     cz: "knihovna",
     gender: "fem",
@@ -1345,6 +1403,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── DOPRAVA / ТРАНСПОРТ ───────────────
   {
     id: "vlak",
+    uncountable: false,
     uk: "потяг",
     cz: "vlak",
     gender: "masc_inan",
@@ -1365,6 +1424,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "autobus",
+    uncountable: false,
     uk: "автобус",
     cz: "autobus",
     gender: "masc_inan",
@@ -1385,6 +1445,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "kolo",
+    uncountable: false,
     uk: "велосипед (колесо)",
     cz: "kolo",
     gender: "neut",
@@ -1405,6 +1466,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "letadlo",
+    uncountable: false,
     uk: "літак",
     cz: "letadlo",
     gender: "neut",
@@ -1425,6 +1487,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "metro",
+    uncountable: false,
     uk: "метро",
     cz: "metro",
     gender: "neut",
@@ -1445,6 +1508,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "silnice",
+    uncountable: false,
     uk: "дорога (шосе)",
     cz: "silnice",
     gender: "fem",
@@ -1465,6 +1529,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "cesta",
+    uncountable: false,
     uk: "дорога (подорож)",
     cz: "cesta",
     gender: "fem",
@@ -1487,6 +1552,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── PŘÍRODA / ПРИРОДА ───────────────
   {
     id: "strom",
+    uncountable: false,
     uk: "дерево",
     cz: "strom",
     gender: "masc_inan",
@@ -1507,6 +1573,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "les",
+    uncountable: false,
     uk: "ліс",
     cz: "les",
     gender: "masc_inan",
@@ -1527,6 +1594,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "kvetina",
+    uncountable: false,
     uk: "квітка",
     cz: "květina",
     gender: "fem",
@@ -1547,6 +1615,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "hvezda",
+    uncountable: false,
     uk: "зірка",
     cz: "hvězda",
     gender: "fem",
@@ -1567,6 +1636,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "reka",
+    uncountable: false,
     uk: "річка",
     cz: "řeka",
     gender: "fem",
@@ -1588,6 +1658,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "hora",
+    uncountable: false,
     uk: "гора",
     cz: "hora",
     gender: "fem",
@@ -1609,6 +1680,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "zahrada",
+    uncountable: false,
     uk: "сад",
     cz: "zahrada",
     gender: "fem",
@@ -1629,6 +1701,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "pole",
+    uncountable: false,
     uk: "поле",
     cz: "pole",
     gender: "neut",
@@ -1649,6 +1722,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "zvire",
+    uncountable: false,
     uk: "тварина",
     cz: "zvíře",
     gender: "neut",
@@ -1671,6 +1745,7 @@ export const NOUNS: NounEntry[] = [
   // ─────────────── ZVÍŘATA / ТВАРИНИ ───────────────
   {
     id: "kocka",
+    uncountable: false,
     uk: "кішка",
     cz: "kočka",
     gender: "fem",
@@ -1692,6 +1767,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "pes",
+    uncountable: false,
     uk: "собака (пес)",
     cz: "pes",
     gender: "masc_anim",
@@ -1713,6 +1789,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "ryba",
+    uncountable: false,
     uk: "риба",
     cz: "ryba",
     gender: "fem",
@@ -1733,6 +1810,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "ptak",
+    uncountable: false,
     uk: "птах",
     cz: "pták",
     gender: "masc_anim",
@@ -1754,6 +1832,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "had",
+    uncountable: false,
     uk: "змія",
     cz: "had",
     gender: "masc_anim",
@@ -1774,6 +1853,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "medved",
+    uncountable: false,
     uk: "ведмідь",
     cz: "medvěd",
     gender: "masc_anim",
@@ -1794,6 +1874,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "mys",
+    uncountable: false,
     uk: "миша",
     cz: "myš",
     gender: "fem",
@@ -1814,6 +1895,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "krava",
+    uncountable: false,
     uk: "корова",
     cz: "kráva",
     gender: "fem",
@@ -1835,6 +1917,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "kun",
+    uncountable: false,
     uk: "кінь",
     cz: "kůň",
     gender: "masc_anim",
@@ -1864,6 +1947,7 @@ export const NOUNS: NounEntry[] = [
   // v/ve + знахідний — саме так по-чеськи кажуть "у понеділок/вівторок…".
   {
     id: "pondeli",
+    uncountable: false,
     uk: "понеділок",
     cz: "pondělí",
     gender: "neut",
@@ -1884,6 +1968,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "utery",
+    uncountable: false,
     uk: "вівторок",
     cz: "úterý",
     gender: "neut",
@@ -1905,6 +1990,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "streda",
+    uncountable: false,
     uk: "середа",
     cz: "středa",
     gender: "fem",
@@ -1925,6 +2011,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "ctvrtek",
+    uncountable: false,
     uk: "четвер",
     cz: "čtvrtek",
     gender: "masc_inan",
@@ -1946,6 +2033,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "patek",
+    uncountable: false,
     uk: "п'ятниця",
     cz: "pátek",
     gender: "masc_inan",
@@ -1966,6 +2054,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "sobota",
+    uncountable: false,
     uk: "субота",
     cz: "sobota",
     gender: "fem",
@@ -1986,6 +2075,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "nedele",
+    uncountable: false,
     uk: "неділя",
     cz: "neděle",
     gender: "fem",
@@ -2016,6 +2106,7 @@ export const NOUNS: NounEntry[] = [
   // навмисно демонструють v/ve + місцевий — саме так по-чеськи кажуть "у січні…".
   {
     id: "leden",
+    uncountable: false,
     uk: "січень",
     cz: "leden",
     gender: "masc_inan",
@@ -2036,6 +2127,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "unor",
+    uncountable: false,
     uk: "лютий",
     cz: "únor",
     gender: "masc_inan",
@@ -2056,6 +2148,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "brezen",
+    uncountable: false,
     uk: "березень",
     cz: "březen",
     gender: "masc_inan",
@@ -2076,6 +2169,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "duben",
+    uncountable: false,
     uk: "квітень",
     cz: "duben",
     gender: "masc_inan",
@@ -2096,6 +2190,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "kveten",
+    uncountable: false,
     uk: "травень",
     cz: "květen",
     gender: "masc_inan",
@@ -2116,6 +2211,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "cerven",
+    uncountable: false,
     uk: "червень",
     cz: "červen",
     gender: "masc_inan",
@@ -2136,6 +2232,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "cervenec",
+    uncountable: false,
     uk: "липень",
     cz: "červenec",
     gender: "masc_inan",
@@ -2156,6 +2253,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "srpen",
+    uncountable: false,
     uk: "серпень",
     cz: "srpen",
     gender: "masc_inan",
@@ -2176,6 +2274,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "zari",
+    uncountable: false,
     uk: "вересень",
     cz: "září",
     gender: "neut",
@@ -2197,6 +2296,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "rijen",
+    uncountable: false,
     uk: "жовтень",
     cz: "říjen",
     gender: "masc_inan",
@@ -2217,6 +2317,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "listopad",
+    uncountable: false,
     uk: "листопад",
     cz: "listopad",
     gender: "masc_inan",
@@ -2238,6 +2339,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "prosinec",
+    uncountable: false,
     uk: "грудень",
     cz: "prosinec",
     gender: "masc_inan",
@@ -2265,6 +2367,7 @@ export const NOUNS: NounEntry[] = [
   // tři sta / pět set) — див. окрему тему в розділі Граматика.
   {
     id: "num-sto",
+    uncountable: false,
     uk: "сто",
     cz: "sto",
     gender: "neut",
@@ -2288,6 +2391,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "num-tisic",
+    uncountable: false,
     uk: "тисяча",
     cz: "tisíc",
     gender: "masc_inan",
@@ -2311,6 +2415,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "num-milion",
+    uncountable: false,
     uk: "мільйон",
     cz: "milion",
     gender: "masc_inan",
@@ -2333,6 +2438,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "num-miliarda",
+    uncountable: false,
     uk: "мільярд",
     cz: "miliarda",
     gender: "fem",
@@ -2360,6 +2466,7 @@ export const NOUNS: NounEntry[] = [
   // для конструкцій часу, не самостійна тема словника.
   {
     id: "hodina",
+    uncountable: false,
     uk: "година",
     cz: "hodina",
     gender: "fem",
@@ -2380,6 +2487,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "minuta",
+    uncountable: false,
     uk: "хвилина",
     cz: "minuta",
     gender: "fem",
@@ -2404,6 +2512,7 @@ export const NOUNS: NounEntry[] = [
   // явно (усі мають реальні нерегулярності, жодна не виведена механічно за зразком).
   {
     id: "den",
+    uncountable: false,
     uk: "день",
     cz: "den",
     gender: "masc_inan",
@@ -2426,6 +2535,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "rok",
+    uncountable: false,
     uk: "рік",
     cz: "rok",
     gender: "masc_inan",
@@ -2450,6 +2560,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "tyden",
+    uncountable: false,
     uk: "тиждень",
     cz: "týden",
     gender: "masc_inan",
@@ -2473,6 +2584,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "hlava",
+    uncountable: false,
     uk: "голова",
     cz: "hlava",
     gender: "fem",
@@ -2493,6 +2605,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "ruka",
+    uncountable: false,
     uk: "рука",
     cz: "ruka",
     gender: "fem",
@@ -2517,6 +2630,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "noha",
+    uncountable: false,
     uk: "нога",
     cz: "noha",
     gender: "fem",
@@ -2540,6 +2654,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "oko",
+    uncountable: false,
     uk: "око",
     cz: "oko",
     gender: "neut",
@@ -2565,6 +2680,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "srdce",
+    uncountable: false,
     uk: "серце",
     cz: "srdce",
     gender: "neut",
@@ -2585,6 +2701,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "prace",
+    uncountable: false,
     uk: "робота",
     cz: "práce",
     gender: "fem",
@@ -2605,6 +2722,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "rodina",
+    uncountable: false,
     uk: "сім'я",
     cz: "rodina",
     gender: "fem",
@@ -2625,13 +2743,13 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "pocasi",
+    uncountable: true,
     uk: "погода",
     cz: "počasí",
     gender: "neut",
     pattern: "stavani",
     category: "nature",
     sem: ["nature"],
-    uncountable: true,
     declension: {
       nominativ: { sg: "počasí", pl: "počasí" },
       genitiv: { sg: "počasí", pl: "počasí" },
@@ -2646,6 +2764,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "slunce",
+    uncountable: false,
     uk: "сонце",
     cz: "slunce",
     gender: "neut",
@@ -2666,14 +2785,13 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "penize",
+    uncountable: true, // гроші не рахують штуками («dvoje peníze», «pět peněz» не кажуть) — рахують koruny / eura
     uk: "гроші",
     cz: "peníze",
     gender: "masc_inan",
     pattern: "stroj",
     category: "city",
     sem: ["money"],
-    // Гроші не рахують штуками («dvoje peníze», «pět peněz» не кажуть) — рахують koruny / eura.
-    uncountable: true,
     declension: {
       // Pluralia tantum — однини НЕМАЄ взагалі ("—" у кожній клітинці sg,
       // рушій квизу (flashcardEngine.ts) явно навчений пропускати такі
@@ -2697,6 +2815,7 @@ export const NOUNS: NounEntry[] = [
   // парадигма множини звірена окремо (не виведена механічно за зразком pán/muž).
   {
     id: "babicka",
+    uncountable: false,
     uk: "бабуся",
     cz: "babička",
     gender: "fem",
@@ -2717,6 +2836,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "dedecek",
+    uncountable: false,
     uk: "дідусь",
     cz: "dědeček",
     gender: "masc_anim",
@@ -2738,6 +2858,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "manzel",
+    uncountable: false,
     uk: "чоловік (у шлюбі)",
     cz: "manžel",
     gender: "masc_anim",
@@ -2759,6 +2880,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "manzelka",
+    uncountable: false,
     uk: "дружина",
     cz: "manželka",
     gender: "fem",
@@ -2779,6 +2901,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "host",
+    uncountable: false,
     uk: "гість",
     cz: "host",
     gender: "masc_anim",
@@ -2799,6 +2922,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "soused",
+    uncountable: false,
     uk: "сусід",
     cz: "soused",
     gender: "masc_anim",
@@ -2821,6 +2945,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "ucho",
+    uncountable: false,
     uk: "вухо",
     cz: "ucho",
     gender: "neut",
@@ -2845,6 +2970,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "telefon",
+    uncountable: false,
     uk: "телефон",
     cz: "telefon",
     gender: "masc_inan",
@@ -2865,6 +2991,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "adresa",
+    uncountable: false,
     uk: "адреса",
     cz: "adresa",
     gender: "fem",
@@ -2885,6 +3012,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "cena",
+    uncountable: false,
     uk: "ціна",
     cz: "cena",
     gender: "fem",
@@ -2913,6 +3041,7 @@ export const NOUNS: NounEntry[] = [
   // виведено механічно.
   {
     id: "snidane",
+    uncountable: false,
     uk: "сніданок",
     cz: "snídaně",
     gender: "fem",
@@ -2933,6 +3062,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "obed",
+    uncountable: false,
     uk: "обід",
     cz: "oběd",
     gender: "masc_inan",
@@ -2954,6 +3084,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "vecere",
+    uncountable: false,
     uk: "вечеря",
     cz: "večeře",
     gender: "fem",
@@ -2974,6 +3105,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "nos",
+    uncountable: false,
     uk: "ніс",
     cz: "nos",
     gender: "masc_inan",
@@ -2994,6 +3126,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "usta",
+    uncountable: false,
     uk: "рот",
     cz: "ústa",
     gender: "neut",
@@ -3016,6 +3149,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "zub",
+    uncountable: false,
     uk: "зуб",
     cz: "zub",
     gender: "masc_inan",
@@ -3036,6 +3170,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "pani",
+    uncountable: false,
     uk: "пані (жінка)",
     cz: "paní",
     gender: "fem",
@@ -3060,13 +3195,13 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "obleceni",
+    uncountable: true,
     uk: "одяг",
     cz: "oblečení",
     gender: "neut",
     pattern: "stavani",
     category: "home",
     sem: ["item", "clothes"],
-    uncountable: true,
     declension: {
       nominativ: { sg: "oblečení", pl: "oblečení" },
       genitiv: { sg: "oblečení", pl: "oblečení" },
@@ -3081,6 +3216,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "dest",
+    uncountable: false,
     uk: "дощ",
     cz: "déšť",
     gender: "masc_inan",
@@ -3104,13 +3240,13 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "snih",
+    uncountable: true,
     uk: "сніг",
     cz: "sníh",
     gender: "masc_inan",
     pattern: "hrad",
     category: "nature",
     sem: ["weather"],
-    uncountable: true,
     declension: {
       // Довге í лише в nom./akuz., непрямі відмінки — коротке e (sněhu, sněhem).
       // Лок.мн. "snězích" (h→z, м'якшення) — звірено напряму dobryslovnik.cz.
@@ -3128,13 +3264,13 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "vitr",
+    uncountable: true,
     uk: "вітер",
     cz: "vítr",
     gender: "masc_inan",
     pattern: "hrad",
     category: "nature",
     sem: ["weather"],
-    uncountable: true,
     declension: {
       // Довге í лише в nom./akuz., непрямі відмінки — коротке e (větru, větrem),
       // той самий тип, що sníh.
@@ -3151,13 +3287,13 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "nebe",
+    uncountable: true,
     uk: "небо",
     cz: "nebe",
     gender: "neut",
     pattern: "more",
     category: "nature",
     sem: ["nature"],
-    uncountable: true,
     declension: {
       // Регулярний more-тип (як moře/srdce). УВАГА: множина "nebesa" — ОКРЕМЕ слово
       // (небеса/канделябр над ліжком), не звичайна множина nebe — не плутати.
@@ -3175,6 +3311,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "letiste",
+    uncountable: false,
     uk: "аеропорт",
     cz: "letiště",
     gender: "neut",
@@ -3195,6 +3332,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "kostel",
+    uncountable: false,
     uk: "церква",
     cz: "kostel",
     gender: "masc_inan",
@@ -3216,6 +3354,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "pocitac",
+    uncountable: false,
     uk: "комп'ютер",
     cz: "počítač",
     gender: "masc_inan",
@@ -3243,6 +3382,7 @@ export const NOUNS: NounEntry[] = [
   // бо помилка тут була б непомітною (обидві форми виглядають "правильно" на вигляд).
   {
     id: "lzice",
+    uncountable: false,
     uk: "ложка",
     cz: "lžíce",
     gender: "fem",
@@ -3263,6 +3403,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "vidlicka",
+    uncountable: false,
     uk: "виделка",
     cz: "vidlička",
     gender: "fem",
@@ -3283,6 +3424,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "hrnek",
+    uncountable: false,
     uk: "чашка (кухоль)",
     cz: "hrnek",
     gender: "masc_inan",
@@ -3303,6 +3445,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "sklenice",
+    uncountable: false,
     uk: "склянка",
     cz: "sklenice",
     gender: "fem",
@@ -3324,6 +3467,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "televize",
+    uncountable: false,
     uk: "телевізор",
     cz: "televize",
     gender: "fem",
@@ -3344,6 +3488,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "lednicka",
+    uncountable: false,
     uk: "холодильник",
     cz: "lednička",
     gender: "fem",
@@ -3364,6 +3509,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "sprcha",
+    uncountable: false,
     uk: "душ",
     cz: "sprcha",
     gender: "fem",
@@ -3384,6 +3530,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "koupelna",
+    uncountable: false,
     uk: "ванна кімната",
     cz: "koupelna",
     gender: "fem",
@@ -3404,6 +3551,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "polstar",
+    uncountable: false,
     uk: "подушка",
     cz: "polštář",
     gender: "masc_inan",
@@ -3424,6 +3572,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "rucnik",
+    uncountable: false,
     uk: "рушник",
     cz: "ručník",
     gender: "masc_inan",
@@ -3444,6 +3593,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "zrcadlo",
+    uncountable: false,
     uk: "дзеркало",
     cz: "zrcadlo",
     gender: "neut",
@@ -3464,6 +3614,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "destnik",
+    uncountable: false,
     uk: "парасолька",
     cz: "deštník",
     gender: "masc_inan",
@@ -3484,6 +3635,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "bryle",
+    uncountable: false,
     uk: "окуляри",
     cz: "brýle",
     gender: "fem",
@@ -3506,6 +3658,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "taska",
+    uncountable: false,
     uk: "сумка (пакет)",
     cz: "taška",
     gender: "fem",
@@ -3526,6 +3679,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "koberec",
+    uncountable: false,
     uk: "килим",
     cz: "koberec",
     gender: "masc_inan",
@@ -3555,6 +3709,7 @@ export const NOUNS: NounEntry[] = [
   // разів у корпусних прикладах).
   {
     id: "kosile",
+    uncountable: false,
     uk: "сорочка",
     cz: "košile",
     gender: "fem",
@@ -3575,6 +3730,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "kalhoty",
+    uncountable: false,
     uk: "штани",
     cz: "kalhoty",
     gender: "fem",
@@ -3597,6 +3753,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "bota",
+    uncountable: false,
     uk: "взуття (черевик)",
     cz: "bota",
     gender: "fem",
@@ -3619,6 +3776,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "kabat",
+    uncountable: false,
     uk: "пальто",
     cz: "kabát",
     gender: "masc_inan",
@@ -3639,6 +3797,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "svetr",
+    uncountable: false,
     uk: "светр",
     cz: "svetr",
     gender: "masc_inan",
@@ -3659,6 +3818,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "ponozka",
+    uncountable: false,
     uk: "шкарпетка",
     cz: "ponožka",
     gender: "fem",
@@ -3679,6 +3839,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "pas",
+    uncountable: false,
     uk: "паспорт",
     cz: "pas",
     gender: "masc_inan",
@@ -3699,6 +3860,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "doklad",
+    uncountable: false,
     uk: "документ",
     cz: "doklad",
     gender: "masc_inan",
@@ -3719,6 +3881,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "ucet",
+    uncountable: false,
     uk: "рахунок",
     cz: "účet",
     gender: "masc_inan",
@@ -3739,6 +3902,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "vejce",
+    uncountable: false,
     uk: "яйце",
     cz: "vejce",
     gender: "neut",
@@ -3761,13 +3925,13 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "zelenina",
+    uncountable: true,
     uk: "овочі",
     cz: "zelenina",
     gender: "fem",
     pattern: "zena",
     category: "food",
     sem: ["food"],
-    uncountable: true,
     declension: {
       nominativ: { sg: "zelenina", pl: "zeleniny" },
       genitiv: { sg: "zeleniny", pl: "zelenin" },
@@ -3782,13 +3946,13 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "ovoce",
+    uncountable: true,
     uk: "фрукти",
     cz: "ovoce",
     gender: "neut",
     pattern: "more",
     category: "food",
     sem: ["food"],
-    uncountable: true,
     declension: {
       nominativ: { sg: "ovoce", pl: "ovoce" },
       genitiv: { sg: "ovoce", pl: "ovocí" },
@@ -3803,6 +3967,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "kavarna",
+    uncountable: false,
     uk: "кафе",
     cz: "kavárna",
     gender: "fem",
@@ -3823,6 +3988,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "rameno",
+    uncountable: false,
     uk: "плече",
     cz: "rameno",
     gender: "neut",
@@ -3846,6 +4012,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "koleno",
+    uncountable: false,
     uk: "коліно",
     cz: "koleno",
     gender: "neut",
@@ -3868,6 +4035,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "staveni",
+    uncountable: false,
     uk: "будівля",
     cz: "stavení",
     gender: "neut",
@@ -3893,6 +4061,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "noc",
+    uncountable: false,
     uk: "ніч",
     cz: "noc",
     gender: "fem",
@@ -3913,6 +4082,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "pulnoc",
+    uncountable: false,
     uk: "північ",
     cz: "půlnoc",
     gender: "fem",
@@ -3933,6 +4103,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "poledne",
+    uncountable: false,
     uk: "полудень",
     cz: "poledne",
     gender: "neut",
@@ -3953,6 +4124,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "dopoledne",
+    uncountable: false,
     uk: "до обіду",
     cz: "dopoledne",
     gender: "neut",
@@ -3973,6 +4145,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "odpoledne",
+    uncountable: false,
     uk: "пообіддя",
     cz: "odpoledne",
     gender: "neut",
@@ -3993,6 +4166,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "rano",
+    uncountable: false,
     uk: "ранок",
     cz: "ráno",
     gender: "neut",
@@ -4013,6 +4187,7 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "vecer",
+    uncountable: false,
     uk: "вечір",
     cz: "večer",
     gender: "masc_inan",
@@ -4037,6 +4212,7 @@ export const NOUNS: NounEntry[] = [
   // Форми звірено: MorfFlex (UniMorph ces) + en.wiktionary (таблиці відмінювання); дублети подано через " / ".
   {
     id: "koruna",
+    uncountable: false,
     uk: "крона (гроші)",
     cz: "koruna",
     gender: "fem",
@@ -4058,6 +4234,7 @@ export const NOUNS: NounEntry[] = [
 
   {
     id: "euro",
+    uncountable: false,
     uk: "євро",
     cz: "euro",
     gender: "neut",
@@ -4080,6 +4257,7 @@ export const NOUNS: NounEntry[] = [
 
   {
     id: "posta",
+    uncountable: false,
     uk: "пошта",
     cz: "pošta",
     gender: "fem",
@@ -4101,6 +4279,7 @@ export const NOUNS: NounEntry[] = [
 
   {
     id: "hotel",
+    uncountable: false,
     uk: "готель",
     cz: "hotel",
     gender: "masc_inan",
@@ -4122,6 +4301,7 @@ export const NOUNS: NounEntry[] = [
 
   {
     id: "urad",
+    uncountable: false,
     uk: "державна установа",
     cz: "úřad",
     gender: "masc_inan",
@@ -4143,6 +4323,7 @@ export const NOUNS: NounEntry[] = [
 
   {
     id: "prizemi",
+    uncountable: false,
     uk: "перший поверх (на рівні землі)",
     cz: "přízemí",
     gender: "neut",
@@ -4164,6 +4345,7 @@ export const NOUNS: NounEntry[] = [
 
   {
     id: "patro",
+    uncountable: false,
     uk: "поверх",
     cz: "patro",
     gender: "neut",
@@ -4186,6 +4368,7 @@ export const NOUNS: NounEntry[] = [
 
   {
     id: "leto",
+    uncountable: false,
     uk: "літо",
     cz: "léto",
     gender: "neut",
@@ -4208,6 +4391,7 @@ export const NOUNS: NounEntry[] = [
 
   {
     id: "zima",
+    uncountable: false,
     uk: "зима",
     cz: "zima",
     gender: "fem",
@@ -4229,6 +4413,7 @@ export const NOUNS: NounEntry[] = [
 
   {
     id: "jaro",
+    uncountable: false,
     uk: "весна",
     cz: "jaro",
     gender: "neut",
@@ -4250,6 +4435,7 @@ export const NOUNS: NounEntry[] = [
 
   {
     id: "podzim",
+    uncountable: false,
     uk: "осінь",
     cz: "podzim",
     gender: "masc_inan",
@@ -4271,6 +4457,7 @@ export const NOUNS: NounEntry[] = [
 
   {
     id: "mesic",
+    uncountable: false,
     uk: "місяць",
     cz: "měsíc",
     gender: "masc_inan",

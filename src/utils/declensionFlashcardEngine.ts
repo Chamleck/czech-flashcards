@@ -168,6 +168,7 @@ interface Tested {
   quiz: PronounQuiz;
   head: "adjective" | "determiner"; // прикметник стоїть після займенника-партнера, займенник — перед прикметником
   degree?: "comparative" | "superlative";
+  semClass?: AdjectiveEntry["semClass"]; // лише в прикметника: стан — не у фразах-оцінках, відносний — не у фразах qualitative
   baseCz?: string; // ступінь: показуємо базове слово, учень сам утворює ступінь
   baseUk?: string;
 }
@@ -176,8 +177,8 @@ const declinable = (p: PronounEntry): p is Extract<PronounEntry, { declinable: t
 
 function buildTestedPool(): Tested[] {
   const adj: Tested[] = ADJECTIVES.filter((a) => adjQuizUsable(a.category)).flatMap((a) => {
-    const base: Tested = { id: a.id, kind: "adjective", cz: a.cz, uk: a.uk, decl: a.declension, fits: a.fits, quiz: {}, head: "adjective" };
-    if (!a.degrees || a.quizDegrees === false) return [base];
+    const base: Tested = { id: a.id, kind: "adjective", cz: a.cz, uk: a.uk, decl: a.declension, fits: a.fits, quiz: {}, head: "adjective", semClass: a.semClass };
+    if (a.semClass !== "quality" || !a.quizDegrees) return [base];
     const deg = (d: "comparative" | "superlative", suffix: string): Tested => ({
       ...base,
       id: `${a.id}${suffix}`,
@@ -209,8 +210,9 @@ function buildTestedPool(): Tested[] {
 const DETERMINER_PARTNERS: PronounEntry[] = [...PRONOUNS, ...INDEFINITE_ADJ].filter(
   (p) => !p.declinable || (p.quiz?.partner !== false && !p.quiz?.role && !p.quiz?.skip)
 );
-// Прикметники-партнери (лише звичайний ступінь) перед іменником у питанні про займенник.
-const ADJECTIVE_PARTNERS: AdjectiveEntry[] = ADJECTIVES.filter((a) => adjQuizUsable(a.category));
+// Прикметники-партнери (лише звичайний ступінь) перед іменником у питанні про займенник: не відносні (semClass) —
+// poslední, stejný, cizí… суперечать займеннику: «nějaké poslední divadlo», «tvá cizí eura».
+const ADJECTIVE_PARTNERS: AdjectiveEntry[] = ADJECTIVES.filter((a) => adjQuizUsable(a.category) && a.semClass !== "relational");
 
 // Обмеження слова-займенника на число й відмінок (дані: quiz.num, quiz.massSg, quiz.nominative).
 function quizAllows(q: PronounQuiz, noun: NounEntry, c: QuizCase, n: GrammaticalNumber, f?: DeclFrame): boolean {
@@ -244,6 +246,8 @@ function frameFitsWord(f: DeclFrame, t: Tested, c: QuizCase): boolean {
     if (f.role || !f.some) return false;
   } else if ((f.role ?? null) !== (role ?? null)) return false;
   if (t.degree && !f.degrees) return false;
+  if (t.semClass === "state" && f.evaluative) return false;
+  if (t.semClass === "relational" && f.qualitative) return false;
   if (c === "nominativ" && t.quiz.nominative === false) return false;
   if (t.quiz.needsOwner && ownerless(f, c)) return false;
   return true;
@@ -408,12 +412,13 @@ function makeWithStyle(
         if (!lead) continue;
         partners.push(lead);
       }
-      // Питання про порядок — без прикметника: «Kolikátý den už čekáš?», не «Kolikátý dobrý den…».
-      else if (Math.random() < 0.5 && t.quiz.role !== "order") {
+      // Питання — без партнера: «Za jakým přítelem jdeš?», не «Za jakým stejným přítelem…»; так само питання про порядок.
+      // У фразі-оцінці партнер-прикметник не буває станом: не «Mám rád tvé nemocné koně».
+      else if (Math.random() < 0.5 && t.quiz.role !== "order" && f.role !== "question") {
         const pool =
           t.head === "adjective"
             ? DETERMINER_PARTNERS.map((p) => determinerForm(p, noun, g, c, n, f))
-            : ADJECTIVE_PARTNERS.filter((a) => a.id !== t.id).map((a) => adjectiveForm(a, noun, g, c, n));
+            : ADJECTIVE_PARTNERS.filter((a) => a.id !== t.id && !(f.evaluative && a.semClass === "state")).map((a) => adjectiveForm(a, noun, g, c, n));
         const p = randomOf(shuffle(pool.filter((x): x is string => !!x)));
         if (p) partners.push(p);
       }
