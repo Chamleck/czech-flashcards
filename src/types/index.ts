@@ -92,6 +92,13 @@ export interface NounEntry {
   // děti, oči, uši узгоджуються як жіночий рід («ty malé děti», «modré oči»), хоча dítě / oko / ucho — середній.
   // Квіз «Прикметники та займенники» інакше склав би «ta malá děti». Для решти слів поле відсутнє.
   plGender?: Gender;
+  // Лише sto: у спілці з іменником може лишатися невідмінюваним (bez sto korun, ke sto korunám, se sto korunami —
+  // IJP id=792, поряд із bez sta korun, ke stu korunám). Квіз «Числівники» не подає «sto» як помилку в жодному відмінку.
+  uninflectedAsNumeral?: true;
+  // Лише лічильні іменники sto, tisíc, milion, miliarda (категорія «numbers»): яке число вони означають. Квіз
+  // «Числівники» за ним не ставить мільйон у фразу, де така кількість безглузда («Znám milion hostů») —
+  // поле max фрази в data/numeralFrames.ts.
+  numeralValue?: number;
 }
 
 // Вимога до іменника-партнера (квіз «Прикметники та займенники»): ті самі смислові теги, що у фреймах квізу
@@ -296,6 +303,21 @@ export const NUMERAL_CASE_ORDER: CzechCase[] = [
   "instrumental",
 ];
 
+// Форми для іменників, що мають ЛИШЕ множину (kalhoty, brýle): з ними замість jeden / dva / oba / tři / čtyři
+// кажуть jedny / dvoje / oboje / troje / čtvery (IJP: «u pomnožných jmen význam číslovky základní»; dvoje kalhoty =
+// двоє штанів). Від п'яти — звичайне pět kalhot, тому в pět+ цього поля немає. Картка показує ці форми на окремій
+// вкладці, квіз «Числівники» тренує їх із такими іменниками (слово без форм однини в nouns.ts).
+export interface PluralOnlyForms {
+  cz: string; // заголовок вкладки й форма називного: "dvoje"
+  // Форма для чоловічого неістотового й жіночого роду (і для середнього, якщо neut не задано).
+  forms: Record<CzechCase, string>;
+  // Лише відмінки, де середній рід має іншу форму: jedna (ústa) проти jedny (kalhoty) у називному й знахідному.
+  neut?: Partial<Record<CzechCase, string>>;
+  example: { cz: string; uk: string };
+  note: string; // текст банера «Важливо» на цій вкладці
+  noteLinks?: NoteLink[]; // клікабельні слова в банері (kalhoty, brýle)
+}
+
 // 1) jeden — повна парадигма рід×відмінок (як ten). Лише однина.
 //    Використовує наявний FullDeclension, але значущі лише поля sg
 //    (pl не застосовне до "один"); заповнюємо sg=pl однаково для типобезпеки.
@@ -306,6 +328,7 @@ export interface GenderedNumeral {
   kind: "gendered"; // jeden/jedna/jedno
   declension: FullDeclension;
   examples: GenderExamples;
+  pluralOnly?: PluralOnlyForms; // jedny
 }
 
 // 2) dva — дві колонки за родом: masc vs fem/neut. Одна форма на відмінок.
@@ -318,6 +341,7 @@ export interface TwoFormNumeral {
   // Кожен відмінок → { masc, femNeut }.
   forms: Record<CzechCase, { masc: string; femNeut: string }>;
   examples: GenderExamples; // приклад на кожен рід
+  pluralOnly?: PluralOnlyForms; // dvoje, oboje
 }
 
 // 3) tři, čtyři — без роду, одна колонка × відмінки (зразок kost із винятками).
@@ -329,6 +353,7 @@ export interface InvariantDeclNumeral {
   forms: Record<CzechCase, string>;
   exampleCz: string;
   exampleUk: string;
+  pluralOnly?: PluralOnlyForms; // troje, čtvery
 }
 
 // 4) pět…dvanáct — лише дві форми: пряма (N/A) + спільна на решту відмінків (-i).

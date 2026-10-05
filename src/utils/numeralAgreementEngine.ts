@@ -6,35 +6,47 @@ import {
   Gender,
   NounEntry,
   GrammaticalNumber,
+  PluralOnlyForms,
 } from "../types";
 import { CARDINALS } from "../data/cardinals";
 import { NOUNS } from "../data/nouns";
 import { nounUsableAsPartner } from "../data/categories";
+import { NUMERAL_FRAMES, NumeralFrame } from "../data/numeralFrames";
+import type { QuizCase } from "../data/declensionFrames";
+import type { VocalPrep } from "../data/prepositionPartners";
+import { matchesNeeds, freshWeightedOrder, acceptedForms, formOf, vocalDecision } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
 
 // ─────────────────── Узгодження числівник + іменник ───────────────────
-// Тестує ОДНЕ з двох взаємоузгоджених слів (числівник або іменник) у випадково
-// обраному відмінку; друге показане готовою правильною формою (декорація).
-// Правило (звірено з ÚJČ/czechency.org):
-//  • jeden       → іменник в ОДНИНІ, узгоджений рід+відмінок
-//  • dva/oba/3/4 → іменник у МНОЖИНІ, ЗАВЖДИ узгоджений відмінок (без винятків)
-//  • pět+        → іменник у МНОЖИНІ; РОДОВИЙ лише в наз./знах., інакше узгоджений
-// Дублети (форми з " / ") зводяться до першого варіанта — у квизі потрібна
-// ОДНА правильна відповідь.
+// Тестує ОДНЕ з двох слів групи (числівник або іменник) у реченні з data/numeralFrames.ts; друге слово показане
+// готовою правильною формою. Правила (IJP id=792 «Počítaný předmět po číslovkách», Naše řeč 54/1971):
+//  • jeden       → іменник в ОДНИНІ, узгоджений рід + відмінок;
+//  • dva/oba/3/4 → іменник у МНОЖИНІ, той самий відмінок;
+//  • pět+        → у називному/знахідному іменник у РОДОВОМУ множини, у непрямих — той самий відмінок;
+//  • sto/tisíc/milion/miliarda → іменник у родовому множини; у непрямих відмінках можлива й відмінкова
+//    shoda («s třemi tisíci diváků / diváky»), а sto буває невідмінюваним («ke sto korunám») — обидва варіанти
+//    квіз приймає (ніколи не подає як помилку);
+//  • складені 21–99 → правило ОСТАННЬОЇ цифри; на …2–…4 у називному/знахідному правильний і родовий множини
+//    («dvacet dva žáci» і «dvacet dva žáků»), у непрямих відмінюються обидві частини («od dvaceti dvou žáků»);
+//    на …1 — «dvacet jeden žák» / «dvacet jedna žáků», у непрямих «k dvaceti jedna žákům» (див. agreeing21Counter);
+//  • іменники лише з множиною (kalhoty, brýle) → jedny / dvoje / oboje / troje / čtvery (поле pluralOnly картки),
+//    від п'яти — звичайне pět kalhot.
+// Відповідь завжди одна: дистрактор — справжня форма того самого слова, що НЕ входить у прийнятні форми клітинки
+// (усі дублети, variants іменника, варіанти з IJP вище).
 
 export interface AgreementQuestion {
   comboId: string;
   blank: "numeral" | "noun";
-  promptWord: string; // called-form пара в називному — стабільний заголовок незалежно від тестованого відмінка
-  promptUk: string; // напр. "п'ять хлопців"
-  promptLabel: string; // заголовок-підпис: частина мови ("числівник"/"іменник")
-  taskText: string; // "Оберіть іменник: чол. іст., Родовий (Genitiv) — Koho? Čeho?, множина"
-  contextPhrase: string; // "bez ___ chlapců" / "bez pěti ___"
+  promptWord: string;
+  promptUk: string;
+  promptLabel: string; // частина мови тестованого слова ("числівник"/"іменник")
+  taskText: string; // "Оберіть іменник: чол. іст., Давальний (Dativ) — Komu? Čemu?, множина"
+  contextPhrase: string; // "Volám dvěma ___." / "Volám ___ kamarádům."
   correct: string;
   options: string[];
 }
 
-function shuffle<T>(arr: T[]): T[] {
+function shuffle<T>(arr: readonly T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -43,9 +55,12 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-function firstForm(s: string): string {
-  return s.split(" / ")[0];
-}
+const split = (s: string): string[] => s.split(" / ").map((x) => x.trim());
+const isDirect = (c: CzechCase) => c === "nominativ" || c === "akuzativ";
+const isMasc = (g: Gender) => g === "masc_anim" || g === "masc_inan";
+const hasNumber = (n: NounEntry, num: GrammaticalNumber) => n.declension.nominativ[num] !== "—";
+const QUIZ_CASES = NUMERAL_CASE_ORDER as QuizCase[];
+const GENDERS: Gender[] = ["masc_anim", "masc_inan", "fem", "neut"];
 
 function collapseVowelLength(s: string): string {
   return s
@@ -59,285 +74,374 @@ function collapseVowelLength(s: string): string {
     .toLowerCase();
 }
 
-function isUsable(correct: string, d: string | null | undefined): d is string {
-  return !!d && d !== "—" && d !== correct && collapseVowelLength(d) !== collapseVowelLength(correct);
+// Дистрактор: справжня форма, не прийнятна для клітинки й не та сама форма з іншою довжиною голосного.
+function usable(d: string | null | undefined, accepted: string[], correct: string): d is string {
+  return !!d && d !== "—" && !accepted.includes(d) && collapseVowelLength(d) !== collapseVowelLength(correct);
 }
 
-// Прийменники по відмінку. Родовий/місцевий БЕЗ вокалізації (bez не має єдиного
-// стабільного правила — джерела фіксують саме bez як приклад нестабільності;
-// безпечніше лишати незмінним). Давальний/орудний ВОКАЛІЗУЮТЬСЯ, але лише за
-// єдиним підтвердженим безвинятковим правилом: той самий/парний приголосний.
-const CASE_FRAME: Partial<Record<CzechCase, { pre: string; prep?: string }>> = {
-  genitiv: { pre: "bez " },
-  dativ: { pre: "", prep: "k" },
-  lokal: { pre: "o " },
-  instrumental: { pre: "", prep: "s" },
-};
+// ─────────────────── Лічильне слово ───────────────────
+// Усе, що квізу треба знати про числівник: його форми, які клітинки іменника він вимагає і з якими іменниками
+// поєднується. Один інтерфейс для простих числівників, сотень, складених 21–99 і форм jedny / dvoje.
+type Cell = { c: CzechCase; n: GrammaticalNumber };
+// Прості й складені числівники в cardinals.ts — від 1 до 99.
+const CARDINAL_MAX = 99;
 
-function vocalize(prep: string, next: string): string {
-  if (prep === "k" && /^[kg]/i.test(next)) return "ke";
-  if (prep === "s" && /^[szšž]/i.test(next)) return "se";
-  return prep;
+interface Counter {
+  key: string; // однаковий key — однаковий набір придатних іменників (кеш кандидатів)
+  forms: (c: CzechCase, g: Gender) => string[]; // прийнятні форми; [0] показуємо
+  // Питання з пропуском на числівнику: заголовок (саме слово й переклад) і кандидати-дистрактори за пріоритетом
+  // (фільтр — usable). Немає — лише пропуск на іменнику.
+  numeral?: { prompt: { word: string; uk: string }; distractors: (c: CzechCase, g: Gender) => string[] };
+  cell: (c: CzechCase) => Cell; // клітинка іменника, яку показуємо як правильну
+  altCells: (c: CzechCase) => Cell[]; // теж правильні клітинки (варіанти з IJP) — ніколи не дистрактор
+  nounDistractorCells: (c: CzechCase) => Cell[]; // кандидати за пріоритетом
+  taskCase: (c: CzechCase) => CzechCase; // відмінок у підписі завдання про іменник
+  verbPl: boolean; // дієслово {V}: множина після 2–4
+  many: boolean; // кількість від двох (фрази з mezi)
+  value: number; // найбільша кількість, яку це слово означає (фрази з max: data/numeralFrames.ts)
+  cases?: QuizCase[]; // лише ці відмінки (інакше всі)
+  accepts: (n: NounEntry) => boolean;
 }
 
-// ─────────────────── Форма числівника в заданому відмінку ───────────────────
-// Повертає форму ЦЬОГО числівника для іменника заданого роду в заданому
-// відмінку. Для kind="gendered"/"twoForm" рід іменника визначає колонку.
-function numeralForm(card: CardinalEntry, c: CzechCase, nounGender: Gender): string {
-  if (card.kind === "gendered") {
-    return firstForm(card.declension[nounGender][c].sg);
+const otherCases = (c: CzechCase) => shuffle(NUMERAL_CASE_ORDER.filter((x) => x !== c));
+const firstOf = (s: string) => split(s)[0];
+
+// Форма простого числівника для іменника роду g (усі дублети).
+function cardinalForms(card: CardinalEntry, c: CzechCase, g: Gender): string[] {
+  switch (card.kind) {
+    case "gendered":
+      return split(card.declension[g][c].sg);
+    case "twoForm":
+      return split(card.forms[c][isMasc(g) ? "masc" : "femNeut"]);
+    case "invariantDecl":
+      return split(card.forms[c]);
+    case "oblique":
+      return isDirect(c) ? [card.direct] : split(card.oblique);
   }
-  if (card.kind === "twoForm") {
-    const col = nounGender === "masc_anim" || nounGender === "masc_inan" ? "masc" : "femNeut";
-    return firstForm(card.forms[c][col]);
-  }
-  if (card.kind === "invariantDecl") {
-    return firstForm(card.forms[c]);
-  }
-  // oblique (pět+): пряма форма лише в наз./знах., інакше спільна непряма.
-  return c === "nominativ" || c === "akuzativ" ? card.direct : firstForm(card.oblique);
 }
 
-// Дистрактор числівника — інша форма ЦЬОГО Ж числівника (інший відмінок,
-// за потреби інший рід/колонка для gendered/twoForm).
-function numeralDistractor(card: CardinalEntry, c: CzechCase, nounGender: Gender, correct: string): string | null {
-  const otherCases = shuffle(NUMERAL_CASE_ORDER.filter((cc) => cc !== c));
-  for (const cc of otherCases) {
-    const f = numeralForm(card, cc, nounGender);
-    if (isUsable(correct, f)) return f;
+// Яку клітинку іменника вимагає простий числівник у відмінку c.
+function cardinalCell(card: CardinalEntry, c: CzechCase): Cell {
+  if (card.kind === "gendered") return { c, n: "sg" };
+  if (card.kind === "oblique" && isDirect(c)) return { c: "genitiv", n: "pl" };
+  return { c, n: "pl" };
+}
+
+// Кандидати-дистрактори іменника: спершу типова помилка правила (інше число / родовий після 5+), далі інші відмінки.
+function cardinalNounDistractors(card: CardinalEntry, c: CzechCase): Cell[] {
+  if (card.kind === "gendered") return [{ c, n: "pl" }, ...otherCases(c).map((x) => ({ c: x, n: "sg" as const }))];
+  if (card.kind === "oblique") {
+    if (isDirect(c)) return [{ c, n: "pl" }, { c: "genitiv", n: "sg" }, ...otherCases("genitiv").map((x) => ({ c: x, n: "pl" as const }))];
+    return [{ c, n: "sg" }, { c: "genitiv", n: "pl" }, ...otherCases(c).map((x) => ({ c: x, n: "pl" as const }))];
   }
-  // gendered/twoForm: спробувати інший рід/колонку в ТОМУ Ж відмінку.
-  if (card.kind === "gendered") {
-    for (const g of ["masc_anim", "masc_inan", "fem", "neut"] as Gender[]) {
-      const f = firstForm(card.declension[g][c].sg);
-      if (isUsable(correct, f)) return f;
+  return [{ c, n: "sg" }, ...otherCases(c).map((x) => ({ c: x, n: "pl" as const }))];
+}
+
+const countable = (n: NounEntry) => !n.uncountable;
+const pluralOnly = (n: NounEntry) => !hasNumber(n, "sg") && hasNumber(n, "pl");
+const bothNumbers = (n: NounEntry) => hasNumber(n, "sg") && hasNumber(n, "pl");
+
+function simpleCounter(card: CardinalEntry): Counter {
+  return {
+    key: `card:${card.id}`,
+    forms: (c, g) => cardinalForms(card, c, g),
+    numeral: {
+      prompt: { word: card.cz, uk: card.uk },
+      distractors: (c, g) => {
+        const out = otherCases(c).map((x) => cardinalForms(card, x, g)[0]);
+        // інший рід у тому самому відмінку: jeden ↔ jednoho, dva ↔ dvě
+        if (card.kind === "gendered" || card.kind === "twoForm") for (const og of GENDERS) out.push(cardinalForms(card, c, og)[0]);
+        return out;
+      },
+    },
+    cell: (c) => cardinalCell(card, c),
+    altCells: () => [],
+    nounDistractorCells: (c) => cardinalNounDistractors(card, c),
+    taskCase: (c) => c,
+    verbPl: card.kind === "twoForm" || card.kind === "invariantDecl",
+    many: card.kind !== "gendered",
+    value: CARDINAL_MAX,
+    // jeden, 2–4 — лише слова з обома числами (kalhoty рахують jedny / dvoje); pět+ — і слова лише з множиною.
+    accepts: card.kind === "oblique" ? (n) => countable(n) && hasNumber(n, "pl") : (n) => countable(n) && bothNumbers(n),
+  };
+}
+
+function hundredCounter(h: NounEntry): Counter {
+  const forms = (c: CzechCase) => [...split(h.declension[c].sg), ...(h.uninflectedAsNumeral ? [h.cz] : [])];
+  return {
+    key: `hundred:${h.id}`,
+    forms: (c) => forms(c),
+    numeral: { prompt: { word: h.cz, uk: h.uk }, distractors: (c) => otherCases(c).map((x) => firstOf(h.declension[x].sg)) },
+    cell: () => ({ c: "genitiv", n: "pl" }),
+    // «s třemi tisíci diváků / diváky» — у непрямих відмінках правильна й відмінкова shoda (IJP id=792)
+    altCells: (c) => (isDirect(c) || c === "genitiv" ? [] : [{ c, n: "pl" }]),
+    nounDistractorCells: () => [{ c: "genitiv", n: "sg" }, ...otherCases("genitiv").map((x) => ({ c: x, n: "pl" as const }))],
+    taskCase: () => "genitiv",
+    verbPl: false,
+    many: true,
+    value: h.numeralValue ?? Infinity, // без numeralValue — лише у фрази без max (dev-перевірка попереджає)
+    accepts: (n) => countable(n) && hasNumber(n, "pl"),
+  };
+}
+
+// Складене число «десяток + одиниця» на …2–…9. Узгодження веде одиниця (unit — картка dva…devět).
+function compoundCounter(decade: CardinalEntry, unit: CardinalEntry, group: number): Counter {
+  const lowGroup = group <= 4; // …2–…4: у називному/знахідному правильний і родовий множини
+  const join = (dc: CzechCase, uc: CzechCase, g: Gender) => `${cardinalForms(decade, dc, g)[0]} ${cardinalForms(unit, uc, g)[0]}`;
+  const allForms = (c: CzechCase, g: Gender): string[] => {
+    const out: string[] = [];
+    for (const d of cardinalForms(decade, c, g)) for (const u of cardinalForms(unit, c, g)) out.push(`${d} ${u}`);
+    return out;
+  };
+  return {
+    key: `compound:${group}`,
+    forms: (c, g) => {
+      const shown = allForms(c, g);
+      if (!lowGroup || isDirect(c)) return shown;
+      // У непрямих відмінках у мові трапляється й невідмінювана форма («s dvacet dva žáky» — Naše řeč 1971):
+      // показуємо повністю відмінювану (вона переважає), решту не подаємо як помилку.
+      const extra: string[] = [];
+      for (const dc of NUMERAL_CASE_ORDER)
+        for (const og of GENDERS) extra.push(`${cardinalForms(decade, dc, og)[0]} ${cardinalForms(unit, "nominativ", og)[0]}`);
+      return [...shown, ...extra.filter((x) => !shown.includes(x))];
+    },
+    numeral: {
+      // українське число як орієнтир: чеська форма була б підказкою відповіді
+      prompt: { word: `${decade.uk} ${unit.uk}`, uk: "" },
+      distractors: (c, g) => {
+        const oc = otherCases(c);
+        const out = [...oc.map((x) => join(x, x, g)), ...oc.map((x) => join(c, x, g))];
+        if (unit.kind === "gendered" || unit.kind === "twoForm") for (const og of GENDERS) out.push(join(c, c, og));
+        return out;
+      },
+    },
+    cell: (c) => cardinalCell(unit, c),
+    altCells: () => (lowGroup ? [{ c: "genitiv", n: "pl" }] : []),
+    nounDistractorCells: (c) => cardinalNounDistractors(unit, c),
+    taskCase: (c) => c,
+    verbPl: unit.kind === "twoForm" || unit.kind === "invariantDecl",
+    many: true,
+    value: CARDINAL_MAX,
+    accepts: lowGroup ? (n) => countable(n) && bothNumbers(n) : (n) => countable(n) && hasNumber(n, "pl"),
+  };
+}
+
+// Складені на …1 (21, 31…). IJP (hesla jednadvacet, jeden; id=792) дає лише називний: «dvacet jeden žák» (однина,
+// узгоджена з jeden) і «dvacet jedna žáků» (родовий множини, як після 5+); повного відмінювання «dvaceti jednomu»
+// у ній немає. Тому дві конструкції:
+//  • узгоджена — лише називний: «Na fotce je dvacet jeden ___» → dědeček;
+//  • з «dvacet jedna» — усі відмінки: «Mám dvacet jedna ___» → bratrů; у непрямих число відмінюється частково,
+//    іменник у тому самому відмінку множини: «k dvaceti jedna žákům», «od dvaceti jedna žáků» (Naše řeč 1971).
+// Пропуск — лише іменник: форма самого числа «jeden / jedna / dvaceti jedna» в мові коливається, однієї правильної
+// відповіді для кнопки немає.
+function agreeing21Counter(decade: CardinalEntry, unit: CardinalEntry): Counter {
+  return {
+    key: "compound:1-agree",
+    forms: (c, g) => [`${cardinalForms(decade, c, g)[0]} ${cardinalForms(unit, c, g)[0]}`],
+    cell: (c) => ({ c, n: "sg" }),
+    altCells: () => [{ c: "genitiv", n: "pl" }],
+    nounDistractorCells: (c) => otherCases(c).map((x) => ({ c: x, n: "sg" as const })),
+    taskCase: (c) => c,
+    verbPl: false,
+    many: true,
+    value: CARDINAL_MAX,
+    cases: ["nominativ"],
+    accepts: (n) => countable(n) && bothNumbers(n),
+  };
+}
+
+function invariant21Counter(decade: CardinalEntry, unit: CardinalEntry): Counter {
+  const one = unit.kind === "gendered" ? firstOf(unit.declension.fem.nominativ.sg) : unit.cz; // «jedna»
+  return {
+    key: "compound:1-jedna",
+    forms: (c, g) => [`${cardinalForms(decade, c, g)[0]} ${one}`],
+    cell: (c) => (isDirect(c) ? { c: "genitiv", n: "pl" } : { c, n: "pl" }),
+    // називний/знахідний: однина того самого відмінка (dvacet jedna žena) — теж правильна; непрямі: і родовий
+    // множини («k dvaceti jedna žáků» — Naše řeč)
+    altCells: (c) => (isDirect(c) ? [{ c, n: "sg" }] : [{ c: "genitiv", n: "pl" }]),
+    nounDistractorCells: (c) =>
+      isDirect(c)
+        ? [{ c: "genitiv", n: "sg" }, ...otherCases(c).filter((x) => !isDirect(x) && x !== "genitiv").map((x) => ({ c: x, n: "pl" as const }))]
+        : otherCases(c).filter((x) => x !== "genitiv").map((x) => ({ c: x, n: "pl" as const })),
+    taskCase: (c) => c,
+    verbPl: false,
+    many: true,
+    value: CARDINAL_MAX,
+    accepts: (n) => countable(n) && bothNumbers(n),
+  };
+}
+
+// jedny / dvoje / oboje / troje / čtvery з іменниками лише з множиною.
+function pluralOnlyCounter(card: CardinalEntry, po: PluralOnlyForms): Counter {
+  const form = (c: CzechCase, g: Gender) => (g === "neut" && po.neut?.[c]) || po.forms[c];
+  return {
+    key: `po:${card.id}`,
+    forms: (c, g) => [form(c, g)],
+    numeral: {
+      prompt: { word: card.cz, uk: card.uk },
+      distractors: (c, g) => [
+        // типова помилка в називному/знахідному — звичайна форма: «dvě kalhoty», «jedna kalhoty»
+        ...(isDirect(c) ? [cardinalForms(card, c, g)[0]] : []),
+        ...otherCases(c).map((x) => form(x, g)),
+      ],
+    },
+    cell: (c) => ({ c, n: "pl" }),
+    altCells: () => [],
+    nounDistractorCells: (c) => otherCases(c).map((x) => ({ c: x, n: "pl" as const })),
+    taskCase: (c) => c,
+    verbPl: true,
+    many: card.kind !== "gendered",
+    value: 4,
+    accepts: (n) => countable(n) && pluralOnly(n),
+  };
+}
+
+// ─────────────────── Іменники й фрази ───────────────────
+// Партнери: не дні/місяці/сотні (nounUsableAsPartner); незлічувані відсіює Counter.accepts.
+const NOUN_POOL = NOUNS.filter((n) => nounUsableAsPartner(n.category));
+const HUNDRED_NOUNS = NOUNS.filter((n) => n.category === "numbers");
+
+const frameFits = (f: NumeralFrame, k: Counter, n: NounEntry) =>
+  matchesNeeds(n, f) && (!f.many || k.many) && (f.max === undefined || k.value <= f.max);
+
+// fit — у скількох фразах слово може з'явитися (з даних): вага 1/fit вирівнює частоту слів.
+const FIT = new Map<string, number>(
+  NOUN_POOL.map((n) => [n.id, Math.max(1, QUIZ_CASES.reduce((s, c) => s + NUMERAL_FRAMES[c].filter((f) => matchesNeeds(n, f)).length, 0))])
+);
+
+interface Candidate {
+  noun: NounEntry;
+  frames: NumeralFrame[];
+}
+const candCache = new Map<string, Candidate[]>();
+function candidatesFor(k: Counter, c: QuizCase): Candidate[] {
+  const key = `${k.key}|${k.value}|${k.many}|${c}`;
+  let out = candCache.get(key);
+  if (!out) {
+    out = [];
+    for (const noun of NOUN_POOL) {
+      if (!k.accepts(noun)) continue;
+      const frames = NUMERAL_FRAMES[c].filter((f) => frameFits(f, k, noun));
+      if (frames.length > 0) out.push({ noun, frames });
+    }
+    candCache.set(key, out);
+  }
+  return out;
+}
+
+const GENDER_UK: Record<Gender, string> = { masc_anim: "чол. іст.", masc_inan: "чол. неіст.", fem: "жін.", neut: "сер." };
+const PREP_SLOT = /\{([vksz])\} ___/;
+
+// Речення з групою. firstWord — перше слово групи (числівник), за ним вирішується ve/ke/se/ze; null — фраза не
+// годиться (вокалізацію не класифіковано).
+function render(f: NumeralFrame, k: Counter, group: string, firstWord: string): string | null {
+  let text = f.text;
+  if (f.verb) text = text.replace("{V}", f.verb[k.verbPl ? 1 : 0]);
+  const m = PREP_SLOT.exec(text);
+  if (m) {
+    const prep = m[1] as VocalPrep;
+    const d = vocalDecision(prep, firstWord);
+    if (d === null) return null;
+    text = text.replace(`{${prep}} `, d === "vocal" ? `${prep}e ` : `${prep} `);
+  }
+  return text.replace("___", group);
+}
+
+interface Built {
+  q: AgreementQuestion;
+  nounId: string;
+}
+
+// Питання для (лічильне слово, відмінок): пропуск → іменник (свіжі першими, вага 1/fit) → фраза. Перебір повний:
+// якщо питання для цієї пари взагалі можливе, воно буде побудоване.
+function build(k: Counter, c: QuizCase, id: string, used: ReadonlySet<string>): Built | null {
+  if (k.cases && !k.cases.includes(c)) return null;
+  const cands = candidatesFor(k, c);
+  type Side = { blank: "numeral"; numeral: NonNullable<Counter["numeral"]> } | { blank: "noun" };
+  const sides: Side[] = k.numeral ? [{ blank: "numeral", numeral: k.numeral }, { blank: "noun" }] : [{ blank: "noun" }];
+  for (const side of shuffle(sides)) {
+    const blank = side.blank;
+    for (const { noun, frames } of freshWeightedOrder(cands, (x) => used.has(x.noun.id), (x) => FIT.get(x.noun.id) ?? 1)) {
+      const g = noun.gender;
+      const numAcc = k.forms(c, g);
+      const numShown = numAcc[0];
+      const cell = k.cell(c);
+      const nounShown = formOf(noun, cell.c, cell.n);
+      if (!numShown || numShown.includes("—") || !nounShown) continue;
+      const nounAcc = [cell, ...k.altCells(c)].flatMap((x) => acceptedForms(noun, x.c, x.n));
+      const firstWord = numShown.split(" ")[0];
+
+      let correct: string;
+      let distractors: string[];
+      if (side.blank === "numeral") {
+        correct = numShown;
+        distractors = side.numeral.distractors(c, g).filter((d) => usable(d, numAcc, correct));
+      } else {
+        correct = nounShown;
+        distractors = k
+          .nounDistractorCells(c)
+          .map((x) => formOf(noun, x.c, x.n))
+          .filter((d): d is string => usable(d, nounAcc, correct));
+      }
+      for (const f of shuffle(frames)) {
+        // Прийменник перед пропуском-числівником: обидві кнопки мусять мати те саме ve/v («se ___» — і stem, і sta).
+        const m = PREP_SLOT.exec(f.text);
+        const distractor =
+          blank === "numeral" && m
+            ? distractors.find((d) => vocalDecision(m[1] as VocalPrep, d.split(" ")[0]) === vocalDecision(m[1] as VocalPrep, firstWord))
+            : distractors[0];
+        if (!distractor) continue;
+        const group = blank === "numeral" ? `___ ${nounShown}` : `${numShown} ___`;
+        const text = render(f, k, group, firstWord);
+        if (!text) continue;
+        const lbl = CASE_LABELS[c];
+        const tl = CASE_LABELS[k.taskCase(c)];
+        return {
+          q: {
+            comboId: id,
+            blank,
+            promptWord: side.blank === "numeral" ? side.numeral.prompt.word : noun.cz,
+            promptUk: side.blank === "numeral" ? side.numeral.prompt.uk : noun.uk,
+            promptLabel: blank === "numeral" ? "числівник" : "іменник",
+            taskText:
+              blank === "numeral"
+                ? `Оберіть числівник: ${lbl.uk} (${lbl.cz}) — ${lbl.question}`
+                : `Оберіть іменник: ${GENDER_UK[g]}, ${tl.uk} (${tl.cz}) — ${tl.question}, ${cell.n === "sg" ? "однина" : "множина"}`,
+            contextPhrase: text,
+            correct,
+            options: shuffle([correct, distractor]),
+          },
+          nounId: noun.id,
+        };
+      }
     }
   }
-  if (card.kind === "twoForm") {
-    const otherCol = nounGender === "masc_anim" || nounGender === "masc_inan" ? "femNeut" : "masc";
-    const f = firstForm(card.forms[c][otherCol]);
-    if (isUsable(correct, f)) return f;
-  }
   return null;
 }
 
-// ─────────────────── Форма іменника (з узгодженням числа+відмінка за правилом) ───────────────────
-type NounForm = { c: CzechCase; n: GrammaticalNumber };
-
-// Яка клітинка іменника відповідає числівнику card у синтаксичному відмінку phraseCase.
-function nounTargetCell(card: CardinalEntry, phraseCase: CzechCase): NounForm {
-  if (card.kind === "gendered") return { c: phraseCase, n: "sg" };
-  const isDirect = phraseCase === "nominativ" || phraseCase === "akuzativ";
-  if (card.kind === "oblique" && isDirect) return { c: "genitiv", n: "pl" }; // 5+ у наз./знах. → родовий множини
-  return { c: phraseCase, n: "pl" }; // 2-4 завжди; 5+ у непрямих — узгоджений відмінок
-}
-
-function nounForm(entry: NounEntry, cell: NounForm): string {
-  return firstForm(entry.declension[cell.c][cell.n]);
-}
-
-function nounDistractor(entry: NounEntry, cell: NounForm, correct: string): string | null {
-  // Спершу інше число тим самим відмінком, потім інший відмінок тим самим числом.
-  const otherN: GrammaticalNumber = cell.n === "sg" ? "pl" : "sg";
-  let f = firstForm(entry.declension[cell.c][otherN]);
-  if (isUsable(correct, f)) return f;
-  const otherCases = shuffle(NUMERAL_CASE_ORDER.filter((cc) => cc !== cell.c));
-  for (const cc of otherCases) {
-    f = firstForm(entry.declension[cc][cell.n]);
-    if (isUsable(correct, f)) return f;
-  }
-  return null;
-}
-
-// ─────────────────── Побудова одного питання ───────────────────
-function buildQuestion(card: CardinalEntry, phraseCase: CzechCase, noun: NounEntry): AgreementQuestion | null {
-  // Рід іменника визначає колонку числівника (gendered/twoForm).
-  const numCorrect = numeralForm(card, phraseCase, noun.gender);
-  const cell = nounTargetCell(card, phraseCase);
-  const nounCorrect = nounForm(noun, cell);
-  if (!numCorrect || numCorrect === "—" || !nounCorrect || nounCorrect === "—") return null;
-
-  const blank: "numeral" | "noun" = Math.random() < 0.5 ? "numeral" : "noun";
-  const correct = blank === "numeral" ? numCorrect : nounCorrect;
-  const distractor =
-    blank === "numeral"
-      ? numeralDistractor(card, phraseCase, noun.gender, numCorrect)
-      : nounDistractor(noun, cell, nounCorrect);
-  if (!distractor) return null;
-
-  // Контекстна фраза: показуємо готове слово (не бланк) у правильній формі.
-  const frame = CASE_FRAME[phraseCase];
-  const shownNum = blank === "numeral" ? "___" : numCorrect;
-  const shownNoun = blank === "noun" ? "___" : nounCorrect;
-  let contextPhrase: string;
-  if (frame?.prep) {
-    // Вокалізація прийменника залежить від слова ОДРАЗУ після нього — це завжди
-    // числівник (носій іде першим): якщо числівник — бланк, беремо його ГОТОВУ
-    // (правильну) форму лише для перевірки вокалізації, у фразі показуємо "___".
-    const p = vocalize(frame.prep, numCorrect);
-    contextPhrase = `${p} ${shownNum} ${shownNoun}`;
-  } else if (frame?.pre) {
-    contextPhrase = `${frame.pre}${shownNum} ${shownNoun}`;
-  } else if (phraseCase === "akuzativ") {
-    contextPhrase = `Mám ${shownNum} ${shownNoun}`;
-  } else {
-    contextPhrase = `${shownNum} ${shownNoun}`;
-  }
-
-  const lbl = CASE_LABELS[phraseCase];
-  const genderUk: Record<Gender, string> = {
-    masc_anim: "чол. іст.",
-    masc_inan: "чол. неіст.",
-    fem: "жін.",
-    neut: "сер.",
-  };
-  const taskText =
-    blank === "numeral"
-      ? `Оберіть числівник: ${lbl.uk} (${lbl.cz}) — ${lbl.question}`
-      : `Оберіть іменник: ${genderUk[noun.gender]}, ${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${
-          cell.n === "sg" ? "однина" : "множина"
-        }`;
-
-  // Prompt стосується ЛИШЕ тестованого слова (того, що в пропуску) — базова форма
-  // + її переклад. Декоратор (друге слово) не перекладається, він лише у фразі.
-  const promptWord = blank === "numeral" ? card.cz : noun.cz;
-  const promptUk = blank === "numeral" ? card.uk : noun.uk;
-  const promptLabel = blank === "numeral" ? "числівник" : "іменник";
-
-  return {
-    // Вага рахується на рівні числівник+відмінок, НЕЗАЛЕЖНО від випадкового
-    // blank (numeral/noun) — тому фіксуємо "x", щоб цей id збігався з id у пулі
-    // (enumerateAgreementCombos). Інакше mistake-стор пише один id, а
-    // selectRoundCombos шукає інший — і резервація помилок не спрацьовує.
-    comboId: comboId(card.id, phraseCase, "x"),
-    blank,
-    promptWord,
-    promptUk,
-    promptLabel,
-    taskText,
-    contextPhrase,
-    correct,
-    options: shuffle([correct, distractor]),
-  };
-}
-
-// ─────────────────── Сесія ───────────────────
-// Пул лічених іменників: виключаємо непридатні як партнер (дні/місяці/сотні —
-// nounUsableAsPartner) І незлічувані (maso/voda/rýže/káva — «osm mas» безглузде).
-const PARTNER_POOL = NOUNS.filter((n) => nounUsableAsPartner(n.category) && !n.uncountable);
+// ─────────────────── Комбінації ───────────────────
+type NumKind = "base" | "hundreds" | "compound" | "plural-only";
 
 interface Combo {
   id: string;
   wordId: string;
-  make: () => AgreementQuestion | null;
+  kind: NumKind;
+  make: (used: ReadonlySet<string>) => Built | null;
 }
 
-// ─────────────────── sto/tisíc/milion/miliarda як лічильне слово ───────────────────
-// Ці чотири — NounEntry (не CardinalEntry), але в ролі числівника. Правило
-// узгодження (звірено з Elon.io + акад. праця dspace.cuni.cz): іменник-предмет
-// ЗАВЖДИ в родовому множини (sto korun, tisíc korun, k tisíci korun, o milionu
-// lidí). Для tisíc/milion/miliarda це безвиняткове правило в усіх відмінках; для
-// sto існує варіативність у непрямих, але беремо єдиний найпоширеніший варіант
-// (родовий) — щоб у квизі була одна правильна відповідь.
-const HUNDRED_IDS = ["num-sto", "num-tisic", "num-milion", "num-miliarda"];
-const HUNDRED_NOUNS = NOUNS.filter((n) => HUNDRED_IDS.includes(n.id));
-
-function nounGenPlDistractor(entry: NounEntry, correct: string, phraseCase: CzechCase): string | null {
-  // Інша форма ТОГО Ж числа-слова (sto/tisíc…) в ІНШОМУ відмінку, завжди в
-  // однині (бо correct теж завжди береться з .sg — див. buildHundredQuestion).
-  // Виключаємо і genitiv, і сам phraseCase: якщо не виключити phraseCase,
-  // цикл може дійти до pl-форми ТОГО Ж відмінка (напр. lokal.sg="tisíci" /
-  // lokal.pl="tisících") — а це вже не дистрактор, а другий граматично
-  // коректний варіант («o tisíci domů» і «o tisících domů» обидва правильні,
-  // партнер завжди в родовому множини незалежно від числа самого числівника).
-  const otherCases = shuffle(NUMERAL_CASE_ORDER.filter((cc) => cc !== "genitiv" && cc !== phraseCase));
-  for (const cc of otherCases) {
-    const f = firstForm(entry.declension[cc].sg);
-    if (isUsable(correct, f)) return f;
-  }
-  return null;
+// Один відмінок, одне лічильне слово (прості числівники, сотні, jedny / dvoje…).
+function singleCombo(id: string, wordId: string, kind: NumKind, k: Counter, c: QuizCase): Combo {
+  return { id, wordId, kind, make: (used) => build(k, c, id, used) };
 }
 
-function buildHundredQuestion(hundred: NounEntry, phraseCase: CzechCase, partner: NounEntry): AgreementQuestion | null {
-  // Форма числа-слова (sto/tisíc…) — за його власною парадигмою у відмінку фрази,
-  // число: sg для "один" сенсу (sto/tisíc), але тут завжди однина самого слова.
-  const numCorrect = firstForm(hundred.declension[phraseCase].sg);
-  // Партнер завжди в родовому множини.
-  const nounCorrect = firstForm(partner.declension.genitiv.pl);
-  if (!numCorrect || numCorrect === "—" || !nounCorrect || nounCorrect === "—") return null;
-
-  const blank: "numeral" | "noun" = Math.random() < 0.5 ? "numeral" : "noun";
-  const correct = blank === "numeral" ? numCorrect : nounCorrect;
-  const distractor =
-    blank === "numeral"
-      ? nounGenPlDistractor(hundred, numCorrect, phraseCase)
-      : nounDistractor(partner, { c: "genitiv", n: "pl" }, nounCorrect);
-  if (!distractor) return null;
-
-  const frame = CASE_FRAME[phraseCase];
-  const shownNum = blank === "numeral" ? "___" : numCorrect;
-  const shownNoun = blank === "noun" ? "___" : nounCorrect;
-  let contextPhrase: string;
-  if (frame?.prep) {
-    const p = vocalize(frame.prep, numCorrect);
-    contextPhrase = `${p} ${shownNum} ${shownNoun}`;
-  } else if (frame?.pre) {
-    contextPhrase = `${frame.pre}${shownNum} ${shownNoun}`;
-  } else if (phraseCase === "akuzativ") {
-    contextPhrase = `Mám ${shownNum} ${shownNoun}`;
-  } else {
-    contextPhrase = `${shownNum} ${shownNoun}`;
-  }
-
-  const lbl = CASE_LABELS[phraseCase];
-  const genderUk: Record<Gender, string> = {
-    masc_anim: "чол. іст.",
-    masc_inan: "чол. неіст.",
-    fem: "жін.",
-    neut: "сер.",
-  };
-  const taskText =
-    blank === "numeral"
-      ? `Оберіть числівник: ${lbl.uk} (${lbl.cz}) — ${lbl.question}`
-      : `Оберіть іменник: ${genderUk[partner.gender]}, Родовий (Genitiv) — Koho? Čeho?, множина`;
-
-  const promptWord = blank === "numeral" ? hundred.cz : partner.cz;
-  const promptUk = blank === "numeral" ? hundred.uk : partner.uk;
-  const promptLabel = blank === "numeral" ? "числівник" : "іменник";
-
-  return {
-    // Див. коментар у buildQuestion: фіксуємо "x", щоб id збігався з пулом.
-    comboId: comboId(hundred.id, phraseCase, "x"),
-    blank,
-    promptWord,
-    promptUk,
-    promptLabel,
-    taskText,
-    contextPhrase,
-    correct,
-    options: shuffle([correct, distractor]),
-  };
-}
-
-// ═══════════════════ СКЛАДЕНІ ЧИСЛА 21–99 (композиційно) ═══════════════════
-// Складені числа не мають окремих записів у cardinals.ts — генеруються на льоту
-// з десятки (dvacet…devadesát) + одиниці (jeden…devět). Узгодження іменника
-// визначає ОСТАННЯ цифра (одиниця): це та сама навичка, що для простих 1–9,
-// але вимагає спершу впізнати, яке правило застосувати. Тому:
-//  • форма числівника = «<форма десятки> <форма одиниці>» (обидві в phraseCase);
-//  • узгодження іменника = за unit-карткою (перевикористовуємо nounTargetCell);
-//  • вага помилок трекається за ГРУПОЮ останньої цифри (1/2/3/4/5), не за
-//    конкретним числом — навичка саме в розпізнаванні групи.
-// Відмінки: одиниця 5–9 → всі 6 (усталена норма); одиниця 1–4 → лише прямі
-// (naz/akuz) — непрямі відмінки складених на -1..-4 у реальному вжитку хиткі,
-// носії часто лишають їх невідмінюваними (Naše řeč / ÚJČ: nase-rec.ujc.cas.cz),
-// тож єдиної правильної відповіді для квізу там нема.
-
+// ═══════════════════ СКЛАДЕНІ ЧИСЛА 21–99 ═══════════════════
+// Без окремих записів у cardinals.ts: десяток (dvacet…devadesát) + одиниця (jeden…devět). Вага помилок — за
+// ГРУПОЮ останньої цифри (compound-1 … compound-5, де 5 = «5–9»): навичка в тому, щоб упізнати правило. Відмінок,
+// десяток і одиниця обираються всередині make() випадково, перебір повний.
 const DECADE_IDS = [
   "card-dvacet", "card-tricet", "card-ctyricet", "card-padesat",
   "card-sedesat", "card-sedmdesat", "card-osmdesat", "card-devadesat",
 ];
-// Одиниці 1–9 за групами останньої цифри. Група 5 = «5–9» (усі oblique).
 const UNIT_IDS_BY_GROUP: Record<number, string[]> = {
   1: ["card-jeden"],
   2: ["card-dva"],
@@ -345,209 +449,104 @@ const UNIT_IDS_BY_GROUP: Record<number, string[]> = {
   4: ["card-ctyri"],
   5: ["card-pet", "card-sest", "card-sedm", "card-osm", "card-devet"],
 };
-// Прямі відмінки для всіх; групи 1–4 обмежені саме ними.
-const DIRECT_CASES: CzechCase[] = ["nominativ", "akuzativ"];
+const card = (id: string) => CARDINALS.find((c) => c.id === id)!;
 
-const DECADE_CARDS = DECADE_IDS.map((id) => CARDINALS.find((c) => c.id === id)!);
-function unitCardsForGroup(group: number): CardinalEntry[] {
-  return UNIT_IDS_BY_GROUP[group].map((id) => CARDINALS.find((c) => c.id === id)!);
-}
-
-// Форма складеного числівника у відмінку: обидві частини відмінюються.
-// Одиниця враховує рід іменника (jeden/jedna, dva/dvě).
-function compoundNumeralForm(decade: CardinalEntry, unit: CardinalEntry, c: CzechCase, nounGender: Gender): string {
-  const d = numeralForm(decade, c, nounGender);
-  const u = numeralForm(unit, c, nounGender);
-  return `${d} ${u}`;
-}
-
-// Дистрактор складеного числівника: та сама десятка, але одиниця (і за потреби
-// десятка) в ІНШОМУ відмінку — типова помилка «не відмінив другу частину».
-// ВАЖЛИВО: шукаємо ЛИШЕ серед відмінків, дозволених для ЦІЄЇ групи (те саме
-// allowedCases, що й у enumerateCompoundCombos) — інакше для груп 1-4 сюди
-// просочилися б непрямі форми (jednomu/dvou/třech…), яких ми свідомо не
-// тестуємо через спірність норми. Дистрактор — теж контент, а не лише
-// правильна відповідь, тож обмеження стосується його так само.
-function compoundNumeralDistractor(
-  decade: CardinalEntry, unit: CardinalEntry, c: CzechCase, nounGender: Gender, correct: string, allowedCases: CzechCase[]
-): string | null {
-  const otherCases = shuffle(allowedCases.filter((cc) => cc !== c));
-  for (const cc of otherCases) {
-    const f = `${numeralForm(decade, cc, nounGender)} ${numeralForm(unit, cc, nounGender)}`;
-    if (isUsable(correct, f)) return f;
-  }
-  // запасний: лише одиниця в іншому відмінку (десятка правильна) — теж у межах allowedCases.
-  for (const cc of otherCases) {
-    const f = `${numeralForm(decade, c, nounGender)} ${numeralForm(unit, cc, nounGender)}`;
-    if (isUsable(correct, f)) return f;
-  }
-  // Останній рівень: tři/čtyři не відрізняють naz./znah. (обидва "tři"), а
-  // allowedCases для груп 1-4 має лише ці два відмінки — тож жоден з циклів
-  // вище не знайде відмінності. Беремо ІНШУ десятку з тим самим відмінком:
-  // «sedmdesát tři» vs «osmdesát tři» — тестує впізнавання самої десятки.
-  const otherDecades = shuffle(DECADE_CARDS.filter((d) => d.id !== decade.id));
-  for (const d of otherDecades) {
-    const f = `${numeralForm(d, c, nounGender)} ${numeralForm(unit, c, nounGender)}`;
-    if (isUsable(correct, f)) return f;
-  }
-  return null;
-}
-
-function buildCompoundQuestion(group: number, phraseCase: CzechCase, noun: NounEntry): AgreementQuestion | null {
-  // Випадкова десятка + випадкова одиниця з групи. Узгодження веде ОДИНИЦЯ.
-  const decade = DECADE_CARDS[Math.floor(Math.random() * DECADE_CARDS.length)];
-  const units = unitCardsForGroup(group);
-  const unit = units[Math.floor(Math.random() * units.length)];
-  const allowedCases = group === 5 ? NUMERAL_CASE_ORDER : DIRECT_CASES;
-
-  const numCorrect = compoundNumeralForm(decade, unit, phraseCase, noun.gender);
-  // Клітинка іменника — за правилом ОДИНИЦІ (остання цифра диктує узгодження).
-  const cell = nounTargetCell(unit, phraseCase);
-  const nounCorrect = nounForm(noun, cell);
-  if (!numCorrect || numCorrect.includes("—") || !nounCorrect || nounCorrect === "—") return null;
-
-  const blank: "numeral" | "noun" = Math.random() < 0.5 ? "numeral" : "noun";
-  const correct = blank === "numeral" ? numCorrect : nounCorrect;
-  const distractor =
-    blank === "numeral"
-      ? compoundNumeralDistractor(decade, unit, phraseCase, noun.gender, numCorrect, allowedCases)
-      : nounDistractor(noun, cell, nounCorrect);
-  if (!distractor) return null;
-
-  const frame = CASE_FRAME[phraseCase];
-  const shownNum = blank === "numeral" ? "___" : numCorrect;
-  const shownNoun = blank === "noun" ? "___" : nounCorrect;
-  let contextPhrase: string;
-  if (frame?.prep) {
-    // Слово одразу після прийменника — десятка; вокалізацію рахуємо за її формою.
-    const decadeForm = numeralForm(decade, phraseCase, noun.gender);
-    const p = vocalize(frame.prep, decadeForm);
-    contextPhrase = `${p} ${shownNum} ${shownNoun}`;
-  } else if (frame?.pre) {
-    contextPhrase = `${frame.pre}${shownNum} ${shownNoun}`;
-  } else if (phraseCase === "akuzativ") {
-    contextPhrase = `Mám ${shownNum} ${shownNoun}`;
-  } else {
-    contextPhrase = `${shownNum} ${shownNoun}`;
-  }
-
-  const lbl = CASE_LABELS[phraseCase];
-  const genderUk: Record<Gender, string> = {
-    masc_anim: "чол. іст.", masc_inan: "чол. неіст.", fem: "жін.", neut: "сер.",
-  };
-  const taskText =
-    blank === "numeral"
-      ? `Оберіть числівник: ${lbl.uk} (${lbl.cz}) — ${lbl.question}`
-      : `Оберіть іменник: ${genderUk[noun.gender]}, ${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${
-          cell.n === "sg" ? "однина" : "множина"
-        }`;
-
-  // Промпт: складене число. Для blank=numeral показуємо УКРАЇНСЬКЕ число як
-  // орієнтир (готова чеська форма була б спойлером відповіді). Для blank=noun —
-  // чеський іменник + укр. переклад (як у простих числах).
-  const compoundUk = `${decade.uk} ${unit.uk}`;
-  const promptWord = blank === "numeral" ? compoundUk : noun.cz;
-  const promptUk = blank === "numeral" ? "" : noun.uk;
-  const promptLabel = blank === "numeral" ? "числівник" : "іменник";
-
+function compoundCombo(group: number): Combo {
+  const id = `compound-${group}`;
+  const counters = DECADE_IDS.flatMap((d) =>
+    UNIT_IDS_BY_GROUP[group].flatMap((u) =>
+      group === 1
+        ? [agreeing21Counter(card(d), card(u)), invariant21Counter(card(d), card(u))]
+        : [compoundCounter(card(d), card(u), group)]
+    )
+  );
   return {
-    // Вага — за групою останньої цифри (compound-N), НЕ за конкретним
-    // відмінком — саме так, як вирішили. Відмінок обирається випадково в
-    // enumerateCompoundCombos(), тому тут лише group, без case.
-    comboId: `compound-${group}`,
-    blank,
-    promptWord,
-    promptUk,
-    promptLabel,
-    taskText,
-    contextPhrase,
-    correct,
-    options: shuffle([correct, distractor]),
+    id,
+    wordId: id,
+    kind: "compound",
+    make: (used) => {
+      for (const c of shuffle(QUIZ_CASES))
+        for (const k of shuffle(counters)) {
+          const b = build(k, c, id, used);
+          if (b) return b;
+        }
+      return null;
+    },
   };
 }
 
-function enumerateCompoundCombos(): Combo[] {
-  const combos: Combo[] = [];
-  for (const group of [1, 2, 3, 4, 5]) {
-    const cases = group === 5 ? NUMERAL_CASE_ORDER : DIRECT_CASES;
-    // ОДНА запис на групу (не на кожен відмінок) — інакше група 5 (6 відмінків)
-    // мала б у 3 рази більше записів у пулі за групи 1-4 (2 відмінки), і
-    // пропорційна вибірка перекосила б усе на користь групи 5. Відмінок
-    // обираємо ВИПАДКОВО всередині make() — вага помилок лишається на рівні
-    // групи, як і вирішили (compound-N, без відмінка в id).
-    combos.push({
-      id: `compound-${group}`,
-      wordId: `compound-${group}`,
-      make: () => {
-        const c = cases[Math.floor(Math.random() * cases.length)];
-        const noun = PARTNER_POOL[Math.floor(Math.random() * PARTNER_POOL.length)];
-        return buildCompoundQuestion(group, c, noun);
-      },
-    });
-  }
-  return combos;
-}
-
-function enumerateAgreementCombos(): Combo[] {
-  const combos: Combo[] = [];
-  for (const card of CARDINALS) {
-    for (const c of NUMERAL_CASE_ORDER) {
-      combos.push({
-        id: comboId(card.id, c, "x"), // ваги рахуємо на рівні числівник+відмінок, незалежно від випадкового партнера/бланку
-        wordId: card.id,
-        make: () => {
-          const noun = PARTNER_POOL[Math.floor(Math.random() * PARTNER_POOL.length)];
-          return buildQuestion(card, c, noun);
-        },
-      });
+// Комбо існує, лише якщо для нього питання будується (перевірка один раз під час перелічення): інакше
+// зарезервоване під помилку комбо мовчки не з'являлося б.
+function enumerateAll(): { combos: Combo[]; dropped: string[] } {
+  const all: Combo[] = [];
+  for (const cd of CARDINALS) {
+    for (const c of QUIZ_CASES) {
+      // ваги — на рівні числівник + відмінок, незалежно від іменника й пропуску (id сумісні зі старими)
+      all.push(singleCombo(comboId(cd.id, c, "x"), cd.id, "base", simpleCounter(cd), c));
+      if ("pluralOnly" in cd && cd.pluralOnly)
+        all.push(singleCombo(comboId(cd.id, c, "pt"), cd.id, "plural-only", pluralOnlyCounter(cd, cd.pluralOnly), c));
     }
   }
-  // sto/tisíc/milion/miliarda — той самий механізм, окрема гілка побудови.
-  for (const hundred of HUNDRED_NOUNS) {
-    for (const c of NUMERAL_CASE_ORDER) {
-      combos.push({
-        id: comboId(hundred.id, c, "x"),
-        wordId: hundred.id,
-        make: () => {
-          const noun = PARTNER_POOL[Math.floor(Math.random() * PARTNER_POOL.length)];
-          return buildHundredQuestion(hundred, c, noun);
-        },
-      });
-    }
-  }
-  // Складені 21–99 (композиційно, 5 груп за останньою цифрою).
-  combos.push(...enumerateCompoundCombos());
-  return combos;
+  for (const h of HUNDRED_NOUNS) for (const c of QUIZ_CASES) all.push(singleCombo(comboId(h.id, c, "x"), h.id, "hundreds", hundredCounter(h), c));
+  for (const g of [1, 2, 3, 4, 5]) all.push(compoundCombo(g));
+  const combos = all.filter((x) => x.make(new Set()) !== null);
+  return { combos, dropped: all.filter((x) => !combos.includes(x)).map((x) => x.id) };
 }
 
-// Баланс base/compound: складені (compound) — новіша навичка, але їх лише 5
-// груп проти 32+4 простих слів; без квоти вони б випадали рідко. Floor
-// підібрано емпірично harness'ом (див. коментар нижче): compound стабільно
-// присутній, але не давить прості числа. Точне число — константа, звірена
-// прогоном тисяч раундів.
+let cached: Combo[] | null = null;
+function allNumeralCombos(): Combo[] {
+  if (!cached) {
+    const { combos, dropped } = enumerateAll();
+    if (dropped.length > 0 && typeof __DEV__ !== "undefined" && __DEV__)
+      console.warn(`numeralQuiz: ${dropped.length} комбінацій без жодного питання: ${dropped.join(", ")}`);
+    cached = combos;
+  }
+  return cached;
+}
+
+// ─────────────── Dev-перевірка даних (лише dev-збірка, нічого не блокує) ───────────────
+function devCheckData(): void {
+  const issues: string[] = [];
+  for (const c of QUIZ_CASES)
+    for (const f of NUMERAL_FRAMES[c]) {
+      const k = NOUN_POOL.filter((n) => countable(n) && matchesNeeds(n, f)).length;
+      if (k < 3) issues.push(`фраза «${f.text}» (${c}): лише ${k} іменників (потрібно ≥ 3)`);
+    }
+  for (const h of HUNDRED_NOUNS) if (h.numeralValue === undefined) issues.push(`${h.id}: немає numeralValue`);
+  if (issues.length > 0) console.warn(`numeralQuiz: ${issues.length} зауваж.:\n  ` + issues.join("\n  "));
+}
+if (typeof __DEV__ !== "undefined" && __DEV__) devCheckData();
+
+// ─────────────────── Сесія ───────────────────
+// Баланс: складених лише 5 груп проти десятків простих комбо — без мінімуму вони б випадали рідко. Форми для слів
+// лише з множиною мають 30 комбо на 2–3 іменники (brýle, kalhoty): вага 0,25 тримає їх близько одного питання на
+// два раунди, інакше ці кілька слів повторювалися б щораунду.
 const NUM_KIND_QUOTA: KindQuota<string> = {
-  kindOf: (c) => (c.id.startsWith("compound-") ? "compound" : "base"),
+  kindOf: (c) => (c as Combo).kind,
   minSlots: { compound: 2 },
+  kindWeight: { "plural-only": 0.25 },
 };
 
 export function generateNumeralAgreementSession(
   count: number,
-  pool: Combo[] = enumerateAgreementCombos(),
+  pool: Combo[] = allNumeralCombos(),
   mistakes: MistakeStore = {}
 ): AgreementQuestion[] {
   const chosen = selectRoundCombos(pool, mistakes, count, (c) => c.wordId, undefined, NUM_KIND_QUOTA);
   const questions: AgreementQuestion[] = [];
-  for (const c of chosen) {
-    const q = c.make();
-    if (q) questions.push(q);
-  }
-  // Добір, якщо якісь make() повернули null (дистрактор збігся) — інакше
-  // зарезервоване під помилку комбо може мовчки випасти без заміни.
+  const used = new Set<string>(); // іменники раунду: той самий іменник не повторюється, поки є інші
+  const take = (c: Combo) => {
+    const b = c.make(used);
+    if (!b) return;
+    used.add(b.nounId);
+    questions.push(b.q);
+  };
+  for (const c of chosen) take(c);
+  // Добір, якщо make() повернув null (не мало б статися: комбо без питань відсіяні при переліченні).
   if (questions.length < count) {
     for (const c of shuffle(pool)) {
       if (questions.length >= count) break;
-      const q = c.make();
-      if (q && !questions.some((x) => x.comboId === q.comboId)) questions.push(q);
+      if (!questions.some((x) => x.comboId === c.id)) take(c);
     }
   }
   return questions;

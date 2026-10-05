@@ -45,7 +45,8 @@ function CardFor({ kind, entry, navigation }: { kind: BrowseKind; entry: any; na
       // тапах туди-сюди, replace тримає глибину стека постійною.
       return <VerbCard entry={entry} {...p} navigation={navigation} linkMode="replace" />;
     case "cardinals":
-      return <NumeralCard entry={entry} {...p} />;
+      // navigation — клікабельні kalhoty / brýle у банері вкладки dvoje (той самий принцип, що VerbCard)
+      return <NumeralCard entry={entry} {...p} navigation={navigation} linkMode="replace" />;
     case "prepositions":
       return <PrepositionCard entry={entry} {...p} />;
     case "adverbs":

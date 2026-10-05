@@ -1396,6 +1396,40 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           { text: " змінюються за родом. jeden / jedna / jedno (чол. / жін. / сер.). dva (чол.) — але dvě (жін. і сер.): dva muži, dvě ženy, dvě auta. Слово oba (обидва) поводиться точно так само, як dva: oba (чол.) — obě (жін. і сер.): oba bratři, obě sestry, obě auta. Числівники tři, čtyři та 5+ за родом не змінюються." },
         ],
       },
+      { type: "heading", text: "Слова лише з множиною: dvoje kalhoty" },
+      {
+        type: "rich-paragraph",
+        segments: [
+          { text: "Іменники, що мають лише множину (" },
+          { word: "kalhoty", wordId: "kalhoty", kind: "nouns" },
+          { text: ", " },
+          { word: "brýle", wordId: "bryle", kind: "nouns" },
+          { text: "), рахують особливими формами — як українське «двоє штанів». Вони є на картках " },
+          { word: "jeden", wordId: "card-jeden", kind: "cardinals" },
+          { text: ", " },
+          { word: "dva", wordId: "card-dva", kind: "cardinals" },
+          { text: ", " },
+          { word: "oba", wordId: "card-oba", kind: "cardinals" },
+          { text: ", " },
+          { word: "tři", wordId: "card-tri", kind: "cardinals" },
+          { text: " і " },
+          { word: "čtyři", wordId: "card-ctyri", kind: "cardinals" },
+          { text: " (друга вкладка)." },
+        ],
+      },
+      {
+        type: "list",
+        items: [
+          { term: "1 → jedny", note: "jedny kalhoty (одні штани); із середнім родом — jedna ústa (одні уста)." },
+          { term: "2 → dvoje, обидва → oboje", note: "dvoje kalhoty (двоє штанів), oboje brýle (обидві пари окулярів)." },
+          { term: "3 → troje, 4 → čtvery", note: "troje kalhoty (троє штанів), čtvery brýle (четверо окулярів)." },
+          { term: "5 і більше → як завжди", note: "pět kalhot (п'ять штанів), šest brýlí (шість окулярів) — родовий множини." },
+        ],
+      },
+      {
+        type: "tip",
+        text: "Ці форми відмінюються як прикметники в множині: bez dvojích kalhot (без двох пар штанів), s trojími brýlemi (з трьома парами окулярів). «Dvě kalhoty» чи «tři brýle» так не кажуть.",
+      },
       { type: "heading", text: "Сотні і тисячі" },
       {
         type: "rich-paragraph",
@@ -1430,12 +1464,12 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           { word: "milion", wordId: "num-milion", kind: "nouns" },
           { text: ", " },
           { word: "miliarda", wordId: "num-miliarda", kind: "nouns" },
-          { text: " іменник-предмет стоїть у РОДОВОМУ множини: sto korun, tisíc lidí, milion obyvatel. Для tisíc/milion/miliarda це діє в усіх відмінках без винятку (k tisíci korun, o milionu lidí — іменник лишається в родовому)." },
+          { text: " іменник-предмет стоїть у РОДОВОМУ множини: sto korun (сто крон), tisíc lidí (тисяча людей), milion obyvatel (мільйон мешканців). Так само в усіх відмінках: k tisíci korun (до тисячі крон), o milionu lidí (про мільйон людей). У непрямих відмінках правильна й форма в тому самому відмінку: s třemi tisíci diváků / diváky (з трьома тисячами глядачів)." },
         ],
       },
       {
         type: "tip",
-        text: "У непрямих відмінках зі sto є й варіант з повним узгодженням (ke stu korunám), обидва нормативні. Базовий, найуживаніший спосіб — родовий іменника (ke stu korun); у сумніві обирайте його — він працює завжди.",
+        text: "Зі sto у непрямих відмінках можливі три варіанти, усі нормативні: ke stu korun, ke stu korunám і навіть незмінне ke sto korunám (до ста крон). Найпростіше — родовий іменника (ke stu korun): він працює завжди.",
       },
       { type: "heading", text: "Мільйони і мільярди" },
       {
@@ -1459,14 +1493,14 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
       {
         type: "list",
         items: [
-          { term: "…1 → як jeden", note: "dvacet jeden dům, třicet jedna žena — однина, узгоджена в роді." },
-          { term: "…2, …3, …4 → як 2-4", note: "dvacet dva domy, čtyřicet tři ženy — множина." },
-          { term: "…5–…9 → як 5+", note: "dvacet pět domů, šedesát osm žen — родовий множини." },
+          { term: "…1 → як jeden", note: "dvacet jeden dům (двадцять один будинок), třicet jedna žena (тридцять одна жінка) — однина, узгоджена в роді." },
+          { term: "…2, …3, …4 → як 2-4", note: "dvacet dva domy (двадцять два будинки), čtyřicet tři ženy (сорок три жінки) — множина." },
+          { term: "…5–…9 → як 5+", note: "dvacet pět domů (двадцять п'ять будинків), šedesát osm žen (шістдесят вісім жінок) — родовий множини." },
         ],
       },
       {
         type: "tip",
-        text: "У непрямих відмінках чисел на …5–…9 відмінюються ОБИДВІ частини: «bez čtyřiceti sedmi oken» (47), «o šedesáti osmi lidech» (68). А от для чисел на …1–…4 непрямі відмінки в реальній мові хиткі — носії часто лишають число незмінним. Тому тут досить знати називний і знахідний, а в непрямих орієнтуйся на …5+ як надійний зразок.",
+        text: "Після …1–…4 у називному й знахідному правильний і родовий множини, і він навіть уживаніший: dvacet jedna žáků (двадцять один учень), dvacet dva žáků (двадцять два учні). У непрямих відмінках чисел на …2–…9 відмінюються ОБИДВІ частини числа, а іменник стоїть у тому самому відмінку: bez čtyřiceti sedmi oken (без сорока семи вікон), o šedesáti osmi lidech (про шістдесят вісім людей), od dvaceti dvou žáků (від двадцяти двох учнів). Із …1 зазвичай кажуть dvacet jedna і відмінюють лише десяток, іменник — у множині: k dvaceti jedna žákům (до двадцяти одного учня), od dvaceti jedna žáků (від двадцяти одного учня). У розмові трапляється й зовсім незмінна форма: s dvacet dva žáky (з двадцятьма двома учнями).",
       },
       { type: "heading", text: "Як складаються великі числа" },
       {

@@ -245,7 +245,9 @@ function buildIndex(): SearchEntry[] {
   // Числівники (кількісні) — суцільний список (той самий CARDINAL_IDS, що в NumeralsScreen).
   const cardinalIds = CARDINALS.map((c) => c.id);
   for (const c of CARDINALS) {
-    push(out, c.id, "cardinals", c.cz, c.uk, [], cardinalIds, NUMERAL_CARDINAL_TITLE, "Numerals");
+    // dvoje / troje… — форми для слів лише з множиною на тій самій картці (вкладка pluralOnly)
+    const po = c.kind !== "oblique" && c.pluralOnly ? [c.pluralOnly.cz] : [];
+    push(out, c.id, "cardinals", c.cz, c.uk, po, cardinalIds, NUMERAL_CARDINAL_TITLE, "Numerals");
   }
 
   // Прийменники — фіксовані group за govCase, дуальні — одна суцільна група.

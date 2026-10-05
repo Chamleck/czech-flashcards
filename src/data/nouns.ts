@@ -38,6 +38,10 @@ import { NounEntry } from "../types";
 //     «malé děti», «modré oči»). Без цього квіз «Прикметники та займенники» склав би «ta malá děti».
 //  8. Квіз «Прикметники та займенники» теж бере іменник за тегами: у фрази (data/declensionFrames.ts) і в пари з
 //     прикметниками (поле fits у data/adjectives.ts). Після додавання прочитай і ці фрази та пари.
+//  9. Квіз «Числівники» теж бере іменник за тегами (data/numeralFrames.ts). uncountable: true — слово не рахують
+//     штуками (voda, rýže, peníze): у цей квіз воно не потрапляє. Слово лише з множиною (вся однина «—») квіз сам
+//     рахує через jedny / dvoje / troje / čtvery (поле pluralOnly у data/cardinals.ts) і через pět+: окремо нічого
+//     не позначай. Після додавання прочитай фрази цього квізу, куди слово потрапило.
 //
 export const NOUNS: NounEntry[] = [
   // ─────────────── pán (чол. істот., твердий) ───────────────
@@ -2261,7 +2265,9 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "numbers",
+    numeralValue: 100,
     sem: ["abstract"],
+    uninflectedAsNumeral: true,
     declension: {
       // Родовий множини "set" — виняток (епентетичне -e-, як okno→oken).
       nominativ: { sg: "sto", pl: "sta" },
@@ -2282,6 +2288,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "numbers",
+    numeralValue: 1000,
     sem: ["abstract"],
     declension: {
       // Родовий множини: "tisíc" (старобильна форма без закінчення) і новіша
@@ -2304,6 +2311,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "numbers",
+    numeralValue: 1_000_000,
     sem: ["abstract"],
     declension: {
       // Повністю регулярний зразок hrad (на відміну від sto/tisíc — жодних винятків).
@@ -2325,6 +2333,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "numbers",
+    numeralValue: 1_000_000_000,
     sem: ["abstract"],
     declension: {
       // Повністю регулярний зразок žena.
@@ -2658,6 +2667,8 @@ export const NOUNS: NounEntry[] = [
     pattern: "stroj",
     category: "city",
     sem: ["money"],
+    // Гроші не рахують штуками («dvoje peníze», «pět peněz» не кажуть) — рахують koruny / eura.
+    uncountable: true,
     declension: {
       // Pluralia tantum — однини НЕМАЄ взагалі ("—" у кожній клітинці sg,
       // рушій квизу (flashcardEngine.ts) явно навчений пропускати такі

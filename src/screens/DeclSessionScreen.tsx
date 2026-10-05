@@ -195,7 +195,7 @@ export function DeclSessionScreen({ route, navigation }: Props) {
       const r = resolveNumeral(current.id);
       if (!r) return null;
       if (r.cardType === "cardinal")
-        return <NumeralCard entry={r.entry as (typeof CARDINALS)[number]} {...p} />;
+        return <NumeralCard entry={r.entry as (typeof CARDINALS)[number]} {...p} navigation={navigation} />;
       if (r.cardType === "hundreds")
         return <FlashCard entry={r.entry as (typeof NOUNS)[number]} {...p} />;
       return <AdjPronounCard entry={r.entry as DeclEntry} {...p} />;
@@ -225,7 +225,7 @@ export function DeclSessionScreen({ route, navigation }: Props) {
     }
     if (isPersonal)
       return <PersonalPronounCard entry={current as (typeof PERSONAL_PRONOUNS)[number]} {...p} />;
-    if (isCardinal) return <NumeralCard entry={current as (typeof CARDINALS)[number]} {...p} />;
+    if (isCardinal) return <NumeralCard entry={current as (typeof CARDINALS)[number]} {...p} navigation={navigation} />;
     return <AdjPronounCard entry={current as DeclEntry} {...p} />;
   }
 

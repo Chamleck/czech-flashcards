@@ -3,7 +3,7 @@ import { CardinalEntry } from "../types";
 // Кількісні числівники 1–19 + круглі десятки 20–90. Форми звірено з ÚJČ
 // (prirucka.ujc.cas.cz) / czechency.org / cesky-jazyk.cz / erikahanackova /
 // umimecesky / mozaika.eu:
-//  • jeden — займенникове тверде відмінювання (як ten), лише однина;
+//  • jeden — займенникове тверде відмінювання (як ten); множина jedny — лише з pluralOnly (jedny kalhoty);
 //  • dva/oba — «двоїнне» відмінювання (dvou, dvěma; форма dvěmi НЕ існує);
 //  • tři/čtyři — за зразком kost із винятками (Gsg tří/čtyř, Isg třemi/čtyřmi);
 //  • pět–devatenáct + десятки dvacet–devadesát — лише дві форми: пряма (N/A)
@@ -15,6 +15,10 @@ import { CardinalEntry } from "../types";
 // Складені числа 21–99 (dvacet jeden…) НЕ мають окремих записів — вони
 // генеруються композиційно в квизі (desítka + jednotka), див.
 // numeralAgreementEngine.ts.
+// pluralOnly (jeden, dva, oba, tři, čtyři) — форми для іменників лише з множиною: jedny / dvoje / oboje / troje /
+// čtvery (IJP, hesla dvoje, oboje, troje, čtvery; jedny / jedna — множина в heslech jeden, jedna, jedno). Середній
+// рід відрізняється лише в jedny → jedna (називний і знахідний). Для čtvery IJP допускає й «čtvera» із середнім
+// родом — показуємо одну форму (правило про валідні варіанти), квіз «čtvera» помилкою не подає.
 
 export const CARDINALS: CardinalEntry[] = [
   // ─────────────── jeden (gendered, як ten) ───────────────
@@ -68,6 +72,26 @@ export const CARDINALS: CardinalEntry[] = [
       fem: { cz: "Mám jednu sestru.", uk: "У мене одна сестра." },
       neut: { cz: "Máme jedno auto.", uk: "У нас одне авто." },
     },
+    pluralOnly: {
+      cz: "jedny",
+      forms: {
+        nominativ: "jedny",
+        genitiv: "jedněch",
+        dativ: "jedněm",
+        akuzativ: "jedny",
+        vokativ: "—",
+        lokal: "jedněch",
+        instrumental: "jedněmi",
+      },
+      neut: { nominativ: "jedna", akuzativ: "jedna" },
+      example: { cz: "Mám jen jedny brýle.", uk: "У мене лише одні окуляри." },
+      note: "Зі словами, що мають лише множину (kalhoty, brýle), кажуть jedny: jedny kalhoty (одні штани). Із середнім родом — jedna: jedna ústa (одні уста).",
+      noteLinks: [
+        { word: "kalhoty", wordId: "kalhoty", kind: "nouns" },
+        { word: "brýle", wordId: "bryle", kind: "nouns" },
+        { word: "ústa", wordId: "usta", kind: "nouns" },
+      ],
+    },
   },
 
   // ─────────────── dva / oba (twoForm) ───────────────
@@ -91,6 +115,24 @@ export const CARDINALS: CardinalEntry[] = [
       fem: { cz: "Mám dvě sestry.", uk: "У мене дві сестри." },
       neut: { cz: "Máme dvě auta.", uk: "У нас два авто." },
     },
+    pluralOnly: {
+      cz: "dvoje",
+      forms: {
+        nominativ: "dvoje",
+        genitiv: "dvojích",
+        dativ: "dvojím",
+        akuzativ: "dvoje",
+        vokativ: "—",
+        lokal: "dvojích",
+        instrumental: "dvojími",
+      },
+      example: { cz: "Koupil jsem dvoje kalhoty.", uk: "Я купив двоє штанів." },
+      note: "Зі словами, що мають лише множину (kalhoty, brýle), замість dva / dvě кажуть dvoje: dvoje kalhoty (двоє штанів). Від п'яти — як завжди: pět kalhot (п'ять штанів).",
+      noteLinks: [
+        { word: "kalhoty", wordId: "kalhoty", kind: "nouns" },
+        { word: "brýle", wordId: "bryle", kind: "nouns" },
+      ],
+    },
   },
   {
     id: "card-oba",
@@ -112,6 +154,24 @@ export const CARDINALS: CardinalEntry[] = [
       fem: { cz: "Mám obě ruce plné.", uk: "У мене обидві руки зайняті." },
       neut: { cz: "Obě auta jsou nová.", uk: "Обидва авто нові." },
     },
+    pluralOnly: {
+      cz: "oboje",
+      forms: {
+        nominativ: "oboje",
+        genitiv: "obojích",
+        dativ: "obojím",
+        akuzativ: "oboje",
+        vokativ: "—",
+        lokal: "obojích",
+        instrumental: "obojími",
+      },
+      example: { cz: "Oboje kalhoty jsou mokré.", uk: "Обидві пари штанів мокрі." },
+      note: "Зі словами, що мають лише множину (kalhoty, brýle), замість oba / obě кажуть oboje: oboje brýle (обидві пари окулярів).",
+      noteLinks: [
+        { word: "kalhoty", wordId: "kalhoty", kind: "nouns" },
+        { word: "brýle", wordId: "bryle", kind: "nouns" },
+      ],
+    },
   },
 
   // ─────────────── tři / čtyři (invariantDecl) ───────────────
@@ -131,6 +191,24 @@ export const CARDINALS: CardinalEntry[] = [
     },
     exampleCz: "Mám tři děti.",
     exampleUk: "У мене троє дітей.",
+    pluralOnly: {
+      cz: "troje",
+      forms: {
+        nominativ: "troje",
+        genitiv: "trojích",
+        dativ: "trojím",
+        akuzativ: "troje",
+        vokativ: "—",
+        lokal: "trojích",
+        instrumental: "trojími",
+      },
+      example: { cz: "Mám troje brýle.", uk: "У мене троє окулярів." },
+      note: "Зі словами, що мають лише множину (kalhoty, brýle), замість tři кажуть troje: troje kalhoty (троє штанів). Від п'яти — як завжди: pět kalhot (п'ять штанів).",
+      noteLinks: [
+        { word: "kalhoty", wordId: "kalhoty", kind: "nouns" },
+        { word: "brýle", wordId: "bryle", kind: "nouns" },
+      ],
+    },
   },
   {
     id: "card-ctyri",
@@ -148,6 +226,24 @@ export const CARDINALS: CardinalEntry[] = [
     },
     exampleCz: "Koupil jsem čtyři knihy.",
     exampleUk: "Я купив чотири книжки.",
+    pluralOnly: {
+      cz: "čtvery",
+      forms: {
+        nominativ: "čtvery",
+        genitiv: "čtverých",
+        dativ: "čtverým",
+        akuzativ: "čtvery",
+        vokativ: "—",
+        lokal: "čtverých",
+        instrumental: "čtverými",
+      },
+      example: { cz: "Ve skříni jsou čtvery kalhoty.", uk: "У шафі четверо штанів." },
+      note: "Зі словами, що мають лише множину (kalhoty, brýle), замість čtyři кажуть čtvery: čtvery brýle (четверо окулярів). Від п'яти — як завжди: pět kalhot (п'ять штанів).",
+      noteLinks: [
+        { word: "kalhoty", wordId: "kalhoty", kind: "nouns" },
+        { word: "brýle", wordId: "bryle", kind: "nouns" },
+      ],
+    },
   },
 
   // ─────────────── pět–dvanáct (oblique) ───────────────

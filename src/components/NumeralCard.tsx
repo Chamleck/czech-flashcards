@@ -15,15 +15,25 @@ import { TileEmoji } from "./TileEmoji";
 import { GenderIcon } from "./GenderIcon";
 import { SegmentTabs } from "./SegmentTabs";
 import { Speakable } from "./Speakable";
+import { InfoBanner } from "./InfoBanner";
+import { AppNav } from "./ClickableWord";
+import { renderNoteWithLinks } from "./NoteLinks";
 
 interface Props {
   entry: CardinalEntry;
   revealed: boolean;
   onReveal: () => void;
+  // Клікабельні слова в банері вкладки jedny / dvoje… (kalhoty, brýle) — як у SimpleWordCard.
+  navigation?: AppNav;
+  linkMode?: "push" | "replace";
 }
 
+// Друга вісь картки (як ступені в AdjPronounCard чи «простір / обмін» у PrepositionCard): звичайні форми та форми
+// для іменників лише з множиною (dva → dvoje).
+type FormTab = "base" | "pluralOnly";
+
 const KIND_LABEL: Record<CardinalEntry["kind"], string> = {
-  gendered: "відмінюється за родом (як ten) · лише однина",
+  gendered: "відмінюється за родом (як ten)",
   twoForm: "особлива форма за родом (двоїна: dvěma, oběma)",
   invariantDecl: "відмінюється як kost (із винятками)",
   oblique: "дві форми: пряма (Н/З) і спільна на -i (решта)",
@@ -79,12 +89,16 @@ function CaseRow({
   );
 }
 
-export function NumeralCard({ entry, revealed, onReveal }: Props) {
+export function NumeralCard({ entry, revealed, onReveal, navigation, linkMode }: Props) {
   const [gender, setGender] = useState<Gender>("masc_anim");
+  const [formTab, setFormTab] = useState<FormTab>("base");
   const accent = theme.colors.honey;
+  const po = entry.kind !== "oblique" ? entry.pluralOnly : undefined;
+  const showPo = !!po && formTab === "pluralOnly";
 
   useEffect(() => {
     setGender("masc_anim");
+    setFormTab("base");
   }, [entry.id]);
 
   return (
@@ -123,7 +137,45 @@ export function NumeralCard({ entry, revealed, onReveal }: Props) {
             <Text style={styles.patternText}>{KIND_LABEL[entry.kind]}</Text>
           </View>
 
-          {entry.kind === "gendered" && (
+          {po && (
+            <SegmentTabs<FormTab>
+              options={["base", "pluralOnly"] as const}
+              active={formTab}
+              onSelect={setFormTab}
+              colorFor={() => accent}
+              labelFor={(v) => (v === "base" ? entry.cz : po.cz)}
+              minWidth={120}
+              flexBasis="46%"
+            />
+          )}
+
+          {showPo && po && (
+            <>
+              <InfoBanner paragraphs={[renderNoteWithLinks(po.note, po.noteLinks, navigation, linkMode)]} />
+              <View style={styles.table}>
+                {NUMERAL_CASE_ORDER.map((c) => (
+                  <CaseRow
+                    key={c}
+                    c={c}
+                    speakId={`${entry.id}:pluralOnly`}
+                    left={po.forms[c]}
+                    right={po.neut ? po.neut[c] ?? po.forms[c] : undefined}
+                    leftLabel={po.neut ? "чол. / жін." : undefined}
+                    rightLabel={po.neut ? "сер." : undefined}
+                  />
+                ))}
+              </View>
+              <View style={styles.example}>
+                <View style={styles.exampleRow}>
+                  <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
+                  <Speakable id={`${entry.id}:pluralOnly:example`} text={po.example.cz} style={styles.exampleCz} />
+                </View>
+                <Text style={styles.exampleUk}>{po.example.uk}</Text>
+              </View>
+            </>
+          )}
+
+          {!showPo && entry.kind === "gendered" && (
             <>
               <SegmentTabs
                 options={GENDER_ORDER}
@@ -146,7 +198,7 @@ export function NumeralCard({ entry, revealed, onReveal }: Props) {
             </>
           )}
 
-          {entry.kind === "twoForm" && (
+          {!showPo && entry.kind === "twoForm" && (
             <View style={styles.table}>
               {NUMERAL_CASE_ORDER.map((c) => (
                 <CaseRow
@@ -162,7 +214,7 @@ export function NumeralCard({ entry, revealed, onReveal }: Props) {
             </View>
           )}
 
-          {entry.kind === "invariantDecl" && (
+          {!showPo && entry.kind === "invariantDecl" && (
             <View style={styles.table}>
               {NUMERAL_CASE_ORDER.map((c) => (
                 <CaseRow key={c} c={c} speakId={entry.id} left={entry.forms[c]} />
@@ -194,7 +246,7 @@ export function NumeralCard({ entry, revealed, onReveal }: Props) {
             })()}
 
           {/* Приклад(и) речення */}
-          {(entry.kind === "gendered" || entry.kind === "twoForm") && (
+          {!showPo && (entry.kind === "gendered" || entry.kind === "twoForm") && (
             <View style={styles.example}>
               {(() => {
                 const ex = entry.examples[gender];
@@ -214,7 +266,7 @@ export function NumeralCard({ entry, revealed, onReveal }: Props) {
               })()}
             </View>
           )}
-          {(entry.kind === "invariantDecl" || entry.kind === "oblique") && (
+          {!showPo && (entry.kind === "invariantDecl" || entry.kind === "oblique") && (
             <View style={styles.example}>
               <View style={styles.exampleRow}>
                 <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
