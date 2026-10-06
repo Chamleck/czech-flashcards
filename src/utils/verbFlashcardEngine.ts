@@ -18,6 +18,9 @@ import {
   IMPERATIVE_LABELS,
   firstForm,
   nthForm,
+  participleFor,
+  infinitiveAfterPastPhase,
+  infinitiveAfterFuturePhase,
 } from "./verbForms";
 
 // Питання квізу дієслів. Той самий контракт полів, що й у Question іменників,
@@ -71,24 +74,29 @@ function allFormsAllTenses(v: VerbEntry): string[] {
   return tenses.flatMap((t) => allFormsInTense(v, t));
 }
 
-// Дистрактор = РЕАЛЬНА форма того ж дієслова, відмінна від правильної
-// (і візуально, не лише як рядок). Спершу інша особа того ж часу,
-// потім — будь-яка форма з інших часів.
+// Дистрактор = РЕАЛЬНА форма того ж дієслова з ІНШОЇ клітинки: спершу інша особа того ж часу, потім — будь-яка
+// форма з інших часів. Форми, що різняться лише довготою голосної (kupuji / kupují — я / вони), дозволені: це
+// реальна граматична різниця двох клітинок (рішення 2026-10-06, як ji / jí у займенниках). Пул форм бере лише
+// першу половину дублета (firstForm), тож друга половина клітинки-дублета (jsi se) дистрактором не стає.
+function usableConjugationDistractor(correct: string, d: string | null | undefined): d is string {
+  return !!d && d !== "—" && d !== correct;
+}
+
 function buildDistractor(v: VerbEntry, tense: VerbQuestion["tense"], correct: string): string | null {
   const sameTense = shuffle(allFormsInTense(v, tense));
   for (const f of sameTense) {
-    if (isUsableDistractor(correct, f)) return f;
+    if (usableConjugationDistractor(correct, f)) return f;
   }
   const allForms = shuffle(allFormsAllTenses(v));
   for (const f of allForms) {
-    if (isUsableDistractor(correct, f)) return f;
+    if (usableConjugationDistractor(correct, f)) return f;
   }
   return null;
 }
 
 // Чи знайде buildDistractor хоч щось — ті самі два кроки, без перемішування (для переліку комбінацій).
 function hasDistractor(v: VerbEntry, tense: VerbQuestion["tense"], correct: string): boolean {
-  const ok = (f: string) => isUsableDistractor(correct, f);
+  const ok = (f: string) => usableConjugationDistractor(correct, f);
   return allFormsInTense(v, tense).some(ok) || allFormsAllTenses(v).some(ok);
 }
 
@@ -118,21 +126,24 @@ type FramePosition = "initial" | "afterAdverb";
 // Macurová 2023, CASALC Review 2023-2):
 //  - "durative": обставина тривалості ("celou noc", "dvě hodiny") — з доконаним
 //    неможлива, КРІМ делімітативних (poseděl, proplakala celou noc); для таких
-//    пар питання лишається, бо вид визначає підказка (taskText);
-//    для миттєвих недоконаних (momentary) вимкнено — «celou noc přicházel» дивно;
+//    пар питання лишається, бо вид визначає підказка (taskText). Лише для
+//    недоконаних з durative: true (див. VerbEntry.durative);
 //  - "terminative": "za + час" (час до досягнення результату) — природний
 //    вибір доконаного; недоконаний змінює значення. Для делімітативних пар
 //    (delimitativePartner) вимкнено: "Poseděl jsem za minutu" неприродно;
-//  - "other": контекст завершеності/послідовності — доконаний природніший,
-//    недоконаний неприродний, але не заборонений (критерій Macurová: вибір
-//    носія).
-type FrameKind = "durative" | "terminative" | "other";
+//  - "resultative": "Zítra ___ a bude hotovo" — навмисна дія з результатом; лише
+//    для доконаних з resultative: true ("Zítra přijdu a bude hotovo" неприродно);
+//  - "other": контекст завершеності — доконаний природніший, недоконаний
+//    неприродний, але не заборонений (критерій Macurová: вибір носія).
+// Фазові фрейми ("Přestal jsem ___") — окремий тип нижче (PhasalFrame).
+type FrameKind = "durative" | "terminative" | "resultative" | "other";
 
 // Підмет типізований за часом: неіснуюче значення не скомпілюється (раніше
 // `subject: string` + касти пропустили "ja_m", і форма мовчки ставала undefined).
-type AspectFrame =
+// {V} — місце дієслова (пропуск), {O} — додаток пари (VerbEntry.complement) або нічого.
+type TextFrame =
   | {
-      text: string; // {V} — місце дієслова
+      text: string;
       tense: "future";
       subjects: readonly VerbPerson[];
       position: FramePosition;
@@ -151,64 +162,107 @@ type AspectFrame =
 const ALL_PAST: readonly PastSubject[] = PAST_SUBJECT_ORDER;
 const ALL_FUTURE: readonly VerbPerson[] = PERSON_ORDER;
 
-// Недоконаний вид — лише обставини тривалості: доконаний із ними неграматичний.
-export const IMPERF_FRAMES: AspectFrame[] = [
-  { text: "{V} celý večer.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "durative" },
-  { text: "{V} celou noc.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "durative" },
-  { text: "{V} dvě hodiny.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "durative" },
-  { text: "{V} celé odpoledne.", tense: "future", subjects: ALL_FUTURE, position: "initial", kind: "durative" },
-  { text: "{V} celý týden.", tense: "future", subjects: ALL_FUTURE, position: "initial", kind: "durative" },
+// Недоконаний вид — обставини тривалості: доконаний із ними неграматичний.
+export const IMPERF_FRAMES: TextFrame[] = [
+  { text: "{V}{O} celý večer.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "durative" },
+  { text: "{V}{O} celou noc.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "durative" },
+  { text: "{V}{O} dvě hodiny.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "durative" },
+  { text: "{V}{O} celé odpoledne.", tense: "future", subjects: ALL_FUTURE, position: "initial", kind: "durative" },
+  { text: "{V}{O} celý týden.", tense: "future", subjects: ALL_FUTURE, position: "initial", kind: "durative" },
 ];
 
 // Доконаний вид — «za + час» (результат за певний час; «Nakonec» додає ознаку
 // завершення і прибирає двозначність «за хвилину» = «через хвилину») та контексти
 // завершеності.
-export const PERF_FRAMES: AspectFrame[] = [
-  { text: "{V} za minutu.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "terminative" },
-  { text: "{V} za pět minut.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "terminative" },
-  { text: "Nakonec {V} za minutu.", tense: "past", subjects: ALL_PAST, position: "afterAdverb", kind: "terminative" },
-  { text: "Nakonec {V} za pět minut.", tense: "past", subjects: ALL_PAST, position: "afterAdverb", kind: "terminative" },
-  { text: "Konečně {V}.", tense: "past", subjects: ALL_PAST, position: "afterAdverb", kind: "other" },
-  { text: "Zítra {V} a bude hotovo.", tense: "future", subjects: ALL_FUTURE, position: "afterAdverb", kind: "other" },
+export const PERF_FRAMES: TextFrame[] = [
+  { text: "{V}{O} za minutu.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "terminative" },
+  { text: "{V}{O} za pět minut.", tense: "past", subjects: ALL_PAST, position: "initial", kind: "terminative" },
+  { text: "Nakonec {V}{O} za minutu.", tense: "past", subjects: ALL_PAST, position: "afterAdverb", kind: "terminative" },
+  { text: "Nakonec {V}{O} za pět minut.", tense: "past", subjects: ALL_PAST, position: "afterAdverb", kind: "terminative" },
+  { text: "Konečně {V}{O}.", tense: "past", subjects: ALL_PAST, position: "afterAdverb", kind: "other" },
+  { text: "Zítra {V}{O} a bude hotovo.", tense: "future", subjects: ALL_FUTURE, position: "afterAdverb", kind: "resultative" },
 ];
 
-// Форма дієслова для i-го підмета фрейму. Індекс (а не сам підмет) — щоб
-// TypeScript звужував тип підмета за frame.tense без кастів.
-// Минулий: pastForm/pastFormAfterAdverb дають дублет лише для ty+зворотне
-// ("ses / jsi se"); half обирає ОДНУ половину, спільну для обох варіантів
-// питання (інакше кнопки різнились би стилем, а не лише видом).
-// Майбутній: дублети даних ("a / b") показуються цілком — як у питаннях на
-// дієвідміну.
-function renderAspectForm(v: VerbEntry, frame: AspectFrame, i: number, half: number): string {
-  if (frame.tense === "past") {
-    const s = frame.subjects[i];
-    return nthForm(frame.position === "initial" ? pastForm(v, s) : pastFormAfterAdverb(v, s), half);
+// Фазовий фрейм: «Přestal jsem ___», «Začnu ___». Після фазового дієслова (začít, přestat) інфінітив лише
+// недоконаний (CzechEncy «Fázové sloveso»: «začne psát / *napsat», «začal blednout / *zblednout»), тож це
+// граматичне, а не лише смислове обмеження. Для недоконаних з durative: false (миттєві, стани) замість фреймів
+// тривалості. Фазові дієслова — з даних (VerbEntry.phasal), кожне в минулому і майбутньому; своєї пари фазове
+// дієслово не питає («Přestal jsem přestávat»). У пропуск іде вся група клітик + інфінітив («jsem se učit»), бо
+// se/si інфінітива стоїть на 2-му місці разом із допоміжним (і стягується: «Přestala ses učit»).
+type PhasalFrame =
+  | { phase: VerbEntry; tense: "past"; subjects: readonly PastSubject[] }
+  | { phase: VerbEntry; tense: "future"; subjects: readonly VerbPerson[] };
+
+type AspectFrame = { type: "text"; frame: TextFrame } | { type: "phasal"; frame: PhasalFrame };
+
+const PHASE_VERBS: VerbEntry[] = VERBS.filter((v) => v.phasal);
+
+function phasalFrames(testVerb: VerbEntry, partner: VerbEntry): PhasalFrame[] {
+  return PHASE_VERBS.filter((ph) => ph.id !== testVerb.id && ph.id !== partner.id).flatMap((phase): PhasalFrame[] => [
+    { phase, tense: "past", subjects: ALL_PAST },
+    { phase, tense: "future", subjects: ALL_FUTURE },
+  ]);
+}
+
+const capitalize = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
+const withSpace = (x: string | undefined) => (x ? ` ${x}` : "");
+
+// Недоконаний член пари — носій complement / phasalComplement / durative.
+function imperfectiveOf(testVerb: VerbEntry, partner: VerbEntry): VerbEntry {
+  return testVerb.aspect === "imperfective" ? testVerb : partner;
+}
+
+// Речення з пропуском + форма дієслова для i-го підмета фрейму. Індекс (а не сам підмет) — щоб TypeScript звужував
+// тип підмета за tense без кастів. Минулий: дублет лише для ty+зворотне ("ses / jsi se"); half обирає ОДНУ
+// половину, спільну для обох варіантів питання (інакше кнопки різнились би стилем, а не лише видом).
+function renderAspect(f: AspectFrame, v: VerbEntry, imp: VerbEntry, i: number, half: number): { phrase: string; form: string } {
+  if (f.type === "phasal") {
+    const fr = f.frame;
+    const tail = withSpace(imp.phasalComplement ?? imp.complement);
+    if (fr.tense === "past") {
+      const s = fr.subjects[i];
+      return { phrase: `${capitalize(participleFor(fr.phase, s))} ___${tail}.`, form: nthForm(infinitiveAfterPastPhase(v, s), half) };
+    }
+    const p = fr.subjects[i];
+    return { phrase: `${capitalize(futureForm(fr.phase, p))} ___${tail}.`, form: infinitiveAfterFuturePhase(v) };
   }
-  const p = frame.subjects[i];
-  return frame.position === "initial" ? futureForm(v, p) : futureFormAfterAdverb(v, p);
+  const fr = f.frame;
+  const phrase = fr.text.replace("{V}", "___").replace("{O}", withSpace(imp.complement));
+  if (fr.tense === "past") {
+    const s = fr.subjects[i];
+    return { phrase, form: nthForm(fr.position === "initial" ? pastForm(v, s) : pastFormAfterAdverb(v, s), half) };
+  }
+  const p = fr.subjects[i];
+  return { phrase, form: fr.position === "initial" ? futureForm(v, p) : futureFormAfterAdverb(v, p) };
 }
 
 // aspectId → сам entry (для швидкого пошуку партнера).
 const VERB_BY_ID: Record<string, VerbEntry> = Object.fromEntries(VERBS.map((v) => [v.id, v]));
 
-// Фрейми, придатні для пари:
-//  - делімітативна пара (delimitativePartner на недоконаному): відпадають "terminative";
-//  - миттєве недоконане (momentary): відпадають "durative" (див. VerbEntry.momentary);
-//    у недоконаного інших фреймів нема — воно не береться як відповідь «недоконаний».
+// Фрейми, придатні для пари (рішення — у даних, VerbEntry):
+//  - недоконане: durative → фрейми тривалості, інакше фазові;
+//  - доконане: делімітативна пара (delimitativePartner на недоконаному) — без "terminative";
+//    resultative: false — без "resultative".
 function availableAspectFrames(testVerb: VerbEntry, partner: VerbEntry): AspectFrame[] {
-  const frames = testVerb.aspect === "imperfective" ? IMPERF_FRAMES : PERF_FRAMES;
-  const delimitative = !!(testVerb.delimitativePartner || partner.delimitativePartner);
-  const momentary = !!testVerb.momentary;
-  return frames.filter(
-    (f) => !(delimitative && f.kind === "terminative") && !(momentary && f.kind === "durative")
-  );
+  const imp = imperfectiveOf(testVerb, partner);
+  if (testVerb.aspect === "imperfective") {
+    return imp.durative
+      ? IMPERF_FRAMES.map((frame) => ({ type: "text", frame }))
+      : phasalFrames(testVerb, partner).map((frame) => ({ type: "phasal", frame }));
+  }
+  const delimitative = !!imp.delimitativePartner;
+  return PERF_FRAMES.filter(
+    (f) => !(delimitative && f.kind === "terminative") && !(!testVerb.resultative && f.kind === "resultative")
+  ).map((frame) => ({ type: "text", frame }));
 }
 
 // Усі придатні (фрейм × підмет × половина дублета) для дієслова — для скрипту
 // перевірки словника (scripts/check-verb-quiz.ts). Друга половина — лише там, де
 // дублет справді є (ty+зворотне).
 interface AspectCandidate {
-  frame: AspectFrame;
+  phrase: string;
+  kind: FrameKind | "phasal";
+  tense: "past" | "future";
   subject: string;
   half: number;
   correct: string;
@@ -217,15 +271,19 @@ interface AspectCandidate {
 export function aspectCandidates(testVerb: VerbEntry): AspectCandidate[] {
   const partner = testVerb.aspectPairId ? VERB_BY_ID[testVerb.aspectPairId] : undefined;
   if (!partner) return [];
+  const imp = imperfectiveOf(testVerb, partner);
   const out: AspectCandidate[] = [];
-  for (const frame of availableAspectFrames(testVerb, partner)) {
-    for (let i = 0; i < frame.subjects.length; i++) {
-      const c0 = renderAspectForm(testVerb, frame, i, 0);
-      const d0 = renderAspectForm(partner, frame, i, 0);
-      const c1 = renderAspectForm(testVerb, frame, i, 1);
-      const d1 = renderAspectForm(partner, frame, i, 1);
-      out.push({ frame, subject: frame.subjects[i], half: 0, correct: c0, distractor: d0 });
-      if (c1 !== c0 || d1 !== d0) out.push({ frame, subject: frame.subjects[i], half: 1, correct: c1, distractor: d1 });
+  for (const f of availableAspectFrames(testVerb, partner)) {
+    const kind = f.type === "phasal" ? "phasal" : f.frame.kind;
+    const tense = f.frame.tense;
+    for (let i = 0; i < f.frame.subjects.length; i++) {
+      const subject = f.frame.subjects[i];
+      const c0 = renderAspect(f, testVerb, imp, i, 0);
+      const d0 = renderAspect(f, partner, imp, i, 0);
+      const c1 = renderAspect(f, testVerb, imp, i, 1);
+      const d1 = renderAspect(f, partner, imp, i, 1);
+      out.push({ phrase: c0.phrase, kind, tense, subject, half: 0, correct: c0.form, distractor: d0.form });
+      if (c1.form !== c0.form || d1.form !== d0.form) out.push({ phrase: c1.phrase, kind, tense, subject, half: 1, correct: c1.form, distractor: d1.form });
     }
   }
   return out;
@@ -236,6 +294,7 @@ export function aspectCandidates(testVerb: VerbEntry): AspectCandidate[] {
 function buildAspectQuestion(testVerb: VerbEntry): VerbQuestion | null {
   const partner = testVerb.aspectPairId ? VERB_BY_ID[testVerb.aspectPairId] : undefined;
   if (!partner) return null;
+  const imp = imperfectiveOf(testVerb, partner);
 
   // Половина дублета (ses / jsi se) — одна на питання: обидві кнопки в одному
   // стилі, а тренуються обидві форми (кодифікована і повна) з часом.
@@ -244,17 +303,17 @@ function buildAspectQuestion(testVerb: VerbEntry): VerbQuestion | null {
   // Рівномірно за ФРЕЙМАМИ (а не за парами фрейм×підмет — інакше фрейми з
   // меншим набором підметів майже не випадали б), потім випадковий підмет.
   // Беремо ПЕРШУ валідну пару: так floor у kindQuota реально добирається.
-  for (const frame of shuffle(availableAspectFrames(testVerb, partner))) {
-    for (const i of shuffle(frame.subjects.map((_, idx) => idx))) {
-      const correctForm = renderAspectForm(testVerb, frame, i, half);
-      const distractorForm = renderAspectForm(partner, frame, i, half);
-      if (!correctForm || !distractorForm) continue;
-      if (!isUsableDistractor(correctForm, distractorForm)) continue;
+  for (const f of shuffle(availableAspectFrames(testVerb, partner))) {
+    for (const i of shuffle(f.frame.subjects.map((_, idx) => idx))) {
+      const correct = renderAspect(f, testVerb, imp, i, half);
+      const distractorForm = renderAspect(f, partner, imp, i, half).form;
+      if (!correct.form || !distractorForm) continue;
+      if (!isUsableDistractor(correct.form, distractorForm)) continue;
 
       return {
         entry: testVerb,
-        tense: frame.tense,
-        personKey: `aspect:${frame.subjects[i]}`,
+        tense: f.frame.tense,
+        personKey: `aspect:${f.frame.subjects[i]}`,
         // comboId МУСИТЬ збігатися з id у пулі enumerateCombos (третій сегмент
         // "x", НЕ frame.tense) — інакше mistake-стор пише один id, а
         // selectRoundCombos шукає інший, і резервація помилок не працює (реальна
@@ -272,9 +331,9 @@ function buildAspectQuestion(testVerb: VerbEntry): VerbQuestion | null {
           testVerb.aspect === "imperfective"
             ? "Оберіть ВИД: дія повторювана / у процесі → недоконаний"
             : "Оберіть ВИД: дія завершена / одноразова → доконаний",
-        contextPhrase: frame.text.replace("{V}", "___"),
-        correct: correctForm,
-        options: shuffle([correctForm, distractorForm]),
+        contextPhrase: correct.phrase,
+        correct: correct.form,
+        options: shuffle([correct.form, distractorForm]),
       };
     }
   }
@@ -346,8 +405,7 @@ function enumerateCombos(pool: VerbEntry[]): Combo[] {
   // дієслово через id. tense/personKey службові — питання будує makeQuestion
   // через buildAspectQuestion (обирає фрейм випадково щоразу).
   for (const v of pool) {
-    // Лише для пар, у яких є хоч один придатний фрейм (делімітативні недоконані
-    // їх не мають — питання не вийшло б, а резерв слоту «згорав» би).
+    // Лише для пар, у яких є хоч один придатний фрейм (інакше питання не вийшло б, а резерв слоту «згорав» би).
     const partner = v.aspectPairId ? VERB_BY_ID[v.aspectPairId] : undefined;
     if (partner && availableAspectFrames(v, partner).length > 0) {
       combos.push({

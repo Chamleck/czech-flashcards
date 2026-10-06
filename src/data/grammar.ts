@@ -873,6 +873,44 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
           },
         ],
       },
+      { type: "heading", text: "Який вид обрати" },
+      {
+        type: "rich-paragraph",
+        segments: [
+          { text: "Вид обирають за змістом речення, і деякі слова прямо його підказують. Наприклад, для пари " },
+          { word: "psát", wordId: "psat", kind: "verbs" },
+          { text: " — " },
+          { word: "napsat", wordId: "napsat", kind: "verbs" },
+          { text: " (писати — написати):" },
+        ],
+      },
+      {
+        type: "rich-list",
+        items: [
+          {
+            term: [{ text: "Скільки тривала дія — недоконаний" }],
+            note: [{ text: "celou noc, celý večer, dvě hodiny: Psal jsem dopis celou noc (Я писав лист усю ніч). Доконаний napsal тут неможливий." }],
+          },
+          {
+            term: [{ text: "За скільки дію завершено — доконаний" }],
+            note: [{ text: "za + час або konečně: Napsal jsem dopis za hodinu (Я написав лист за годину), Konečně jsem napsal dopis (Нарешті я написав лист)." }],
+          },
+          {
+            term: [
+              { text: "Після " },
+              { word: "začít", wordId: "zacit", kind: "verbs" },
+              { text: " і " },
+              { word: "přestat", wordId: "prestat", kind: "verbs" },
+              { text: " — лише недоконаний" },
+            ],
+            note: [{ text: "Začal jsem vstávat brzy (Я почав вставати рано), Přestala zapomínat klíče (Вона перестала забувати ключі). Доконаний інфінітив після цих дієслів неможливий." }],
+          },
+        ],
+      },
+      {
+        type: "tip",
+        text: "Українською так само: «писав усю ніч», «написав за годину», «почав вставати» — тут можна спиратися на рідну мову.",
+      },
       { type: "heading", text: "Дієслова руху: однократні й багатократні" },
       {
         type: "paragraph",

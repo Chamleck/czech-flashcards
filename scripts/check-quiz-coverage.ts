@@ -45,7 +45,7 @@ import { CARDINALS } from "../src/data/cardinals";
 import { DATE_ORDINALS } from "../src/data/dates";
 import { NOUN_CATS_EXCLUDED_FROM_QUIZ } from "../src/data/categories";
 import { adjQuizUsable } from "../src/data/adjectiveCategories";
-import { CASE_ORDER, CzechCase, FullDeclension, Gender, GENDER_ORDER, GrammaticalNumber, NounEntry, PERSON_ORDER, PronounEntry, PronounQuiz } from "../src/types";
+import { CASE_ORDER, CzechCase, FullDeclension, Gender, GENDER_ORDER, GrammaticalNumber, NounEntry, PERSON_ORDER, PronounEntry, PronounQuiz, VerbEntry } from "../src/types";
 
 // ─────────────── Звіт ───────────────
 interface Report {
@@ -61,7 +61,6 @@ const KNOWN: { quiz: string; match: string; reason: string }[] = [
   { quiz: "Числівники", match: "порядков", reason: "порядкові числівники (první, druhý…) — у квіз «Числівники» (рішення 2026-10-06)" },
   { quiz: "Числівники", match: "card-dva instrumental чол. іст.", reason: "dva + чол. істот. іменник в орудному не трапляється — розібрати в рефакторі числівників" },
   { quiz: "Прийменники", match: "prep-v::dual-location::lokal мн.", reason: "v + місцевий множини (ve školách) — фрази лише в однині, рефактор прийменників" },
-  { quiz: "Дієслова", match: "::aspect::x", reason: "недоконані з momentary без видового питання — рефактор дієслів" },
 ];
 function gap(r: Report, quiz: string, msg: string): void {
   if (FOCUS && !FOCUS.some((p) => msg.includes(p))) return; // самоперевірка: решта слів не прогонялась
@@ -401,30 +400,85 @@ function checkPrepositions(r: Report, gen: Gen<AnyQ>): void {
 }
 
 // ═════════════ «Дієслова» ═════════════
+// Форми, що належать дієслову (окремими словами): інфінітив, дієприкметники, теперішній, майбутній, наказовий.
+function verbWords(v: VerbEntry): Set<string> {
+  const w = new Set<string>([v.cz, ...Object.values(v.pastParticiple)]);
+  for (const t of [v.present, v.future, v.imperative]) if (t) for (const f of Object.values(t)) split(f).forEach((x) => w.add(x));
+  return w;
+}
+// budu/budeš… — допоміжне складеного майбутнього недоконаного; у доконаного його немає (budu psát / napíšu).
+const BUDU = new Set(["budu", "budeš", "bude", "budeme", "budete", "budou"]);
+const DURATIVE_RE = /celý večer|celou noc|dvě hodiny|celé odpoledne|celý týden/;
+const PERFECTIVE_RE = /za minutu|za pět minut|^Konečně|a bude hotovo/;
+
+// Видове питання, незалежно від рушія: на кнопці правильної відповіді — форма тестованого дієслова (і жодної форми
+// партнера), на дистракторі — навпаки; решта слів кнопок (допоміжне, se/si) та сама, з точністю до зворотності
+// (spát / vyspat se) і budu складеного майбутнього; контекст вимагає саме вид тестованого: тривалість → недоконаний (лише durative), za + час /
+// Konečně / «a bude hotovo» → доконаний (останнє — лише resultative), фазове дієслово перед пропуском → лише
+// недоконаний ІНФІНІТИВ (дистрактор — доконаний інфінітив).
+function checkAspect(r: Report, QUIZ: string, v: VerbEntry, q: AnyQ): void {
+  const bad = (m: string) => r.errors.push(`${QUIZ}: ${q.comboId}: ${m} — «${q.contextPhrase ?? ""}» [${q.options.join(" / ")}]`);
+  const p = VERBS.find((x) => x.id === v.aspectPairId);
+  const d = distractorOf(q);
+  if (!p || !d || !q.contextPhrase) {
+    bad("немає партнера, дистрактора чи речення");
+    return;
+  }
+  const mine = verbWords(v);
+  const theirs = verbWords(p);
+  const own = (opt: string, a: Set<string>, b: Set<string>) => {
+    const t = opt.split(" ");
+    return t.some((x) => a.has(x)) && !t.some((x) => b.has(x) && !a.has(x));
+  };
+  if (!own(q.correct, mine, theirs)) bad(`правильна «${q.correct}» — не форма ${v.cz}`);
+  if (!own(d, theirs, mine)) bad(`дистрактор «${d}» — не форма ${p.cz}`);
+  const rest = (opt: string, w: Set<string>) =>
+    opt.split(" ").filter((x) => !w.has(x) && x !== "se" && x !== "si" && !BUDU.has(x)).map((x) => (x === "ses" || x === "sis" ? "jsi" : x)).join(" ");
+  if (rest(q.correct, mine) !== rest(d, theirs)) bad("кнопки різняться не лише дієсловом (допоміжне / стиль)");
+  const phase = VERBS.find((x) => x.phasal && verbWords(x).has(q.contextPhrase!.split(" ")[0].toLowerCase()));
+  if (phase) {
+    if (v.aspect !== "imperfective" || v.durative) bad("фазовий фрейм — лише для недоконаного з durative: false");
+    if (!q.correct.split(" ").includes(v.cz) || !d.split(" ").includes(p.cz)) bad("після фазового дієслова — не інфінітиви");
+    if (phase.id === v.id || phase.id === p.id) bad("фазове дієслово питає власну пару");
+  } else if (DURATIVE_RE.test(q.contextPhrase)) {
+    if (v.aspect !== "imperfective" || !v.durative) bad("тривалість — лише недоконаний з durative: true");
+  } else if (PERFECTIVE_RE.test(q.contextPhrase)) {
+    if (v.aspect !== "perfective") bad("контекст завершеності — лише доконаний");
+    if (/a bude hotovo/.test(q.contextPhrase) && !v.resultative) bad("«a bude hotovo» з resultative: false");
+  } else bad("невідомий тип видового фрейму");
+}
+
 function checkVerbs(r: Report, gen: Gen<AnyQ>): void {
   const QUIZ = "Дієслова";
   for (const v of VERBS) {
     const cells: [string, string, string | null][] = [];
     if (v.present) for (const p of PERSON_ORDER) cells.push(["present", p, presentForm(v, p)]);
     for (const p of PERSON_ORDER) cells.push(["future", p, futureForm(v, p)]);
-    for (const s of PAST_SUBJECT_ORDER) cells.push(["past", s, split(pastForm(v, s))[0] ?? null]);
+    for (const s of PAST_SUBJECT_ORDER) cells.push(["past", s, pastForm(v, s)]);
     if (v.imperative) for (const p of IMPERATIVE_ORDER) cells.push(["imperative", p, imperativeForm(v, p)]);
     else exclude(r, `${QUIZ}: наказового способу немає (moci, muset, smět, růst)`);
-    for (const [t, p, f] of cells) {
-      if (!f || f.includes("—")) continue;
+    for (const [t, p, cell] of cells) {
+      const forms = split(cell ?? undefined);
+      if (forms.length === 0) continue;
       const id = `${v.id}::${t}::${p}`;
       const qs = forced(gen, id);
       if (qs.length === 0) gap(r, QUIZ, `${id} не питається`);
       for (const q of qs) {
         basic(r, QUIZ, q);
-        if (q.correct !== f) r.errors.push(`${QUIZ}: ${id}: правильна «${q.correct}», а за даними «${f}»`);
+        if (q.correct !== forms[0]) r.errors.push(`${QUIZ}: ${id}: правильна «${q.correct}», а за даними «${forms[0]}»`);
+        const d = distractorOf(q);
+        if (d && forms.includes(d)) r.errors.push(`${QUIZ}: ${id}: дистрактор «${d}» — теж правильна форма клітинки`);
       }
     }
     if (v.aspectPairId) {
       const id = `${v.id}::aspect::x`;
-      const qs = forced(gen, id);
+      const qs: AnyQ[] = [];
+      for (let i = 0; i < 4; i++) qs.push(...forced(gen, id));
       if (qs.length === 0) gap(r, QUIZ, `${id} не питається`);
-      for (const q of qs) basic(r, QUIZ, q);
+      for (const q of qs) {
+        basic(r, QUIZ, q);
+        checkAspect(r, QUIZ, v, q);
+      }
     }
   }
 }
@@ -513,6 +567,10 @@ function selfTest(): boolean {
     { name: "зникло комбо прийменника (bez)", only: ["preps"], focus: ["prep-bez::"], gens: { preps: mutate(REAL.preps, (q) => (q.comboId.startsWith("prep-bez::") ? null : q)) } },
     { name: "числівник: зникла форма «pěti»", only: ["numerals"], focus: ["card-pet"], gens: { numerals: mutate(REAL.numerals, (q) => (q.correct === "pěti" ? null : q)) } },
     { name: "зникла форма дієслова", only: ["verbs"], focus: ["delat::"], gens: { verbs: mutate(REAL.verbs, (q) => (q.comboId === "delat::past::ja" ? null : q)) } },
+    { name: "дієслово: друга половина дублета (jsi se) як дистрактор", only: ["verbs"], focus: ["ucit-se::"], gens: { verbs: mutate(REAL.verbs, (q) => (q.comboId === "ucit-se::past::ty" ? { ...q, options: [q.correct, "učil jsi se"] } : q)) } },
+    { name: "вид: хибна правильна відповідь (psát)", only: ["verbs"], focus: ["psat::"], gens: { verbs: mutate(REAL.verbs, (q) => (q.comboId === "psat::aspect::x" ? swap(q) : q)) } },
+    { name: "вид: доконаний інфінітив після фазового (vstávat)", only: ["verbs"], focus: ["vstavat::"], gens: { verbs: mutate(REAL.verbs, (q) => (q.comboId === "vstavat::aspect::x" ? swap(q) : q)) } },
+    { name: "вид: «a bude hotovo» для resultative: false (přijít)", only: ["verbs"], focus: ["prijit::"], gens: { verbs: mutate(REAL.verbs, (q) => (q.comboId === "prijit::aspect::x" ? { ...q, contextPhrase: "Zítra ___ a bude hotovo." } : q)) } },
   ];
   let ok = true;
   for (const t of cases) {

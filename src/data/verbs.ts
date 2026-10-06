@@ -15,7 +15,7 @@ import { VerbEntry } from "../types";
 
 // ДІЄСЛОВА РУХУ: пара «однократне ↔ багатократне» (jít–chodit…) задається полем `motion`
 // ({ kind: "single" | "multi", partnerId }) на ОБОХ членах; це не видова пара, тому aspectPairId
-// і прапорці видів (momentary, delimitativePartner) тут не ставимо. Пояснення на картці будує
+// і прапорці видів (durative, delimitativePartner, resultative) тут не ставимо. Пояснення на картці будує
 // компонент сам, у aspectPairNote про рух нічого не пишемо.
 //
 // ПРАВИЛА ДОДАВАННЯ ДІЄСЛІВ (квіз і картка покладаються на них; перевіряє
@@ -25,17 +25,30 @@ import { VerbEntry } from "../types";
 //  2. Доконане ОБОВ'ЯЗКОВО має future; недоконане — present (виняток: být/jít/jet
 //     мають власне future). Забуте future дало б «budu udělat».
 //  3. Пара видів — двобічна aspectPairId.
-//  4–5. Недоконане з видовою парою ОБОВ'ЯЗКОВО має обидва рішення (без них проєкт не збереться; на доконаному
-//     й на недоконаному без пари їх поставити не можна — тип VerbEntry у types/index.ts):
+//  4. Недоконане з видовою парою ОБОВ'ЯЗКОВО має обидва рішення, доконане з парою — resultative (без них проєкт
+//     не збереться; на дієсловах без пари їх поставити не можна — тип VerbEntry у types/index.ts):
 //     delimitativePartner — true, якщо доконаний партнер делімітативний (po-/pro-: sedět → posedět, čekat → počkat);
-//     momentary — true для миттєвої зміни стану (přicházet, začínat, končit, nacházet…); тест: «Celou noc jsem ___»
-//     з однією безперервною дією звучить природно? Якщо ні — true.
+//     durative — «Celou noc / dvě hodiny jsem ___ (+ complement)» звучить природно? Якщо ні — false: миттєва зміна
+//     стану (přicházet, začínat, končit, nacházet…), стан чи сприйняття (vidět, slyšet, rozumět), дія іншого масштабу
+//     (růst, snídat) або фрейм міняє значення (stíhat = «гнатися»). Тоді замість фреймів тривалості — фазові
+//     («Přestal jsem ___», «Začal jsem ___»: після фазового дієслова лише недоконаний інфінітив);
+//     resultative (на доконаному) — «Zítra ___ a bude hotovo» звучить природно (навмисна дія з результатом)?
+//     Ні для přijít, zapomenout, uvidět, posedět… — тоді цього фрейму не буде.
+//  5. complement (недоконане з парою, необов'язкове) — додаток, спільний для обох дієслів пари в усіх видових
+//     фреймах: «Psal jsem DOPIS celou noc», «Konečně jsem napsal DOPIS». Той самий відмінок підходить обом
+//     (dívat se / podívat se NA FILM). Без займенників-клітик (to, mu): у фреймі «Konečně ___» вони стали б не
+//     на своє місце. phasalComplement — лише для фазових фреймів, замінює complement («Přestal jsem vstávat
+//     BRZY»); порожній рядок = фазовий фрейм без додатка («Přestal jsem vidět»).
+//  6. phasal: true — фазове дієслово (začít, přestat): дає фазові фрейми іншим парам; власної пари в них не
+//     питає («Přestal jsem přestávat» не буває).
+//  Прочитай речення, у які потрапляє нове дієслово (видові питання), перед здачею.
 
 export const VERBS: VerbEntry[] = [
   // ═══════════════════ I КЛАС (-e/-ě) ═══════════════════
   {
     id: "nest",
-    momentary: false,
+    durative: true,
+    complement: "tašku",
     delimitativePartner: false,
     uk: "нести",
     cz: "nést",
@@ -56,7 +69,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "brat",
-    momentary: false,
+    durative: false,
+    complement: "léky",
     delimitativePartner: false,
     uk: "брати",
     cz: "brát",
@@ -76,7 +90,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "psat",
-    momentary: false,
+    durative: true,
+    complement: "dopis",
     delimitativePartner: false,
     uk: "писати",
     cz: "psát",
@@ -96,7 +111,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "cist",
-    momentary: false,
+    durative: true,
+    complement: "knihu",
     delimitativePartner: false,
     uk: "читати",
     cz: "číst",
@@ -116,7 +132,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "pect",
-    momentary: false,
+    durative: true,
+    complement: "koláč",
     delimitativePartner: false,
     uk: "пекти",
     cz: "péct",
@@ -136,7 +153,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "pit",
-    momentary: false,
+    durative: true,
+    complement: "čaj",
     delimitativePartner: false,
     uk: "пити",
     cz: "pít",
@@ -157,7 +175,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "myt",
-    momentary: false,
+    durative: true,
+    complement: "nádobí",
     delimitativePartner: false,
     uk: "мити",
     cz: "mýt",
@@ -178,7 +197,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vest",
-    momentary: false,
+    durative: true,
+    complement: "děti domů",
     delimitativePartner: false,
     uk: "вести",
     cz: "vést",
@@ -198,7 +218,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "rust",
-    momentary: false,
+    durative: false,
     delimitativePartner: false,
     uk: "рости",
     cz: "růst",
@@ -218,6 +238,8 @@ export const VERBS: VerbEntry[] = [
   // ═══════════════════ II КЛАС (-ne) ═══════════════════
   {
     id: "zacit",
+    resultative: false,
+    phasal: true,
     uk: "почати",
     cz: "začít",
     aspect: "perfective",
@@ -234,7 +256,27 @@ export const VERBS: VerbEntry[] = [
     },
   },
   {
+    id: "prestat",
+    resultative: false,
+    phasal: true,
+    uk: "перестати",
+    cz: "přestat",
+    aspect: "perfective",
+    verbClass: "II",
+    future: { ja: "přestanu", ty: "přestaneš", on: "přestane", my: "přestaneme", vy: "přestanete", oni: "přestanou" },
+    pastParticiple: { m: "přestal", f: "přestala", n: "přestalo", manim_pl: "přestali", other_pl: "přestaly" },
+    imperative: { ty: "přestaň", vy: "přestaňte", my: "přestaňme" },
+    aspectPairNote: "недоконаний партнер: přestávat (переставати)",
+    aspectPairId: "prestavat",
+    examples: {
+      past: { cz: "Přestal jsem kouřit.", uk: "Я перестав курити." },
+      future: { cz: "Zítra přestanu kouřit.", uk: "Завтра я перестану курити." },
+      imperative: { cz: "Přestaň křičet!", uk: "Перестань кричати!" },
+    },
+  },
+  {
     id: "zapomenout",
+    resultative: false,
     uk: "забути",
     cz: "zapomenout",
     aspect: "perfective",
@@ -252,6 +294,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vstat",
+    resultative: false,
     uk: "встати",
     cz: "vstát",
     aspect: "perfective",
@@ -269,6 +312,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "obleknout-se",
+    resultative: false,
     uk: "одягнутися",
     cz: "obléknout",
     aspect: "perfective",
@@ -287,6 +331,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "sednout-si",
+    resultative: false,
     uk: "сісти",
     cz: "sednout",
     aspect: "perfective",
@@ -305,6 +350,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vzpomenout-si",
+    resultative: false,
     uk: "згадати",
     cz: "vzpomenout",
     aspect: "perfective",
@@ -323,6 +369,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "padnout",
+    resultative: false,
     uk: "впасти",
     cz: "padnout",
     aspect: "perfective",
@@ -340,7 +387,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "tisknout",
-    momentary: false,
+    durative: true,
+    complement: "dokumenty",
     delimitativePartner: false,
     uk: "тиснути / друкувати",
     cz: "tisknout",
@@ -362,7 +410,8 @@ export const VERBS: VerbEntry[] = [
   // ═══════════════════ III КЛАС (-uje/-je) ═══════════════════
   {
     id: "kupovat",
-    momentary: false,
+    durative: true,
+    complement: "dárky",
     delimitativePartner: false,
     uk: "купувати",
     cz: "kupovat",
@@ -417,7 +466,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "divat-se",
-    momentary: false,
+    durative: true,
+    complement: "na film",
     delimitativePartner: false,
     uk: "дивитися",
     cz: "dívat",
@@ -456,7 +506,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "kryt",
-    momentary: false,
+    durative: false,
+    complement: "hrnec pokličkou",
     delimitativePartner: false,
     uk: "крити / ховати",
     cz: "krýt",
@@ -494,7 +545,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "dekovat",
-    momentary: false,
+    durative: true,
+    complement: "všem",
     delimitativePartner: false,
     uk: "дякувати",
     cz: "děkovat",
@@ -532,7 +584,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "opakovat",
-    momentary: false,
+    durative: true,
+    complement: "slovíčka",
     delimitativePartner: false,
     uk: "повторювати",
     cz: "opakovat",
@@ -555,7 +608,8 @@ export const VERBS: VerbEntry[] = [
   // ═══════════════════ IV КЛАС (-í) ═══════════════════
   {
     id: "prosit",
-    momentary: false,
+    durative: true,
+    complement: "o pomoc",
     delimitativePartner: false,
     uk: "просити",
     cz: "prosit",
@@ -575,7 +629,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "mluvit",
-    momentary: false,
+    durative: true,
+    complement: "s mámou",
     delimitativePartner: true,
     uk: "говорити",
     cz: "mluvit",
@@ -595,7 +650,9 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "videt",
-    momentary: false,
+    durative: false,
+    complement: "moře",
+    phasalComplement: "",
     delimitativePartner: false,
     uk: "бачити",
     cz: "vidět",
@@ -615,7 +672,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "spat",
-    momentary: false,
+    durative: true,
     delimitativePartner: false,
     uk: "спати",
     cz: "spát",
@@ -635,7 +692,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "ucit-se",
-    momentary: false,
+    durative: true,
+    complement: "slovíčka",
     delimitativePartner: false,
     uk: "вчити / навчатися",
     cz: "učit",
@@ -656,6 +714,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vratit-se",
+    resultative: false,
     uk: "повернутися",
     cz: "vrátit",
     aspect: "perfective",
@@ -674,6 +733,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "koupit",
+    resultative: true,
     uk: "купити",
     cz: "koupit",
     aspect: "perfective",
@@ -708,7 +768,9 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "slyset",
-    momentary: false,
+    durative: false,
+    complement: "hudbu",
+    phasalComplement: "",
     delimitativePartner: false,
     uk: "чути",
     cz: "slyšet",
@@ -728,7 +790,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "sedet",
-    momentary: false,
+    durative: true,
+    complement: "s kamarády",
     delimitativePartner: true,
     uk: "сидіти",
     cz: "sedět",
@@ -748,7 +811,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "lezet",
-    momentary: false,
+    durative: true,
+    complement: "v posteli",
     delimitativePartner: true,
     uk: "лежати",
     cz: "ležet",
@@ -802,7 +866,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "platit",
-    momentary: false,
+    durative: true,
+    complement: "účty",
     delimitativePartner: false,
     uk: "платити",
     cz: "platit",
@@ -824,7 +889,8 @@ export const VERBS: VerbEntry[] = [
   // ═══════════════════ V КЛАС (-á) ═══════════════════
   {
     id: "delat",
-    momentary: false,
+    durative: true,
+    complement: "úkol",
     delimitativePartner: false,
     uk: "робити",
     cz: "dělat",
@@ -844,6 +910,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "udelat",
+    resultative: true,
     uk: "зробити",
     cz: "udělat",
     aspect: "perfective",
@@ -861,7 +928,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "cekat",
-    momentary: false,
+    durative: true,
+    complement: "na autobus",
     delimitativePartner: true,
     uk: "чекати",
     cz: "čekat",
@@ -881,7 +949,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "hrat",
-    momentary: false,
+    durative: true,
+    complement: "na kytaru",
     delimitativePartner: false,
     uk: "грати",
     cz: "hrát",
@@ -902,7 +971,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "ptat-se",
-    momentary: false,
+    durative: true,
+    complement: "na cestu",
     delimitativePartner: false,
     uk: "питати",
     cz: "ptát",
@@ -923,7 +993,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "snidat",
-    momentary: false,
+    durative: false,
     delimitativePartner: false,
     uk: "снідати",
     cz: "snídat",
@@ -943,7 +1013,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "volat",
-    momentary: false,
+    durative: true,
+    complement: "mámě",
     delimitativePartner: false,
     uk: "дзвонити / кликати",
     cz: "volat",
@@ -963,6 +1034,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zavolat",
+    resultative: true,
     uk: "подзвонити",
     cz: "zavolat",
     aspect: "perfective",
@@ -980,7 +1052,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "poslouchat",
-    momentary: false,
+    durative: true,
+    complement: "hudbu",
     delimitativePartner: false,
     uk: "слухати",
     cz: "poslouchat",
@@ -1000,7 +1073,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vstavat",
-    momentary: true,
+    durative: false,
+    phasalComplement: "brzy",
     delimitativePartner: false,
     uk: "вставати",
     cz: "vstávat",
@@ -1041,7 +1115,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zpivat",
-    momentary: false,
+    durative: true,
+    complement: "písničku",
     delimitativePartner: false,
     uk: "співати",
     cz: "zpívat",
@@ -1256,6 +1331,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vzit",
+    resultative: true,
     uk: "взяти",
     cz: "vzít",
     aspect: "perfective",
@@ -1273,6 +1349,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "stat-se",
+    resultative: false,
     uk: "статися / стати",
     cz: "stát",
     aspect: "perfective",
@@ -1314,6 +1391,7 @@ export const VERBS: VerbEntry[] = [
   // dobryslovnik.cz / Wikislovník / umimecesky.
   {
     id: "prinest",
+    resultative: true,
     uk: "принести",
     cz: "přinést",
     aspect: "perfective",
@@ -1331,6 +1409,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "napsat",
+    resultative: true,
     uk: "написати",
     cz: "napsat",
     aspect: "perfective",
@@ -1348,6 +1427,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "precist",
+    resultative: true,
     uk: "прочитати",
     cz: "přečíst",
     aspect: "perfective",
@@ -1365,6 +1445,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "upect",
+    resultative: true,
     uk: "спекти",
     cz: "upéct",
     aspect: "perfective",
@@ -1382,6 +1463,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vypit",
+    resultative: true,
     uk: "випити",
     cz: "vypít",
     aspect: "perfective",
@@ -1400,6 +1482,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "umyt",
+    resultative: true,
     uk: "вимити",
     cz: "umýt",
     aspect: "perfective",
@@ -1418,6 +1501,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "dovest",
+    resultative: true,
     uk: "довести (доправити)",
     cz: "dovést",
     aspect: "perfective",
@@ -1435,6 +1519,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vyrust",
+    resultative: false,
     uk: "вирости",
     cz: "vyrůst",
     aspect: "perfective",
@@ -1457,6 +1542,7 @@ export const VERBS: VerbEntry[] = [
   // pravidla.cz. Доконані: future замість present, значення майбутнє.
   {
     id: "podivat-se",
+    resultative: true,
     uk: "подивитися",
     cz: "podívat",
     aspect: "perfective",
@@ -1475,6 +1561,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "podekovat",
+    resultative: true,
     uk: "подякувати",
     cz: "poděkovat",
     aspect: "perfective",
@@ -1493,6 +1580,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zopakovat",
+    resultative: true,
     uk: "повторити",
     cz: "zopakovat",
     aspect: "perfective",
@@ -1511,6 +1599,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "poprosit",
+    resultative: true,
     uk: "попросити",
     cz: "poprosit",
     aspect: "perfective",
@@ -1528,6 +1617,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "promluvit",
+    resultative: true,
     uk: "заговорити",
     cz: "promluvit",
     aspect: "perfective",
@@ -1545,6 +1635,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "uvidet",
+    resultative: false,
     uk: "побачити",
     cz: "uvidět",
     aspect: "perfective",
@@ -1567,6 +1658,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "naucit-se",
+    resultative: true,
     uk: "навчитися",
     cz: "naučit",
     aspect: "perfective",
@@ -1585,6 +1677,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "uslyset",
+    resultative: false,
     uk: "почути",
     cz: "uslyšet",
     aspect: "perfective",
@@ -1605,6 +1698,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zaplatit",
+    resultative: true,
     uk: "заплатити",
     cz: "zaplatit",
     aspect: "perfective",
@@ -1622,6 +1716,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "pockat",
+    resultative: false,
     uk: "почекати",
     cz: "počkat",
     aspect: "perfective",
@@ -1639,6 +1734,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zahrat",
+    resultative: false,
     uk: "зіграти",
     cz: "zahrát",
     aspect: "perfective",
@@ -1657,6 +1753,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zeptat-se",
+    resultative: true,
     uk: "запитати",
     cz: "zeptat",
     aspect: "perfective",
@@ -1675,6 +1772,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "poslechnout-si",
+    resultative: false,
     uk: "послухати",
     cz: "poslechnout",
     aspect: "perfective",
@@ -1693,6 +1791,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zazpivat",
+    resultative: false,
     uk: "заспівати",
     cz: "zazpívat",
     aspect: "perfective",
@@ -1710,6 +1809,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vyspat-se",
+    resultative: false,
     uk: "виспатися",
     cz: "vyspat",
     aspect: "perfective",
@@ -1728,6 +1828,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "posedet",
+    resultative: false,
     uk: "посидіти",
     cz: "posedět",
     aspect: "perfective",
@@ -1745,6 +1846,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "polezet",
+    resultative: false,
     uk: "полежати",
     cz: "poležet",
     aspect: "perfective",
@@ -1762,6 +1864,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "nasnidat-se",
+    resultative: false,
     uk: "поснідати",
     cz: "nasnídat",
     aspect: "perfective",
@@ -1780,6 +1883,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zakryt",
+    resultative: true,
     uk: "закрити (накрити)",
     cz: "zakrýt",
     aspect: "perfective",
@@ -1798,6 +1902,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vytisknout",
+    resultative: true,
     uk: "надрукувати",
     cz: "vytisknout",
     aspect: "perfective",
@@ -1820,7 +1925,8 @@ export const VERBS: VerbEntry[] = [
   // в прикладі йде через budu. Форми звірено з ÚJČ / Wikislovník / dobryslovnik.
   {
     id: "zacinat",
-    momentary: true,
+    durative: false,
+    phasalComplement: "pozdě",
     delimitativePartner: false,
     uk: "починати",
     cz: "začínat",
@@ -1839,8 +1945,30 @@ export const VERBS: VerbEntry[] = [
     },
   },
   {
+    id: "prestavat",
+    durative: false,
+    phasalComplement: "věřit",
+    delimitativePartner: false,
+    uk: "переставати",
+    cz: "přestávat",
+    aspect: "imperfective",
+    verbClass: "V",
+    present: { ja: "přestávám", ty: "přestáváš", on: "přestává", my: "přestáváme", vy: "přestáváte", oni: "přestávají" },
+    pastParticiple: { m: "přestával", f: "přestávala", n: "přestávalo", manim_pl: "přestávali", other_pl: "přestávaly" },
+    imperative: { ty: "přestávej", vy: "přestávejte", my: "přestávejme" },
+    aspectPairNote: "доконаний партнер: přestat (перестати)",
+    aspectPairId: "prestat",
+    examples: {
+      present: { cz: "Nikdy nepřestává mluvit.", uk: "Він ніколи не перестає говорити." },
+      past: { cz: "Pomalu jsem přestával věřit.", uk: "Я поволі переставав вірити." },
+      future: { cz: "Nebudu přestávat cvičit.", uk: "Я не переставатиму тренуватися." },
+      imperative: { cz: "Nepřestávej se učit!", uk: "Не переставай вчитися!" },
+    },
+  },
+  {
     id: "zapominat",
-    momentary: true,
+    durative: false,
+    phasalComplement: "klíče",
     delimitativePartner: false,
     uk: "забувати",
     cz: "zapomínat",
@@ -1860,7 +1988,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "oblekat-se",
-    momentary: false,
+    durative: true,
     delimitativePartner: false,
     uk: "одягатися",
     cz: "oblékat",
@@ -1881,7 +2009,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "sedat-si",
-    momentary: true,
+    durative: false,
+    phasalComplement: "dopředu",
     delimitativePartner: false,
     uk: "сідати",
     cz: "sedat",
@@ -1902,7 +2031,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vzpominat-si",
-    momentary: false,
+    durative: true,
+    complement: "na jméno",
     delimitativePartner: false,
     uk: "згадувати",
     cz: "vzpomínat",
@@ -1923,7 +2053,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "padat",
-    momentary: false,
+    durative: false,
     delimitativePartner: false,
     uk: "падати",
     cz: "padat",
@@ -1943,7 +2073,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vracet-se",
-    momentary: false,
+    durative: true,
+    complement: "domů",
     delimitativePartner: false,
     uk: "повертатися",
     cz: "vracet",
@@ -1964,7 +2095,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "stavat-se",
-    momentary: false,
+    durative: false,
+    complement: "lepším člověkem",
     delimitativePartner: false,
     uk: "ставати (робитися)",
     cz: "stávat",
@@ -1989,7 +2121,8 @@ export const VERBS: VerbEntry[] = [
   // КОЖНОГО дієслова — урок з uvidět/uslyšet: рідковживаність ≠ відсутність форми).
   {
     id: "rikat",
-    momentary: false,
+    durative: false,
+    complement: "pravdu",
     delimitativePartner: false,
     uk: "казати",
     cz: "říkat",
@@ -2009,6 +2142,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "rict",
+    resultative: true,
     uk: "сказати",
     cz: "říct",
     aspect: "perfective",
@@ -2026,7 +2160,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "davat",
-    momentary: false,
+    durative: false,
+    complement: "dětem dárky",
     delimitativePartner: false,
     uk: "давати",
     cz: "dávat",
@@ -2046,6 +2181,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "dat",
+    resultative: true,
     uk: "дати",
     cz: "dát",
     aspect: "perfective",
@@ -2063,7 +2199,9 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "nachazet",
-    momentary: true,
+    durative: false,
+    complement: "klíče",
+    phasalComplement: "chyby",
     delimitativePartner: false,
     uk: "знаходити",
     cz: "nacházet",
@@ -2083,6 +2221,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "najit",
+    resultative: false,
     uk: "знайти",
     cz: "najít",
     aspect: "perfective",
@@ -2100,7 +2239,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "pomahat",
-    momentary: false,
+    durative: true,
+    complement: "mámě",
     delimitativePartner: false,
     uk: "допомагати",
     cz: "pomáhat",
@@ -2120,6 +2260,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "pomoct",
+    resultative: true,
     uk: "допомогти",
     cz: "pomoct",
     aspect: "perfective",
@@ -2137,7 +2278,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "oteviret",
-    momentary: true,
+    durative: false,
+    complement: "okno",
     delimitativePartner: false,
     uk: "відкривати",
     cz: "otevírat",
@@ -2157,6 +2299,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "otevrit",
+    resultative: false,
     uk: "відкрити",
     cz: "otevřít",
     aspect: "perfective",
@@ -2174,7 +2317,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zaviret",
-    momentary: true,
+    durative: false,
+    complement: "dveře",
     delimitativePartner: false,
     uk: "закривати",
     cz: "zavírat",
@@ -2194,6 +2338,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zavrit",
+    resultative: false,
     uk: "закрити",
     cz: "zavřít",
     aspect: "perfective",
@@ -2211,7 +2356,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "rozumet",
-    momentary: false,
+    durative: false,
     delimitativePartner: false,
     uk: "розуміти",
     cz: "rozumět",
@@ -2231,6 +2376,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "porozumet",
+    resultative: false,
     uk: "зрозуміти",
     cz: "porozumět",
     aspect: "perfective",
@@ -2253,7 +2399,8 @@ export const VERBS: VerbEntry[] = [
   // дієслова); rarity відзначена в примітці, форму НЕ пропущено (урок з uvidět/uslyšet).
   {
     id: "ukazovat",
-    momentary: false,
+    durative: true,
+    complement: "fotky",
     delimitativePartner: false,
     uk: "показувати",
     cz: "ukazovat",
@@ -2274,6 +2421,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "ukazat",
+    resultative: true,
     uk: "показати",
     cz: "ukázat",
     aspect: "perfective",
@@ -2291,7 +2439,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zkouset",
-    momentary: false,
+    durative: true,
+    complement: "nový recept",
     delimitativePartner: false,
     uk: "пробувати",
     cz: "zkoušet",
@@ -2311,6 +2460,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "zkusit",
+    resultative: true,
     uk: "спробувати",
     cz: "zkusit",
     aspect: "perfective",
@@ -2328,7 +2478,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "poznavat",
-    momentary: false,
+    durative: true,
+    complement: "město",
     delimitativePartner: false,
     uk: "впізнавати (знайомитися)",
     cz: "poznávat",
@@ -2348,6 +2499,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "poznat",
+    resultative: false,
     uk: "впізнати (познайомитися)",
     cz: "poznat",
     aspect: "perfective",
@@ -2368,7 +2520,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "potkavat",
-    momentary: true,
+    durative: false,
+    complement: "sousedy",
     delimitativePartner: false,
     uk: "зустрічати",
     cz: "potkávat",
@@ -2388,6 +2541,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "potkat",
+    resultative: false,
     uk: "зустріти",
     cz: "potkat",
     aspect: "perfective",
@@ -2405,7 +2559,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "koncit",
-    momentary: true,
+    durative: false,
+    phasalComplement: "pozdě",
     delimitativePartner: false,
     uk: "закінчувати",
     cz: "končit",
@@ -2425,6 +2580,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "skoncit",
+    resultative: true,
     uk: "закінчити",
     cz: "skončit",
     aspect: "perfective",
@@ -2503,7 +2659,9 @@ export const VERBS: VerbEntry[] = [
   // (як líbit se) — обидва РЕАЛЬНО атестовані (vaď!/stač!), перевірено явно, не припущено.
   {
     id: "dostavat",
-    momentary: true,
+    durative: false,
+    complement: "dopis",
+    phasalComplement: "dopisy",
     delimitativePartner: false,
     uk: "отримувати",
     cz: "dostávat",
@@ -2523,6 +2681,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "dostat",
+    resultative: false,
     uk: "отримати",
     cz: "dostat",
     aspect: "perfective",
@@ -2540,7 +2699,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "posilat",
-    momentary: false,
+    durative: true,
+    complement: "dopisy",
     delimitativePartner: false,
     uk: "надсилати",
     cz: "posílat",
@@ -2560,6 +2720,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "poslat",
+    resultative: true,
     uk: "надіслати",
     cz: "poslat",
     aspect: "perfective",
@@ -2577,7 +2738,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "rozhodovat-se",
-    momentary: false,
+    durative: true,
     delimitativePartner: false,
     uk: "вирішувати",
     cz: "rozhodovat",
@@ -2599,6 +2760,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "rozhodnout-se",
+    resultative: true,
     uk: "вирішити",
     cz: "rozhodnout",
     aspect: "perfective",
@@ -2617,7 +2779,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "omlouvat-se",
-    momentary: false,
+    durative: true,
     delimitativePartner: false,
     uk: "вибачатися",
     cz: "omlouvat",
@@ -2638,6 +2800,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "omluvit-se",
+    resultative: true,
     uk: "вибачитися",
     cz: "omluvit",
     aspect: "perfective",
@@ -2656,7 +2819,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "citit",
-    momentary: false,
+    durative: true,
+    complement: "bolest",
     delimitativePartner: false,
     uk: "відчувати",
     cz: "cítit",
@@ -2676,6 +2840,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "ucitit",
+    resultative: false,
     uk: "відчути",
     cz: "ucítit",
     aspect: "perfective",
@@ -2750,7 +2915,8 @@ export const VERBS: VerbEntry[] = [
   // ОБИДВА окремо, не екстрапольовано з одного на інше.
   {
     id: "varit",
-    momentary: false,
+    durative: true,
+    complement: "polévku",
     delimitativePartner: false,
     uk: "варити",
     cz: "vařit",
@@ -2770,6 +2936,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "uvarit",
+    resultative: true,
     uk: "зварити",
     cz: "uvařit",
     aspect: "perfective",
@@ -2787,7 +2954,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "prichazet",
-    momentary: true,
+    durative: false,
+    phasalComplement: "pozdě",
     delimitativePartner: false,
     uk: "приходити",
     cz: "přicházet",
@@ -2807,6 +2975,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "prijit",
+    resultative: false,
     uk: "прийти",
     cz: "přijít",
     aspect: "perfective",
@@ -2824,7 +2993,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "odchazet",
-    momentary: true,
+    durative: false,
+    phasalComplement: "brzy",
     delimitativePartner: false,
     uk: "відходити (йти геть)",
     cz: "odcházet",
@@ -2844,6 +3014,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "odejit",
+    resultative: false,
     uk: "піти геть",
     cz: "odejít",
     aspect: "perfective",
@@ -2861,7 +3032,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "uklizet",
-    momentary: false,
+    durative: true,
+    complement: "byt",
     delimitativePartner: false,
     uk: "прибирати",
     cz: "uklízet",
@@ -2881,6 +3053,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "uklidit",
+    resultative: true,
     uk: "прибрати",
     cz: "uklidit",
     aspect: "perfective",
@@ -2898,7 +3071,8 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "prodavat",
-    momentary: false,
+    durative: true,
+    complement: "auto",
     delimitativePartner: false,
     uk: "продавати",
     cz: "prodávat",
@@ -2918,6 +3092,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "prodat",
+    resultative: true,
     uk: "продати",
     cz: "prodat",
     aspect: "perfective",
@@ -2935,7 +3110,9 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "stihat",
-    momentary: false,
+    durative: false,
+    complement: "vlak",
+    phasalComplement: "",
     delimitativePartner: false,
     uk: "встигати",
     cz: "stíhat",
@@ -2955,6 +3132,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "stihnout",
+    resultative: false,
     uk: "встигнути",
     cz: "stihnout",
     aspect: "perfective",

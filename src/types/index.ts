@@ -615,23 +615,65 @@ interface VerbBase {
   };
 }
 
-// Вид і видова пара. Для НЕДОКОНАНОГО з видовою парою два рішення про видові питання квізу ОБОВ'ЯЗКОВІ (без них
-// проєкт не збереться), на доконаному й на недоконаному без пари їх поставити не можна:
+// Вид і видова пара. Рішення для видових питань квізу ОБОВ'ЯЗКОВІ на кожному члені пари (без них проєкт не збереться),
+// на дієсловах без пари їх поставити не можна. Правила й тести — у шапці verbs.ts.
 //  • aspectPairId — структурне посилання на id видового партнера (для квізу «обери вид за контекстом»):
 //    двонапрямне, обидва дієслова пари вказують одне на одного; немає лише в дієслів без чіткої пари
 //    (модальні, нерегулярні без партнера).
-//  • delimitativePartner — true, якщо доконаний партнер може бути ДЕЛІМІТАТИВНИМ (po-/pro-: poseděl, poležel,
-//    počkal, promluvil — «певний час»): у видових питаннях пари не буде фрейму «za + час» («Poseděl jsem za
-//    minutu» неприродно); фрейми тривалості й завершеності лишаються. Кандидатів підказує scripts/check-verb-quiz.ts.
-//  • momentary — true, якщо дієслово означає МИТТЄВУ зміну стану (přicházet, začínat, končit, nacházet…). Тест:
-//    «Celou noc jsem ___» (одна безперервна дія з одним учасником) звучить природно? Якщо ні — true. Для такого
-//    дієслова фрейми тривалості у видових питаннях вимкнено, тож як правильна відповідь «недоконаний» воно не
-//    з'являється (доконаний бік пари працює як завжди). Правило — і в шапці verbs.ts.
+//  • delimitativePartner (недоконане) — true, якщо доконаний партнер може бути ДЕЛІМІТАТИВНИМ (po-/pro-: poseděl,
+//    poležel, počkal, promluvil — «певний час»): у видових питаннях пари не буде фрейму «za + час» («Poseděl jsem za
+//    minutu» неприродно). Кандидатів підказує scripts/check-verb-quiz.ts.
+//  • durative (недоконане) — true, якщо «Celou noc / dvě hodiny jsem ___ (+ complement)» звучить природно. false —
+//    миттєва зміна стану (přicházet, začínat), стан/сприйняття (vidět, rozumět), інший масштаб (růst, snídat): тоді
+//    недоконане питають у фазових фреймах («Přestal jsem ___» — лише недоконаний інфінітив), а не у фреймах тривалості.
+//  • complement / phasalComplement (недоконане, необов'язкові) — додаток у видових фреймах, спільний для пари
+//    («Psal jsem dopis…», «Konečně jsem napsal dopis»); phasalComplement замінює його у фазових фреймах
+//    («Přestal jsem vstávat brzy»), "" — фазовий фрейм без додатка.
+//  • resultative (доконане) — true, якщо «Zítra ___ a bude hotovo» звучить природно (навмисна дія з результатом);
+//    false для přijít, zapomenout, uvidět, posedět…
+//  • phasal (доконане) — фазове дієслово (začít, přestat), з якого будуються фазові фрейми.
 export type VerbEntry = VerbBase &
   (
-    | { aspect: "perfective"; aspectPairId?: string; delimitativePartner?: never; momentary?: never }
-    | { aspect: "imperfective"; aspectPairId?: undefined; delimitativePartner?: never; momentary?: never }
-    | { aspect: "imperfective"; aspectPairId: string; delimitativePartner: boolean; momentary: boolean }
+    | {
+        aspect: "perfective";
+        aspectPairId: string;
+        resultative: boolean;
+        phasal?: true;
+        delimitativePartner?: never;
+        durative?: never;
+        complement?: never;
+        phasalComplement?: never;
+      }
+    | {
+        aspect: "perfective";
+        aspectPairId?: undefined;
+        resultative?: never;
+        phasal?: never;
+        delimitativePartner?: never;
+        durative?: never;
+        complement?: never;
+        phasalComplement?: never;
+      }
+    | {
+        aspect: "imperfective";
+        aspectPairId?: undefined;
+        resultative?: never;
+        phasal?: never;
+        delimitativePartner?: never;
+        durative?: never;
+        complement?: never;
+        phasalComplement?: never;
+      }
+    | {
+        aspect: "imperfective";
+        aspectPairId: string;
+        delimitativePartner: boolean;
+        durative: boolean;
+        complement?: string;
+        phasalComplement?: string;
+        resultative?: never;
+        phasal?: never;
+      }
   );
 
 // Параметри навігації (React Navigation, native stack)

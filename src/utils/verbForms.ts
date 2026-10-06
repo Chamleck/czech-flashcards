@@ -116,8 +116,8 @@ function auxPersonFor(s: PastSubject): VerbPerson {
   }
 }
 
-// Яку форму l-дієприкметника бере підмет.
-function participleFor(v: VerbEntry, s: PastSubject): string {
+// Яку форму l-дієприкметника бере підмет (і фазове дієслово у «Přestala ___»).
+export function participleFor(v: VerbEntry, s: PastSubject): string {
   const pp = v.pastParticiple;
   switch (s) {
     case "ja":
@@ -214,15 +214,33 @@ export function pastForm(v: VerbEntry, s: PastSubject): string {
 // stálých příklonek -li – být – se/si – zájmena). 2 ос. одн. зі зворотним —
 // стягнене ses/sis першим, повна "jsi se" — другою (дублет, як у pastForm).
 export function pastFormAfterAdverb(v: VerbEntry, s: PastSubject): string {
-  const participle = participleFor(v, s);
+  return cliticsBefore(v, s, participleFor(v, s));
+}
+
+// Клітики минулого часу підмета s (допоміжне → se/si дієслова v) перед словом head; 2 ос. одн. зі зворотним —
+// стягнене ses/sis першим, повна "jsi se" — другою (дублет).
+function cliticsBefore(v: VerbEntry, s: PastSubject, head: string): string {
   if (isTySingular(s) && v.reflexive) {
     const contracted = v.reflexive === "se" ? "ses" : "sis";
-    return `${contracted} ${participle} / jsi ${v.reflexive} ${participle}`;
+    return `${contracted} ${head} / jsi ${v.reflexive} ${head}`;
   }
   const auxP = auxPersonFor(s);
   const aux = auxP === "on" ? "" : PAST_AUX[auxP];
   const clitics = [aux, v.reflexive ?? ""].filter(Boolean).join(" ");
-  return clitics ? `${clitics} ${participle}` : participle;
+  return clitics ? `${clitics} ${head}` : head;
+}
+
+// ── Інфінітив після фазового дієслова (přestat, začít) ──
+// Минулий: «Přestal ___» — допоміжне підмета і se/si інфінітива стають на 2-ге місце, одразу після дієприкметника
+// фазового дієслова, перед інфінітивом: «Přestal jsem se učit», «Přestala ses učit / Přestala jsi se učit». Та
+// сама послідовність клітик, що в pastFormAfterAdverb, лише замість дієприкметника — інфінітив.
+export function infinitiveAfterPastPhase(v: VerbEntry, s: PastSubject): string {
+  return cliticsBefore(v, s, v.cz);
+}
+
+// Майбутній: «Přestanu ___» — se/si одразу після фазового дієслова: «Přestanu se učit».
+export function infinitiveAfterFuturePhase(v: VerbEntry): string {
+  return v.reflexive ? `${v.reflexive} ${v.cz}` : v.cz;
 }
 
 // Майбутній час після початкового прислівника: se/si ПЕРЕД дієсловом/budu.

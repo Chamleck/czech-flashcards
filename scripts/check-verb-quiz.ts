@@ -14,7 +14,8 @@
 //     половина дублета (ses / jsi se) дає дві різні форми без "undefined", обидві
 //     кнопки в одному стилі.
 //  5. Делімітативні пари: кандидати без прапорця delimitativePartner (INFO).
-//  6. Пари без жодного придатного фрейму (WARN — питань на таку пару не буде).
+//  6. Пари без жодного придатного фрейму (WARN — питань на таку пару не буде); фазові фрейми: лише недоконаний
+//     з durative: false, форма = клітики + se/si + інфінітив; фрейми тривалості й «a bude hotovo» — за прапорцями.
 //  7. Вага минулого (PAST_BASE_SHARE) у межах (0, 1].
 //  8. Підписи завдань (усі часи й особи): одна пара дужок, не довші за LABEL_MAX.
 //  9. Симуляція сесій: жодного зламаного питання.
@@ -166,6 +167,7 @@ for (const v of VERBS) {
 const ALL_FRAMES = [...IMPERF_FRAMES.map((f) => ({ f, side: "недоконаний" })), ...PERF_FRAMES.map((f) => ({ f, side: "доконаний" }))];
 for (const { f, side } of ALL_FRAMES) {
   if (f.text.split("{V}").length !== 2) err(`фрейм "${f.text}" (${side}): має бути рівно один {V}`);
+  if (f.text.split("{O}").length !== 2 || !f.text.includes("{V}{O}")) err(`фрейм "${f.text}" (${side}): {O} (додаток пари) має йти одразу після {V}`);
   if (f.position === "initial" && !f.text.startsWith("{V}")) err(`фрейм "${f.text}": position=initial, але {V} не на початку`);
   if (f.position === "afterAdverb" && !/^\S+ \{V\}/.test(f.text)) err(`фрейм "${f.text}": position=afterAdverb вимагає одного слова перед {V}`);
   if (f.subjects.length === 0) err(`фрейм "${f.text}": порожній набір підметів`);
@@ -187,7 +189,20 @@ for (const v of VERBS) {
   if (cands.length === 0) noFrames.push(`${v.cz}${v.reflexive ? " " + v.reflexive : ""} (${v.aspect})`);
   for (const c of cands) {
     candidates++;
-    const label = `${v.id} «${c.frame.text}» ${c.subject} /${c.half}`;
+    const label = `${v.id} «${c.phrase}» ${c.subject} /${c.half}`;
+    if (c.phrase.split("___").length !== 2 || /[{}]|undefined|  /.test(c.phrase)) err(`${label}: зламане речення`);
+    // Фазовий фрейм: лише недоконаний інфінітив; форма = клітики підмета + se/si + інфінітив (як після прислівника).
+    if (c.kind === "phasal") {
+      if (v.aspect !== "imperfective" || v.durative) err(`${label}: фазовий фрейм лише для недоконаного з durative: false`);
+      const p = byId[v.aspectPairId];
+      const fut = c.tense === "future";
+      const exp = (x: VerbEntry) =>
+        fut ? [x.reflexive, x.cz].filter(Boolean).join(" ") : expectedPast({ ...x, pastParticiple: Object.fromEntries(PP_KEYS.map((k) => [k, x.cz])) as unknown as PastParticiple } as VerbEntry, c.subject as PastSubject, true);
+      if (!exp(v).split(" / ").includes(c.correct)) err(`${label}: форма "${c.correct}" ≠ очікуваної "${exp(v)}"`);
+      if (!exp(p).split(" / ").includes(c.distractor)) err(`${label}: дистрактор "${c.distractor}" ≠ очікуваного "${exp(p)}"`);
+    }
+    if (c.kind === "durative" && !v.durative) err(`${label}: фрейм тривалості для durative: false`);
+    if (c.kind === "resultative" && !v.resultative) err(`${label}: «a bude hotovo» для resultative: false`);
     if (!c.correct || !c.distractor) err(`${label}: порожня форма`);
     else if (/undefined|NaN|\[object/.test(c.correct + c.distractor)) err(`${label}: зламана форма "${c.correct}" / "${c.distractor}"`);
     else if (c.correct === c.distractor) err(`${label}: однакові форми "${c.correct}"`);
@@ -198,11 +213,7 @@ for (const v of VERBS) {
     if (c.half === 1) halfPairs++;
   }
 }
-// Миттєві (momentary) недоконані НЕ мають фреймів за задумом; усі інші — мусять мати.
-const momentaryNames = VERBS.filter((v) => v.momentary).map((v) => `${v.cz}${v.reflexive ? " " + v.reflexive : ""}`);
-const unexpectedNoFrames = noFrames.filter((n) => !momentaryNames.some((m) => n.startsWith(m + " (")));
-if (unexpectedNoFrames.length > 0) warnings.push(`пари без жодного придатного фрейму (питань на них не буде): ${unexpectedNoFrames.join(", ")}`);
-infos.push(`momentary (${momentaryNames.length}, без фреймів недоконаного за задумом): ${momentaryNames.join(", ")}`);
+if (noFrames.length > 0) warnings.push(`пари без жодного придатного фрейму (питань на них не буде): ${noFrames.join(", ")}`);
 infos.push(`Кандидатів з другою половиною дублета (jsi se/si): ${halfPairs}`);
 
 for (const v of VERBS) {
