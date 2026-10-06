@@ -39,6 +39,7 @@ import { INTERROGATIVE_ADJ, INTERROGATIVE_CORE } from "../src/data/interrogative
 import { INDEFINITE_ADJ, INDEFINITE_CORE } from "../src/data/indefinitePronouns";
 import { NOUNS } from "../src/data/nouns";
 import { VERBS } from "../src/data/verbs";
+import { BYT_FUTURE } from "../src/data/auxVerbs";
 import { ADVERBS } from "../src/data/adverbs";
 import { PREPOSITIONS } from "../src/data/prepositions";
 import { CARDINALS } from "../src/data/cardinals";
@@ -407,7 +408,7 @@ function verbWords(v: VerbEntry): Set<string> {
   return w;
 }
 // budu/budeš… — допоміжне складеного майбутнього недоконаного; у доконаного його немає (budu psát / napíšu).
-const BUDU = new Set(["budu", "budeš", "bude", "budeme", "budete", "budou"]);
+const BUDU = new Set(Object.values(BYT_FUTURE));
 const DURATIVE_RE = /celý večer|celou noc|dvě hodiny|celé odpoledne|celý týden/;
 const PERFECTIVE_RE = /za minutu|za pět minut|^Konečně|a bude hotovo/;
 

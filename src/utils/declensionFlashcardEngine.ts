@@ -36,7 +36,7 @@ import {
 import type { VocalPrep } from "../data/prepositionPartners";
 import { agreementGender, candidateNumbers, freshWeightedOrder, matchesFilter, vocalDecision } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
-import { formsOf, once, shuffle, splitForms } from "./quizCommon";
+import { capitalize, formsOf, isRealOtherForm, once, shuffle, splitForms } from "./quizCommon";
 
 // ═══════════════════ КВІЗ «ПРИКМЕТНИКИ ТА ЗАЙМЕННИКИ» ═══════════════════
 // Знання — у даних: смислові теги іменників (data/nounTags.ts), fits прикметників (data/adjectives.ts), лексичні
@@ -92,7 +92,7 @@ function firstForm(cell: string): string {
 // «mé / mojí» — mojí правильне в обох. Різниця лише в довжині голосного — теж граматика (mladý / mladí, ji / jí).
 function cellUsable(target: string[], cell: string | undefined): boolean {
   const forms = formsOf(cell);
-  return forms.length > 0 && forms.every((f) => !target.includes(f));
+  return forms.length > 0 && forms.every((f) => isRealOtherForm(target[0], f, target));
 }
 
 // Усі придатні клітинки-дистрактори в порядку пріоритету: інший відмінок (той самий рід/число) → інше число →
@@ -275,10 +275,6 @@ function frameFitsWord(f: DeclFrame, t: Tested, c: QuizCase): boolean {
 
 // ─────────────── Складання фрази ───────────────
 const PREP_TOKEN = /\{([vksz])\}/;
-
-function capitalize(s: string): string {
-  return s.length > 0 && s[0] !== "_" ? s[0].toUpperCase() + s.slice(1) : s;
-}
 
 // Підставляє групу у фрейм. lead — перше слово групи після «{v}/{k}/{s}/{z}» (за ним вокалізація); null — групу
 // не можна поставити (вокалізацію для цієї групи приголосних не класифіковано, CLUSTER_RULES).

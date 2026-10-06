@@ -36,13 +36,8 @@ import {
   futureForm,
   futureFormAfterAdverb,
 } from "../src/utils/verbForms";
-import {
-  IMPERF_FRAMES,
-  PERF_FRAMES,
-  aspectCandidates,
-  generateVerbSession,
-  taskTextFor,
-} from "../src/utils/verbFlashcardEngine";
+import { IMPERF_FRAMES, PERF_FRAMES } from "../src/data/verbFrames";
+import { aspectCandidates, generateVerbSession, taskTextFor } from "../src/utils/verbFlashcardEngine";
 
 const errors: string[] = [];
 const warnings: string[] = [];
@@ -170,7 +165,6 @@ for (const { f, side } of ALL_FRAMES) {
   if (f.text.split("{O}").length !== 2 || !f.text.includes("{V}{O}")) err(`фрейм "${f.text}" (${side}): {O} (додаток пари) має йти одразу після {V}`);
   if (f.position === "initial" && !f.text.startsWith("{V}")) err(`фрейм "${f.text}": position=initial, але {V} не на початку`);
   if (f.position === "afterAdverb" && !/^\S+ \{V\}/.test(f.text)) err(`фрейм "${f.text}": position=afterAdverb вимагає одного слова перед {V}`);
-  if (f.subjects.length === 0) err(`фрейм "${f.text}": порожній набір підметів`);
 }
 
 // ── 4–6. Придатні (фрейм × підмет) для кожного дієслова з парою ──

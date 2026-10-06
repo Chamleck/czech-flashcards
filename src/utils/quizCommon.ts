@@ -56,8 +56,20 @@ export function once<T>(build: () => T): () => T {
   };
 }
 
-// Дистрактор придатний: існує (не «—»), не збігається з правильною формою, не є жодною з інших прийнятних форм
-// клітинки (accepted: дублети, variants) і відрізняється від правильної не лише довготою голосної.
+// Реальна форма ІНШОЇ клітинки: існує (не «—»), не збігається з правильною формою і не є жодною з інших прийнятних форм
+// клітинки (accepted: дублети, variants). Відмінність лише довготою голосної дозволена — там, де це граматика двох
+// клітинок (ji / jí, mladý / mladí, kupuji / kupují): adj-pron і дієвідміна дієслів.
+export function isRealOtherForm(correct: string, d: string | null | undefined, accepted: readonly string[] = []): d is string {
+  return !!d && d !== "—" && d !== correct && !accepted.includes(d);
+}
+
+// Дистрактор придатний: реальна форма іншої клітинки (isRealOtherForm), що відрізняється від правильної не лише
+// довготою голосної.
 export function isUsableDistractor(correct: string, d: string | null | undefined, accepted: readonly string[] = []): d is string {
-  return !!d && d !== "—" && d !== correct && !accepted.includes(d) && collapseVowelLength(d) !== collapseVowelLength(correct);
+  return isRealOtherForm(correct, d, accepted) && collapseVowelLength(d) !== collapseVowelLength(correct);
+}
+
+// Велика перша літера речення; фраза, що починається пропуском («___ celou noc»), лишається як є.
+export function capitalize(s: string): string {
+  return s.length > 0 && s[0] !== "_" ? s[0].toUpperCase() + s.slice(1) : s;
 }
