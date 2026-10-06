@@ -5,9 +5,9 @@ import { COLS_NP, PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { nounUsableAsPartner } from "../data/categories";
 import { validateNounSem } from "../data/nounTags";
 import { CONFUSABLE_PREP_PAIRS, DUAL_FRAMES, EXCHANGE_FRAMES, FIXED_FRAMES, Frame, Needs, PRONOUN_FRAMES } from "../data/prepositionPartners";
-import { acceptedForms, candidateNumbers, disjoint, formOf, freshWeightedOrder, matchesNeeds, vocalizedPrep } from "./partnerSelection";
+import { acceptedForms, candidateNumbers, disjoint, fitCounts, formOf, freshWeightedOrder, matchesNeeds, vocalizedPrep } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
-import { formsOf, isUsableDistractor, once, shuffle } from "./quizCommon";
+import { NUMBER_LABEL, formsOf, isUsableDistractor, once, shuffle } from "./quizCommon";
 
 // ─────────────────────────── Квіз «Прийменники» ───────────────────────────
 // Одна категорія «Флеш-картки», кілька механік (як «Числівники» / «Час і дата»):
@@ -49,7 +49,6 @@ export interface PrepQuestion {
 
 const CASES: CzechCase[] = ["nominativ", "genitiv", "dativ", "akuzativ", "lokal", "instrumental"];
 
-const NUMBER_LABEL: Record<GrammaticalNumber, string> = { sg: "однина", pl: "множина" };
 
 // Єдиний "хвіст" завдання: відмінок (укр+чес) + контрольне питання + число.
 // Той самий формат, що в квізі прикметників/займенників (consistency).
@@ -117,15 +116,8 @@ function allPools(): NounEntry[][] {
 // У скількох пулах є слово. most чи dům підходять до більшості просторових фраз і без поправки займали б помітну
 // частку всіх питань; вага 1 / fit вирівнює частку слова у квізі. Рахується з даних, тож нові слова й фрейми
 // враховуються самі.
-let fitCache: Map<string, number> | null = null;
-function fitCount(nounId: string): number {
-  if (!fitCache) {
-    const m = new Map<string, number>();
-    for (const pool of allPools()) for (const n of pool) m.set(n.id, (m.get(n.id) ?? 0) + 1);
-    fitCache = m;
-  }
-  return fitCache.get(nounId) ?? 1;
-}
+const FIT = once(() => fitCounts(PARTNER_POOL, allPools(), (n, pool) => pool.includes(n)));
+const fitCount = (nounId: string) => FIT().get(nounId) ?? 1;
 
 // Порядок перебору кандидатів: спершу слова, яких ще не було в раунді, всередині вага 1 / fit (freshWeightedOrder).
 // Перебір повний: якщо в комбо придатні лише вже використані слова, береться одне з них — питання (зокрема

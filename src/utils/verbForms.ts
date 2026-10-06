@@ -1,5 +1,6 @@
 import { VerbEntry, VerbPerson, PERSON_ORDER } from "../types";
 import { BYT_FUTURE, PAST_AUX } from "../data/auxVerbs";
+import { firstForm, splitForms } from "./quizCommon";
 
 // ─────────────────────────────────────────────────────────────
 // Єдине місце побудови фінітних форм дієслова з правильним порядком
@@ -172,15 +173,12 @@ export function futureForm(v: VerbEntry, p: VerbPerson): string {
 }
 
 // Дублетні форми зберігаються як "форма1 / форма2" (як усюди в проєкті —
-// іменники, дати). firstForm — детермінований вибір (пул дистракторів і
+// іменники, дати). firstForm (quizCommon) — детермінований вибір (пул дистракторів і
 // комбінації питань на дієвідміну), nthForm — вибір половини за індексом: ОДНУ й
 // ту саму для обох варіантів відповіді в питанні, щоб з часом траплялись обидві
 // форми, а кнопки різнились лише тим, що тестується.
-function firstForm(s: string): string {
-  return s.split(" / ")[0];
-}
 function nthForm(s: string, n: number): string {
-  const parts = s.split(" / ");
+  const parts = splitForms(s);
   return parts[Math.min(n, parts.length - 1)];
 }
 

@@ -24,15 +24,15 @@ const COLS_ONE = { a: "форма", b: "—" };
 // (IJP, heslo «on»: «Dej to jemu, ne mně»; ho, jej, mu — «v příklonné pozici»). У ji, jí, jich, jim такої різниці немає.
 type PersonalQuizPair = [string, string, string?];
 export const PERSONAL_QUIZ_FORMS: {
-  on: Record<"masc_anim" | "fem" | "neut", Partial<Record<"genitiv" | "dativ" | "akuzativ" | "lokal" | "instrumental", PersonalQuizPair>>>;
-  oni: Partial<Record<"genitiv" | "dativ" | "akuzativ" | "lokal" | "instrumental", PersonalQuizPair>>;
+  sg: Record<"masc_anim" | "fem" | "neut", Partial<Record<"genitiv" | "dativ" | "akuzativ" | "lokal" | "instrumental", PersonalQuizPair>>>;
+  pl: Partial<Record<"genitiv" | "dativ" | "akuzativ" | "lokal" | "instrumental", PersonalQuizPair>>;
 } = {
-  on: {
+  sg: {
     masc_anim: { genitiv: ["ho", "něho", "jeho"], dativ: ["mu", "němu", "jemu"], akuzativ: ["ho", "něho", "jeho"], lokal: ["—", "něm"], instrumental: ["jím", "ním"] },
     fem: { genitiv: ["jí", "ní"], dativ: ["jí", "ní"], akuzativ: ["ji", "ni"], lokal: ["—", "ní"], instrumental: ["jí", "ní"] },
     neut: { genitiv: ["ho", "něho", "jeho"], dativ: ["mu", "němu", "jemu"], akuzativ: ["ho", "ně"], lokal: ["—", "něm"], instrumental: ["jím", "ním"] },
   },
-  oni: { genitiv: ["jich", "nich"], dativ: ["jim", "nim"], akuzativ: ["je", "ně"], lokal: ["—", "nich"], instrumental: ["jimi", "nimi"] },
+  pl: { genitiv: ["jich", "nich"], dativ: ["jim", "nim"], akuzativ: ["je", "ně"], lokal: ["—", "nich"], instrumental: ["jimi", "nimi"] },
 };
 
 const d = (a: string, b: string) => ({ a, b });
@@ -140,9 +140,14 @@ const oniPl = (nom: string): PersonalDeclension => ({
   ...PL_BODY,
 });
 
-export const PERSONAL_PRONOUNS: PersonalPronounEntry[] = [
+// Особа — для квізу «Прикметники та займенники»: 1 — підмет фрази «ти» («Bojíš se mě?»), 2 і 3 — «я» («Bojím se tě»),
+// reflexive (se) — власні фрази (REFLEXIVE_FRAMES). Обов'язкова: без неї «já» потрапило б у фразу з підметом «я».
+export type PersonalQuizPronoun = PersonalPronounEntry & { person: 1 | 2 | 3 | "reflexive" };
+
+export const PERSONAL_PRONOUNS: PersonalQuizPronoun[] = [
   {
     id: "pp-ja",
+    person: 1,
     uk: "я",
     cz: "já",
     patternLabel: "особовий займенник · нерегулярне відмінювання",
@@ -154,6 +159,7 @@ export const PERSONAL_PRONOUNS: PersonalPronounEntry[] = [
   },
   {
     id: "pp-ty",
+    person: 2,
     uk: "ти",
     cz: "ty",
     patternLabel: "особовий займенник · нерегулярне відмінювання",
@@ -165,6 +171,8 @@ export const PERSONAL_PRONOUNS: PersonalPronounEntry[] = [
   },
   {
     id: "pp-on",
+    person: 3,
+    number: "sg",
     uk: "він / вона / воно",
     cz: "on / ona / ono",
     patternLabel: "особовий займенник · нерегулярне відмінювання",
@@ -185,6 +193,7 @@ export const PERSONAL_PRONOUNS: PersonalPronounEntry[] = [
   },
   {
     id: "pp-my",
+    person: 1,
     uk: "ми",
     cz: "my",
     patternLabel: "особовий займенник · нерегулярне відмінювання",
@@ -196,6 +205,7 @@ export const PERSONAL_PRONOUNS: PersonalPronounEntry[] = [
   },
   {
     id: "pp-vy",
+    person: 2,
     uk: "ви",
     cz: "vy",
     patternLabel: "особовий займенник · нерегулярне відмінювання",
@@ -207,6 +217,8 @@ export const PERSONAL_PRONOUNS: PersonalPronounEntry[] = [
   },
   {
     id: "pp-oni",
+    person: 3,
+    number: "pl",
     uk: "вони",
     cz: "oni / ony / ona",
     patternLabel: "особовий займенник · нерегулярне відмінювання",
@@ -227,6 +239,7 @@ export const PERSONAL_PRONOUNS: PersonalPronounEntry[] = [
   },
   {
     id: "pp-se",
+    person: "reflexive",
     uk: "себе (зворотний)",
     cz: "se / si",
     patternLabel: "особовий займенник · нерегулярне відмінювання",

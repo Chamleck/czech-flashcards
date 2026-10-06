@@ -9,10 +9,9 @@ import { NOUNS } from "../data/nouns";
 import { nounQuizTestable } from "../data/categories";
 import { NOUN_FRAMES, NounFrame } from "../data/nounFrames";
 import type { NounTag } from "../data/nounTags";
-import type { VocalPrep } from "../data/prepositionPartners";
-import { matchesNeeds, acceptedForms, vocalDecision, freshWeightedOrder } from "./partnerSelection";
+import { matchesNeeds, acceptedForms, freshWeightedOrder, hasNumber, pluralOnly, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
-import { formsOf, isUsableDistractor, once, shuffle, splitForms } from "./quizCommon";
+import { NUMBER_LABEL, formsOf, isUsableDistractor, once, shuffle, splitForms } from "./quizCommon";
 
 // ─────────────────── Квіз «Іменники»: форма іменника за відмінком і числом ───────────────────
 // Атомарна одиниця — «слово + відмінок + число» (comboId). Питання — речення з data/nounFrames.ts, де пропуск —
@@ -34,15 +33,9 @@ export interface Question {
   options: string[]; // [правильна, дистрактор] — вже перемішані
 }
 
-const NUMBER_LABEL: Record<GrammaticalNumber, string> = {
-  sg: "однина",
-  pl: "множина",
-};
 const NUMBERS: GrammaticalNumber[] = ["sg", "pl"];
 
 const other = (n: GrammaticalNumber): GrammaticalNumber => (n === "sg" ? "pl" : "sg");
-const hasNumber = (n: NounEntry, num: GrammaticalNumber) => n.declension.nominativ[num] !== "—";
-const pluralOnly = (n: NounEntry) => !hasNumber(n, "sg") && hasNumber(n, "pl");
 
 // ─────────────────── Які клітинки питаємо ───────────────────
 // Заголовок картки: називний однини, а для слів лише з множиною (peníze) — називний множини.
@@ -73,19 +66,6 @@ function frameFits(f: NounFrame, n: NounEntry, num: GrammaticalNumber): boolean 
   if (num === "sg") return policy !== "pl";
   if (!pluralFits(n)) return false;
   return policy !== "sg" || pluralOnly(n) || n.sem.includes("paired");
-}
-
-const PREP_SLOT = /\{([vksz])\} ___/;
-
-// Речення з формою у пропуску; null — прийменник перед пропуском вокалізується по-різному для двох кнопок
-// або вокалізацію не класифіковано (правило 4 у шапці data/nounFrames.ts).
-function render(f: NounFrame, correct: string, distractor: string): string | null {
-  const m = PREP_SLOT.exec(f.text);
-  if (!m) return f.text;
-  const prep = m[1] as VocalPrep;
-  const d = vocalDecision(prep, correct);
-  if (d === null || vocalDecision(prep, distractor) !== d) return null;
-  return f.text.replace(`{${prep}} `, d === "vocal" ? `${prep}e ` : `${prep} `);
 }
 
 // ─────────────────── Дистрактор ───────────────────
@@ -168,7 +148,9 @@ function makeQuestion(
     bare = bare ?? { q: ask(correct, ds[0]), frame: null };
     for (const f of frames) {
       for (const d of ds) {
-        const text = render(f, correct, d);
+        // null — прийменник перед пропуском вокалізується по-різному для двох кнопок або вокалізацію не
+        // класифіковано (правило 4 у шапці data/nounFrames.ts).
+        const text = vocalizeSlot(f.text, [correct, d]);
         if (text) return { q: ask(correct, d, text), frame: f.text };
       }
     }

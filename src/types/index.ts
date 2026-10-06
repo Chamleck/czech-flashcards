@@ -294,6 +294,7 @@ export interface PlainPersonalPronoun extends PersonalPronounBase {
 // У множині за родом різниться лише називний; решта форм спільні.
 export interface GenderedPersonalPronoun extends PersonalPronounBase {
   gendered: true;
+  number: GrammaticalNumber; // on/ona/ono — sg, oni/ony/ona — pl (квіз бере форми з PERSONAL_QUIZ_FORMS[number])
   declension: Record<Gender, PersonalDeclension>;
   examples: GenderExamples;
 }
@@ -333,13 +334,19 @@ export interface PluralOnlyForms {
   noteLinks?: NoteLink[]; // клікабельні слова в банері (kalhoty, brýle)
 }
 
-// 1) jeden — повна парадигма рід×відмінок (як ten). Лише однина.
-//    Використовує наявний FullDeclension, але значущі лише поля sg
-//    (pl не застосовне до "один"); заповнюємо sg=pl однаково для типобезпеки.
-export interface GenderedNumeral {
+// Спільне для кількісних числівників. value — число, яке слово називає (1 … 90); немає в oba (не число, а «обидва»).
+// З value квіз «Числівники» складає 21–99 (десяток + одиниця) — без списків id у коді.
+interface CardinalBase {
   id: string;
   uk: string;
   cz: string;
+  value?: number;
+}
+
+// 1) jeden — повна парадигма рід×відмінок (як ten). Лише однина.
+//    Використовує наявний FullDeclension, але значущі лише поля sg
+//    (pl не застосовне до "один"); заповнюємо sg=pl однаково для типобезпеки.
+export interface GenderedNumeral extends CardinalBase {
   kind: "gendered"; // jeden/jedna/jedno
   declension: FullDeclension;
   examples: GenderExamples;
@@ -348,10 +355,7 @@ export interface GenderedNumeral {
 
 // 2) dva — дві колонки за родом: masc vs fem/neut. Одна форма на відмінок.
 //    (oba/obě відмінюється ідентично — окремий запис із тією ж структурою.)
-export interface TwoFormNumeral {
-  id: string;
-  uk: string;
-  cz: string;
+export interface TwoFormNumeral extends CardinalBase {
   kind: "twoForm"; // dva/dvě, oba/obě
   // Кожен відмінок → { masc, femNeut }.
   forms: Record<CzechCase, { masc: string; femNeut: string }>;
@@ -360,10 +364,7 @@ export interface TwoFormNumeral {
 }
 
 // 3) tři, čtyři — без роду, одна колонка × відмінки (зразок kost із винятками).
-export interface InvariantDeclNumeral {
-  id: string;
-  uk: string;
-  cz: string;
+export interface InvariantDeclNumeral extends CardinalBase {
   kind: "invariantDecl"; // tři, čtyři
   forms: Record<CzechCase, string>;
   exampleCz: string;
@@ -372,10 +373,7 @@ export interface InvariantDeclNumeral {
 }
 
 // 4) pět…dvanáct — лише дві форми: пряма (N/A) + спільна на решту відмінків (-i).
-export interface ObliqueNumeral {
-  id: string;
-  uk: string;
-  cz: string;
+export interface ObliqueNumeral extends CardinalBase {
   kind: "oblique"; // pět, šest…
   direct: string; // N/A: pět
   oblique: string; // G/D/L/I: pěti

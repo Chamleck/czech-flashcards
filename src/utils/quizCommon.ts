@@ -1,3 +1,5 @@
+import type { GrammaticalNumber } from "../types";
+
 // ─────────────── Спільні допоміжні функції квізів (усі 7 движків) ───────────────
 // Чисті функції без стану, крім кешів-запам'ятовувань нижче (лише прискорення, результат той самий).
 
@@ -38,6 +40,11 @@ export function splitForms(cell: string): string[] {
   return cell.split(" / ").map((x) => x.trim());
 }
 
+// Перша (показувана) форма клітинки-дублета: «stole / stolu» → «stole».
+export function firstForm(cell: string): string {
+  return splitForms(cell)[0];
+}
+
 // Те саме для клітинки, якої може не бути: порожня або «—» (форма не існує) → [].
 export function formsOf(cell: string | undefined): string[] {
   return !cell || cell === "—" ? [] : splitForms(cell);
@@ -68,6 +75,9 @@ export function isRealOtherForm(correct: string, d: string | null | undefined, a
 export function isUsableDistractor(correct: string, d: string | null | undefined, accepted: readonly string[] = []): d is string {
   return isRealOtherForm(correct, d, accepted) && collapseVowelLength(d) !== collapseVowelLength(correct);
 }
+
+// Підпис числа в тексті завдання.
+export const NUMBER_LABEL: Record<GrammaticalNumber, string> = { sg: "однина", pl: "множина" };
 
 // Велика перша літера речення; фраза, що починається пропуском («___ celou noc»), лишається як є.
 export function capitalize(s: string): string {

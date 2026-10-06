@@ -24,6 +24,7 @@ export const CARDINALS: CardinalEntry[] = [
   // ─────────────── jeden (gendered, як ten) ───────────────
   {
     id: "card-jeden",
+    value: 1,
     uk: "один",
     cz: "jeden",
     kind: "gendered",
@@ -97,6 +98,7 @@ export const CARDINALS: CardinalEntry[] = [
   // ─────────────── dva / oba (twoForm) ───────────────
   {
     id: "card-dva",
+    value: 2,
     uk: "два",
     cz: "dva",
     kind: "twoForm",
@@ -177,6 +179,7 @@ export const CARDINALS: CardinalEntry[] = [
   // ─────────────── tři / čtyři (invariantDecl) ───────────────
   {
     id: "card-tri",
+    value: 3,
     uk: "три",
     cz: "tři",
     kind: "invariantDecl",
@@ -212,6 +215,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-ctyri",
+    value: 4,
     uk: "чотири",
     cz: "čtyři",
     kind: "invariantDecl",
@@ -249,6 +253,7 @@ export const CARDINALS: CardinalEntry[] = [
   // ─────────────── pět–dvanáct (oblique) ───────────────
   {
     id: "card-pet",
+    value: 5,
     uk: "п'ять",
     cz: "pět",
     kind: "oblique",
@@ -259,6 +264,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-sest",
+    value: 6,
     uk: "шість",
     cz: "šest",
     kind: "oblique",
@@ -269,6 +275,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-sedm",
+    value: 7,
     uk: "сім",
     cz: "sedm",
     kind: "oblique",
@@ -279,6 +286,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-osm",
+    value: 8,
     uk: "вісім",
     cz: "osm",
     kind: "oblique",
@@ -289,6 +297,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-devet",
+    value: 9,
     uk: "дев'ять",
     cz: "devět",
     kind: "oblique",
@@ -299,6 +308,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-deset",
+    value: 10,
     uk: "десять",
     cz: "deset",
     kind: "oblique",
@@ -309,6 +319,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-jedenact",
+    value: 11,
     uk: "одинадцять",
     cz: "jedenáct",
     kind: "oblique",
@@ -319,6 +330,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-dvanact",
+    value: 12,
     uk: "дванадцять",
     cz: "dvanáct",
     kind: "oblique",
@@ -329,6 +341,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-trinact",
+    value: 13,
     uk: "тринадцять",
     cz: "třináct",
     kind: "oblique",
@@ -339,6 +352,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-ctrnact",
+    value: 14,
     uk: "чотирнадцять",
     cz: "čtrnáct",
     kind: "oblique",
@@ -349,6 +363,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-patnact",
+    value: 15,
     uk: "п'ятнадцять",
     cz: "patnáct",
     kind: "oblique",
@@ -359,6 +374,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-sestnact",
+    value: 16,
     uk: "шістнадцять",
     cz: "šestnáct",
     kind: "oblique",
@@ -369,6 +385,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-sedmnact",
+    value: 17,
     uk: "сімнадцять",
     cz: "sedmnáct",
     kind: "oblique",
@@ -379,6 +396,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-osmnact",
+    value: 18,
     uk: "вісімнадцять",
     cz: "osmnáct",
     kind: "oblique",
@@ -389,6 +407,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-devatenact",
+    value: 19,
     uk: "дев'ятнадцять",
     cz: "devatenáct",
     kind: "oblique",
@@ -401,6 +420,7 @@ export const CARDINALS: CardinalEntry[] = [
   // ─────────────── круглі десятки 20–90 (oblique) ───────────────
   {
     id: "card-dvacet",
+    value: 20,
     uk: "двадцять",
     cz: "dvacet",
     kind: "oblique",
@@ -411,6 +431,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-tricet",
+    value: 30,
     uk: "тридцять",
     cz: "třicet",
     kind: "oblique",
@@ -421,6 +442,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-ctyricet",
+    value: 40,
     uk: "сорок",
     cz: "čtyřicet",
     kind: "oblique",
@@ -431,6 +453,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-padesat",
+    value: 50,
     uk: "п'ятдесят",
     cz: "padesát",
     kind: "oblique",
@@ -441,6 +464,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-sedesat",
+    value: 60,
     uk: "шістдесят",
     cz: "šedesát",
     kind: "oblique",
@@ -451,6 +475,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-sedmdesat",
+    value: 70,
     uk: "сімдесят",
     cz: "sedmdesát",
     kind: "oblique",
@@ -461,6 +486,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-osmdesat",
+    value: 80,
     uk: "вісімдесят",
     cz: "osmdesát",
     kind: "oblique",
@@ -471,6 +497,7 @@ export const CARDINALS: CardinalEntry[] = [
   },
   {
     id: "card-devadesat",
+    value: 90,
     uk: "дев'яносто",
     cz: "devadesát",
     kind: "oblique",

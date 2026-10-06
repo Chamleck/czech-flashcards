@@ -14,9 +14,9 @@ import { nounUsableAsPartner } from "../data/categories";
 import { NUMERAL_FRAMES, NumeralFrame } from "../data/numeralFrames";
 import type { QuizCase } from "../data/declensionFrames";
 import type { VocalPrep } from "../data/prepositionPartners";
-import { matchesNeeds, freshWeightedOrder, acceptedForms, formOf, vocalDecision } from "./partnerSelection";
+import { matchesNeeds, freshWeightedOrder, acceptedForms, formOf, fitCounts, hasNumber, pluralOnly, sharedVocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
-import { isUsableDistractor, once, shuffle, splitForms } from "./quizCommon";
+import { firstForm, isUsableDistractor, once, shuffle, splitForms } from "./quizCommon";
 
 // ─────────────────── Узгодження числівник + іменник ───────────────────
 // Тестує ОДНЕ з двох слів групи (числівник або іменник) у реченні з data/numeralFrames.ts; друге слово показане
@@ -49,7 +49,6 @@ export interface AgreementQuestion {
 
 const isDirect = (c: CzechCase) => c === "nominativ" || c === "akuzativ";
 const isMasc = (g: Gender) => g === "masc_anim" || g === "masc_inan";
-const hasNumber = (n: NounEntry, num: GrammaticalNumber) => n.declension.nominativ[num] !== "—";
 const QUIZ_CASES = NUMERAL_CASE_ORDER as QuizCase[];
 const GENDERS: Gender[] = ["masc_anim", "masc_inan", "fem", "neut"];
 
@@ -78,7 +77,6 @@ interface Counter {
 }
 
 const otherCases = (c: CzechCase) => shuffle(NUMERAL_CASE_ORDER.filter((x) => x !== c));
-const firstOf = (s: string) => splitForms(s)[0];
 
 // Форма простого числівника для іменника роду g (усі дублети).
 function cardinalForms(card: CardinalEntry, c: CzechCase, g: Gender): string[] {
@@ -112,7 +110,6 @@ function cardinalNounDistractors(card: CardinalEntry, c: CzechCase): Cell[] {
 }
 
 const countable = (n: NounEntry) => !n.uncountable;
-const pluralOnly = (n: NounEntry) => !hasNumber(n, "sg") && hasNumber(n, "pl");
 const bothNumbers = (n: NounEntry) => hasNumber(n, "sg") && hasNumber(n, "pl");
 
 function simpleCounter(card: CardinalEntry): Counter {
@@ -145,7 +142,7 @@ function hundredCounter(h: NounEntry): Counter {
   return {
     key: `hundred:${h.id}`,
     forms: (c) => forms(c),
-    numeral: { prompt: { word: h.cz, uk: h.uk }, distractors: (c) => otherCases(c).map((x) => firstOf(h.declension[x].sg)) },
+    numeral: { prompt: { word: h.cz, uk: h.uk }, distractors: (c) => otherCases(c).map((x) => firstForm(h.declension[x].sg)) },
     cell: () => ({ c: "genitiv", n: "pl" }),
     // «s třemi tisíci diváků / diváky» — у непрямих відмінках правильна й відмінкова shoda (IJP id=792)
     altCells: (c) => (isDirect(c) || c === "genitiv" ? [] : [{ c, n: "pl" }]),
@@ -225,7 +222,7 @@ function agreeing21Counter(decade: CardinalEntry, unit: CardinalEntry): Counter 
 }
 
 function invariant21Counter(decade: CardinalEntry, unit: CardinalEntry): Counter {
-  const one = unit.kind === "gendered" ? firstOf(unit.declension.fem.nominativ.sg) : unit.cz; // «jedna»
+  const one = unit.kind === "gendered" ? firstForm(unit.declension.fem.nominativ.sg) : unit.cz; // «jedna»
   return {
     key: "compound:1-jedna",
     forms: (c, g) => [`${cardinalForms(decade, c, g)[0]} ${one}`],
@@ -279,9 +276,7 @@ const frameFits = (f: NumeralFrame, k: Counter, n: NounEntry) =>
   matchesNeeds(n, f) && (!f.many || k.many) && (f.max === undefined || k.value <= f.max);
 
 // fit — у скількох фразах слово може з'явитися (з даних): вага 1/fit вирівнює частоту слів.
-const FIT = new Map<string, number>(
-  NOUN_POOL.map((n) => [n.id, Math.max(1, QUIZ_CASES.reduce((s, c) => s + NUMERAL_FRAMES[c].filter((f) => matchesNeeds(n, f)).length, 0))])
-);
+const FIT = fitCounts(NOUN_POOL, QUIZ_CASES.flatMap((c) => NUMERAL_FRAMES[c]), matchesNeeds);
 
 interface Candidate {
   noun: NounEntry;
@@ -304,21 +299,11 @@ function candidatesFor(k: Counter, c: QuizCase): Candidate[] {
 }
 
 const GENDER_UK: Record<Gender, string> = { masc_anim: "чол. іст.", masc_inan: "чол. неіст.", fem: "жін.", neut: "сер." };
-const PREP_SLOT = /\{([vksz])\} ___/;
-
 // Речення з групою. firstWord — перше слово групи (числівник), за ним вирішується ve/ke/se/ze; null — фраза не
 // годиться (вокалізацію не класифіковано).
 function render(f: NumeralFrame, k: Counter, group: string, firstWord: string): string | null {
-  let text = f.text;
-  if (f.verb) text = text.replace("{V}", f.verb[k.verbPl ? 1 : 0]);
-  const m = PREP_SLOT.exec(text);
-  if (m) {
-    const prep = m[1] as VocalPrep;
-    const d = vocalDecision(prep, firstWord);
-    if (d === null) return null;
-    text = text.replace(`{${prep}} `, d === "vocal" ? `${prep}e ` : `${prep} `);
-  }
-  return text.replace("___", group);
+  const text = vocalizeSlot(f.verb ? f.text.replace("{V}", f.verb[k.verbPl ? 1 : 0]) : f.text, [firstWord]);
+  return text === null ? null : text.replace("___", group);
 }
 
 interface Built {
@@ -364,10 +349,10 @@ function prepare(k: Counter, c: QuizCase, side: Side, noun: NounEntry): Prepared
 // прийменника або вокалізацію не класифіковано).
 function tryFrame(k: Counter, p: Prepared, f: NumeralFrame): { distractor: string; text: string } | null {
   // Прийменник перед пропуском-числівником: обидві кнопки мусять мати те саме ve/v («se ___» — і stem, і sta).
-  const m = PREP_SLOT.exec(f.text);
+  const m = VOCAL_PREP_TOKEN.exec(f.text);
   const distractor =
     p.side.blank === "numeral" && m
-      ? p.distractors.find((d) => vocalDecision(m[1] as VocalPrep, d.split(" ")[0]) === vocalDecision(m[1] as VocalPrep, p.firstWord))
+      ? p.distractors.find((d) => sharedVocalDecision(m[1] as VocalPrep, [p.firstWord, d.split(" ")[0]]) !== null)
       : p.distractors[0];
   if (!distractor) return null;
   const group = p.side.blank === "numeral" ? `___ ${p.nounShown}` : `${p.numShown} ___`;
@@ -446,26 +431,17 @@ function singleCombo(id: string, wordId: string, kind: NumKind, k: Counter, c: Q
 // Без окремих записів у cardinals.ts: десяток (dvacet…devadesát) + одиниця (jeden…devět). Вага помилок — за
 // ГРУПОЮ останньої цифри (compound-1 … compound-5, де 5 = «5–9»): навичка в тому, щоб упізнати правило. Відмінок,
 // десяток і одиниця обираються всередині make() випадково, перебір повний.
-const DECADE_IDS = [
-  "card-dvacet", "card-tricet", "card-ctyricet", "card-padesat",
-  "card-sedesat", "card-sedmdesat", "card-osmdesat", "card-devadesat",
-];
-const UNIT_IDS_BY_GROUP: Record<number, string[]> = {
-  1: ["card-jeden"],
-  2: ["card-dva"],
-  3: ["card-tri"],
-  4: ["card-ctyri"],
-  5: ["card-pet", "card-sest", "card-sedm", "card-osm", "card-devet"],
-};
-const card = (id: string) => CARDINALS.find((c) => c.id === id)!;
+// Складові — з даних за value: десятки 20 … 90 і одиниці 1–9; група одиниці — її значення, 5–9 разом.
+const cardinalsWhere = (pred: (v: number) => boolean) =>
+  CARDINALS.filter((c) => c.value !== undefined && pred(c.value)).sort((a, b) => (a.value ?? 0) - (b.value ?? 0));
+const DECADES = cardinalsWhere((v) => v >= 20 && v <= 90 && v % 10 === 0);
+const unitsOfGroup = (group: number) => cardinalsWhere((v) => v >= 1 && v <= 9 && Math.min(v, 5) === group);
 
 function compoundCombo(group: number): Combo {
   const id = `compound-${group}`;
-  const counters = DECADE_IDS.flatMap((d) =>
-    UNIT_IDS_BY_GROUP[group].flatMap((u) =>
-      group === 1
-        ? [agreeing21Counter(card(d), card(u)), invariant21Counter(card(d), card(u))]
-        : [compoundCounter(card(d), card(u), group)]
+  const counters = DECADES.flatMap((d) =>
+    unitsOfGroup(group).flatMap((u) =>
+      group === 1 ? [agreeing21Counter(d, u), invariant21Counter(d, u)] : [compoundCounter(d, u, group)]
     )
   );
   return {

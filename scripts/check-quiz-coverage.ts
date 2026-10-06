@@ -201,7 +201,7 @@ function checkPersonal(r: Report, gen: Gen<DeclQuestion>): void {
   const expect: { id: string; form: string; sameCase: string[]; stressed: boolean }[] = [];
   for (const e of PERSONAL_PRONOUNS) {
     if (e.gendered) {
-      const tables = e.id === "pp-oni" ? [{ part: "pl", t: PERSONAL_QUIZ_FORMS.oni }] : (["masc_anim", "fem", "neut"] as const).map((g) => ({ part: g, t: PERSONAL_QUIZ_FORMS.on[g] }));
+      const tables = e.number === "pl" ? [{ part: "pl", t: PERSONAL_QUIZ_FORMS.pl }] : (["masc_anim", "fem", "neut"] as const).map((g) => ({ part: g, t: PERSONAL_QUIZ_FORMS.sg[g] }));
       for (const { part, t } of tables)
         for (const c of PP_CASES) {
           const row = (t as Partial<Record<CzechCase, string[]>>)[c];

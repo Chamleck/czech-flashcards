@@ -26,6 +26,11 @@ export function agreementGender(n: NounEntry, num: GrammaticalNumber): Gender {
   return num === "pl" && n.plGender ? n.plGender : n.gender;
 }
 
+// Скільки фраз (чи пулів) банку квізу підходить слову — fit для ваги 1 / fit у freshWeightedOrder; мінімум 1.
+export function fitCounts<F>(nouns: readonly NounEntry[], frames: readonly F[], fits: (n: NounEntry, f: F) => boolean): Map<string, number> {
+  return new Map(nouns.map((n) => [n.id, Math.max(1, frames.filter((f) => fits(n, f)).length)]));
+}
+
 // Порядок перебору кандидатів (спільний для квізів): спершу ті, кого ще не було в раунді, всередині — зважена
 // випадкова вибірка без повернень (ключ u^fit, Efraimidis–Spirakis), тож імовірність бути першим ∝ 1 / fit. Перебір
 // повний: якщо придатні лише вже використані, береться один із них — питання не губиться.
@@ -42,7 +47,9 @@ export function pluralNatural(n: NounEntry): boolean {
   return !n.uncountable && !(n.sem ?? []).some((t) => SINGULAR_ONLY.includes(t));
 }
 
-const hasNumber = (n: NounEntry, num: GrammaticalNumber) => n.declension.nominativ[num] !== "—";
+// Чи має слово це число (клітинка називного не «—»); лише множина — peníze, brýle, kalhoty.
+export const hasNumber = (n: NounEntry, num: GrammaticalNumber) => n.declension.nominativ[num] !== "—";
+export const pluralOnly = (n: NounEntry) => !hasNumber(n, "sg") && hasNumber(n, "pl");
 
 // Які числа можна взяти для слова за політикою фрейму, у ВИПАДКОВОМУ порядку (перебирає той, хто викликає:
 // якщо перше число не дає контрасту форм, пробуємо друге — слово не карається за невдалий жереб).
@@ -114,4 +121,28 @@ export function vocalizedPrep(prep: { cz: string; vocalized?: string }, word: st
   const d = vocalDecision(prep.cz as VocalPrep, word);
   if (d === null) return null;
   return d === "vocal" ? prep.vocalized : prep.cz;
+}
+
+// ─────────────── Вокалізація прийменника у фразі ({v} {k} {s} {z} у даних фраз) ───────────────
+export const VOCAL_PREP_TOKEN = /\{([vksz])\}/;
+
+// Одне рішення ve / v для всіх слів (обидві кнопки, перше слово групи); null — хоч одне не класифіковане
+// (CLUSTER_RULES) або слова вимагають різного (тоді прийменник підказав би відповідь).
+export function sharedVocalDecision(prep: VocalPrep, words: readonly string[]): VocalDecision | null {
+  let d: VocalDecision | null = null;
+  for (const w of words) {
+    const x = vocalDecision(prep, w);
+    if (x === null || (d !== null && x !== d)) return null;
+    d = x;
+  }
+  return d;
+}
+
+// Підставляє перший {v}/{k}/{s}/{z} фрази як ve / v за словами words; фраза без прийменника — як є; null — не можна.
+export function vocalizeSlot(text: string, words: readonly string[]): string | null {
+  const m = VOCAL_PREP_TOKEN.exec(text);
+  if (!m) return text;
+  const d = sharedVocalDecision(m[1] as VocalPrep, words);
+  if (d === null) return null;
+  return text.replace(m[0], d === "vocal" ? `${m[1]}e` : m[1]);
 }

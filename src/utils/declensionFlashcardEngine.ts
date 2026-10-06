@@ -34,9 +34,9 @@ import {
   REFLEXIVE_FRAMES,
 } from "../data/declensionFrames";
 import type { VocalPrep } from "../data/prepositionPartners";
-import { agreementGender, candidateNumbers, freshWeightedOrder, matchesFilter, vocalDecision } from "./partnerSelection";
+import { agreementGender, candidateNumbers, fitCounts, freshWeightedOrder, matchesFilter, sharedVocalDecision, vocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
-import { capitalize, formsOf, isRealOtherForm, once, shuffle, splitForms } from "./quizCommon";
+import { NUMBER_LABEL, capitalize, firstForm, formsOf, isRealOtherForm, once, shuffle } from "./quizCommon";
 
 // ═══════════════════ КВІЗ «ПРИКМЕТНИКИ ТА ЗАЙМЕННИКИ» ═══════════════════
 // Знання — у даних: смислові теги іменників (data/nounTags.ts), fits прикметників (data/adjectives.ts), лексичні
@@ -77,15 +77,10 @@ export interface DeclQuestion {
 // Вокатив не тестуємо: у займенників це "—", у прикметників він дублює називний.
 const QUIZ_CASES = CASE_ORDER.filter((c) => c !== "vokativ") as QuizCase[];
 const NUMBERS: GrammaticalNumber[] = ["sg", "pl"];
-const NUMBER_LABEL: Record<GrammaticalNumber, string> = { sg: "однина", pl: "множина" };
 const BLANK = "___";
 
 function randomOf<T>(arr: T[]): T | null {
   return arr.length === 0 ? null : arr[Math.floor(Math.random() * arr.length)];
-}
-
-function firstForm(cell: string): string {
-  return splitForms(cell)[0];
 }
 
 // Клітинка-дистрактор придатна, якщо ЖОДНА її форма не є прийнятною формою цілі: «mou / mojí» не дистрактор до
@@ -154,12 +149,11 @@ const ownerless = (f: DeclFrame, c: QuizCase) => c === "nominativ" || !!f.ownerl
 
 // fit — у скількох звичайних фразах (усі відмінки) є слово; вага 1 / fit вирівнює частку слів, що підходять до
 // багатьох фраз (людина пасує майже всюди, «polštář» — у двох).
-const FIT = new Map<string, number>();
-for (const noun of NOUN_POOL) {
-  let k = 0;
-  for (const c of QUIZ_CASES) for (const f of DECL_FRAMES[c]) if (!f.role && matchesFilter(noun, f)) k++;
-  FIT.set(noun.id, Math.max(1, k));
-}
+const FIT = fitCounts(
+  NOUN_POOL,
+  QUIZ_CASES.flatMap((c) => DECL_FRAMES[c]).filter((f) => !f.role),
+  matchesFilter
+);
 const fitOf = (noun: NounEntry) => FIT.get(noun.id) ?? 1;
 
 // ─────────────── Тестовані слова з повною парадигмою ───────────────
@@ -274,8 +268,6 @@ function frameFitsWord(f: DeclFrame, t: Tested, c: QuizCase): boolean {
 }
 
 // ─────────────── Складання фрази ───────────────
-const PREP_TOKEN = /\{([vksz])\}/;
-
 // Підставляє групу у фрейм. lead — перше слово групи після «{v}/{k}/{s}/{z}» (за ним вокалізація); null — групу
 // не можна поставити (вокалізацію для цієї групи приголосних не класифіковано, CLUSTER_RULES).
 function renderFrame(f: DeclFrame, blankSide: string[], restSide: string[]): { text: string; lead: string } | null {
@@ -283,15 +275,15 @@ function renderFrame(f: DeclFrame, blankSide: string[], restSide: string[]): { t
   let text = hasN
     ? f.text.replace(BLANK, blankSide.join(" ")).replace("{N}", restSide.join(" "))
     : f.text.replace(BLANK, [...blankSide, ...restSide].join(" "));
-  const m = text.match(PREP_TOKEN);
+  const m = text.match(VOCAL_PREP_TOKEN);
   let lead = "";
   if (m) {
     const after = text.slice((m.index ?? 0) + m[0].length).trim().split(/\s+/)[0];
     lead = after;
     if (after === BLANK) return { text, lead: BLANK }; // вирішується за формою відповіді (див. vocalizeFor)
-    const d = vocalDecision(m[1] as VocalPrep, after);
-    if (d === null) return null;
-    text = text.replace(m[0], d === "vocal" ? `${m[1]}e` : m[1]);
+    const v = vocalizeSlot(text, [after]);
+    if (v === null) return null;
+    text = v;
   }
   return { text: capitalize(text), lead };
 }
@@ -299,11 +291,8 @@ function renderFrame(f: DeclFrame, blankSide: string[], restSide: string[]): { t
 // Прийменник перед самим пропуском: вокалізація за показаною формою відповіді; дистрактор мусить дати те саме
 // рішення (інакше прийменник підказав би відповідь). null — не можна.
 function vocalizeFor(text: string, shown: string[]): string | null {
-  const m = text.match(PREP_TOKEN);
-  if (!m) return text;
-  const ds = shown.map((w) => vocalDecision(m[1] as VocalPrep, w));
-  if (ds.some((d) => d === null) || ds.some((d) => d !== ds[0])) return null;
-  return capitalize(text.replace(m[0], ds[0] === "vocal" ? `${m[1]}e` : m[1]));
+  const v = vocalizeSlot(text, shown);
+  return v === null ? null : capitalize(v);
 }
 
 // Прийменник, що в реченні стоїть просто перед пропуском («Bydlím {v} ___ domě», «{k} ___ {N} jdeš?») — тоді його
@@ -314,10 +303,7 @@ function blankLeadPrep(f: DeclFrame): VocalPrep | null {
   return m ? (m[1] as VocalPrep) : null;
 }
 // Обидві кнопки дають ОДНАКОВЕ класифіковане рішення (ve/v): інакше прийменник підказав би відповідь або був би вгаданий.
-function samePrepDecision(prep: VocalPrep, a: string, b: string): boolean {
-  const da = vocalDecision(prep, a);
-  return da !== null && da === vocalDecision(prep, b);
-}
+const samePrepDecision = (prep: VocalPrep, a: string, b: string) => sharedVocalDecision(prep, [a, b]) !== null;
 
 // Чи можна поставити слово в цю фразу без партнера хоча б з одним стилем дублету й одним дистрактором. Фраза, де
 // прийменник перед пропуском не вокалізується однозначно для цього слова (tvůj: «v/ve tvém» коливається), береться
@@ -534,8 +520,6 @@ type Reg = 0 | 1 | 2;
 const PP_QUIZ_CASES: QuizCase[] = ["genitiv", "dativ", "akuzativ", "lokal", "instrumental"];
 const REG_LABEL_3: Record<Reg, string> = { 0: "без прийм.", 1: "після прийм.", 2: "наголошений" };
 const REG_LABEL_12: Record<Reg, string> = { 0: "короткий", 1: "довгий", 2: "наголошений" };
-// 1-ша особа (já, my) — підмет «ти» у фреймі; решта — підмет «я».
-const FIRST_PERSON = new Set(["pp-ja", "pp-my"]);
 
 function vocalizePersonalPrep(prep: string, ans: string): string {
   if (prep === "k" && /^mn/.test(ans)) return "ke"; // ke mně
@@ -657,7 +641,7 @@ function personalUnits(): UnitCombo[] {
     PP_QUIZ_CASES.filter((c) => c !== except).flatMap((c) => [getForm(c, 0), getForm(c, 1), getForm(c, 2)]);
 
   for (const entry of PERSONAL_PRONOUNS) {
-    if (entry.id === "pp-se") {
+    if (entry.person === "reflexive") {
       const getForm = (c: QuizCase, r: Reg) => REFLEXIVE_FRAMES[c]?.find((x) => x.reg === r)?.form ?? "—";
       for (const c of PP_QUIZ_CASES) {
         for (const sf of REFLEXIVE_FRAMES[c] ?? []) {
@@ -691,7 +675,7 @@ function personalUnits(): UnitCombo[] {
           const form = getForm(c, r);
           if (!cf || !form || form === "—") continue;
           if (single && r === 1 && PERSONAL_FRAMES[c]?.[0]) continue;
-          const frame = FIRST_PERSON.has(entry.id) ? cf.s2 : cf.s1;
+          const frame = entry.person === 1 ? cf.s2 : cf.s1; // 1-ша особа — підмет «ти»; решта — «я»
           push({
             id: comboId(entry.id, `x_${c}`, `${r}`),
             wordId: entry.id,
@@ -711,10 +695,10 @@ function personalUnits(): UnitCombo[] {
       continue;
     }
     // 3-тя особа: форми з PERSONAL_QUIZ_FORMS (ненаголошена без прийменника, після прийменника, наголошена).
-    const isOni = entry.id === "pp-oni";
+    const isOni = entry.number === "pl";
     const tables: { g: Gender; idPart: string; table: Partial<Record<QuizCase, [string, string, string?]>> }[] = isOni
-      ? [{ g: "masc_anim", idPart: "pl", table: PERSONAL_QUIZ_FORMS.oni }]
-      : (["masc_anim", "fem", "neut"] as const).map((g) => ({ g, idPart: g, table: PERSONAL_QUIZ_FORMS.on[g] }));
+      ? [{ g: "masc_anim", idPart: "pl", table: PERSONAL_QUIZ_FORMS.pl }]
+      : (["masc_anim", "fem", "neut"] as const).map((g) => ({ g, idPart: g, table: PERSONAL_QUIZ_FORMS.sg[g] }));
     for (const { g, idPart, table } of tables) {
       const getForm = (c: QuizCase, r: Reg) => table[c]?.[r] ?? "—";
       for (const c of PP_QUIZ_CASES) {
