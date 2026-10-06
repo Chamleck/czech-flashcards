@@ -22,8 +22,14 @@ import { NounEntry } from "../types";
 //         бракуючий тег = слово просто рідше з'являється (безпечно);
 //       • місце ЗАВЖДИ має рівно один із placeV (в школі) чи placeNa (на пошті) — це лексична властивість
 //         слова; перевір за словником, а не за відчуттям;
-//       • особа, тварина, їжа, час, погода, гроші, документ, тіло — «самотні» теги (без інших; винятки:
-//         тіло + bodyLevel, час + timeUnit / dayPart, документ + carried — pas, doklad);
+//       • особа, тварина, їжа, час, погода, гроші, документ, тіло, повітря — «самотні» теги (без інших; винятки:
+//         тіло + bodyLevel, час + timeUnit / dayPart, їжа + served / homemade, документ + carried — pas, doklad);
+//       • їжа: served — страва чи напій, який подають теплим або холодним (káva, polévka, maso: «teplá polévka»);
+//         homemade — буває домашнім (chléb, pivo, ovoce: «domácí chléb»); жодного — як cukr. Без них teplý / studený /
+//         domácí з цим словом не з'являться (і «studený cukr» теж) — це безпечно; зайвий тег дасть безглузду пару;
+//       • повітря (vzduch) — air, НЕ weather: weather бере квіз «Прийменники» у «při ___» («při vzduchu» — ні);
+//       • новий смисловий клас, для якого жоден тег не відділяє погані пари від добрих (як було з cukr і vzduch), —
+//         новий тег із поясненням у NOUN_TAG_DOC (data/nounTags.ts), а не виняток для слова: списків слів у коді немає;
 //       • dev-збірка пише в консоль, якщо набір тегів суперечливий (validateNounSem).
 //  4. variants (необов'язково) — прийнятні, але НЕ показані на картці форми клітинки, що збігаються з формою
 //     ІНШОГО відмінка цього слова (родовий kostel: kostela, але вживають і kostelu = давальний). Квіз не подасть
@@ -48,6 +54,12 @@ import { NounEntry } from "../types";
 //     Якщо під теги слова в якомусь відмінку й числі не підійшла жодна фраза, квіз питає форму без речення —
 //     dev-збірка друкує такі комбінації; прочитай фрази, куди слово потрапило, і за потреби додай фразу
 //     (правила — у шапці data/nounFrames.ts).
+// 11. Форми — за двома джерелами (IJP + en.wiktionary / MorfFlex); дублет, де обидві форми правильні, НЕ подаємо через
+//     « / » — лише першу форму IJP (cukre, vzduchách), решта прийнятна й так.
+// 12. ПЕРЕД ЗДАЧЕЮ — оракул покриття й граматики (scripts/check-quiz-coverage.ts, запуск у шапці скрипта): кожна
+//     клітинка нового слова в кожному квізі або питається, або стоїть у закритому списку винятків з причиною; кожне
+//     питання граматично правильне (правильна — з таблиці, дистрактор — не прийнятна форма). Результат: «Помилок: 0».
+//     Потім — прочитати нові речення й пари з прикметниками (правила 6, 8–10).
 //
 export const NOUNS: NounEntry[] = [
   // ─────────────── pán (чол. істот., твердий) ───────────────
@@ -256,7 +268,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "served"],
     declension: {
       nominativ: { sg: "káva", pl: "kávy" },
       genitiv: { sg: "kávy", pl: "káv" },
@@ -434,7 +446,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "kure",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "served", "homemade"],
     declension: {
       nominativ: { sg: "kuře", pl: "kuřata" },
       genitiv: { sg: "kuřete", pl: "kuřat" },
@@ -980,7 +992,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "homemade"],
     declension: {
       nominativ: { sg: "jablko", pl: "jablka" },
       genitiv: { sg: "jablka", pl: "jablek" },
@@ -1001,7 +1013,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "served", "homemade"],
     declension: {
       nominativ: { sg: "maso", pl: "masa" },
       genitiv: { sg: "masa", pl: "mas" },
@@ -1022,7 +1034,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "served", "homemade"],
     declension: {
       nominativ: { sg: "pivo", pl: "piva" },
       genitiv: { sg: "piva", pl: "piv" },
@@ -1043,7 +1055,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "homemade"],
     declension: {
       nominativ: { sg: "máslo", pl: "másla" },
       genitiv: { sg: "másla", pl: "másel" },
@@ -1057,6 +1069,29 @@ export const NOUNS: NounEntry[] = [
     exampleSentenceUk: "Хліб з маслом.",
   },
   {
+    id: "cukr",
+    uncountable: true,
+    uk: "цукор",
+    cz: "cukr",
+    gender: "masc_inan",
+    pattern: "hrad",
+    category: "food",
+    sem: ["food"],
+    declension: {
+      // Звірено IJP (prirucka.ujc.cas.cz) і en.wiktionary. Кличний «cukre / cukře» — обидва нормативні; показуємо
+      // першу форму IJP (правило: другий правильний варіант не додаємо).
+      nominativ: { sg: "cukr", pl: "cukry" },
+      genitiv: { sg: "cukru", pl: "cukrů" },
+      dativ: { sg: "cukru", pl: "cukrům" },
+      akuzativ: { sg: "cukr", pl: "cukry" },
+      vokativ: { sg: "cukre", pl: "cukry" },
+      lokal: { sg: "cukru", pl: "cukrech" },
+      instrumental: { sg: "cukrem", pl: "cukry" },
+    },
+    exampleSentenceCz: "Piju kávu bez cukru.",
+    exampleSentenceUk: "П'ю каву без цукру.",
+  },
+  {
     id: "voda",
     uncountable: true,
     uk: "вода",
@@ -1064,7 +1099,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "served"],
     declension: {
       nominativ: { sg: "voda", pl: "vody" },
       genitiv: { sg: "vody", pl: "vod" },
@@ -1085,7 +1120,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "served"],
     declension: {
       nominativ: { sg: "čaj", pl: "čaje" },
       genitiv: { sg: "čaje", pl: "čajů" },
@@ -1106,7 +1141,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "homemade"],
     declension: {
       nominativ: { sg: "sýr", pl: "sýry" },
       genitiv: { sg: "sýra", pl: "sýrů" },
@@ -1128,7 +1163,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "served", "homemade"],
     declension: {
       // чергування k→c: polévce
       nominativ: { sg: "polévka", pl: "polévky" },
@@ -1150,7 +1185,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "served"],
     declension: {
       nominativ: { sg: "rýže", pl: "rýže" },
       genitiv: { sg: "rýže", pl: "rýží" },
@@ -1171,7 +1206,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "served", "homemade"],
     declension: {
       // é→e в непрямих відмінках; розм. основа chleb-
       nominativ: { sg: "chléb", pl: "chleby" },
@@ -3310,6 +3345,29 @@ export const NOUNS: NounEntry[] = [
     exampleSentenceUk: "Небо синє.",
   },
   {
+    id: "vzduch",
+    uncountable: true,
+    uk: "повітря",
+    cz: "vzduch",
+    gender: "masc_inan",
+    pattern: "hrad",
+    category: "nature",
+    sem: ["air"],
+    declension: {
+      // Звірено IJP (prirucka.ujc.cas.cz) і en.wiktionary. Місц. мн. «vzduchách / vzduších» — обидва нормативні;
+      // показуємо першу форму IJP. Кличний «vzduchu» (основа на -ch, як sníh → sněhu).
+      nominativ: { sg: "vzduch", pl: "vzduchy" },
+      genitiv: { sg: "vzduchu", pl: "vzduchů" },
+      dativ: { sg: "vzduchu", pl: "vzduchům" },
+      akuzativ: { sg: "vzduch", pl: "vzduchy" },
+      vokativ: { sg: "vzduchu", pl: "vzduchy" },
+      lokal: { sg: "vzduchu", pl: "vzduchách" },
+      instrumental: { sg: "vzduchem", pl: "vzduchy" },
+    },
+    exampleSentenceCz: "Venku je čerstvý vzduch.",
+    exampleSentenceUk: "Надворі свіже повітря.",
+  },
+  {
     id: "letiste",
     uncountable: false,
     uk: "аеропорт",
@@ -3908,7 +3966,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "served", "homemade"],
     declension: {
       // Gen.pl "vajec" — виняток (звичайний more-тип дав би "vejcí"). Підтверджено
       // багатократно в корпусних прикладах ("100 g vajec", "velikost vajec").
@@ -3931,7 +3989,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "served", "homemade"],
     declension: {
       nominativ: { sg: "zelenina", pl: "zeleniny" },
       genitiv: { sg: "zeleniny", pl: "zelenin" },
@@ -3952,7 +4010,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "food",
-    sem: ["food"],
+    sem: ["food", "homemade"],
     declension: {
       nominativ: { sg: "ovoce", pl: "ovoce" },
       genitiv: { sg: "ovoce", pl: "ovocí" },

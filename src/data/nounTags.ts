@@ -50,6 +50,9 @@ export type NounTag =
   | "opening"
   | "abstract"
   | "nature"
+  | "air"
+  | "served"
+  | "homemade"
   | "landform";
 
 // Запис для КОЖНОГО тегу обов'язковий (Record): додав тег до NounTag — компілятор вимагає пояснення.
@@ -89,13 +92,16 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
   opening: "отвір, крізь який дивляться чи проходять: okno",
   abstract: "абстракція чи слово без природних просторових фраз: cena, sto, milion",
   nature: "рослина, світило, природний об'єкт без власної фрази: růže, květina, hvězda, strom",
+  served: "страва чи напій, який подають теплим або холодним («teplá polévka», «studené pivo»): káva, čaj, voda, polévka, maso (НЕ cukr, máslo, jablko — «studený cukr» безглузде; разом з food)",
+  homemade: "їжа, що буває домашньою — приготованою чи вирощеною вдома («domácí chléb», «domácí vejce»): chléb, pivo, sýr, ovoce (НЕ voda, káva, cukr; разом з food)",
+  air: "повітря, яким дихають і яке відчувають («svěží / čistý / teplý vzduch»): vzduch (НЕ weather — «při vzduchu» безглузде)",
   landform: "природний ландшафт, не створений людиною: moře, řeka, hora, les, pole — «staré / nové moře» неприродне (разом з outdoor)",
 };
 
 // Теги-«самоцілі»: слово з таким тегом не має жодних інших (особа не буває будівлею, їжа — місцем тощо).
 // Винятки: body разом з bodyLevel, time разом з timeUnit і dayPart, document разом з carried (pas, doklad),
-// person разом з collective (rodina).
-const SOLO: NounTag[] = ["person", "animal", "money", "food", "meal", "time", "weather", "abstract", "document", "body"];
+// person разом з collective (rodina), food разом з served / homemade.
+const SOLO: NounTag[] = ["person", "animal", "money", "food", "meal", "time", "weather", "abstract", "document", "body", "air"];
 // Теги, що ВИМАГАЮТЬ супутнього: (тег → хоча б один з переліку).
 const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
   residence: ["placeV", "placeNa"],
@@ -103,6 +109,8 @@ const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
   bodyLevel: ["body"],
   timeUnit: ["time"],
   landform: ["outdoor"],
+  served: ["food"],
+  homemade: ["food"],
 };
 
 // Перевірка набору тегів одного слова: список проблем (порожній — усе гаразд). Використовується у
@@ -115,7 +123,7 @@ export function validateNounSem(n: Pick<NounEntry, "id" | "sem">): string[] {
   for (const solo of SOLO) {
     if (!sem.includes(solo)) continue;
     const allowed: NounTag[] =
-      solo === "body" ? ["body", "bodyLevel"] : solo === "time" ? ["time", "timeUnit", "dayPart"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : [solo];
+      solo === "body" ? ["body", "bodyLevel"] : solo === "time" ? ["time", "timeUnit", "dayPart"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade"] : [solo];
     const extra = sem.filter((t) => !allowed.includes(t));
     if (extra.length > 0) out.push(`${n.id}: тег «${solo}» не сполучається з ${extra.join(", ")}`);
   }

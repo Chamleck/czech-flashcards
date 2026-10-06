@@ -14,8 +14,9 @@ import { AdjectiveEntry, NounFilter } from "../types";
 //  2. Став лише ті теги, де фраза природна для КОЖНОГО іменника з тегом. Тег надто широкий (наприклад, food містить і
 //     воду, і хліб: «tvrdý chléb» добре, «tvrdá káva» — ні) — краще не став: слово просто рідше з'явиться (безпечно),
 //     а неприродних фраз не буде. countable: true відсіює незлічувані (voda, rýže, sníh).
+//     Для «теплий / холодний» є вужчий тег served, для «домашній» — homemade (food містить і cukr: «studený cukr»).
 //  3. Прикметник лише про неістот (кольори, широкий, глибокий) не має партнерів чол. істот. роду, тож його форми
-//     «чол. іст.» квіз не тестує — це свідома ціна природності, ці форми тренують інші прикметники того ж зразка.
+//     «чол. іст.» квіз питає без речення (за підписом роду, відмінка й числа) — у реченні з неприродною парою їх немає.
 //  4. semClass — ОБОВ'ЯЗКОВЕ рішення (без нього проєкт не збереться; повний опис — тип AdjectiveEntry у types/index.ts):
 //     "quality" — постійна якість, має degrees і обов'язкове quizDegrees: true / false (false, коли вищий ступінь
 //     у мовленні рідкісний чи дивний: кольори «červenější vlak», otevřený/zavřený, plný/prázdný, volný, ubohý);
@@ -27,6 +28,9 @@ import { AdjectiveEntry, NounFilter } from "../types";
 //     data/declensionFrames.ts): тег, що дає безглузду пару, прибери.
 //  6. Слово-партнер перед іменником у питанні про займенник — лише не відносний прикметник: відносні суперечать
 //     займеннику («nějaké poslední divadlo», «tvá cizí eura»). Новий "relational" партнером не стане сам.
+//  7. Кожна клітинка слова питається, навіть якщо природного іменника для неї немає (питання без речення), тож fits
+//     впливає на природність речень, а не на покриття. Перед здачею — оракул scripts/check-quiz-coverage.ts
+//     (запуск у шапці скрипта): «Помилок: 0».
 const ANY: NounFilter = {};
 const ANIMATE: NounFilter = { any: ["person", "animal"] };
 const PERSON: NounFilter = { any: ["person"] };
@@ -38,8 +42,8 @@ const HEIGHT: NounFilter = { any: ["person", "building", "furniture", "abstract"
 const LENGTH: NounFilter = { any: ["timeUnit", "clothes", "path"], none: ["outdoor"] }; // dlouhý den, kabát, dlouhá cesta, most
 const WIDTH: NounFilter = { any: ["furniture", "clothes", "path"], none: ["outdoor"] }; // široká postel, úzké kalhoty, široká cesta
 const DEPTH: NounFilter = { any: ["container"], none: ["vehicle", "clothes"] }; // hluboký talíř, hrnek, hluboká skříň
-const AGE: NounFilter = { none: ["time", "weather", "meal", "activity", "abstract", "body", "food", "nature", "landform"] }; // не «staré moře»
-const LOOKS: NounFilter = { none: ["abstract", "document", "money", "activity", "meal", "food"] };
+const AGE: NounFilter = { none: ["time", "weather", "air", "meal", "activity", "abstract", "body", "food", "nature", "landform"] }; // не «staré moře»
+const LOOKS: NounFilter = { none: ["abstract", "document", "money", "activity", "meal", "food", "air"] };
 const COLOR: NounFilter = { any: ["item", "clothes", "vehicle", "furniture"] };
 const COLOR_NEUTRAL: NounFilter = { any: ["item", "clothes", "vehicle", "furniture", "animal"] }; // černý pes, bílá kočka (не будівлі: «černá banka»)
 
@@ -757,7 +761,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "nový",
     pattern: "tvrdy",
     category: "quality",
-    fits: { none: ["time", "weather", "meal", "activity", "abstract", "body", "food", "nature", "landform", "person"] },
+    fits: { none: ["time", "weather", "air", "meal", "activity", "abstract", "body", "food", "nature", "landform", "person"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -1885,7 +1889,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "teplý",
     pattern: "tvrdy",
     category: "measure",
-    fits: { any: ["food", "meal", "weather", "dayPart", "clothes"] },
+    fits: { any: ["served", "meal", "weather", "air", "dayPart", "clothes"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -2026,7 +2030,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "studený",
     pattern: "tvrdy",
     category: "measure",
-    fits: { any: ["food", "meal", "weather", "dayPart"] },
+    fits: { any: ["served", "meal", "weather", "air", "dayPart"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -3174,7 +3178,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "domácí",
     pattern: "mekky",
     category: "soft",
-    fits: { any: ["food", "meal"] },
+    fits: { any: ["homemade", "meal"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -5857,7 +5861,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "čistý",
     pattern: "tvrdy",
     category: "quality",
-    fits: { any: ["item", "clothes", "vehicle", "furniture", "container", "placeV", "outdoor", "body", "building", "animal", "person"], none: ["activity"] },
+    fits: { any: ["item", "clothes", "vehicle", "furniture", "container", "placeV", "outdoor", "body", "building", "animal", "person", "air"], none: ["activity"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -5998,7 +6002,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "špinavý",
     pattern: "tvrdy",
     category: "quality",
-    fits: { any: ["item", "clothes", "vehicle", "furniture", "container", "placeV", "outdoor", "body", "building", "animal", "person"], none: ["activity"] },
+    fits: { any: ["item", "clothes", "vehicle", "furniture", "container", "placeV", "outdoor", "body", "building", "animal", "person", "air"], none: ["activity"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -6582,7 +6586,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "svěží",
     pattern: "mekky",
     category: "soft",
-    fits: { any: ["weather"] },
+    fits: { any: ["air"] }, // svěží vzduch; не «svěží sníh / slunce»
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {

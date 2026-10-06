@@ -138,7 +138,7 @@ export const INDEFINITE_ADJ: PronounEntry[] = [
     subtype: "indefinite",
     declinable: true,
     vzorLabel: "як mladý",
-    quiz: { role: "some" },
+    quiz: { role: "some", fits: { none: ["air"] } }, // не «Tady je nějaký vzduch»
     declension: {
       masc_anim: {
         nominativ: { sg: "nějaký", pl: "nějací" },

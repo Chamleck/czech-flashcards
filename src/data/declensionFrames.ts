@@ -38,6 +38,13 @@ import type { NounTag } from "./nounTags";
 //     qualitative: true — фраза природна лише з не відносним прикметником (не semClass "relational": celý, hlavní…).
 //  7. У питаннях (role "question") слова-партнера немає: «Za jakým přítelem jdeš?», не «Za jakým starým přítelem…»;
 //     партнер в інших фразах — лише не відносний прикметник (правило 6 у шапці data/adjectives.ts).
+//  8. plOk — теги, для яких У ЦІЙ фразі природна множина, хоча загальне правило (pluralNatural, utils/partnerSelection.ts)
+//     її не дає: одиниці часу («Strávil jsem tam celé dny», «Během posledních týdnů…»). Фраза мусить дозволяти
+//     множину (num "any" чи "pl"); незлічувані (uncountable) множини не отримують і тут. Погоду сюди не ставимо:
+//     природну множину має лише déšť, а «teplá slunce» — ні.
+//  9. Фрази з role "every" для їжі — лише в однині: všechen з незлічуваним («Zbavil jsem se vší kávy»); «po všech
+//     chlebech» неприродне. Перед všechen у фразі не став {v}/{k}/{s}/{z}: група vš- коливається (CLUSTER_RULES),
+//     слово в таку фразу не потрапить.
 
 export type QuizCase = Exclude<CzechCase, "vokativ">;
 
@@ -50,6 +57,7 @@ export interface DeclFrame extends NounFilter {
   ownerless?: true; // у фразі немає підмета-особи, якому могла б належати річ (Je tu…, Za … je zahrada): svůj сюди не ставимо
   evaluative?: true; // оцінка / ставлення мовця (Mám rád, Líbí se mi, Chybí mi): без прикметників-станів (AdjectiveEntry.semClass "state")
   qualitative?: true; // без відносних прикметників (semClass "relational"): «k vysokým skříním», не «k celým domům»
+  plOk?: NounTag[]; // множина природна в цій фразі для слів із цими тегами (правило 8): «Strávil jsem tam celé dny»
 }
 
 const NOT_THING: NounTag[] = ["time", "weather", "abstract", "activity"];
@@ -67,6 +75,7 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     // заперечення: «Není tu žádný student», «Nejsou tu žádné knihy» (називний)
     { text: "Není tu ___.", num: "sg", role: "neg", any: ["person", "animal", "item", "vehicle", "food", "furniture", "building"] },
     { text: "Nejsou tu ___.", num: "pl", role: "neg", any: ["person", "animal", "item", "vehicle", "food", "furniture", "building"] },
+    { text: "To byly ___.", num: "pl", qualitative: true, any: ["timeUnit"], plOk: ["timeUnit"] }, // to byly krásné dny, dlouhé noci
     // питання
     { text: "___ je to {N}?", num: "sg", role: "question" },
     { text: "___ jsou to {N}?", num: "pl", role: "question" },
@@ -98,6 +107,15 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { text: "Od ___ {N} tu jsi?", role: "question", any: ["timeUnit"] }, // od kterého dne, od kolikátého týdne
     { text: "Bojím se ___.", num: "any", role: "every", any: ["person", "animal"] }, // každého psa, všech psů
     { text: "Ptám se ___.", num: "any", role: "every", any: ["person"] }, // ptát se koho — родовий
+    { text: "Během ___ se toho hodně stalo.", num: "any", ownerless: true, any: ["timeUnit", "dayPart"], plOk: ["timeUnit"] }, // během posledního týdne, během dlouhých nocí
+    { text: "Nevejdu se do ___.", num: "any", any: ["clothes"] }, // do toho úzkého kabátu, do těch bot
+    { text: "Vstal jsem {z} ___.", any: ["seat"] }, // ze židle, z měkkého koberce
+    { some: true, text: "Potřebuju kopie ___.", num: "pl", any: ["document"] }, // kopie důležitých dokladů
+    { text: "Ve městě je hodně ___.", num: "pl", ownerless: true, any: ["path"], none: ["activity", "landform", "residence"] }, // parků, ulic, mostů
+    { text: "Do ___ {N} chodíš?", num: "pl", role: "question", all: ["building", "workplace"], none: ["placeNa"] }, // do kterých obchodů
+    { text: "Nechodím do ___.", num: "pl", role: "neg", all: ["building", "workplace"], none: ["placeNa"] }, // do žádných kaváren
+    { text: "Mám klíče od ___.", num: "any", role: "every", all: ["residence", "building"] }, // od každého domu, od všech hotelů (не «od každého přízemí»)
+    { text: "Zbavil jsem se ___.", role: "every", any: ["food"] }, // vší kávy, všeho cukru
   ],
   dativ: [
     { text: "Věřím ___.", num: "any", evaluative: true, any: ["person"] },
@@ -117,6 +135,12 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { text: "___ {N} pomáháš?", num: "any", role: "question", any: ["person", "animal"] },
     { text: "Pomáhám ___.", num: "any", role: "every", any: ["person", "animal"] },
     { text: "Dám to ___.", num: "any", role: "every", any: ["person", "animal"] },
+    { text: "Dávám přednost ___.", degrees: true, evaluative: true, any: ["food"] }, // teplé polévce, domácímu chlebu
+    { text: "{k} ___ se to hodí.", num: "any", degrees: true, any: ["clothes"] }, // k tomu dlouhému kabátu, k užším kalhotám
+    { text: "Autobusy jezdí {k} ___.", num: "pl", ownerless: true, any: ["building"], none: ["outdoor"] }, // k hlavním nádražím
+    { text: "___ {N} dáváš přednost?", num: "any", role: "question", any: ["item", "vehicle", "clothes"] }, // kterým autům
+    { text: "Dal jsem nálepku ___.", num: "any", role: "every", any: ["item", "furniture", "carried"], none: ["food"] }, // každému pasu, všem židlím
+    { text: "Díky ___ jsme nemuseli nakupovat.", role: "every", any: ["food"] }, // všemu cukru, vší rýži
   ],
   akuzativ: [
     { some: true, text: "Vidím ___.", num: "any", countable: true, any: ["person", "animal", "item", "clothes", "vehicle", "building", "furniture", "outdoor", "nature"] },
@@ -141,7 +165,11 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { text: "___ {N} už čekáš?", role: "order", any: ["timeUnit"] }, // kolikátý den / kolikátou hodinu už čekáš
     { text: "Znám ___.", num: "any", role: "every", any: ["person", "path", "building", "animal"] }, // znám každou ulici
     { text: "Cvičím ___.", role: "every", any: ["timeUnit", "dayPart"] }, // každý den, každé ráno
-    { text: "Koupil jsem ___.", role: "every", any: ["food"] }, // všechen chléb, všechnu kávu
+    { text: "Koupil jsem ___.", role: "every", any: ["food"] }, // všechen cukr, všechnu kávu
+    { text: "Pamatuju si ___.", num: "any", any: ["timeUnit", "dayPart", "weather", "air"], plOk: ["timeUnit"] }, // ten nudný týden, ty dlouhé noci, ten svěží vzduch
+    { text: "Strávil jsem tam ___.", num: "pl", any: ["timeUnit"], plOk: ["timeUnit"] }, // celé dny, dlouhé týdny
+    { text: "Lékař vyšetřil ___.", ownerless: true, any: ["body"] }, // zdravý zub, nemocné koleno
+    { text: "Na zítra hlásí ___.", ownerless: true, any: ["weather"] }, // silný vítr, slabý déšť
   ],
   lokal: [
     { some: true, text: "Mluvíme o ___.", num: "any", degrees: true },
@@ -161,6 +189,8 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { text: "{v} ___ {N} se to stalo?", role: "question", any: ["timeUnit"] }, // ve kterém roce, v kolikátém týdnu
     { text: "{v} ___ je okno.", num: "any", role: "every", ownerless: true, all: ["placeV"], none: ["activity"] }, // v každém pokoji
     { text: "Na ___ leží kniha.", num: "any", role: "every", ownerless: true, any: ["surface"] },
+    { text: "Vím něco o ___.", num: "any", role: "every", any: ["person"] }, // o každém studentovi, o všech dětech
+    { text: "Po ___ mě bolí břicho.", role: "every", any: ["food"] }, // po všem tom cukru, po vší rýži
   ],
   instrumental: [
     { some: true, text: "Jdu tam {s} ___.", num: "any", degrees: true, any: ["person", "animal"] },
@@ -183,36 +213,51 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { text: "Mluvím {s} ___.", num: "any", role: "every", any: ["person"] },
     { text: "Před ___ stojí auto.", num: "any", role: "every", ownerless: true, any: ["building"] }, // před každým domem
     { text: "Jdu za ___.", num: "any", role: "every", any: ["person"] }, // za každým kamarádem, za všemi
+    { text: "Byl jsem spokojený {s} ___.", evaluative: true, any: ["food"] }, // s domácím chlebem, s teplou polévkou
+    { text: "Byl jsem překvapený ___.", any: ["weather", "air"] }, // silným větrem, jarním deštěm, čistým vzduchem
+    { some: true, text: "{s} ___ je problém.", num: "any", ownerless: true, any: ["item", "document", "vehicle"] }, // s tím starým počítačem
+    { text: "{s} ___ {N} je problém?", num: "any", role: "question", any: ["item", "document", "vehicle"] }, // s jakými doklady
+    { text: "Nemám problém {s} ___.", num: "any", role: "neg", any: ["item", "document", "vehicle"] }, // se žádným autem
+    { text: "Co uděláš {s} ___?", num: "any", role: "every", any: ["food", "item"] }, // s každým klíčem
+    { text: "Naplnil jsem sklenici ___.", role: "every", any: ["food"] }, // vším cukrem, vší vodou, vší rýží
   ],
 };
 
 // Речення-контекст для 3-ї особи (on/ona/ono, oni): антецедент задає рід і референта — «Znáš [toho starého psa]?»
 // Іменник — особа чи тварина (за тегами), прикметник — з його fits, займенник-партнер — будь-який дозволений.
 export const ANTECEDENT_FRAME: DeclFrame = { text: "Znáš ___?", num: "any", any: ["person", "animal"] };
+// Власник у питанні «чий?» (jeho / její / jejich) — лише людина: «Znáš tu ženu? Bydlím v jejím domě», не «Znáš krávu?
+// Vidím její silnice».
+export const OWNER_FRAME: DeclFrame = { text: "Znáš ___?", num: "any", any: ["person"] };
 
 // ── Особові займенники ──
-// Регістр 0 = без прийменника / короткий, 1 = після прийменника / довгий. s1 — підмет «я» (ціль 2/3 особи),
+// Регістр 0 = без прийменника / короткий, 1 = після прийменника / довгий, 2 = наголошений (лише 3-тя особа: jeho / jemu
+// проти ho / mu; фраза з протиставленням «…, ne tebe», де ненаголошена форма неможлива). s1 — підмет «я» (ціль 2/3 особи),
 // s2 — підмет «ти» (ціль 1 особи): «Vidím mě» неможливе (кореференція). Займенник-приклонка ніколи не перший у реченні.
 // Прийменник (prep) вокалізується за формою (ke mně, se mnou, ode mě).
 export interface PersonalFrame { pre: string; post: string; prep?: string }
 export interface PersonalCaseFrame { s1: PersonalFrame; s2: PersonalFrame }
-export const PERSONAL_FRAMES: Partial<Record<QuizCase, Partial<Record<0 | 1, PersonalCaseFrame>>>> = {
+export const PERSONAL_FRAMES: Partial<Record<QuizCase, Partial<Record<0 | 1 | 2, PersonalCaseFrame>>>> = {
   genitiv: {
     0: { s1: { pre: "Bojím se ", post: "." }, s2: { pre: "Bojíš se ", post: "?" } },
     1: { s1: { pre: "Dostal jsem dárek ", post: ".", prep: "od" }, s2: { pre: "Dostal jsi dárek ", post: "?", prep: "od" } },
+    2: { s1: { pre: "Bojím se ", post: ", ne tebe." }, s2: { pre: "Bojíš se ", post: ", ne mě?" } },
   },
   dativ: {
     0: { s1: { pre: "Věřím ", post: "." }, s2: { pre: "Věříš ", post: "?" } },
     1: { s1: { pre: "Jdu ", post: ".", prep: "k" }, s2: { pre: "Jdeš ", post: "?", prep: "k" } },
+    2: { s1: { pre: "Dej to ", post: ", ne mně." }, s2: { pre: "Dáš to ", post: ", ne mně?" } },
   },
   akuzativ: {
     0: { s1: { pre: "Vidím ", post: "." }, s2: { pre: "Vidíš ", post: "?" } },
     1: { s1: { pre: "Ten dárek je ", post: ".", prep: "pro" }, s2: { pre: "Ten dárek je ", post: ".", prep: "pro" } },
+    2: { s1: { pre: "Vidím ", post: ", ne tebe." }, s2: { pre: "Vidíš ", post: ", ne mě?" } },
   },
   lokal: {
     1: { s1: { pre: "Mluví se ", post: ".", prep: "o" }, s2: { pre: "Mluví se ", post: ".", prep: "o" } },
   },
   instrumental: {
+    0: { s1: { pre: "Byl jsem ", post: " překvapený." }, s2: { pre: "Byl jsi ", post: " překvapený?" } }, // jím, jí, jimi, námi
     1: { s1: { pre: "Pojedu ", post: ".", prep: "s" }, s2: { pre: "Pojedeš ", post: "?", prep: "s" } },
   },
 };

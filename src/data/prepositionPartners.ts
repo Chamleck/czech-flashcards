@@ -283,6 +283,7 @@ export const CLUSTER_RULES: Record<string, Partial<Record<VocalPrep, VocalDecisi
   // та сама приголосна — «vokalizujeme vždy»: ke kterému, ve všem; решта коливається («v/ve kterém», «se/s všemi»)
   kt: { k: "vocal" },
   vš: { v: "vocal" },
+  vz: { v: "vocal" }, // vzduch: ve vzduchu (та сама приголосна — завжди); k/s/z коливаються
   // коливання: «v tváři» vedle «ve tváři» (Naše řeč, nase-rec.ujc.cas.cz, стаття 6494); hn- — друга не r/l, лише тенденція
   tv: {},
   hn: {},

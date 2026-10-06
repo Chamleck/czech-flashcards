@@ -15,6 +15,8 @@ import { PronounEntry } from "../types";
 //    однині лише з незлічуваними, žádný лише в реченнях із запереченням, питальні — лише у фреймах-питаннях.
 //    Звичайному займенникові поле не потрібне. Кожен факт — за джерелом (IJP/ÚJČ + ще одне), не за відчуттям.
 //  • Фрази — дані в data/declensionFrames.ts; нове слово потрапляє у квіз саме.
+//  • quiz.owner (jeho / její / jejich) — власник для питання «чий?». Перед здачею будь-якої зміни — оракул
+//    scripts/check-quiz-coverage.ts (запуск у шапці скрипта): «Помилок: 0».
 
 export const PRONOUNS: PronounEntry[] = [
   {
@@ -24,7 +26,7 @@ export const PRONOUNS: PronounEntry[] = [
     subtype: "possessive",
     declinable: true,
     vzorLabel: "як mladý (крім Nom/Acc)",
-    quiz: { fits: { none: ["weather", "time", "abstract"] } }, // присвійний: не «můj sníh», «tvoje ráno»
+    quiz: { fits: { none: ["weather", "air", "time", "abstract"] } }, // присвійний: не «můj sníh», «tvoje ráno», «její vzduch»
     declension: {
       masc_anim: {
         nominativ: { sg: "můj", pl: "mí / moji" },
@@ -77,7 +79,7 @@ export const PRONOUNS: PronounEntry[] = [
     subtype: "possessive",
     declinable: true,
     vzorLabel: "як mladý (крім Nom/Acc)",
-    quiz: { fits: { none: ["weather", "time", "abstract"] } }, // присвійний: не «můj sníh», «tvoje ráno»
+    quiz: { fits: { none: ["weather", "air", "time", "abstract"] } }, // присвійний: не «můj sníh», «tvoje ráno», «její vzduch»
     declension: {
       masc_anim: {
         nominativ: { sg: "tvůj", pl: "tví / tvoji" },
@@ -130,7 +132,7 @@ export const PRONOUNS: PronounEntry[] = [
     subtype: "possessive",
     declinable: true,
     vzorLabel: "як mladý (крім Nom/Acc)",
-    quiz: { needsOwner: true, fits: { none: ["weather", "time", "abstract"] } },
+    quiz: { needsOwner: true, fits: { none: ["weather", "air", "time", "abstract"] } },
     declension: {
       masc_anim: {
         nominativ: { sg: "svůj", pl: "sví / svoji" },
@@ -183,7 +185,7 @@ export const PRONOUNS: PronounEntry[] = [
     subtype: "possessive",
     declinable: true,
     vzorLabel: "vzor náš (м'який займенниковий)",
-    quiz: { fits: { none: ["weather", "time", "abstract"] } }, // присвійний: не «můj sníh», «tvoje ráno»
+    quiz: { fits: { none: ["weather", "air", "time", "abstract"] } }, // присвійний: не «můj sníh», «tvoje ráno», «její vzduch»
     declension: {
       masc_anim: {
         nominativ: { sg: "náš", pl: "naši" },
@@ -236,7 +238,7 @@ export const PRONOUNS: PronounEntry[] = [
     subtype: "possessive",
     declinable: true,
     vzorLabel: "vzor náš (м'який займенниковий)",
-    quiz: { fits: { none: ["weather", "time", "abstract"] } }, // присвійний: не «můj sníh», «tvoje ráno»
+    quiz: { fits: { none: ["weather", "air", "time", "abstract"] } }, // присвійний: не «můj sníh», «tvoje ráno», «její vzduch»
     declension: {
       masc_anim: {
         nominativ: { sg: "váš", pl: "vaši" },
@@ -289,7 +291,7 @@ export const PRONOUNS: PronounEntry[] = [
     subtype: "possessive",
     declinable: true,
     vzorLabel: "як jarní",
-    quiz: { fits: { none: ["weather", "time", "abstract"] } }, // присвійний: не «můj sníh», «tvoje ráno»
+    quiz: { owner: "f", fits: { none: ["weather", "air", "time", "abstract"] } }, // присвійний: не «můj sníh», «tvoje ráno», «její vzduch»
     declension: {
       masc_anim: {
         nominativ: { sg: "její", pl: "její" },
@@ -342,7 +344,7 @@ export const PRONOUNS: PronounEntry[] = [
     subtype: "possessive",
     declinable: false,
     invariantForm: "jeho",
-    quiz: { fits: { none: ["weather", "time", "abstract"] } },
+    quiz: { owner: "m", fits: { none: ["weather", "air", "time", "abstract"] } },
     exampleSentenceCz: "To je jeho auto.",
     exampleSentenceUk: "Це його авто.",
   },
@@ -353,7 +355,7 @@ export const PRONOUNS: PronounEntry[] = [
     subtype: "possessive",
     declinable: false,
     invariantForm: "jejich",
-    quiz: { fits: { none: ["weather", "time", "abstract"] } },
+    quiz: { owner: "pl", fits: { none: ["weather", "air", "time", "abstract"] } },
     exampleSentenceCz: "To je jejich dům.",
     exampleSentenceUk: "Це їхній будинок.",
   },

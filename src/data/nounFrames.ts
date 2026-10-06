@@ -39,7 +39,7 @@ export interface NounFrame extends Needs {
 // Предмети й речі, які можна шукати чи взяти.
 const THINGS: NounTag[] = ["item", "carried", "clothes", "document", "money"];
 // Те, що не намалюєш і не сфотографуєш як річ.
-const NOT_PICTURED: NounTag[] = ["time", "weather", "abstract", "activity"];
+const NOT_PICTURED: NounTag[] = ["time", "weather", "air", "abstract", "activity"];
 
 export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
   // Називний однини — словникова форма (заголовок картки), квіз його не питає; тут лише множина.

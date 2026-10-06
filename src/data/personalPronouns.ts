@@ -15,20 +15,22 @@ const COLS_SL = { a: "короткий", b: "довгий" };
 export const COLS_NP = { a: "без прийм.", b: "після прийм." };
 const COLS_ONE = { a: "форма", b: "—" };
 
-// Форми 3-ї особи для квізу «Прикметники та займенники»: [без прийменника, після прийменника] на відмінок. У реченнях
+// Форми 3-ї особи для квізу «Прикметники та займенники»: [без прийменника, після прийменника, наголошена] на відмінок. У реченнях
 // квізу займенник стоїть після дієслова без наголосу («Vidím ho», «Věřím mu»), тож без прийменника потрібна
 // ненаголошена форма (ho, mu), а не перша форма дублету картки (jeho / ho, jemu / mu). Кожна форма тут є і в таблиці
 // картки нижче — це лише вибір однієї з дублету. masc_inan = masc_anim (не дублюємо); «—» — форми немає (місцевий
 // без прийменника не вживається).
-type PersonalQuizPair = [string, string];
+// Наголошена (третя, необов'язкова) — лише там, де вона відрізняється від ненаголошеної: jeho / jemu проти ho / mu
+// (IJP, heslo «on»: «Dej to jemu, ne mně»; ho, jej, mu — «v příklonné pozici»). У ji, jí, jich, jim такої різниці немає.
+type PersonalQuizPair = [string, string, string?];
 export const PERSONAL_QUIZ_FORMS: {
   on: Record<"masc_anim" | "fem" | "neut", Partial<Record<"genitiv" | "dativ" | "akuzativ" | "lokal" | "instrumental", PersonalQuizPair>>>;
   oni: Partial<Record<"genitiv" | "dativ" | "akuzativ" | "lokal" | "instrumental", PersonalQuizPair>>;
 } = {
   on: {
-    masc_anim: { genitiv: ["ho", "něho"], dativ: ["mu", "němu"], akuzativ: ["ho", "něho"], lokal: ["—", "něm"], instrumental: ["jím", "ním"] },
+    masc_anim: { genitiv: ["ho", "něho", "jeho"], dativ: ["mu", "němu", "jemu"], akuzativ: ["ho", "něho", "jeho"], lokal: ["—", "něm"], instrumental: ["jím", "ním"] },
     fem: { genitiv: ["jí", "ní"], dativ: ["jí", "ní"], akuzativ: ["ji", "ni"], lokal: ["—", "ní"], instrumental: ["jí", "ní"] },
-    neut: { genitiv: ["ho", "něho"], dativ: ["mu", "němu"], akuzativ: ["ho", "ně"], lokal: ["—", "něm"], instrumental: ["jím", "ním"] },
+    neut: { genitiv: ["ho", "něho", "jeho"], dativ: ["mu", "němu", "jemu"], akuzativ: ["ho", "ně"], lokal: ["—", "něm"], instrumental: ["jím", "ním"] },
   },
   oni: { genitiv: ["jich", "nich"], dativ: ["jim", "nim"], akuzativ: ["je", "ně"], lokal: ["—", "nich"], instrumental: ["jimi", "nimi"] },
 };

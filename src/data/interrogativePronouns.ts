@@ -125,7 +125,7 @@ export const INTERROGATIVE_ADJ: PronounEntry[] = [
     subtype: "interrogative",
     declinable: true,
     vzorLabel: "як jarní",
-    quiz: { role: "question", partner: false, fits: { none: ["time", "weather", "abstract", "nature", "activity", "meal", "body", "food"] } },
+    quiz: { role: "question", partner: false, fits: { none: ["time", "weather", "air", "abstract", "nature", "activity", "meal", "body", "food"] } },
     declension: {
       masc_anim: {
         nominativ: { sg: "čí", pl: "čí" },

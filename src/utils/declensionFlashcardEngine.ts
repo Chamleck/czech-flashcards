@@ -25,6 +25,7 @@ import { adjQuizUsable } from "../data/adjectiveCategories";
 import { nounUsableAsPartner } from "../data/categories";
 import {
   ANTECEDENT_FRAME,
+  OWNER_FRAME,
   DECL_FRAMES,
   DeclFrame,
   PERSONAL_FRAMES,
@@ -35,7 +36,7 @@ import {
 import type { VocalPrep } from "../data/prepositionPartners";
 import { agreementGender, candidateNumbers, freshWeightedOrder, matchesFilter, vocalDecision } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
-import { collapseVowelLength, formsOf, isUsableDistractor, once, shuffle, splitForms } from "./quizCommon";
+import { formsOf, once, shuffle, splitForms } from "./quizCommon";
 
 // ═══════════════════ КВІЗ «ПРИКМЕТНИКИ ТА ЗАЙМЕННИКИ» ═══════════════════
 // Знання — у даних: смислові теги іменників (data/nounTags.ts), fits прикметників (data/adjectives.ts), лексичні
@@ -44,7 +45,9 @@ import { collapseVowelLength, formsOf, isUsableDistractor, once, shuffle, splitF
 // тестованому слові. Жодних id слів у коді.
 //
 // Питання: тестоване слово × рід × відмінок × число (comboId не змінився з попередньої версії, ваги помилок сумісні).
-// Дистрактор — реальна форма того ж слова, жодна з прийнятних форм цільової клітинки (усі дублети).
+// Питається КОЖНА клітинка, що існує в мові: немає природної фрази — без речення (makeBare), тож покриття не залежить
+// від тегів. Дистрактор — реальна форма того ж слова, жодна з прийнятних форм цільової клітинки (усі дублети);
+// різниця лише в довжині голосного теж рахується (mladý / mladí, ji / jí). Окремо — «чий?» (jeho / její / jejich).
 
 type DeclKind =
   | "adjective"
@@ -53,7 +56,8 @@ type DeclKind =
   | "interrogative-adj"
   | "interrogative-core"
   | "indefinite"
-  | "indefinite-core";
+  | "indefinite-core"
+  | "possessive";
 
 export interface DeclQuestion {
   kind: DeclKind;
@@ -65,7 +69,7 @@ export interface DeclQuestion {
   promptUk: string;
   promptLabel: string; // заголовок-підпис: частина мови ("прикметник"/"займенник")
   taskText: string;
-  contextPhrase: string; // речення з пропуском
+  contextPhrase?: string; // речення з пропуском; немає — питання без речення (форма за підписом, як у квізі «Іменники»)
   correct: string;
   options: string[];
 }
@@ -84,13 +88,11 @@ function firstForm(cell: string): string {
   return splitForms(cell)[0];
 }
 
-// Клітинка-дистрактор придатна, якщо ЖОДНА її форма не є прийнятною формою цілі (і не відрізняється лише довжиною
-// голосного): «mou / mojí» не дистрактор до «mé / mojí» — mojí правильне в обох.
+// Клітинка-дистрактор придатна, якщо ЖОДНА її форма не є прийнятною формою цілі: «mou / mojí» не дистрактор до
+// «mé / mojí» — mojí правильне в обох. Різниця лише в довжині голосного — теж граматика (mladý / mladí, ji / jí).
 function cellUsable(target: string[], cell: string | undefined): boolean {
   const forms = formsOf(cell);
-  if (forms.length === 0) return false;
-  const tc = new Set(target.map(collapseVowelLength));
-  return forms.every((f) => !target.includes(f) && !tc.has(collapseVowelLength(f)));
+  return forms.length > 0 && forms.every((f) => !target.includes(f));
 }
 
 // Усі придатні клітинки-дистрактори в порядку пріоритету: інший відмінок (той самий рід/число) → інше число →
@@ -137,10 +139,15 @@ function nounForm(noun: NounEntry, c: QuizCase, n: GrammaticalNumber): string | 
 
 // Чи бере фрейм це слово в цьому числі (політика числа фрейму, множина лише де природна — candidateNumbers).
 // У називному дієслово узгоджується з групою («To je» / «To jsou»), тож число фрейму там суворе: brýle — лише в «To jsou».
+// plOk фрейму відкриває множину, якої загальне правило не дає (одиниці часу: «Strávil jsem tam celé dny»), — лише
+// у фразі, що дозволяє множину, і не для незлічуваних.
 function frameTakes(f: DeclFrame, noun: NounEntry, n: GrammaticalNumber, c: QuizCase): boolean {
   if (c === "nominativ" && f.num !== "any" && (f.num ?? "sg") !== n) return false;
+  if (n === "pl" && f.plOk && (f.num ?? "sg") !== "sg" && pluralByFrame(f.plOk, noun)) return true;
   return candidateNumbers(noun, f.num ?? "sg", () => 0).includes(n);
 }
+const pluralByFrame = (tags: readonly string[], noun: NounEntry) =>
+  !noun.uncountable && noun.declension.nominativ.pl !== "—" && (noun.sem ?? []).some((t) => tags.includes(t));
 
 // Фраза без підмета-власника (називний — сама група і є підметом; ownerless — «Je tu hodně…»): svůj сюди не можна.
 const ownerless = (f: DeclFrame, c: QuizCase) => c === "nominativ" || !!f.ownerless;
@@ -215,11 +222,24 @@ const DETERMINER_PARTNERS: PronounEntry[] = [...PRONOUNS, ...INDEFINITE_ADJ].fil
 const ADJECTIVE_PARTNERS: AdjectiveEntry[] = ADJECTIVES.filter((a) => adjQuizUsable(a.category) && a.semClass !== "relational");
 
 // Обмеження слова-займенника на число й відмінок (дані: quiz.num, quiz.massSg, quiz.nominative).
-function quizAllows(q: PronounQuiz, noun: NounEntry, c: QuizCase, n: GrammaticalNumber, f?: DeclFrame): boolean {
+// Обмеження самого слова, без іменника: лише це число (každý), svůj не в називному, quiz.nominative = false.
+function wordAllows(q: PronounQuiz, c: QuizCase, n: GrammaticalNumber): boolean {
   if (q.num && q.num !== n) return false;
-  if (q.needsOwner && (c === "nominativ" || (f && ownerless(f, c)))) return false;
-  if (q.massSg && n === "sg" && !noun.uncountable) return false;
+  if (q.needsOwner && c === "nominativ") return false;
   if (c === "nominativ" && q.nominative === false) return false;
+  return true;
+}
+function quizAllows(q: PronounQuiz, noun: NounEntry, c: QuizCase, n: GrammaticalNumber, f?: DeclFrame): boolean {
+  if (!wordAllows(q, c, n)) return false;
+  if (q.needsOwner && f && ownerless(f, c)) return false;
+  if (q.massSg && n === "sg" && !noun.uncountable) return false;
+  return true;
+}
+// Клітинка, яку треба питати (з реченням чи без): форма існує в мові. Однина všechen — лише з незлічуваним іменником,
+// тож у роді, де незлічуваних немає (чол. істот.: «všechen pes» — ні), клітинки немає.
+function cellAllowed(t: Tested, g: Gender, c: QuizCase, n: GrammaticalNumber): boolean {
+  if (!wordAllows(t.quiz, c, n)) return false;
+  if (t.quiz.massSg && n === "sg" && !NOUN_POOL.some((x) => x.uncountable && agreementGender(x, n) === g)) return false;
   return true;
 }
 
@@ -375,6 +395,33 @@ interface Built {
   nounIds: string[];
 }
 
+// Питання про слово з повною парадигмою — одне місце для обох видів: у реченні й без речення.
+function adjLikeQuestion(
+  t: Tested,
+  g: Gender,
+  c: QuizCase,
+  n: GrammaticalNumber,
+  id: string,
+  correct: string,
+  distractor: string,
+  contextPhrase?: string
+): DeclQuestion {
+  return {
+    kind: t.kind,
+    gender: g,
+    targetCase: c,
+    targetNumber: n,
+    comboId: id,
+    promptWord: t.baseCz ?? t.cz,
+    promptUk: t.baseUk ?? t.uk,
+    promptLabel: t.kind === "adjective" ? "прикметник" : "займенник",
+    taskText: taskTextFor(t, g, c, n),
+    ...(contextPhrase ? { contextPhrase } : {}),
+    correct,
+    options: shuffle([correct, distractor]),
+  };
+}
+
 // Питання для комбо: іменник (свіжі першими, вага 1/fit) → фрейм → партнер (навпіл) → вокалізація.
 // Перебір повний (стиль дублету → іменник → фрейм → з партнером / без), тож для комбо, що пройшло candidatesFor,
 // питання будується завжди: варіант «без партнера» в придатній фразі гарантовано існує.
@@ -434,23 +481,7 @@ function makeWithStyle(
         if (!distractor) continue;
         const text = prep ? vocalizeFor(r.text, [correct, distractor]) : r.text;
         if (!text) continue;
-        return {
-          q: {
-            kind: t.kind,
-            gender: g,
-            targetCase: c,
-            targetNumber: n,
-            comboId: id,
-            promptWord: t.baseCz ?? t.cz,
-            promptUk: t.baseUk ?? t.uk,
-            promptLabel: t.kind === "adjective" ? "прикметник" : "займенник",
-            taskText: taskTextFor(t, g, c, n),
-            contextPhrase: text,
-            correct,
-            options: shuffle([correct, distractor]),
-          },
-          nounIds: [noun.id],
-        };
+        return { q: adjLikeQuestion(t, g, c, n, id, correct, distractor, text), nounIds: [noun.id] };
       }
     }
   }
@@ -464,19 +495,33 @@ interface UnitCombo {
   make: (used: ReadonlySet<string>) => Built | null;
 }
 
+// Без речення: клітинка, під яку немає природної фрази (у teplý немає живих іменників), питається формою за підписом
+// роду, відмінка й числа, як у квізі «Іменники». Тож покриття не залежить від тегів: нове слово дірок не лишає,
+// невдалі теги дають хіба що питання без речення. Дистрактор — той самий перший за пріоритетом, що й у реченні.
+function makeBare(t: Tested, g: Gender, c: QuizCase, n: GrammaticalNumber, id: string): Built {
+  const idx = Math.random() < 0.5 ? 0 : 1;
+  const correct = pickForm(formsOf(t.decl[g][c][n]), idx);
+  const distractor = pickForm(formsOf(distractorCells(t.decl, g, c, n)[0]), idx);
+  return { q: adjLikeQuestion(t, g, c, n, id, correct, distractor), nounIds: [] };
+}
+
 function adjLikeUnits(pool: Tested[]): UnitCombo[] {
   const units: UnitCombo[] = [];
   for (const t of pool) {
     for (const g of GENDER_ORDER) {
       for (const c of QUIZ_CASES) {
         for (const n of NUMBERS) {
-          if (formsOf(t.decl[g][c][n]).length === 0 || !hasDistractorCell(t.decl, g, c, n)) continue;
-          // немає природної фрази з іменником цього роду — клітинку не питаємо
-          if (candidatesFor(t, g, c, n, true).length === 0) continue;
+          if (formsOf(t.decl[g][c][n]).length === 0 || !hasDistractorCell(t.decl, g, c, n) || !cellAllowed(t, g, c, n)) continue;
           const id = comboId(t.id, `${g}_${c}`, n);
+          const inSentence = candidatesFor(t, g, c, n, true).length > 0;
           // Повний список кандидатів — при першому питанні цього комбо, далі з пам'яті.
           const cands = once(() => candidatesFor(t, g, c, n));
-          units.push({ id, wordId: t.id, kind: t.kind, make: (used) => makeAdjLike(t, g, c, n, cands(), id, used) });
+          units.push({
+            id,
+            wordId: t.id,
+            kind: t.kind,
+            make: (used) => (inSentence ? makeAdjLike(t, g, c, n, cands(), id, used) : null) ?? makeBare(t, g, c, n, id),
+          });
         }
       }
     }
@@ -484,14 +529,15 @@ function adjLikeUnits(pool: Tested[]): UnitCombo[] {
   return units;
 }
 
+
 // ════════════════════ ОСОБОВІ ЗАЙМЕННИКИ ════════════════════
 // Правила (звірено з ÚJČ): дистрактор — форма того ж займенника з ІНШОГО відмінка, яка не є водночас формою
 // цільового відмінка (mě/mne — і родовий, і знахідний); фільтр довготи прибирає ji/jí. Підмет фрейму ≠ тестований
 // займенник; приклонка не перша в реченні; 3-тя особа без прийменника — ненаголошена (ho, mu), див. PERSONAL_QUIZ_FORMS.
-type Reg = 0 | 1;
+type Reg = 0 | 1 | 2;
 const PP_QUIZ_CASES: QuizCase[] = ["genitiv", "dativ", "akuzativ", "lokal", "instrumental"];
-const REG_LABEL_3: Record<Reg, string> = { 0: "без прийм.", 1: "після прийм." };
-const REG_LABEL_12: Record<Reg, string> = { 0: "короткий", 1: "довгий" };
+const REG_LABEL_3: Record<Reg, string> = { 0: "без прийм.", 1: "після прийм.", 2: "наголошений" };
+const REG_LABEL_12: Record<Reg, string> = { 0: "короткий", 1: "довгий", 2: "наголошений" };
 // 1-ша особа (já, my) — підмет «ти» у фреймі; решта — підмет «я».
 const FIRST_PERSON = new Set(["pp-ja", "pp-my"]);
 
@@ -509,22 +555,40 @@ function fillPersonal(fr: PersonalFrame, ans: string, antecedent?: string): stri
 
 // Антецедент для 3-ї особи: «Znáš [займенник] [прикметник] іменник?» — іменник за тегами ANTECEDENT_FRAME (особа чи
 // тварина), прикметник — з його fits, партнери навпіл. Рід узгодження — з урахуванням plGender (děti → жін.).
-function antecedentPool(g: Gender, n: GrammaticalNumber): NounEntry[] {
+// Для «чий?» число власника мусить читатися з форми: «Znáš otce?» — і один батько, і кілька (otce = вин. одн. і мн.),
+// тож jeho чи jejich вгадати не можна. Такий іменник власником не береться (forms — з таблиці, без списків слів).
+const numberUnambiguous = (x: NounEntry, n: GrammaticalNumber) =>
+  formsOf(x.declension.akuzativ[n === "sg" ? "pl" : "sg"]).every((f) => !formsOf(x.declension.akuzativ[n]).includes(f));
+// Антецедент: хто це (теги фрейму), які слова-партнери перед ним, чи мусить форма показувати число.
+interface AnteSpec {
+  frame: DeclFrame;
+  partners: PronounEntry[];
+  numberMatters: boolean;
+}
+function antecedentPool(g: Gender, n: GrammaticalNumber, spec: AnteSpec): NounEntry[] {
+  const { frame, numberMatters } = spec;
   return NOUN_POOL.filter(
-    (x) => agreementGender(x, n) === g && matchesFilter(x, ANTECEDENT_FRAME) && frameTakes(ANTECEDENT_FRAME, x, n, "akuzativ") && nounForm(x, "akuzativ", n)
+    (x) =>
+      agreementGender(x, n) === g &&
+      matchesFilter(x, frame) &&
+      frameTakes(frame, x, n, "akuzativ") &&
+      nounForm(x, "akuzativ", n) &&
+      (!numberMatters || numberUnambiguous(x, n))
   );
 }
+const PERSONAL_ANTE: AnteSpec = { frame: ANTECEDENT_FRAME, partners: DETERMINER_PARTNERS, numberMatters: false };
 // oni: рід антецедента довільний (непрямі форми множини спільні), але лише з тих, де є особа чи тварина.
-const ONI_GENDERS = GENDER_ORDER.filter((g) => antecedentPool(g, "pl").length > 0);
+const ONI_GENDERS = GENDER_ORDER.filter((g) => antecedentPool(g, "pl", PERSONAL_ANTE).length > 0);
 
-function buildAntecedent(g: Gender, n: GrammaticalNumber, used: Set<string>): string {
-  const pool = antecedentPool(g, n);
+function buildAntecedent(g: Gender, n: GrammaticalNumber, used: Set<string>, spec: AnteSpec = PERSONAL_ANTE): string {
+  const { partners } = spec;
+  const pool = antecedentPool(g, n, spec);
   const noun = freshWeightedOrder(pool, (x) => used.has(x.id), fitOf)[0];
   if (!noun) return "";
   used.add(noun.id);
   const parts: string[] = [];
   if (Math.random() < 0.5) {
-    const d = randomOf(DETERMINER_PARTNERS.map((p) => determinerForm(p, noun, g, "akuzativ", n)).filter((x): x is string => !!x));
+    const d = randomOf(partners.map((p) => determinerForm(p, noun, g, "akuzativ", n)).filter((x): x is string => !!x));
     if (d) parts.push(d);
   }
   if (Math.random() < 0.5) {
@@ -535,11 +599,12 @@ function buildAntecedent(g: Gender, n: GrammaticalNumber, used: Set<string>): st
   return `Znáš ${parts.join(" ")}?`;
 }
 
-function ppTaskText(g: Gender | null, c: CzechCase, reg: Reg, is3rdPerson: boolean): string {
+// regLbl null — у займенника одна форма на відмінок (my, vy: nás, nám, námi), регістр не пишемо.
+function ppTaskText(g: Gender | null, c: CzechCase, reg: Reg | null, is3rdPerson: boolean): string {
   const l = CASE_LABELS[c];
-  const regLbl = is3rdPerson ? REG_LABEL_3[reg] : REG_LABEL_12[reg];
+  const regLbl = reg === null ? "" : `, ${is3rdPerson ? REG_LABEL_3[reg] : REG_LABEL_12[reg]}`;
   const genPart = g ? `${GENDER_SHORT[g]}, ` : "";
-  return `Оберіть займенник: ${genPart}${l.uk} (${l.cz}) — ${l.question}, ${regLbl}`;
+  return `Оберіть займенник: ${genPart}${l.uk} (${l.cz}) — ${l.question}${regLbl}`;
 }
 
 interface PPSpec {
@@ -560,8 +625,8 @@ interface PPSpec {
 function personalUnits(): UnitCombo[] {
   const units: UnitCombo[] = [];
   const push = (c: PPSpec) => {
-    const avoid = new Set(c.avoid.filter((f) => f && f !== "—").map(collapseVowelLength));
-    const ok = (d: string) => isUsableDistractor(c.correct, d) && !avoid.has(collapseVowelLength(d));
+    const avoid = new Set(c.avoid.filter((f) => f && f !== "—"));
+    const ok = (d: string) => !!d && d !== "—" && d !== c.correct && !avoid.has(d);
     if (!c.forms.some(ok)) return;
     units.push({
       id: c.id,
@@ -593,7 +658,7 @@ function personalUnits(): UnitCombo[] {
     });
   };
   const otherForms = (getForm: (c: QuizCase, r: Reg) => string, except: QuizCase) =>
-    PP_QUIZ_CASES.filter((c) => c !== except).flatMap((c) => [getForm(c, 0), getForm(c, 1)]);
+    PP_QUIZ_CASES.filter((c) => c !== except).flatMap((c) => [getForm(c, 0), getForm(c, 1), getForm(c, 2)]);
 
   for (const entry of PERSONAL_PRONOUNS) {
     if (entry.id === "pp-se") {
@@ -620,12 +685,16 @@ function personalUnits(): UnitCombo[] {
     }
     if (!entry.gendered) {
       const decl: PersonalDeclension = entry.declension;
-      const getForm = (c: QuizCase, r: Reg) => firstForm(r === 0 ? decl[c].a : decl[c].b);
+      // Одна форма на відмінок (my, vy — колонка b «—»): форма та сама з прийменником і без, тож на відмінок одне
+      // питання — у фразі без прийменника, а місцевий і орудний (лише з прийменником) — у фразі з ним (o nás, s námi).
+      const single = entry.columns.b === "—";
+      const getForm = (c: QuizCase, r: Reg) => firstForm(r === 0 || single ? decl[c].a : decl[c].b);
       for (const c of PP_QUIZ_CASES) {
         for (const r of [0, 1] as Reg[]) {
           const cf = PERSONAL_FRAMES[c]?.[r];
           const form = getForm(c, r);
           if (!cf || !form || form === "—") continue;
+          if (single && r === 1 && PERSONAL_FRAMES[c]?.[0]) continue;
           const frame = FIRST_PERSON.has(entry.id) ? cf.s2 : cf.s1;
           push({
             id: comboId(entry.id, `x_${c}`, `${r}`),
@@ -633,7 +702,7 @@ function personalUnits(): UnitCombo[] {
             correct: form,
             forms: otherForms(getForm, c),
             avoid: [getForm(c, 0), getForm(c, 1)],
-            taskText: ppTaskText(null, c, r, false),
+            taskText: ppTaskText(null, c, single ? null : r, false),
             context: () => fillPersonal(frame, form),
             promptWord: entry.cz,
             promptUk: entry.uk,
@@ -645,24 +714,27 @@ function personalUnits(): UnitCombo[] {
       }
       continue;
     }
-    // 3-тя особа: форми з PERSONAL_QUIZ_FORMS (ненаголошені без прийменника).
+    // 3-тя особа: форми з PERSONAL_QUIZ_FORMS (ненаголошена без прийменника, після прийменника, наголошена).
     const isOni = entry.id === "pp-oni";
-    const tables: { g: Gender; idPart: string; table: Partial<Record<QuizCase, [string, string]>> }[] = isOni
+    const tables: { g: Gender; idPart: string; table: Partial<Record<QuizCase, [string, string, string?]>> }[] = isOni
       ? [{ g: "masc_anim", idPart: "pl", table: PERSONAL_QUIZ_FORMS.oni }]
       : (["masc_anim", "fem", "neut"] as const).map((g) => ({ g, idPart: g, table: PERSONAL_QUIZ_FORMS.on[g] }));
     for (const { g, idPart, table } of tables) {
       const getForm = (c: QuizCase, r: Reg) => table[c]?.[r] ?? "—";
       for (const c of PP_QUIZ_CASES) {
-        for (const r of [0, 1] as Reg[]) {
+        for (const r of [0, 1, 2] as Reg[]) {
           const cf = PERSONAL_FRAMES[c]?.[r];
           const form = getForm(c, r);
           if (!cf || !form || form === "—") continue;
+          // Наголошена форма: дистрактор — ненаголошена того ж відмінка («Dej to [jemu] / mu, ne mně»), бо саме цей
+          // вибір і тренуємо; в інших регістрах наголошена форма не дистрактор (з наголосом вона теж правильна).
+          const stressed = r === 2;
           push({
             id: comboId(entry.id, `${idPart}_${c}`, `${r}`),
             wordId: entry.id,
             correct: form,
-            forms: otherForms(getForm, c),
-            avoid: [getForm(c, 0), getForm(c, 1)],
+            forms: stressed ? [getForm(c, 0)] : otherForms(getForm, c),
+            avoid: stressed ? [] : [getForm(c, 0), getForm(c, 1), getForm(c, 2)],
             taskText: ppTaskText(isOni ? null : g, c, r, true),
             // oni: рід лише декорує антецедент (непрямі форми множини спільні для всіх родів)
             context: (used) =>
@@ -675,6 +747,94 @@ function personalUnits(): UnitCombo[] {
           });
         }
       }
+    }
+  }
+  return units;
+}
+
+// ═══════════ «ЧИЙ?»: jeho / její / jejich за власником ═══════════
+// Власник — у першому реченні (антецедент, як у 3-ї особи: «Znáš tu ženu?»), друге — звичайна фраза банку з присвійним
+// займенником на місці пропуску: «Bydlím v ___ domě» → jejím. Дистрактор — та сама клітинка в іншого власника (jeho,
+// jejich), тож перевіряється і вибір слова, і відмінювання «její». Слова й власники — з даних (PronounQuiz.owner);
+// речення й іменники — ті самі, що для відмінюваного присвійного (його fits і фрази). Підмет фрази — я / ти, тож svůj
+// тут неможливий: власник не підмет.
+type Owner = NonNullable<PronounQuiz["owner"]>;
+const OWNER_SUBJECT: Record<Owner, { genders: Gender[]; n: GrammaticalNumber }> = {
+  m: { genders: ["masc_anim", "neut"], n: "sg" }, // він / воно: Petr, to dítě
+  f: { genders: ["fem"], n: "sg" },
+  pl: { genders: GENDER_ORDER, n: "pl" },
+};
+const ownerForm = (p: PronounEntry, g: Gender, c: QuizCase, n: GrammaticalNumber) =>
+  p.declinable ? firstForm(p.declension[g][c][n]) : p.invariantForm;
+
+function possessiveUnits(pool: Tested[]): UnitCombo[] {
+  const owners = PRONOUNS.filter((p) => p.quiz?.owner);
+  // Власник — людина (OWNER_FRAME), форма показує число, в антецеденті жодного jeho / její / jejich: «Znáš jeho ženu?
+  // … jejím» плутало б, чий це власник.
+  const ante: AnteSpec = { frame: OWNER_FRAME, partners: DETERMINER_PARTNERS.filter((p) => !owners.includes(p)), numberMatters: true };
+  const frameWord = pool.find((t) => owners.some((o) => o.id === t.id)); // відмінюваний присвійний (její)
+  if (!frameWord) return [];
+  const label = {
+    word: owners.map((o) => o.cz).join(" / "),
+    uk: owners.map((o) => o.uk).join(" / "),
+  };
+  const units: UnitCombo[] = [];
+  for (const p of owners) {
+    const subj = OWNER_SUBJECT[p.quiz!.owner!];
+    const anteGenders = subj.genders.filter((g) => antecedentPool(g, subj.n, ante).length > 0);
+    if (anteGenders.length === 0) continue;
+    for (const c of QUIZ_CASES) {
+      const cells = once(() =>
+        GENDER_ORDER.flatMap((g) => NUMBERS.map((n) => ({ g, n, cands: candidatesFor(frameWord, g, c, n) }))).filter((x) => x.cands.length > 0)
+      );
+      if (cells().length === 0) continue;
+      const id = comboId(p.id, `owner_${c}`, "x");
+      units.push({
+        id,
+        wordId: p.id,
+        kind: "possessive",
+        make: (used) => {
+          for (const { g, n, cands } of shuffle(cells())) {
+            const correct = ownerForm(p, g, c, n);
+            const others = shuffle(owners.filter((o) => o !== p).map((o) => ownerForm(o, g, c, n)).filter((f) => f !== correct));
+            if (others.length === 0) continue;
+            const scratch = new Set(used);
+            const before = new Set(scratch);
+            const antecedent = buildAntecedent(randomOf(anteGenders)!, subj.n, scratch, ante);
+            const anteIds = [...scratch].filter((x) => !before.has(x));
+            for (const { noun, frames } of freshWeightedOrder(cands, (x) => scratch.has(x.noun.id), (x) => fitOf(x.noun))) {
+              if (anteIds.includes(noun.id)) continue; // не «Znáš toho kluka? Vidím jeho kluka»
+              for (const { f, needsPartner } of shuffle(frames)) {
+                if (needsPartner) continue;
+                const r = renderFrame(f, [BLANK], [nounForm(noun, c, n)!]);
+                if (!r) continue;
+                const prep = r.lead === BLANK ? blankLeadPrep(f) : null;
+                const text = prep ? vocalizeFor(r.text, [correct, others[0]]) : r.text;
+                if (!text) continue;
+                const l = CASE_LABELS[c];
+                return {
+                  q: {
+                    kind: "possessive",
+                    gender: g,
+                    targetCase: c,
+                    targetNumber: n,
+                    comboId: id,
+                    promptWord: label.word,
+                    promptUk: label.uk,
+                    promptLabel: "займенник",
+                    taskText: `Оберіть займенник: чий? (власник — у першому реченні), ${l.uk} (${l.cz})`,
+                    contextPhrase: `${antecedent} ${text}`,
+                    correct,
+                    options: shuffle([correct, others[0]]),
+                  },
+                  nounIds: [noun.id, ...anteIds],
+                };
+              }
+            }
+          }
+          return null;
+        },
+      });
     }
   }
   return units;
@@ -750,16 +910,20 @@ if (typeof __DEV__ !== "undefined" && __DEV__) devCheckData();
 
 // ─────────────── Сесія ───────────────
 // Пул комбінацій залежить лише від даних — будується раз за запуск застосунку.
-const allDeclensionCombos = once((): UnitCombo[] => [
-  ...adjLikeUnits(buildTestedPool()),
-  ...personalUnits(),
-  ...coreUnits(INTERROGATIVE_CORE, "interrogative-core"),
-  ...coreUnits(INDEFINITE_CORE, "indefinite-core"),
-]);
+const allDeclensionCombos = once((): UnitCombo[] => {
+  const pool = buildTestedPool();
+  return [
+    ...adjLikeUnits(pool),
+    ...personalUnits(),
+    ...coreUnits(INTERROGATIVE_CORE, "interrogative-core"),
+    ...coreUnits(INDEFINITE_CORE, "indefinite-core"),
+    ...possessiveUnits(pool),
+  ];
+});
 
 // Баланс за типом: численний відкритий клас прикметників не має витісняти закриті групи займенників. Кожен тип
 // набирає свій мінімум зі свого пулу; недобір іде в спільний зважений пул. pronoun 3 → 2 звільнило місце для
-// нових груп indefinite / indefinite-core (по 1).
+// нових груп indefinite / indefinite-core (по 1); possessive («чий?», 18 комбо) — 1.
 const MIN_SLOTS: Partial<Record<DeclKind, number>> = {
   personal: 2,
   pronoun: 2,
@@ -767,6 +931,7 @@ const MIN_SLOTS: Partial<Record<DeclKind, number>> = {
   "interrogative-core": 1,
   indefinite: 1,
   "indefinite-core": 1,
+  possessive: 1,
 };
 
 export function generateDeclensionSession(
