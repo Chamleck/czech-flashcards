@@ -258,8 +258,8 @@ function buildAspectQuestion(testVerb: VerbEntry): VerbQuestion | null {
         promptLabel: "дієслово",
         taskText:
           testVerb.aspect === "imperfective"
-            ? "Оберіть ВИД: дія повторювана / у процесі → недоконаний"
-            : "Оберіть ВИД: дія завершена / одноразова → доконаний",
+            ? "Оберіть ВИД: дія як процес, стан чи повторення → недоконаний"
+            : "Оберіть ВИД: дія як завершений результат → доконаний",
         contextPhrase: correct.phrase,
         correct: correct.form,
         options: shuffle([correct.form, distractorForm]),

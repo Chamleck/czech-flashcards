@@ -19,6 +19,17 @@ import { CardinalEntry } from "../types";
 // čtvery (IJP, hesla dvoje, oboje, troje, čtvery; jedny / jedna — множина в heslech jeden, jedna, jedno). Середній
 // рід відрізняється лише в jedny → jedna (називний і знахідний). Для čtvery IJP допускає й «čtvera» із середнім
 // родом — показуємо одну форму (правило про валідні варіанти), квіз «čtvera» помилкою не подає.
+//
+// ПРАВИЛА ДОДАВАННЯ ЧИСЛІВНИКІВ (картка NumeralCard, квіз «Числівники»)
+//  1. kind — за типом відмінювання (gendered / twoForm / invariantDecl / oblique); форми — за двома джерелами
+//     (IJP + ще одне), дублет через « / », перша форма — показувана.
+//  2. value — число, яке слово називає. З нього квіз складає 21–99: десятки 20 … 90 + одиниці 1–9, група одиниці =
+//     її значення, 5–9 разом (comboId compound-1 … compound-5). Без value слово в складені числа не потрапляє; немає
+//     лише в oba (не число, а «обидва»). Сотні й тисячі — не тут: це іменники з numeralValue (data/nouns.ts).
+//  3. pluralOnly — лише для слів з окремою формою при іменниках лише з множиною (jedny, dvoje, oboje, troje,
+//     čtvery); від pět — звичайне «pět kalhot», поля немає.
+//  4. Нове слово потрапляє у квіз саме (кожен відмінок — окреме комбо). Перед здачею — оракул
+//     scripts/check-quiz-coverage.ts --only=numerals: «Помилок: 0»; прочитай нові речення.
 
 export const CARDINALS: CardinalEntry[] = [
   // ─────────────── jeden (gendered, як ten) ───────────────

@@ -17,6 +17,10 @@ import { PersonalPronounEntry, PronounEntry } from "../types";
 // Дві форми запису, як у питальних слів: někdo/nikdo/něco/nic — PersonalPronounEntry (без роду,
 // одна колонка); nějaký/žádný/každý — PronounEntry (таби роду). Картку вибирає резолвер
 // pronounEntries.ts за id.
+//
+// ПРАВИЛА для квізу «Прикметники та займенники» — у шапці data/pronouns.ts (поле quiz) і в коментарі до quizFrames
+// (types/index.ts): слова з родом беруть фрази з data/declensionFrames.ts, слова без роду — власні речення quizFrames.
+// Перед здачею — оракул scripts/check-quiz-coverage.ts --only=decl: «Помилок: 0».
 
 const d = (a: string, b: string) => ({ a, b });
 const COLS_ONE = { a: "форма", b: "—" };

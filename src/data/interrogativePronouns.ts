@@ -12,6 +12,10 @@ import { PronounEntry, PersonalPronounEntry, PersonalDeclension } from "../types
 // velký (jaký, чергування k→c: jaký→jací), starý (který, чергування r→ř:
 // který→kteří) і її (čí, без чергування) — вокатив виправлено на "—"
 // (займенники, на відміну від прикметників, не мають вокатива).
+//
+// ПРАВИЛА для квізу «Прикметники та займенники» — у шапці data/pronouns.ts (поле quiz) і в коментарі до quizFrames
+// (types/index.ts): слова з родом беруть фрази з data/declensionFrames.ts, слова без роду — власні речення quizFrames.
+// Перед здачею — оракул scripts/check-quiz-coverage.ts --only=decl: «Помилок: 0».
 
 export const INTERROGATIVE_ADJ: PronounEntry[] = [
   {

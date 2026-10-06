@@ -70,7 +70,7 @@ export const VERBS: VerbEntry[] = [
   {
     id: "brat",
     durative: false,
-    complement: "léky",
+    complement: "deštník",
     delimitativePartner: false,
     uk: "брати",
     cz: "brát",
@@ -507,7 +507,7 @@ export const VERBS: VerbEntry[] = [
   {
     id: "kryt",
     durative: false,
-    complement: "hrnec pokličkou",
+    complement: "auto plachtou",
     delimitativePartner: false,
     uk: "крити / ховати",
     cz: "krýt",
@@ -1331,7 +1331,7 @@ export const VERBS: VerbEntry[] = [
   },
   {
     id: "vzit",
-    resultative: true,
+    resultative: false,
     uk: "взяти",
     cz: "vzít",
     aspect: "perfective",
