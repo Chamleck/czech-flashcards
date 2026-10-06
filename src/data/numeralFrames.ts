@@ -16,8 +16,8 @@ import type { QuizCase } from "./declensionFrames";
 //     sto…, dvacet jeden; множина — після dva / tři / čtyři, dvacet dva…, dvoje (IJP id=792: «pět mužů přišlo»,
 //     «dva muži přišli»). Тому окремих фраз для однини й множини не треба.
 //  3. {v} {k} {s} {z} — прийменник перед групою; ve / ke / se / ze вирішує перше слово групи (числівник) за
-//     CLUSTER_RULES (data/prepositionPartners.ts). Невідома група приголосних (dv-, čt-) — ця фраза для такого
-//     числівника не береться (не вгадуємо «s dvěma» / «se dvěma»).
+//     CLUSTER_RULES (data/prepositionPartners.ts). Невідома група приголосних (dv-, čt- з k / s / z; з v вони
+//     класифіковані: ve dvou, ve čtyřech) — ця фраза для такого числівника не береться (не вгадуємо «s dvěma» / «se dvěma»).
 //  4. many: true — лише для кількості від двох (mezi: «mezi dvěma domy», не «mezi jedním domem»).
 //     max — найбільша кількість, за якої фраза ще природна (sto, tisíc… мають numeralValue у nouns.ts; прості й
 //     складені числівники — до 99). max: 99 — фраза про звичайний досвід однієї людини, де sto / tisíc безглузді
@@ -86,7 +86,7 @@ export const NUMERAL_FRAMES: Record<QuizCase, NumeralFrame[]> = {
     { text: "Za ___ je les.", any: ["building"], max: 99 },
     { text: "Před ___ jsem tam byl.", any: ["timeUnit"], max: 99 },
     { text: "Přišel {s} ___.", any: ["carried"], none: ["document"], max: 99 },
-    // mezi — без вокалізації, тож годиться й для dvěma / čtyřmi / dvojími (група dv-, čt- не класифікована)
+    // mezi — без вокалізації, тож годиться й для dvěma / čtyřmi / dvojími (група dv-, čt- з s не класифікована)
     { text: "Mezi ___ leží dopis.", any: ["item", "carried", "clothes"], none: ["support", "furniture"], many: true, max: 99 },
   ],
 };

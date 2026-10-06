@@ -1,4 +1,5 @@
-import { InvariantWordEntry } from "../types";
+import { AdverbSense, SpatialQuestionEntry, SpatialRole } from "../types";
+import { firstForm } from "../utils/quizCommon";
 
 // Питальні прислівники місця: kde? / kam? / odkud? / kudy? — незмінна частина
 // мови (zájmenná příslovce tázací, czechency.org), без парадигми, тому по
@@ -9,10 +10,21 @@ import { InvariantWordEntry } from "../types";
 // Ці ж слова — правильні відповіді у reverse-квізі adverbQuizEngine.ts
 // (кв "Прислівники місця": дано речення-відповідь, обрати яке питання воно
 // покриває). Дані тут — для словника/граматики; квіз-логіка окремо.
+//
+// ПРАВИЛА ДОДАВАННЯ (картка SimpleWordCard, квіз «Прислівники місця»)
+//  1. role — ОБОВ'ЯЗКОВЕ: яку просторову роль питає слово (loc — де?, dir — куди?, orig — звідки?, path — кудою?);
+//     по ОДНОМУ слову на роль. Сенси прислівників у data/adverbs.ts посилаються на роль (поле asks), а не на текст.
+//  2. uk — перша частина до « / » — це підпис сенсу на картці прислівника («де?», «кудою?»).
+//  3. quizHint — текст завдання прямого питання квізу («Де? (стан, без руху)»): коротко, українською, роль як
+//     контраст до інших (стан / рух до / рух від / маршрут).
+//  4. cz — правильна відповідь зворотного питання квізу («На яке питання відповідає?»).
+//  5. Перед здачею — оракул scripts/check-quiz-coverage.ts --only=adverbs: «Помилок: 0».
 
-export const INTERROGATIVE_ADVERBS: InvariantWordEntry[] = [
+export const INTERROGATIVE_ADVERBS: SpatialQuestionEntry[] = [
   {
     id: "int-kde",
+    role: "loc",
+    quizHint: "Де? (стан, без руху)",
     cz: "kde",
     uk: "де?",
     examples: [
@@ -24,6 +36,8 @@ export const INTERROGATIVE_ADVERBS: InvariantWordEntry[] = [
   },
   {
     id: "int-kam",
+    role: "dir",
+    quizHint: "Куди? (рух ДО місця)",
     cz: "kam",
     uk: "куди?",
     examples: [
@@ -35,6 +49,8 @@ export const INTERROGATIVE_ADVERBS: InvariantWordEntry[] = [
   },
   {
     id: "int-odkud",
+    role: "orig",
+    quizHint: "Звідки? (рух ВІД місця)",
     cz: "odkud",
     uk: "звідки?",
     examples: [
@@ -46,6 +62,8 @@ export const INTERROGATIVE_ADVERBS: InvariantWordEntry[] = [
   },
   {
     id: "int-kudy",
+    role: "path",
+    quizHint: "Кудою? (маршрут)",
     cz: "kudy",
     uk: "кудою? / яким шляхом?",
     examples: [
@@ -56,3 +74,18 @@ export const INTERROGATIVE_ADVERBS: InvariantWordEntry[] = [
     ],
   },
 ];
+
+// Питальне слово для ролі (рівно одне на роль — правило 1).
+export function spatialQuestion(role: SpatialRole): SpatialQuestionEntry {
+  const q = INTERROGATIVE_ADVERBS.find((x) => x.role === role);
+  if (!q) throw new Error(`Немає питального прислівника для ролі ${role}`);
+  return q;
+}
+
+// Ролі сенсу як звичайний масив (порожній у rovně).
+export const rolesOf = (sense: AdverbSense): readonly SpatialRole[] => sense.asks;
+
+// Підпис сенсу прислівника на картці: питання, на які відповідає форма («де?», «де? / куди?»), або власний label.
+export function senseLabel(sense: AdverbSense): string {
+  return sense.label ?? rolesOf(sense).map((r) => firstForm(spatialQuestion(r).uk)).join(" / ");
+}

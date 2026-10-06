@@ -6,6 +6,7 @@ import { PosEmoji } from "./PosEmoji";
 import { TileEmoji } from "./TileEmoji";
 import { Speakable } from "./Speakable";
 import { InfoBanner } from "./InfoBanner";
+import { rolesOf, senseLabel } from "../data/interrogativeAdverbs";
 
 interface Props {
   entry: SpatialAdverbEntry;
@@ -13,19 +14,15 @@ interface Props {
   onReveal: () => void;
 }
 
-// Колір за СЕНСОМ (де?/куди?/звідки?), не за позицією в масиві — інакше tam/
-// doma (неповний набір сенсів) отримали б неправильний колір: у tam «звідки?»
-// стоїть на index=1, і за позицією він хибно пофарбувався б як «куди?» (mint)
-// замість «звідки?» (honey), хоча в усіх повних трійках звідки? — завжди honey.
-// Ті самі семантичні кольори, що вже усталені для дуальних прийменників:
-// lilac = місце/спокій ("де?"), mint = рух ("куди?"), honey = третій контраст
-// ("звідки?", як exchange у «za»).
-function accentForLabel(label: string): string {
-  if (label.includes("звідки")) return theme.colors.honey;
-  // Точна рівність, НЕ includes — інакше "де? / куди?" (комбінований лейбл tam)
-  // теж хибно спрацював би на .includes("куди") і пофарбувався як "куди?".
-  if (label === "куди?") return theme.colors.mint;
-  return theme.colors.lilac; // "де?", комбінований "де? / куди?" (tam), або самостійне "напрямок" (rovně)
+// Колір за РОЛЛЮ сенсу (поле asks), не за позицією в масиві — інакше tam/doma (неповний набір сенсів) отримали б
+// неправильний колір. Ті самі семантичні кольори, що вже усталені для дуальних прийменників: lilac = місце/спокій
+// ("де?", а також tam «де? / куди?» і rovně), mint = рух ("куди?"), honey = третій контраст ("звідки?", як exchange
+// у «za»). «кудою?» — lilac, як було.
+function accentFor(sense: AdverbSense): string {
+  const roles = rolesOf(sense);
+  if (roles.includes("orig")) return theme.colors.honey;
+  if (roles.length === 1 && roles[0] === "dir") return theme.colors.mint;
+  return theme.colors.lilac;
 }
 
 // Один приклад-рядок з озвученням. Speakable — сиблінг у View (не в <Text>),
@@ -49,7 +46,7 @@ function ExampleRow({ id, cz, uk }: { id: string; cz: string; uk: string }) {
 function SenseBlock({ idPrefix, sense, accent }: { idPrefix: string; sense: AdverbSense; accent: string }) {
   return (
     <View style={[styles.senseBlock, { borderLeftColor: accent }]}>
-      <Text style={[styles.senseHeading, { color: accent }]}>{sense.label}</Text>
+      <Text style={[styles.senseHeading, { color: accent }]}>{senseLabel(sense)}</Text>
       <Speakable id={`${idPrefix}:word`} text={sense.cz} style={[styles.senseWord, { color: accent }]} />
       {sense.examples.map((ex, i) => (
         <ExampleRow key={i} id={`${idPrefix}:ex${i}`} cz={ex.cz} uk={ex.uk} />
@@ -85,7 +82,7 @@ export function AdverbCard({ entry, revealed, onReveal }: Props) {
           {entry.note && <InfoBanner paragraphs={[entry.note]} />}
 
           {entry.senses.map((sense, i) => (
-            <SenseBlock key={i} idPrefix={`${entry.id}:${i}`} sense={sense} accent={accentForLabel(sense.label)} />
+            <SenseBlock key={i} idPrefix={`${entry.id}:${i}`} sense={sense} accent={accentFor(sense)} />
           ))}
         </ScrollView>
       )}

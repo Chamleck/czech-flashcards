@@ -11,7 +11,7 @@ import { NOUN_FRAMES, NounFrame } from "../data/nounFrames";
 import type { NounTag } from "../data/nounTags";
 import { matchesNeeds, acceptedForms, freshWeightedOrder, hasNumber, pluralOnly, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
-import { NUMBER_LABEL, formsOf, isUsableDistractor, once, shuffle, splitForms } from "./quizCommon";
+import { NUMBER_LABEL, formsOf, isUsableDistractor, once, shuffle, splitForms, topUpRound } from "./quizCommon";
 
 // ─────────────────── Квіз «Іменники»: форма іменника за відмінком і числом ───────────────────
 // Атомарна одиниця — «слово + відмінок + число» (comboId). Питання — речення з data/nounFrames.ts, де пропуск —
@@ -230,12 +230,7 @@ export function generateSession(
     questions.push(b.q);
   };
   chosen.forEach((c, i) => take(c, i % 2 === 0 ? "number" : "case"));
-  // Добір, якщо make повернув null (не мало б статися: комбо без питань відсіяні при переліченні).
-  if (questions.length < count) {
-    for (const c of shuffle(combos)) {
-      if (questions.length >= count) break;
-      if (!questions.some((x) => x.comboId === c.id)) take(c, questions.length % 2 === 0 ? "number" : "case");
-    }
-  }
+  // Добір (не мало б статися: комбо без питань відсіяні при переліченні).
+  topUpRound(questions, count, combos, (c) => take(c, questions.length % 2 === 0 ? "number" : "case"));
   return questions;
 }

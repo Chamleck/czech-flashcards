@@ -283,6 +283,12 @@ export const CLUSTER_RULES: Record<string, Partial<Record<VocalPrep, VocalDecisi
   pt: {},
   // tř-: ve třídě, ke třem, se třemi, ze třídy
   tř: ALL_VOCAL,
+  // v + čt- / dv- (рішення Ніка 2026-10-06, квіз «Дата й час»): ve čtvrtek, ve čtvrt na tři, ve čtyři, ve dvě, ve dvanáct,
+  // ve dveřích. IJP id=770: перед трьома приголосними (čtv-) «většinou vokalizujeme», а де друга приголосна та сама,
+  // що в прийменнику (dv- після v), вокалізація «zvláště frekventovaná»; IJP heslo čtvrtek — «ve čtvrtek»; mozaika.eu
+  // (Kolik je hodin?): «Ve dvě. Ve tři. Ve čtyři.». k/s/z тут не класифіковані — квіз таких фраз не ставить.
+  čt: { v: "vocal" },
+  dv: { v: "vocal" },
   // ── Групи з прикметників і займенників (квіз «Прикметники та займенники»), за тими самими правилами IJP id=770 ──
   // друга приголосна l — «předložka se většinou nevokalizuje»: v mladém, k dlouhému, s tlustým, z mladého
   ml: ALL_PLAIN, dl: ALL_PLAIN, tl: ALL_PLAIN,

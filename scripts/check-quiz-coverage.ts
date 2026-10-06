@@ -41,12 +41,14 @@ import { NOUNS } from "../src/data/nouns";
 import { VERBS } from "../src/data/verbs";
 import { BYT_FUTURE } from "../src/data/auxVerbs";
 import { ADVERBS } from "../src/data/adverbs";
+import { INTERROGATIVE_ADVERBS } from "../src/data/interrogativeAdverbs";
+import { DAY_PARTS } from "../src/data/timeforms";
 import { PREPOSITIONS } from "../src/data/prepositions";
 import { CARDINALS } from "../src/data/cardinals";
 import { DATE_ORDINALS } from "../src/data/dates";
 import { NOUN_CATS_EXCLUDED_FROM_QUIZ } from "../src/data/categories";
 import { adjQuizUsable } from "../src/data/adjectiveCategories";
-import { CASE_ORDER, CzechCase, FullDeclension, Gender, GENDER_ORDER, GrammaticalNumber, NounEntry, PERSON_ORDER, PronounEntry, PronounQuiz, VerbEntry } from "../src/types";
+import { AdverbSense, CASE_ORDER, CzechCase, FullDeclension, Gender, GENDER_ORDER, GrammaticalNumber, NounEntry, PERSON_ORDER, PronounEntry, PronounQuiz, VerbEntry } from "../src/types";
 
 // ─────────────── Звіт ───────────────
 interface Report {
@@ -77,6 +79,8 @@ interface AnyQ {
   options: string[];
   contextPhrase?: string;
   taskText: string;
+  promptWord?: string;
+  promptUk?: string;
 }
 type Gen<Q extends AnyQ> = (store: MistakeStore) => Q[];
 const SESSION = 12;
@@ -485,36 +489,242 @@ function checkVerbs(r: Report, gen: Gen<AnyQ>): void {
 }
 
 // ═════════════ «Прислівники місця» ═════════════
+// Ролі форм — з даних (asks), питальні слова — з data/interrogativeAdverbs.ts. Обов'язково: кожна форма з питанням —
+// прямим питанням (якщо в слова є форма з іншою роллю), кожна форма з ОДНИМ питанням — ще й зворотним.
 function checkAdverbs(r: Report, gen: Gen<AnyQ>): void {
   const QUIZ = "Прислівники";
-  // Форма спитана, якщо є питання цього слова, де вона — відповідь (прямий напрям) або стоїть у реченні (зворотний:
-  // «за формою — питання»).
-  if (FOCUS) return;
-  const asked = new Set<string>();
-  for (let i = 0; i < 3000; i++)
-    for (const q of gen({})) {
-      basic(r, QUIZ, q);
-      const entry = q.comboId.split("::")[0];
-      for (const a of ADVERBS)
-        if (a.id === entry) for (const s of a.senses) if (q.correct === s.cz || (q.contextPhrase ?? "").toLowerCase().includes(s.cz.toLowerCase())) asked.add(`${a.id}|${s.cz}`);
-    }
+  const qWord = (role: string) => INTERROGATIVE_ADVERBS.find((x) => x.role === role);
+  const roles = (s: AdverbSense): readonly string[] => s.asks;
   for (const a of ADVERBS) {
-    if (a.senses.length < 2) { exclude(r, `${QUIZ}: одна форма (rovně) — немає з чим протиставити`); continue; }
-    for (const s of a.senses) if (!asked.has(`${a.id}|${s.cz}`)) gap(r, QUIZ, `${a.id}: «${s.cz}» (${s.label}) не питається`);
+    for (const s of a.senses) {
+      const rs = roles(s);
+      if (rs.length === 0) { exclude(r, `${QUIZ}: форма без питання (${s.cz}) — лише напрямок`); continue; }
+      const others = a.senses.filter((o) => o !== s && !roles(o).some((x) => rs.includes(x)));
+      // прямий: за підказкою ролі — форма; дистрактор — інша форма слова з іншою роллю
+      const fid = `${a.id}::${rs[0]}::x`;
+      if (others.length === 0) exclude(r, `${QUIZ}: одна форма (${s.cz}) — немає з чим протиставити`);
+      else {
+        const qs = forced(gen, fid);
+        if (inFocus(fid) && qs.length === 0) gap(r, QUIZ, `${fid}: «${s.cz}» (${rs.join("+")}) не питається прямим питанням`);
+        for (const q of qs) {
+          basic(r, QUIZ, q);
+          const bad = (m: string) => r.errors.push(`${QUIZ}: ${q.comboId}: ${m} — «${q.contextPhrase}» [${q.options.join(" / ")}]`);
+          if (q.correct !== s.cz) bad(`правильна не «${s.cz}»`);
+          const d = distractorOf(q);
+          if (!others.some((o) => o.cz === d)) bad("дистрактор не форма цього слова з іншою роллю");
+          const filled = (q.contextPhrase ?? "").replace("___", s.cz).toLowerCase();
+          if (!s.examples.some((ex) => ex.cz.toLowerCase() === filled)) bad("пропуск не на місці форми в прикладі");
+          for (const x of rs) if (!q.taskText.toLowerCase().includes((qWord(x)?.uk ?? "?").split(" / ")[0])) bad(`підказка без питання ролі ${x}`);
+        }
+      }
+      // зворотний: за реченням — питальне слово
+      const rid = `${a.id}::${rs[0]}::rev`;
+      if (rs.length > 1) { exclude(r, `${QUIZ}: форма на два питання (${s.cz}) — зворотне питання мало б дві правильні відповіді`); continue; }
+      const qs = forced(gen, rid);
+      if (inFocus(rid) && qs.length === 0) gap(r, QUIZ, `${rid}: «${s.cz}» (${rs[0]}) не питається зворотним питанням`);
+      for (const q of qs) {
+        basic(r, QUIZ, q);
+        const bad = (m: string) => r.errors.push(`${QUIZ}: ${q.comboId}: ${m} — «${q.contextPhrase}» [${q.options.join(" / ")}]`);
+        if (q.correct !== qWord(rs[0])?.cz) bad(`правильна не «${qWord(rs[0])?.cz}»`);
+        if (!INTERROGATIVE_ADVERBS.some((x) => x.cz === distractorOf(q))) bad("дистрактор не питальне слово");
+        if (!s.examples.some((ex) => ex.cz === q.contextPhrase)) bad("речення не приклад цієї форми");
+        if (!(q.contextPhrase ?? "").toLowerCase().split(/[^\p{L}]+/u).includes(s.cz.toLowerCase())) bad("у реченні немає самої форми");
+      }
+    }
   }
 }
 
 // ═════════════ «Дата й час» ═════════════
+// Незалежне від рушія й від data/timeforms.ts читання часу: правила граматики записані тут удруге (mozaika.eu «Kolik je
+// hodin?», czechonline.org, IJP), числівники — з таблиць словника.
+const DT_QUIZ = "Дата й час";
+const DAYS_IN_MONTH = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const UK_MONTH_GEN = ["січня", "лютого", "березня", "квітня", "травня", "червня", "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"];
+const ORACLE_PARTS = [
+  { phrase: "ráno", from: 6 },
+  { phrase: "dopoledne", from: 9 },
+  { phrase: "odpoledne", from: 12 },
+  { phrase: "večer", from: 18 },
+  { phrase: "v noci", from: 22 },
+];
+function femCard(v: number, c: "nominativ" | "akuzativ" | "genitiv"): string {
+  const k = CARDINALS.find((x) => x.value === v)!;
+  const cell = k.kind === "gendered" ? k.declension.fem[c].sg : k.kind === "twoForm" ? k.forms[c].femNeut : k.kind === "invariantDecl" ? k.forms[c] : c === "genitiv" ? k.oblique : k.direct;
+  return split(cell)[0];
+}
+const hoursWord = (n: number, c: "nominativ" | "akuzativ") => (n === 1 ? (c === "nominativ" ? "hodina" : "hodinu") : n <= 4 ? "hodiny" : "hodin");
+function oPlain(n: number): string {
+  if (n === 0) return "nula";
+  if (n < 20 || n % 10 === 0) return femCard(n, "nominativ");
+  const u = n % 10;
+  return `${femCard(n - u, "nominativ")} ${u === 1 ? "jedna" : u === 2 ? "dva" : femCard(u, "nominativ")}`;
+}
+function oHalf(nh: number): string {
+  if (nh === 1) return "jedné";
+  const ord = ADJECTIVES.find((a) => a.category === "ordinal" && a.value === nh);
+  return split(ord?.declension.fem.genitiv.sg)[0];
+}
+// Розмовне читання (без Je/Jsou) у називному або знахідному (після v).
+function oColloquial(h24: number, m: number, c: "nominativ" | "akuzativ" = "nominativ"): string | null {
+  const h = h24 % 12 === 0 ? 12 : h24 % 12;
+  const nh = h === 12 ? 1 : h + 1;
+  const whole = (n: number) => `${femCard(n, c)} ${hoursWord(n, c)}`;
+  // перед цілою годиною «za pět minut dvě» — без hodiny (mozaika.eu, «Kolik je hodin?», 2022)
+  const at: Record<number, string> = { 0: whole(h), 15: `čtvrt na ${femCard(nh, "akuzativ")}`, 30: `půl ${oHalf(nh)}`, 45: `tři čtvrtě na ${femCard(nh, "akuzativ")}`, 60: femCard(nh, "nominativ") };
+  if (m in at && m < 60) return at[m];
+  if (c === "akuzativ") return null;
+  for (const a of [15, 30, 45, 60]) if (a - m === 5 || a - m === 10) return `za ${a - m === 5 ? "pět" : "deset"} minut ${at[a]}`;
+  return null;
+}
+// mozaika.eu: «Je sedmnáct (hodin)», «Je jedna dvacet», «Je sedmnáct hodin pět minut»; 0:xx — лише розмовне (null).
+function oFormal(h: number, m: number): string | null {
+  if (h === 0) return null;
+  const hours = h >= 20 ? `${oPlain(h)} hodin` : `${femCard(h, "nominativ")} ${hoursWord(h, "nominativ")}`;
+  if (m === 0) return hours;
+  if (m < 10) return h < 5 ? null : `${hours} ${femCard(m, "nominativ")} ${m === 1 ? "minuta" : m <= 4 ? "minuty" : "minut"}`;
+  return `${oPlain(h)} ${oPlain(m)}`;
+}
+const oSentence = (h24: number, m: number, sys: "formal" | "colloquial") => {
+  const raw = sys === "formal" ? oFormal(h24, m) : oColloquial(h24, m);
+  const n = sys === "formal" ? h24 : h24 % 12 === 0 ? 12 : h24 % 12;
+  return raw && `${m === 0 && n >= 2 && n <= 4 ? "Jsou" : "Je"} ${raw}`;
+};
+// ve — якщо перше слово починається двома приголосними (mozaika.eu: «Ve dvě. Ve tři.»; ve středu, ve čtvrtek).
+const oVe = (group: string) => (/^[^aáeéěiíoóuúůyý\s]{2}/i.test(group) ? `ve ${group}` : `v ${group}`);
+const oWrongVe = (group: string) => (oVe(group).startsWith("ve ") ? `v ${group}` : `ve ${group}`);
+const partIndex = (h: number) => { let i = ORACLE_PARTS.length - 1; ORACLE_PARTS.forEach((p, j) => { if (h >= p.from) i = j; }); return i; };
+
+function forcedN<Q extends AnyQ>(gen: Gen<Q>, id: string, n: number): Q[] {
+  const out: Q[] = [];
+  if (!inFocus(id)) return out;
+  for (let i = 0; i < n; i++) out.push(...gen({ [id]: 1 }).filter((q) => q.comboId === id));
+  return out;
+}
+
 function checkDateTime(r: Report, gen: Gen<AnyQ>): void {
-  const QUIZ = "Дата й час";
-  const ids = [
-    ...DATE_ORDINALS.flatMap((d) => ["gen", "nom"].map((m) => `date-${d.day}::${m}::x`)),
-    ...NOUNS.filter((n) => n.category === "days").flatMap((d) => [`weekday-when::${d.id}::x`, `weekday-name::${d.id}::x`]),
-  ];
-  for (const id of ids) {
-    const qs = forced(gen, id);
-    if (qs.length === 0) gap(r, QUIZ, `${id} не питається`);
-    for (const q of qs) basic(r, QUIZ, q);
+  const QUIZ = DT_QUIZ;
+  const bad = (q: AnyQ, m: string) => r.errors.push(`${QUIZ}: ${q.comboId}: ${m} — «${q.contextPhrase ?? ""}» [${q.options.join(" / ")}]`);
+  const months = NOUNS.filter((n) => n.month);
+  if (months.length !== 12 || months.some((n) => n.month!.maxDay !== DAYS_IN_MONTH[n.month!.num - 1]))
+    r.errors.push(`${QUIZ}: ДАНІ — місяці словника (поле month) не 12 або хибний найбільший день`);
+
+  // ── Дати: кожен день × родовий / називний × кожен дублет як правильна відповідь
+  for (const d of DATE_ORDINALS) {
+    const ord = ADJECTIVES.find((a) => a.category === "ordinal" && a.value === d.day);
+    if (ord && (split(ord.declension.masc_inan.nominativ.sg)[0] !== split(d.nom)[0] || split(ord.declension.masc_inan.genitiv.sg)[0] !== split(d.gen)[0]))
+      r.errors.push(`${QUIZ}: ДАНІ — день ${d.day} не збігається з порядковим ${ord.cz}`);
+    for (const mode of ["gen", "nom"] as const) {
+      const id = `date-${d.day}::${mode}::x`;
+      const right = split(mode === "gen" ? d.gen : d.nom);
+      const other = split(mode === "gen" ? d.nom : d.gen);
+      const qs = forcedN(gen, id, right.length > 1 ? 12 : TRIES);
+      if (!inFocus(id)) continue;
+      if (qs.length === 0) gap(r, QUIZ, `${id} не питається`);
+      for (const f of right) if (qs.length > 0 && !qs.some((q) => q.correct === f)) gap(r, QUIZ, `${id}: варіант «${f}» не питається`);
+      for (const q of qs) {
+        basic(r, QUIZ, q);
+        const i = right.indexOf(q.correct);
+        if (i < 0) bad(q, "правильна не форма цього відмінка");
+        else if (distractorOf(q) !== other[Math.min(i, other.length - 1)]) bad(q, "дистрактор не інший відмінок у тому ж варіанті");
+        const month = months.find((m) => q.promptWord === `${d.day}. ${split(m.declension.nominativ.sg)[0]}`);
+        if (!month) bad(q, "заголовок не «день. місяць»");
+        else {
+          if (d.day > month.month!.maxDay) bad(q, "такого дня в місяці немає");
+          const want = split((mode === "gen" ? month.declension.genitiv : month.declension.nominativ).sg)[0];
+          if (!(q.contextPhrase ?? "").includes(`___ ${want}`)) bad(q, `після пропуску не «${want}»`);
+        }
+        if (mode === "nom" && /^(dnes|zítra|včera) (je|bude|byl)/i.test(q.contextPhrase ?? "")) bad(q, "«Dnes je ___» допускає й родовий");
+        if (month && q.promptUk !== `${d.uk} ${UK_MONTH_GEN[month.month!.num - 1]}`) bad(q, `переклад не «${d.uk} ${UK_MONTH_GEN[month.month!.num - 1]}»`);
+        if (!/[еє]$/.test(d.uk)) bad(q, `переклад дня не в середньому роді («п'яте травня»): ${d.uk}`);
+      }
+    }
+  }
+
+  // ── Час: розмовне 1–12 × кожні 5 хв, офіційне 0–23 × кожні 5 хв (0:00 — «půlnoc», не питаємо)
+  const allReadings = (sys: "formal" | "colloquial") => {
+    const set = new Set<string>();
+    for (let h = 0; h < 24; h++) for (let m = 0; m < 60; m += 5) { const x = oSentence(h, m, sys); if (x) set.add(x); }
+    return set;
+  };
+  for (const sys of ["colloquial", "formal"] as const) {
+    const valid = allReadings(sys);
+    for (let h = sys === "formal" ? 0 : 1; h <= (sys === "formal" ? 23 : 12); h++)
+      for (let m = 0; m < 60; m += 5) {
+        if (sys === "formal" && h === 0) { exclude(r, `${QUIZ}: офіційне 0:xx — у джерелі лише розмовне (půl jedné) і «půlnoc»`); continue; }
+        if (sys === "formal" && m > 0 && m < 10 && h < 5) { exclude(r, `${QUIZ}: офіційне 1:05–4:05 — узгодження «dvě hodiny pět minut» у джерелі немає`); continue; }
+        const id = `time-${sys}-${h}-${m}::${sys}::x`;
+        const qs = forced(gen, id);
+        if (inFocus(id) && qs.length === 0) gap(r, QUIZ, `${id} не питається`);
+        for (const q of qs) {
+          basic(r, QUIZ, q);
+          if (q.correct !== oSentence(h, m, sys)) bad(q, `правильна не «${oSentence(h, m, sys)}»`);
+          const d = distractorOf(q);
+          if (!d || !valid.has(d)) bad(q, "дистрактор не читання іншого часу");
+        }
+      }
+  }
+
+  // ── Частина доби: кожна частина; години з даних (DAY_PARTS.quizHours) — не перша година частини й не північ
+  const partsAsked = new Set<string>();
+  for (const part of DAY_PARTS)
+    for (const h of part.quizHours) {
+      if (h === 0 || ORACLE_PARTS.some((p) => p.from === h)) r.errors.push(`${QUIZ}: ДАНІ — година ${h} на межі частини доби`);
+      for (const m of [0, 15, 30, 45]) {
+        const id = `time-daypart-${h}-${m}::daypart::x`;
+        const qs = forced(gen, id);
+        if (inFocus(id) && qs.length === 0) gap(r, QUIZ, `${id} не питається`);
+        const i = partIndex(h);
+        for (const q of qs) {
+          basic(r, QUIZ, q);
+          const bare = oSentence(h, m, "colloquial");
+          if (q.correct !== `${bare} ${ORACLE_PARTS[i].phrase}`) bad(q, `правильна не «${bare} ${ORACLE_PARTS[i].phrase}»`);
+          else partsAsked.add(ORACLE_PARTS[i].phrase);
+          const j = ORACLE_PARTS.findIndex((p) => distractorOf(q) === `${bare} ${p.phrase}`);
+          const n = ORACLE_PARTS.length;
+          if (j < 0 || j === i || j === (i + 1) % n || j === (i + n - 1) % n) bad(q, "дистрактор — не та сама година з НЕсуміжною частиною доби");
+        }
+      }
+    }
+  if (!FOCUS) for (const p of ORACLE_PARTS) if (!partsAsked.has(p.phrase)) gap(r, QUIZ, `частина доби «${p.phrase}» не питається`);
+
+  // ── «V kolik?»: 1–12 × чверті
+  for (let h = 1; h <= 12; h++)
+    for (const m of [0, 15, 30, 45]) {
+      const id = `time-at-${h}-${m}::at::x`;
+      const qs = forced(gen, id);
+      if (inFocus(id) && qs.length === 0) gap(r, QUIZ, `${id} не питається`);
+      const group = oColloquial(h, m, "akuzativ")!;
+      const okDistractors = [oWrongVe(group)];
+      if (m !== 0) okDistractors.push(oVe(oColloquial(h === 1 ? 12 : h - 1, m, "akuzativ")!));
+      const nom = oColloquial(h, m)!;
+      if (nom !== group) okDistractors.push(oVe(nom));
+      for (const q of qs) {
+        basic(r, QUIZ, q);
+        if (q.correct !== oVe(group)) bad(q, `правильна не «${oVe(group)}»`);
+        if (!okDistractors.includes(distractorOf(q) ?? "")) bad(q, "дистрактор не хибна вокалізація / сусідня опора / називний");
+      }
+    }
+
+  // ── Дні тижня
+  const days = NOUNS.filter((n) => n.category === "days");
+  const akuz = (d: NounEntry) => split(d.declension.akuzativ.sg)[0];
+  for (const d of days) {
+    for (const kind of ["when", "name"] as const) {
+      const id = `weekday-${kind}::${d.id}::x`;
+      const qs = forced(gen, id);
+      if (inFocus(id) && qs.length === 0) gap(r, QUIZ, `${id} не питається`);
+      for (const q of qs) {
+        basic(r, QUIZ, q);
+        if (kind === "when") {
+          if (q.correct !== oVe(akuz(d))) bad(q, `правильна не «${oVe(akuz(d))}»`);
+          const dd = distractorOf(q);
+          if (dd !== oWrongVe(akuz(d)) && !days.some((o) => o !== d && dd === oVe(akuz(o)))) bad(q, "дистрактор не хибна вокалізація чи інший день");
+        } else {
+          if (q.correct !== d.cz) bad(q, `правильна не «${d.cz}»`);
+          if (!days.some((o) => o !== d && distractorOf(q) === o.cz)) bad(q, "дистрактор не інший день");
+        }
+      }
+    }
   }
   if (!FOCUS) for (let i = 0; i < 500; i++) for (const q of gen({})) basic(r, QUIZ, q);
 }
@@ -572,12 +782,37 @@ function selfTest(): boolean {
     { name: "вид: хибна правильна відповідь (psát)", only: ["verbs"], focus: ["psat::"], gens: { verbs: mutate(REAL.verbs, (q) => (q.comboId === "psat::aspect::x" ? swap(q) : q)) } },
     { name: "вид: доконаний інфінітив після фазового (vstávat)", only: ["verbs"], focus: ["vstavat::"], gens: { verbs: mutate(REAL.verbs, (q) => (q.comboId === "vstavat::aspect::x" ? swap(q) : q)) } },
     { name: "вид: «a bude hotovo» для resultative: false (přijít)", only: ["verbs"], focus: ["prijit::"], gens: { verbs: mutate(REAL.verbs, (q) => (q.comboId === "prijit::aspect::x" ? { ...q, contextPhrase: "Zítra ___ a bude hotovo." } : q)) } },
+    { name: "прислівник: хибна правильна відповідь (vlevo)", only: ["adverbs"], focus: ["adv-vlevo::"], gens: { adverbs: mutate(REAL.adverbs, (q) => (q.comboId.startsWith("adv-vlevo::") && !q.comboId.endsWith("rev") ? swap(q) : q)) } },
+    { name: "прислівник: зворотне — хибне питальне слово", only: ["adverbs"], focus: ["adv-dole::"], gens: { adverbs: mutate(REAL.adverbs, (q) => (q.comboId === "adv-dole::orig::rev" ? swap(q) : q)) } },
+    { name: "прислівник: зникло пряме «кудою?» (tudy)", only: ["adverbs"], focus: ["adv-tady::"], gens: { adverbs: mutate(REAL.adverbs, (q) => (q.comboId === "adv-tady::path::x" ? null : q)) } },
+    { name: "дата: дистрактор в іншому варіанті дублета", only: ["datetime"], focus: ["date-25::"], gens: { datetime: mutate(REAL.datetime, (q) => (q.comboId === "date-25::gen::x" ? { ...q, options: [q.correct, q.correct === "pětadvacátého" ? "dvacátý pátý" : "pětadvacátý"] } : q)) } },
+    { name: "дата: злитий варіант ніколи не питається", only: ["datetime"], focus: ["date-27::"], gens: { datetime: mutate(REAL.datetime, (q) => (q.comboId === "date-27::gen::x" && q.correct === "sedmadvacátého" ? null : q)) } },
+    { name: "час: «půl dvě» замість «půl druhé»", only: ["datetime"], focus: ["time-colloquial-1-30"], gens: { datetime: mutate(REAL.datetime, (q) => (q.comboId === "time-colloquial-1-30::colloquial::x" ? { ...q, correct: "Je půl dvě", options: ["Je půl dvě", distractorOf(q)!] } : q)) } },
+    { name: "час: зникло офіційне 23:55", only: ["datetime"], focus: ["time-formal-23-55"], gens: { datetime: mutate(REAL.datetime, (q) => (q.comboId === "time-formal-23-55::formal::x" ? null : q)) } },
+    { name: "частина доби: суміжна як дистрактор (23 — večer)", only: ["datetime"], focus: ["time-daypart-23-"], gens: { datetime: mutate(REAL.datetime, (q) => (q.comboId.startsWith("time-daypart-23-") ? { ...q, options: [q.correct, q.correct.replace("v noci", "večer")] } : q)) } },
+    { name: "v kolik: «v jedna hodina» як правильна", only: ["datetime"], focus: ["time-at-1-0"], gens: { datetime: mutate(REAL.datetime, (q) => (q.comboId === "time-at-1-0::at::x" ? { ...q, correct: "v jedna hodina", options: ["v jedna hodina", q.correct] } : q)) } },
+    { name: "день: «v čtvrtek» як правильна", only: ["datetime"], focus: ["weekday-when::ctvrtek"], gens: { datetime: mutate(REAL.datetime, (q) => (q.comboId === "weekday-when::ctvrtek::x" ? { ...q, correct: "v čtvrtek", options: ["v čtvrtek", "ve čtvrtek"] } : q)) } },
   ];
+  // Детермінований прогін: обидва прогони кожного випадку — з тим самим зерном генератора випадкових чисел, тож результат
+  // відтворюваний (раніше «хибна вокалізація» інколи не знаходила жодної фрази з «ve ___» і падала випадково).
+  const seeded = (seed: number) => {
+    let a = seed;
+    return () => {
+      a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  };
+  const realRandom = Math.random;
   let ok = true;
   for (const t of cases) {
     FOCUS = t.focus;
+    Math.random = seeded(20261006);
     const base = runAll(REAL, t.only).errors.length;
+    Math.random = seeded(20261006);
     const r = runAll({ ...REAL, ...t.gens }, t.only);
+    Math.random = realRandom;
     FOCUS = null;
     const caught = r.errors.length > base;
     console.log(`${caught ? "PASS" : "FAIL"}  ${t.name}${caught ? ` (+${r.errors.length - base} помилок)` : ""}`);

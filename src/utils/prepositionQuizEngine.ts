@@ -7,7 +7,7 @@ import { validateNounSem } from "../data/nounTags";
 import { CONFUSABLE_PREP_PAIRS, DUAL_FRAMES, EXCHANGE_FRAMES, FIXED_FRAMES, Frame, Needs, PRONOUN_FRAMES } from "../data/prepositionPartners";
 import { acceptedForms, candidateNumbers, disjoint, fitCounts, formOf, freshWeightedOrder, matchesNeeds, vocalizedPrep } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
-import { NUMBER_LABEL, formsOf, isUsableDistractor, once, shuffle } from "./quizCommon";
+import { NUMBER_LABEL, formsOf, isUsableDistractor, once, shuffle, topUpRound } from "./quizCommon";
 
 // ─────────────────────────── Квіз «Прийменники» ───────────────────────────
 // Одна категорія «Флеш-картки», кілька механік (як «Числівники» / «Час і дата»):
@@ -544,12 +544,6 @@ export function generatePrepositionSession(
     questions.push(b.q);
   };
   for (const c of chosen) take(c);
-  // Добір, якщо якісь make() повернули null (дистрактор збігся).
-  if (questions.length < count) {
-    for (const c of shuffle(pool)) {
-      if (questions.length >= count) break;
-      if (!questions.some((x) => x.comboId === c.id)) take(c);
-    }
-  }
+  topUpRound(questions, count, pool, take);
   return questions;
 }

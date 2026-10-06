@@ -36,7 +36,7 @@ import {
 import type { VocalPrep } from "../data/prepositionPartners";
 import { agreementGender, candidateNumbers, fitCounts, freshWeightedOrder, matchesFilter, sharedVocalDecision, vocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
-import { NUMBER_LABEL, capitalize, firstForm, formsOf, isRealOtherForm, once, shuffle } from "./quizCommon";
+import { NUMBER_LABEL, capitalize, firstForm, formsOf, isRealOtherForm, once, randomOf, shuffle, topUpRound } from "./quizCommon";
 
 // ═══════════════════ КВІЗ «ПРИКМЕТНИКИ ТА ЗАЙМЕННИКИ» ═══════════════════
 // Знання — у даних: смислові теги іменників (data/nounTags.ts), fits прикметників (data/adjectives.ts), лексичні
@@ -78,10 +78,6 @@ export interface DeclQuestion {
 const QUIZ_CASES = CASE_ORDER.filter((c) => c !== "vokativ") as QuizCase[];
 const NUMBERS: GrammaticalNumber[] = ["sg", "pl"];
 const BLANK = "___";
-
-function randomOf<T>(arr: T[]): T | null {
-  return arr.length === 0 ? null : arr[Math.floor(Math.random() * arr.length)];
-}
 
 // Клітинка-дистрактор придатна, якщо ЖОДНА її форма не є прийнятною формою цілі: «mou / mojí» не дистрактор до
 // «mé / mojí» — mojí правильне в обох. Різниця лише в довжині голосного — теж граматика (mladý / mladí, ji / jí).
@@ -932,12 +928,6 @@ export function generateDeclensionSession(
     questions.push(b.q);
   };
   for (const c of chosen) take(c);
-  // Добір, якщо якийсь make() повернув null — інакше зарезервоване під помилку комбо мовчки випало б.
-  if (questions.length < count) {
-    for (const c of shuffle(combos)) {
-      if (questions.length >= count) break;
-      if (!questions.some((x) => x.comboId === c.id)) take(c);
-    }
-  }
+  topUpRound(questions, count, combos, take);
   return questions;
 }

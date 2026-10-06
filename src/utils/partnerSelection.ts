@@ -144,5 +144,18 @@ export function vocalizeSlot(text: string, words: readonly string[]): string | n
   if (!m) return text;
   const d = sharedVocalDecision(m[1] as VocalPrep, words);
   if (d === null) return null;
-  return text.replace(m[0], d === "vocal" ? `${m[1]}e` : m[1]);
+  return text.replace(m[0], prepFor(m[1] as VocalPrep, d));
+}
+
+// Написання прийменника за рішенням: v → ve, k → ke, s → se, z → ze.
+function prepFor(prep: VocalPrep, d: VocalDecision): string {
+  return d === "vocal" ? `${prep}e` : prep;
+}
+
+// «v / ve + група»: правильне написання й протилежне (хибна вокалізація як дистрактор); null — група приголосних
+// першого слова не класифікована або вживання коливається (CLUSTER_RULES) — таку форму не тестуємо.
+export function vocalizedGroup(prep: VocalPrep, group: string): { right: string; wrong: string } | null {
+  const d = vocalDecision(prep, group.split(" ")[0]);
+  if (d === null) return null;
+  return { right: `${prepFor(prep, d)} ${group}`, wrong: `${prepFor(prep, d === "vocal" ? "plain" : "vocal")} ${group}` };
 }

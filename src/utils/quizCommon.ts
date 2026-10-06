@@ -13,6 +13,11 @@ export function shuffle<T>(arr: readonly T[]): T[] {
   return a;
 }
 
+// Випадковий елемент масиву; порожній масив → null.
+export function randomOf<T>(arr: readonly T[]): T | null {
+  return arr.length === 0 ? null : arr[Math.floor(Math.random() * arr.length)];
+}
+
 // Дві форми, що різняться ЛИШЕ довготою голосної (i/í, u/ů, e/é, a/á, o/ó, y/ý), на малому екрані виглядають майже
 // однаково (růži / růží): як варіанти квізу вони сприймаються як «два однакових», тож дистрактор має відрізнятися
 // від правильної відповіді й візуально. Результат запам'ятовується: функцію викликають десятки тисяч разів на тих
@@ -82,4 +87,20 @@ export const NUMBER_LABEL: Record<GrammaticalNumber, string> = { sg: "однин
 // Велика перша літера речення; фраза, що починається пропуском («___ celou noc»), лишається як є.
 export function capitalize(s: string): string {
   return s.length > 0 && s[0] !== "_" ? s[0].toUpperCase() + s.slice(1) : s;
+}
+
+// Добір раунду: якщо якісь комбо не дали питання (make → null), доповнює раунд іншими комбо пулу у випадковому
+// порядку, без повтору вже поставлених (за comboId). Інакше зарезервоване під помилку комбо мовчки випало б, а раунд
+// став би коротшим. take(c) сам будує питання й додає його в questions (або нічого не робить).
+export function topUpRound<C extends { id: string }>(
+  questions: readonly { comboId: string }[],
+  count: number,
+  pool: readonly C[],
+  take: (c: C) => void
+): void {
+  if (questions.length >= count) return;
+  for (const c of shuffle(pool)) {
+    if (questions.length >= count) break;
+    if (!questions.some((x) => x.comboId === c.id)) take(c);
+  }
 }

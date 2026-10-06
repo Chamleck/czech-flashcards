@@ -1,7 +1,7 @@
 import { VerbEntry, VerbPerson, PERSON_ORDER, PERSON_LABELS } from "../types";
 import { VERBS } from "../data/verbs";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
-import { capitalize, isRealOtherForm, isUsableDistractor, once, shuffle } from "./quizCommon";
+import { capitalize, isRealOtherForm, isUsableDistractor, once, shuffle, topUpRound } from "./quizCommon";
 import { IMPERF_FRAMES, PERF_FRAMES, VerbFrame, VerbFrameKind } from "../data/verbFrames";
 import {
   presentForm,
@@ -413,18 +413,11 @@ export function generateVerbSession(
   const combos = pool === VERBS ? defaultCombos() : enumerateCombos(pool);
   const chosen = selectRoundCombos(combos, mistakes, count, (c) => c.entry.id, undefined, VERB_KIND_QUOTA);
   const questions: VerbQuestion[] = [];
-  for (const c of chosen) {
+  const take = (c: Combo) => {
     const q = makeQuestion(c);
     if (q) questions.push(q);
-  }
-  // Добір, якщо якісь makeQuestion() повернули null (дистрактор збігся) —
-  // інакше зарезервоване під помилку комбо може мовчки випасти без заміни.
-  if (questions.length < count) {
-    for (const c of shuffle(combos)) {
-      if (questions.length >= count) break;
-      const q = makeQuestion(c);
-      if (q && !questions.some((x) => x.comboId === q.comboId)) questions.push(q);
-    }
-  }
+  };
+  for (const c of chosen) take(c);
+  topUpRound(questions, count, combos, take);
   return questions;
 }

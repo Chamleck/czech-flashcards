@@ -16,7 +16,8 @@ import type { QuizCase } from "../data/declensionFrames";
 import type { VocalPrep } from "../data/prepositionPartners";
 import { matchesNeeds, freshWeightedOrder, acceptedForms, formOf, fitCounts, hasNumber, pluralOnly, sharedVocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
-import { firstForm, isUsableDistractor, once, shuffle, splitForms } from "./quizCommon";
+import { firstForm, isUsableDistractor, once, shuffle, splitForms, topUpRound } from "./quizCommon";
+import { cardinalForms, isDirect } from "./numeralForms";
 
 // ─────────────────── Узгодження числівник + іменник ───────────────────
 // Тестує ОДНЕ з двох слів групи (числівник або іменник) у реченні з data/numeralFrames.ts; друге слово показане
@@ -47,8 +48,6 @@ export interface AgreementQuestion {
   options: string[];
 }
 
-const isDirect = (c: CzechCase) => c === "nominativ" || c === "akuzativ";
-const isMasc = (g: Gender) => g === "masc_anim" || g === "masc_inan";
 const QUIZ_CASES = NUMERAL_CASE_ORDER as QuizCase[];
 const GENDERS: Gender[] = ["masc_anim", "masc_inan", "fem", "neut"];
 
@@ -77,20 +76,6 @@ interface Counter {
 }
 
 const otherCases = (c: CzechCase) => shuffle(NUMERAL_CASE_ORDER.filter((x) => x !== c));
-
-// Форма простого числівника для іменника роду g (усі дублети).
-function cardinalForms(card: CardinalEntry, c: CzechCase, g: Gender): string[] {
-  switch (card.kind) {
-    case "gendered":
-      return splitForms(card.declension[g][c].sg);
-    case "twoForm":
-      return splitForms(card.forms[c][isMasc(g) ? "masc" : "femNeut"]);
-    case "invariantDecl":
-      return splitForms(card.forms[c]);
-    case "oblique":
-      return isDirect(c) ? [card.direct] : splitForms(card.oblique);
-  }
-}
 
 // Яку клітинку іменника вимагає простий числівник у відмінку c.
 function cardinalCell(card: CardinalEntry, c: CzechCase): Cell {
@@ -524,12 +509,6 @@ export function generateNumeralAgreementSession(
     questions.push(b.q);
   };
   for (const c of chosen) take(c);
-  // Добір, якщо make() повернув null (не мало б статися: комбо без питань відсіяні при переліченні).
-  if (questions.length < count) {
-    for (const c of shuffle(pool)) {
-      if (questions.length >= count) break;
-      if (!questions.some((x) => x.comboId === c.id)) take(c);
-    }
-  }
+  topUpRound(questions, count, pool, take);
   return questions;
 }

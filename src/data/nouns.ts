@@ -56,7 +56,10 @@ import { NounEntry } from "../types";
 //     (правила — у шапці data/nounFrames.ts).
 // 11. Форми — за двома джерелами (IJP + en.wiktionary / MorfFlex); дублет, де обидві форми правильні, НЕ подаємо через
 //     « / » — лише першу форму IJP (cukre, vzduchách), решта прийнятна й так.
-// 12. ПЕРЕД ЗДАЧЕЮ — оракул покриття й граматики (scripts/check-quiz-coverage.ts, запуск у шапці скрипта): кожна
+// 12. Місяць (leden … prosinec) — поле month: номер, найбільший день (лютий — 29) і ukGen — українська назва в родовому
+//     («травня», для перекладу дати «п'яте травня»). Квіз «Дата й час» бере місяці саме за ним (у дату «pátého
+//     května», «pátý květen»); пори року (léto, zima…) поля не мають.
+// 13. ПЕРЕД ЗДАЧЕЮ — оракул покриття й граматики (scripts/check-quiz-coverage.ts, запуск у шапці скрипта): кожна
 //     клітинка нового слова в кожному квізі або питається, або стоїть у закритому списку винятків з причиною; кожне
 //     питання граматично правильне (правильна — з таблиці, дистрактор — не прийнятна форма). Результат: «Помилок: 0».
 //     Потім — прочитати нові речення й пари з прикметниками (правила 6, 8–10).
@@ -2147,6 +2150,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    month: { num: 1, maxDay: 31, ukGen: "січня" },
     sem: ["time"],
     declension: {
       nominativ: { sg: "leden", pl: "ledny" },
@@ -2168,6 +2172,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    month: { num: 2, maxDay: 29, ukGen: "лютого" },
     sem: ["time"],
     declension: {
       nominativ: { sg: "únor", pl: "únory" },
@@ -2189,6 +2194,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    month: { num: 3, maxDay: 31, ukGen: "березня" },
     sem: ["time"],
     declension: {
       nominativ: { sg: "březen", pl: "březny" },
@@ -2210,6 +2216,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    month: { num: 4, maxDay: 30, ukGen: "квітня" },
     sem: ["time"],
     declension: {
       nominativ: { sg: "duben", pl: "dubny" },
@@ -2231,6 +2238,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    month: { num: 5, maxDay: 31, ukGen: "травня" },
     sem: ["time"],
     declension: {
       nominativ: { sg: "květen", pl: "květny" },
@@ -2252,6 +2260,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    month: { num: 6, maxDay: 30, ukGen: "червня" },
     sem: ["time"],
     declension: {
       nominativ: { sg: "červen", pl: "červny" },
@@ -2273,6 +2282,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "months",
+    month: { num: 7, maxDay: 31, ukGen: "липня" },
     sem: ["time"],
     declension: {
       nominativ: { sg: "červenec", pl: "července" },
@@ -2294,6 +2304,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    month: { num: 8, maxDay: 31, ukGen: "серпня" },
     sem: ["time"],
     declension: {
       nominativ: { sg: "srpen", pl: "srpny" },
@@ -2315,6 +2326,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "stavani",
     category: "months",
+    month: { num: 9, maxDay: 30, ukGen: "вересня" },
     sem: ["time"],
     declension: {
       // Повністю незмінне в однині — так само, як pondělí/nádraží.
@@ -2337,6 +2349,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    month: { num: 10, maxDay: 31, ukGen: "жовтня" },
     sem: ["time"],
     declension: {
       nominativ: { sg: "říjen", pl: "říjny" },
@@ -2358,6 +2371,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
+    month: { num: 11, maxDay: 30, ukGen: "листопада" },
     sem: ["time"],
     declension: {
       // Єдиний місяць БЕЗ архаїчного -a у родовому — тут звичайний -u (17. listopadu).
@@ -2380,6 +2394,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "months",
+    month: { num: 12, maxDay: 31, ukGen: "грудня" },
     sem: ["time"],
     declension: {
       nominativ: { sg: "prosinec", pl: "prosince" },

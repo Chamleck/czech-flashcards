@@ -31,6 +31,8 @@ import { AdjectiveEntry, NounFilter } from "../types";
 //  7. Кожна клітинка слова питається, навіть якщо природного іменника для неї немає (питання без речення), тож fits
 //     впливає на природність речень, а не на покриття. Перед здачею — оракул scripts/check-quiz-coverage.ts
 //     (запуск у шапці скрипта): «Помилок: 0».
+//  8. Порядкові (category "ordinal") — ОБОВ'ЯЗКОВО value: число, яке слово називає. Квіз «Дата й час» за ним читає
+//     «půl druhé» (родовий жін. роду наступної години, 2–12) і звіряє з ним дані дат (data/dates.ts).
 const ANY: NounFilter = {};
 const ANIMATE: NounFilter = { any: ["person", "animal"] };
 const PERSON: NounFilter = { any: ["person"] };
@@ -3233,6 +3235,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   // Форми згенеровано детерміновано з тих самих закінчень, що velký/jarní.
   {
     id: "ord-prvni",
+    value: 1,
     semClass: "relational",
     uk: "перший",
     cz: "první",
@@ -3287,6 +3290,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-druhy",
+    value: 2,
     semClass: "relational",
     uk: "другий",
     cz: "druhý",
@@ -3341,6 +3345,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-treti",
+    value: 3,
     semClass: "relational",
     uk: "третій",
     cz: "třetí",
@@ -3395,6 +3400,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-ctvrty",
+    value: 4,
     semClass: "relational",
     uk: "четвертий",
     cz: "čtvrtý",
@@ -3449,6 +3455,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-paty",
+    value: 5,
     semClass: "relational",
     uk: "п'ятий",
     cz: "pátý",
@@ -3503,6 +3510,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-sesty",
+    value: 6,
     semClass: "relational",
     uk: "шостий",
     cz: "šestý",
@@ -3557,6 +3565,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-sedmy",
+    value: 7,
     semClass: "relational",
     uk: "сьомий",
     cz: "sedmý",
@@ -3611,6 +3620,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-osmy",
+    value: 8,
     semClass: "relational",
     uk: "восьмий",
     cz: "osmý",
@@ -3665,6 +3675,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-devaty",
+    value: 9,
     semClass: "relational",
     uk: "дев'ятий",
     cz: "devátý",
@@ -3719,6 +3730,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-desaty",
+    value: 10,
     semClass: "relational",
     uk: "десятий",
     cz: "desátý",
@@ -3773,6 +3785,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-jedenacty",
+    value: 11,
     semClass: "relational",
     uk: "одинадцятий",
     cz: "jedenáctý",
@@ -3827,6 +3840,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   },
   {
     id: "ord-dvanacty",
+    value: 12,
     semClass: "relational",
     uk: "дванадцятий",
     cz: "dvanáctý",

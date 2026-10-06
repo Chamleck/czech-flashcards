@@ -98,6 +98,8 @@ export interface NounEntry {
   // «Числівники» за ним не ставить мільйон у фразу, де така кількість безглузда («Znám milion hostů») —
   // поле max фрази в data/numeralFrames.ts.
   numeralValue?: number;
+  // Лише 12 місяців (leden … prosinec): номер і найбільший день. Квіз «Дата й час» бере місяці саме за цим полем.
+  month?: CalendarMonth;
 }
 
 // Вимога до іменника-партнера (квіз «Прикметники та займенники»): ті самі смислові теги, що у фреймах квізу
@@ -168,6 +170,9 @@ interface AdjectiveBase {
   // підпис над основним `examples`, задається лише разом із secondSense.
   senseLabel?: string;
   secondSense?: { label: string; examples: GenderExamples };
+  // Лише порядкові (category "ordinal"): яке число слово називає (druhý — 2). Квіз «Дата й час» за ним читає
+  // «půl druhé» (родовий жін. роду наступної години).
+  value?: number;
 }
 
 // Ступені порівняння (вищий/найвищий); обидва відмінюються за зразком jarní (м'який).
@@ -394,17 +399,17 @@ export type CardinalEntry =
 // Дублети складених 21–31 («dvacátého pátého / pětadvacátého») — рядком через " / ".
 export interface DateOrdinal {
   day: number; // 1..31
-  uk: string; // «двадцять п'ятий»
+  uk: string; // середній рід, як у даті: «двадцять п'яте» (травня)
   nom: string; // називний: «dvacátý pátý / pětadvacátý»
   gen: string; // родовий (у даті): «dvacátého pátého / pětadvacátého»
 }
 
-// Назва місяця: називний + родовий (родовий — форма в даті).
-export interface MonthName {
+// Місяць як іменник (leden … prosinec, data/nouns.ts): номер у році й найбільший день — за ним квіз «Дата й час»
+// не складе «31. února». Лише 12 місяців; пори року (léto, zima…) поля не мають.
+export interface CalendarMonth {
   num: number; // 1..12
-  uk: string;
-  nom: string; // «leden»
-  gen: string; // «ledna»
+  maxDay: number; // 28–31 (лютий — 29: рідкісне, але реальне 29. února)
+  ukGen: string; // українською в родовому — для перекладу дати: «п'яте травня»
 }
 
 // ─────────────────────────── ПРИЙМЕННИКИ ───────────────────────────
@@ -450,11 +455,16 @@ export interface PrepositionEntry {
 // власна структура + власна self-report сесія (не WordSession/DeclSession).
 // Модель "стільки сенсів, скільки реально є" (як CardinalEntry/DateOrdinal):
 // повні слова мають 3 сенси (де/куди/звідки), винятки (tam, doma) — 2, rovně — 1.
-export interface AdverbSense {
-  label: string; // "де?" | "куди?" | "звідки?" (для tam — комбінований напис)
+// Просторова роль форми = на яке питальне слово вона відповідає (kde / kam / odkud / kudy, data/interrogativeAdverbs.ts).
+export type SpatialRole = "loc" | "dir" | "orig" | "path";
+
+// asks — ОБОВ'ЯЗКОВЕ рішення: на які питання відповідає форма (tam — на kde і kam одразу). Підпис сенсу на картці
+// («де?», «де? / куди?») і квіз «Прислівники місця» беруться з нього. Форма без питання (rovně — лише напрямок) має
+// порожній asks і власний label.
+export type AdverbSense = {
   cz: string;
   examples: { cz: string; uk: string }[];
-}
+} & ({ asks: [SpatialRole, ...SpatialRole[]]; label?: never } | { asks: []; label: string });
 
 export interface SpatialAdverbEntry {
   id: string;
@@ -486,6 +496,10 @@ export interface InvariantWordEntry {
   // входження в note рядка renderNoteWithLinks (див. NoteLinks.tsx).
   noteLinks?: NoteLink[];
 }
+
+// Питальний прислівник місця (kde / kam / odkud / kudy): роль, на яку він питає, і підказка квізу «Прислівники місця»
+// для прямого питання («Де? (стан, без руху)»). Ролі — по одному слову на роль.
+export type SpatialQuestionEntry = InvariantWordEntry & { role: SpatialRole; quizHint: string };
 
 // Один клікабельний підрядок усередині note. kind окремо на кожен лінк —
 // ціль може бути з ІНШОГО розділу (напр. když → kdy в "Питальні слова").
