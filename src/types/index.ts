@@ -79,8 +79,8 @@ export interface NounEntry {
   exampleSentenceUk?: string;
   // ОБОВ'ЯЗКОВЕ рішення: true → незлічуване (maso, voda, rýže, peníze…): у квізі «Числівники» не рахується
   // («osm mas»), у множинних фразах квізів не стоїть («vody», «masa») — крім фраз, чиє поле plOk містить тег цього
-  // слова («minerální vody», «silné větry»); квіз «Відмінки» його множину не питає (NOUN_SKIP_RULES,
-  // data/nounFrames.ts). false → звичайний злічуваний іменник (káva — порції: «dvě kávy»).
+  // слова («minerální vody», «silné větry»); його множину, якої мова не вживає, не бере жоден квіз (NOUN_USAGE_RULES,
+  // utils/partnerSelection.ts). false → звичайний злічуваний іменник (káva — порції: «dvě kávy»).
   uncountable: boolean;
   // Смислові теги (data/nounTags.ts): за ними квіз «Прийменники» підбирає слово у фрази, де воно природне
   // («Jsem v ___» — placeV, «Polož to na ___» — surface). ОБОВ'язкове поле: без нього новий іменник

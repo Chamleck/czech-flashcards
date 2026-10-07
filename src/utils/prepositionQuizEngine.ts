@@ -138,13 +138,14 @@ interface PartnerPick<T> {
 function pickPartner<T>(
   prepId: string,
   kind: string,
+  c: CzechCase, // відмінок форми слова у фразі: candidateNumbers не дасть форми, якої мова не вживає («k patru»)
   frames: Frame[],
   used: ReadonlySet<string>,
   tryForm: (noun: NounEntry, num: GrammaticalNumber) => T | null
 ): PartnerPick<T> | null {
   for (const noun of partnerOrder(unionPool(prepId, kind, frames), used)) {
     for (const frame of shuffle(frames.filter((f) => matchesNeeds(noun, f)))) {
-      for (const num of candidateNumbers(noun, frame.num ?? "sg", Math.random, frame.plOk)) {
+      for (const num of candidateNumbers(noun, c, frame.num ?? "sg", Math.random, frame.plOk)) {
         const data = tryForm(noun, num);
         if (data) return { noun, frame, num, data };
       }
@@ -187,7 +188,7 @@ function buildFixedNoun(prep: PrepositionEntry, used: ReadonlySet<string>): Buil
   const c = prep.govCase;
   const frames = FIXED_FRAMES[prep.id];
   if (!frames) return null;
-  const pick = pickPartner(prep.id, "fixed", frames, used, (noun, num) => {
+  const pick = pickPartner(prep.id, "fixed", c, frames, used, (noun, num) => {
     const correct = formOf(noun, c, num);
     if (!correct) return null;
     const shown = vocalizedPrep(prep, correct);
@@ -250,7 +251,7 @@ function buildFixedPrep(prep: PrepositionEntry, used: ReadonlySet<string>): Buil
   // Партнер і фрейм — за правилами ПРАВИЛЬНОГО прийменника; обидва варіанти відповіді показуємо з вокалізацією
   // перед цим словом («ke klukům», а не «k klukům»), тому слово має бути класифіковане для обох.
   for (const nb of shuffle(prepsGoverning(c, prep.id))) {
-    const pick = pickPartner(prep.id, "fixed", frames, used, (noun, num) => {
+    const pick = pickPartner(prep.id, "fixed", c, frames, used, (noun, num) => {
       const form = formOf(noun, c, num);
       if (!form) return null;
       const a = vocalizedPrep(prep, form);
@@ -288,7 +289,7 @@ function buildDual(prep: PrepositionEntry, sense: DualSense, used: ReadonlySet<s
   const frames = DUAL_FRAMES[prep.id]?.[sense];
   if (!frames || frames.length === 0) return null;
 
-  const pick = pickPartner(prep.id, sense, frames, used, (noun, num) => {
+  const pick = pickPartner(prep.id, sense, c, frames, used, (noun, num) => {
     const correct = formOf(noun, c, num);
     if (!correct) return null;
     const shown = vocalizedPrep(prep, correct);
@@ -321,7 +322,7 @@ function buildDual(prep: PrepositionEntry, sense: DualSense, used: ReadonlySet<s
 function buildZaExchange(prep: PrepositionEntry, used: ReadonlySet<string>): Built | null {
   if (!prep.dual?.exchange) return null;
   const c = prep.dual.exchange.govCase; // akuzativ
-  const pick = pickPartner(prep.id, "exchange", EXCHANGE_FRAMES, used, (noun, num) => {
+  const pick = pickPartner(prep.id, "exchange", c, EXCHANGE_FRAMES, used, (noun, num) => {
     const correct = formOf(noun, c, num);
     if (!correct) return null;
     const distractor = nounDistractor(noun, c, num, correct);

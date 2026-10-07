@@ -25,6 +25,9 @@ import type { NounEntry } from "../types";
 //  4. Перед здачею — оракул scripts/check-quiz-coverage.ts (усі квізи): «Помилок: 0».
 //  5. Наскрізний тег (CROSS: ordered) описує не клас слова, а одну його властивість і сполучається з будь-яким
 //     тегом, навіть «самотнім» (den: time + timeUnit + ordered; host: person + ordered).
+//  6. Тег, що означає «цієї форми мова не вживає» (множина місяців, давальний поверхів), діє в УСІХ квізах лише
+//     через правило NOUN_USAGE_RULES (utils/partnerSelection.ts) — додай рядок там, а не в список одного квізу.
+//     Рішення одного квізу («у квізі немає природної фрази») — у його власному списку (NOUN_SKIP_RULES).
 
 export type NounTag =
   | "person"
@@ -151,7 +154,7 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
   sight: "місце, заради якого приїжджають туристи («Turisté sem jezdí kvůli hradům / horám / řekám»): hrad, kostel, most, hora, les, park, zahrada, řeka — НЕ dům, ulice, moře («kvůli mořím» неприродне)",
   overhead: "те, під чим можна стояти («Stojím pod stromem / mostem / sprchou / deštníkem»): strom, most, sprcha, deštník",
   floor: "поверх будинку («Nad přízemím je půda»; у множині «Výtah jezdí mezi patry» — лише разом з ordered): přízemí, patro",
-  bodyMany: "частина тіла, якої в людини дві чи більше, тож множина природна про одну людину («Mám problém se zuby», «To škodí kolenům»; разом з body): ruka, noha, zub, kost, oko, ucho, koleno, rameno — НЕ hlava, nos, krk, srdce",
+  bodyMany: "частина тіла, якої в людини дві чи більше, тож множина природна про одну людину («Mám problém se zuby», «To škodí kolenům»; разом з body): ruka, noha, zub, kost, oko, ucho, koleno, rameno — НЕ hlava, nos, krk, srdce. Частина тіла БЕЗ bodyMany — одна в людини: у фразах інших квізів лише в однині («tvé krky» — ні; SINGLE_BODY, utils/partnerSelection.ts)",
   month: "місяць календаря (leden … prosinec; разом з time). Ставиться ТОДІ Й ЛИШЕ ТОДІ, коли в слова є поле month (validateNounSem): множину місяців квіз «Відмінки» не питає («ledny», «v listopadech» у мові не вживаються)",
   season: "пора року, множина якої означає кілька таких пір («Jaké tu bývají zimy?», «Kolik zim jsi tu strávil?»; разом з time): zima, jaro, podzim — НЕ léto (його множина — «роки», тег yearsPlural)",
   weekday: "день тижня («Mám rád pátky», «O sobotách chodím plavat», «Ve středu mám volno»; разом з time): pondělí … neděle",
@@ -164,7 +167,7 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
   weatherCause: "погода як причина чи перешкода («Kvůli počasí / dešti jsme zůstali doma», «Mám problém se sněhem»): počasí, déšť, sníh, vítr — НЕ slunce",
   sky: "небо й світило, до яких дивляться («Podíval se k nebi / ke slunci»; без weather — ще й «Spím pod širým nebem»): nebe, slunce",
   mineral: "вода, що буває мінеральною, — її множина природна з «minerální» («Pijeme minerální vody»; разом з food): voda",
-  oneSystem: "система, яка в місті одна, тож множина неприродна в УСІХ квізах («kvůli metrům», «s jakými metry» — ні; pluralNatural, а в квізі «Відмінки» — правило NOUN_SKIP_RULES): metro (разом з vehicle)",
+  oneSystem: "система, яка в місті одна, тож множина неприродна в УСІХ квізах («kvůli metrům», «s jakými metry» — ні; pluralNatural і правило NOUN_USAGE_RULES): metro (разом з vehicle)",
   tableware: "столовий посуд і прибори, які миють («Myčka škodí nožům / sklenicím»; разом з item): talíř, nůž, lžíce, vidlička, hrnek, sklenice — НЕ taška, kniha",
   currency: "валюта — одиниця грошей, курс якої рахують («Kurz dolaru ke koruně / k euru roste»; разом з money): koruna, euro — НЕ peníze (лише множина, не валюта)",
   worksPl: "робота, у множини якої значення «роботи» — природна з прикметником («Kvůli stavebním pracím je silnice zavřená», «Pomáhám mámě s domácími pracemi»; разом з activity): práce",

@@ -23,7 +23,13 @@
 //     candidateNumbers — для кожної фрази цих банків вона не дає таким словам множини без plOk. Межа: другий шлях
 //     вибору числа в рушії в обхід candidateNumbers ця перевірка не побачить. Лічбу «Числівників» (metro не
 //     рахується) тримає countable у рушії; тут не перевіряється.
-//  4. Відомі дірки (KNOWN) — заплановані, але ще не закриті роботи (roadmap). Друкуються окремо; закрив — прибери рядок.
+//  4. Форми, яких мова не вживає (NOUN_USAGE_RULES у utils/partnerSelection.ts — спільні для всіх квізів: «ledny»,
+//     «k patru»): у «Відмінках» їх прибирає NOUN_SKIP_RULES (перевірка 1); у «Прийменниках», «Прикметниках та
+//     займенниках» і порядкових «Числівників» — для кожної фрази цих банків у ЇЇ відмінку candidateNumbers не дає числа,
+//     форма якого під таким правилом (межа та сама, що в п. 3: другий шлях вибору числа не видно); лічба «Числівників»
+//     вибирає іменник в обхід candidateNumbers, тому там перевіряються самі питання: форма іменника-відповіді не з
+//     клітинки під правилом.
+//  5. Відомі дірки (KNOWN) — заплановані, але ще не закриті роботи (roadmap). Друкуються окремо; закрив — прибери рядок.
 //
 // Природність речень оракул не оцінює: її перевіряє читання пар «фраза × слово» (правила в шапках data-файлів).
 
@@ -35,7 +41,7 @@ import { generatePrepositionSession } from "../src/utils/prepositionQuizEngine";
 import { generateVerbSession } from "../src/utils/verbFlashcardEngine";
 import { generateAdverbSession } from "../src/utils/adverbQuizEngine";
 import { generateDateTimeSession } from "../src/utils/datetimeEngine";
-import { acceptedForms, candidateNumbers, hasNumber, NO_PLURAL, vocalDecision } from "../src/utils/partnerSelection";
+import { acceptedForms, candidateNumbers, hasNumber, NO_PLURAL, NOUN_USAGE_RULES, vocalDecision } from "../src/utils/partnerSelection";
 import { skipReason } from "../src/utils/quizCommon";
 import { NOUN_FRAMES, NOUN_SKIP_RULES } from "../src/data/nounFrames";
 import { ANTECEDENT_FRAME, DECL_CELL_SKIPS, DECL_FRAMES, DECL_WORD_SKIPS, OWNER_FRAME, QuizCase } from "../src/data/declensionFrames";
@@ -361,22 +367,63 @@ function checkNoPluralNouns(r: Report, gen: Gen<NounQuestion>): void {
   }
 }
 
+// Фрази квізів, де іменник — слово-партнер, разом із відмінком, у якому він стоїть у фразі.
+type CarrierFrame = { quiz: string; c: CzechCase; f: { text: string; num?: "sg" | "pl" | "any"; plOk?: NounEntry["sem"] } };
+function carrierFrames(): CarrierFrame[] {
+  const out: CarrierFrame[] = [];
+  for (const p of PREPOSITIONS) {
+    if (p.type === "fixed") for (const f of FIXED_FRAMES[p.id] ?? []) out.push({ quiz: "Прийменники", c: p.govCase, f });
+    else if (p.dual) {
+      for (const f of DUAL_FRAMES[p.id]?.motion ?? []) out.push({ quiz: "Прийменники", c: p.dual.motion.govCase, f });
+      for (const f of DUAL_FRAMES[p.id]?.location ?? []) out.push({ quiz: "Прийменники", c: p.dual.location.govCase, f });
+      if (p.dual.exchange) for (const f of EXCHANGE_FRAMES) out.push({ quiz: "Прийменники", c: p.dual.exchange.govCase, f });
+    }
+  }
+  for (const [c, fs] of Object.entries(DECL_FRAMES)) for (const f of fs) out.push({ quiz: ADJ_QUIZ, c: c as CzechCase, f });
+  for (const f of [ANTECEDENT_FRAME, OWNER_FRAME]) out.push({ quiz: ADJ_QUIZ, c: "akuzativ", f });
+  for (const [c, fs] of Object.entries(ORDINAL_FRAMES)) for (const f of fs) out.push({ quiz: "Числівники (порядкові)", c: c as CzechCase, f });
+  return out;
+}
+
 function checkNoPluralBanks(r: Report): void {
-  const banks: [string, { text: string; num?: "sg" | "pl" | "any"; plOk?: NounEntry["sem"] }[]][] = [
-    ["Прийменники", [...Object.values(DUAL_FRAMES).flatMap((f) => [...f.motion, ...f.location]), ...EXCHANGE_FRAMES, ...Object.values(FIXED_FRAMES).flat()]],
-    [ADJ_QUIZ, [...Object.values(DECL_FRAMES).flat(), ANTECEDENT_FRAME, OWNER_FRAME]],
-    ["Числівники (порядкові)", Object.values(ORDINAL_FRAMES).flat()],
-  ];
+  const banks = carrierFrames();
   for (const n of NOUNS) {
     const tags = noPluralTags(n);
     if (tags.length === 0 || !hasNumber(n, "sg") || !hasNumber(n, "pl")) continue;
-    for (const [quiz, frames] of banks)
-      for (const f of frames) {
-        if (f.plOk?.some((t) => tags.includes(t))) continue;
-        const pl = [0, 0.99].some((x) => NUMBERS_OF(n, f.num ?? "sg", () => x, f.plOk).includes("pl"));
-        if (pl) r.errors.push(`${quiz}: ${n.id} (${tags.join(", ")}) у множині у фразі «${f.text}» без plOk`);
-      }
+    for (const { quiz, c, f } of banks) {
+      if (f.plOk?.some((t) => tags.includes(t))) continue;
+      const pl = [0, 0.99].some((x) => NUMBERS_OF(n, c, f.num ?? "sg", () => x, f.plOk).includes("pl"));
+      if (pl) r.errors.push(`${quiz}: ${n.id} (${tags.join(", ")}) у множині у фразі «${f.text}» без plOk`);
+    }
   }
+}
+
+// ═════════════ Форми, яких мова не вживає (NOUN_USAGE_RULES) ═════════════
+// Банки фраз: число, яке candidateNumbers дає слову у відмінку фрази, — не під правилом (теги фрази не звужують
+// перевірку: так нове слово чи тег не проскочить і в майбутній фразі).
+function checkUsageBanks(r: Report): void {
+  const banks = carrierFrames();
+  for (const n of NOUNS)
+    for (const { quiz, c, f } of banks)
+      for (const x of [0, 0.99])
+        for (const num of NUMBERS_OF(n, c, f.num ?? "sg", () => x, f.plOk)) {
+          const why = skipReason(NOUN_USAGE_RULES, { noun: n, c, n: num });
+          if (why) r.errors.push(`${quiz}: ${n.id} ${c} ${num} у фразі «${f.text}» — ${why}`);
+        }
+}
+// Лічба «Числівників» обирає іменник в обхід candidateNumbers — перевіряємо самі питання з пропуском на іменнику:
+// відповідь — форма клітинки, яку мова вживає (якщо форма є і в дозволеній клітинці, питання не помилкове).
+function checkUsageNumerals(r: Report, gen: Gen<AnyQ & { blank?: string }>): void {
+  for (let i = 0; i < 1500; i++)
+    for (const q of gen({})) {
+      if (q.blank !== "noun") continue;
+      const cells = NOUNS.filter((n) => n.cz === q.promptWord).flatMap((n) =>
+        CASE_ORDER.flatMap((c) => NUMBERS.filter((num) => acceptedForms(n, c, num).includes(q.correct)).map((num) => ({ noun: n, c, n: num })))
+      );
+      const used = cells.filter((x) => !skipReason(NOUN_USAGE_RULES, x));
+      if (cells.length > 0 && used.length === 0)
+        r.errors.push(`Числівники: ${q.comboId}: «${q.correct}» (${q.promptWord}) — ${skipReason(NOUN_USAGE_RULES, cells[0])}`);
+    }
 }
 
 // ═════════════ «Числівники» ═════════════
@@ -832,6 +879,8 @@ function runAll(g: Gens, only?: (keyof Gens)[]): Report {
   if (on("nouns")) checkNouns(r, g.nouns);
   if (on("nouns")) checkNoPluralNouns(r, g.nouns);
   if (on("decl") || on("preps") || on("numerals")) checkNoPluralBanks(r);
+  if (on("decl") || on("preps") || on("numerals")) checkUsageBanks(r);
+  if (on("numerals")) checkUsageNumerals(r, g.numerals);
   if (on("numerals")) checkNumerals(r, g.numerals);
   if (on("preps")) checkPrepositions(r, g.preps);
   if (on("verbs")) checkVerbs(r, g.verbs);
@@ -844,9 +893,12 @@ function runAll(g: Gens, only?: (keyof Gens)[]): Report {
 function selfTest(): boolean {
   const mutate = <Q extends AnyQ>(gen: Gen<Q>, f: (q: Q) => Q | null): Gen<Q> => (s) => gen(s).map(f).filter((q): q is Q => q !== null);
   const swap = <Q extends AnyQ>(q: Q): Q => ({ ...q, correct: distractorOf(q) ?? q.correct });
-  const withoutOneSystem: typeof candidateNumbers = (n, ...rest) => candidateNumbers({ ...n, sem: n.sem.filter((t) => t !== "oneSystem") }, ...rest);
+  const withoutTag = (tag: string): typeof candidateNumbers => (n, ...rest) => candidateNumbers({ ...n, sem: n.sem.filter((t) => t !== tag) }, ...rest);
+  const withoutOneSystem = withoutTag("oneSystem");
   const cases: { name: string; only: (keyof Gens)[]; focus: string[]; gens: Partial<Gens>; numbersOf?: typeof candidateNumbers }[] = [
     { name: "NO_PLURAL: metro у множині (вибір числа без тегу oneSystem)", only: ["preps"], focus: ["metro"], gens: {}, numbersOf: withoutOneSystem },
+    { name: "NOUN_USAGE_RULES: «k patru» (вибір числа без тегу floor)", only: ["preps"], focus: ["patro"], gens: {}, numbersOf: withoutTag("floor") },
+    { name: "NOUN_USAGE_RULES: лічба з формою, якої мова не вживає (hlavami)", only: ["numerals"], focus: ["hlava"], gens: { numerals: mutate(REAL.numerals, (q) => (q.blank === "noun" ? { ...q, promptWord: "hlava", correct: "hlavami", options: ["hlavami", "hlavy"] } : q)) } },
     { name: "NO_PLURAL: rodina в множині у фразі без plOk", only: ["nouns"], focus: ["rodina::"], gens: { nouns: mutate(REAL.nouns, (q) => (q.comboId === "rodina::lokal::pl" ? { ...q, contextPhrase: "Čtu o ___." } : q)) } },
     { name: "зникла клітинка (velký чол. істот. орудний мн.)", only: ["decl"], focus: ["velky::"], gens: { decl: mutate(REAL.decl, (q) => (q.comboId === "velky::masc_anim_instrumental::pl" ? null : q)) } },
     { name: "хибна правильна відповідь у прикметника", only: ["decl"], focus: ["stary::"], gens: { decl: mutate(REAL.decl, (q) => (q.comboId.startsWith("stary::") ? swap(q) : q)) } },

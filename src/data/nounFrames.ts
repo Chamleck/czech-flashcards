@@ -1,7 +1,7 @@
-import type { CzechCase, GrammaticalNumber, NounEntry } from "../types";
+import type { CzechCase } from "../types";
 import type { Needs, NumberPolicy } from "./prepositionPartners";
 import type { NounTag } from "./nounTags";
-import { matchesNeeds, pluralOnly } from "../utils/partnerSelection";
+import { NOUN_USAGE_RULES, NounCell, tagSkip } from "../utils/partnerSelection";
 import type { SkipRule } from "../utils/quizCommon";
 
 // ─────────────────────── ФРАЗИ КВІЗУ «ІМЕННИКИ» ───────────────────────
@@ -246,55 +246,27 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
 };
 
 // ─────────────────────── ЩО КВІЗ «ВІДМІНКИ» СВІДОМО НЕ ПИТАЄ ───────────────────────
-// Рішення (не граматика): клітинка існує в мові, але квіз її не питає. Рядок = теги (any / all / none, як у фразах) +
-// відмінки + числа + причина; без id слів, тож нове слово з такими тегами виключається саме. Рушій (asked у
-// utils/flashcardEngine.ts) і оракул (scripts/check-quiz-coverage.ts) читають ці самі правила (skipReason, utils/quizCommon.ts).
+// Два джерела, обидва — правила за тегами (any / all / none, як у фразах) + відмінки + числа + причина, без id слів:
+//  • NOUN_USAGE_RULES (utils/partnerSelection.ts) — форми, яких мова не вживає взагалі («ledny», «k patru»). Спільні для
+//    ВСІХ квізів: інші квізи теж ніколи не ставлять у них слово-партнер. Факт про слово додається ТАМ.
+//  • правила нижче — рішення саме цього квізу: клітинка в мові живе, але тут її не питаємо (кличний речей) або для неї
+//    немає природної фрази цього квізу («ve dne», «k roku» — лише з числом). Інші квізи такі форми вживати можуть.
+// Рушій (asked у utils/flashcardEngine.ts) і оракул (scripts/check-quiz-coverage.ts) читають NOUN_SKIP_RULES — обидва
+// джерела разом (skipReason, utils/quizCommon.ts).
 // ПРАВИЛА ДОДАВАННЯ
 //  1. Новий рядок — лише за рішенням Ніка, з причиною, яку друкує оракул; не замість фрази, якої просто ще немає
 //     (клітинку без природної фрази квіз питає без речення).
-//  2. Рядок не може виключати клітинку, під яку є фраза (dev-збірка попереджає).
-//  3. Порожні cases / numbers — усі відмінки / обидва числа.
-export interface NounCell {
-  noun: NounEntry;
-  c: CzechCase;
-  n: GrammaticalNumber;
-}
-interface TagSkip extends Needs {
-  cases?: CzechCase[];
-  numbers?: GrammaticalNumber[];
-  uncountable?: true; // лише незлічувані з одниною (поле uncountable; слова лише з множиною — peníze — не зачіпає)
-  withSg?: true; // лише слова, що мають однину (не ústa, brýle)
-  reason: string;
-}
-const tagSkip = (s: TagSkip): SkipRule<NounCell> => ({
-  reason: s.reason,
-  applies: ({ noun, c, n }) =>
-    (!s.cases || s.cases.includes(c)) &&
-    (!s.numbers || s.numbers.includes(n)) &&
-    (!s.uncountable || (noun.uncountable && !pluralOnly(noun))) &&
-    (!s.withSg || !pluralOnly(noun)) &&
-    matchesNeeds(noun, s),
-});
-export const NOUN_SKIP_RULES: SkipRule<NounCell>[] = [
+//  2. Спершу вирішити, куди: мова форму не вживає ніде — NOUN_USAGE_RULES; не вживає лише ця фраза / цей квіз — сюди.
+//  3. Рядок не може виключати клітинку, під яку є фраза (dev-збірка попереджає).
+//  4. Порожні cases / numbers — усі відмінки / обидва числа.
+const NOUNS_QUIZ_SKIPS: SkipRule<NounCell>[] = [
   tagSkip({ none: ["person", "animal"], cases: ["vokativ"], reason: "кличний не-особи (свідоме рішення)" }), // «stole!» — не звертання
-  // Слова часу (Нік 2026-10-07): лише конструкції, що живуть у мові; «ledny», «k pondělím», «večery» в орудному — ні.
-  tagSkip({ any: ["month"], numbers: ["pl"], reason: "множина місяців (Нік: «ledny», «v listopadech» не вживаються)" }),
-  tagSkip({ any: ["season"], cases: ["dativ", "lokal", "instrumental"], numbers: ["pl"], reason: "пори року: давальний, місцевий, орудний множини (Нік: кажуть «v zimě»)" }),
-  tagSkip({ any: ["weekday"], cases: ["dativ", "instrumental"], numbers: ["pl"], reason: "дні тижня: давальний і орудний множини (Нік: не вживаються)" }),
-  tagSkip({ any: ["daySpan"], none: ["timeUnit"], cases: ["dativ", "instrumental"], numbers: ["pl"], reason: "частини доби: давальний і орудний множини (Нік: не вживаються)" }),
+  // Слова часу (Нік 2026-10-07): форми живі в інших конструкціях («o večeru», «před jedním dnem», «k roku 2025»),
+  // але природної фрази цього квізу для них немає.
   tagSkip({ any: ["daySpan"], none: ["timeUnit"], cases: ["lokal"], numbers: ["sg"], reason: "частини доби: місцевий однини (Нік: «k ránu» — давальний, «v ránu» — ні)" }),
-  tagSkip({ any: ["dayPoint"], numbers: ["pl"], reason: "půlnoc, poledne: множина (Нік: моменти, не відрізки)" }),
   tagSkip({ any: ["timeUnit"], cases: ["dativ"], reason: "одиниці часу: давальний (Нік: живий лише з числом — «k roku 2025»)" }),
   tagSkip({ all: ["dayPart", "timeUnit"], cases: ["instrumental"], numbers: ["sg"], reason: "den, noc: орудний однини (Нік: лише «dnem i nocí»)" }),
   tagSkip({ all: ["dayPart", "timeUnit"], none: ["timeV"], cases: ["lokal"], numbers: ["sg"], reason: "den: місцевий однини (Нік: «ve dne» — застаріла форма)" }),
-  tagSkip({ any: ["yearsPlural"], cases: ["dativ"], numbers: ["pl"], reason: "léto: давальний множини (Нік: не вживається)" }),
-  // Незлічувані (Нік 2026-10-07): множина — «сорти», у мові лише з прикметником; де вона жива, її дає тег із plOk фраз.
-  tagSkip({ uncountable: true, none: ["strongPl", "mineral"], numbers: ["pl"], reason: "незлічувані: множина (Нік: «másla», «oblečení» у мові не вживаються)" }),
-  tagSkip({ uncountable: true, any: ["mineral"], cases: ["dativ", "lokal", "instrumental"], numbers: ["pl"], reason: "voda: «minerální vody» лише в називному, родовому, знахідному" }),
   tagSkip({ any: ["air"], cases: ["dativ"], numbers: ["sg"], reason: "vzduch: давальний (Нік: природної фрази немає)" }),
-  tagSkip({ all: ["sky", "weather"], numbers: ["pl"], reason: "slunce: множина (Нік: «slunce / sluncí» — лише в астрономії)" }),
-  tagSkip({ any: ["body"], none: ["bodyMany"], withSg: true, cases: ["dativ", "instrumental"], numbers: ["pl"], reason: "частина тіла, якої в людини одна (hlava, nos, srdce, krk): давальний і орудний множини (Нік: природної фрази для всіх немає)" }),
-  tagSkip({ any: ["floor"], cases: ["dativ"], reason: "поверхи: давальний (Нік: кажуть «do patra / do přízemí», природної фрази з давальним немає)" }),
-  tagSkip({ any: ["floor"], none: ["ordered"], cases: ["instrumental"], numbers: ["pl"], reason: "přízemí: орудний множини (Нік: у домі одне, фраз немає)" }),
-  tagSkip({ any: ["oneSystem"], numbers: ["pl"], reason: "metro: множина (Нік: у місті одне; множину тренують інші слова)" }),
 ];
+export const NOUN_SKIP_RULES: SkipRule<NounCell>[] = [...NOUN_USAGE_RULES, ...NOUNS_QUIZ_SKIPS];

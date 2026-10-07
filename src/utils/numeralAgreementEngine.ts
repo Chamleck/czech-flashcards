@@ -15,7 +15,7 @@ import { nounUsableAsPartner } from "../data/categories";
 import { NUMERAL_FRAMES, NumeralFrame, ORDINAL_FRAMES } from "../data/numeralFrames";
 import type { QuizCase } from "../data/declensionFrames";
 import type { VocalPrep } from "../data/prepositionPartners";
-import { matchesNeeds, freshWeightedOrder, acceptedForms, formOf, fitCounts, hasNumber, onlyOne, pluralOnly, sharedVocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
+import { matchesNeeds, freshWeightedOrder, acceptedForms, formInUse, formOf, fitCounts, hasNumber, onlyOne, pluralOnly, sharedVocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
 import { firstForm, isUsableDistractor, once, shuffle, splitForms, topUpRound } from "./quizCommon";
 import { cardinalForms, isDirect } from "./numeralForms";
@@ -275,8 +275,9 @@ function candidatesFor(k: Counter, c: QuizCase): Candidate[] {
   let out = candCache.get(key);
   if (!out) {
     out = [];
+    const cell = k.cell(c);
     for (const noun of NOUN_POOL) {
-      if (!k.accepts(noun)) continue;
+      if (!k.accepts(noun) || !formInUse(noun, cell.c, cell.n)) continue; // форма, якої мова не вживає (NOUN_USAGE_RULES), — ні
       const frames = NUMERAL_FRAMES[c].filter((f) => frameFits(f, k, noun));
       if (frames.length > 0) out.push({ noun, frames });
     }

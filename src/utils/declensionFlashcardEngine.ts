@@ -130,13 +130,14 @@ function nounForm(noun: NounEntry, c: QuizCase, n: GrammaticalNumber): string | 
   return !cell || cell === "—" ? null : firstForm(cell);
 }
 
-// Чи бере фрейм це слово в цьому числі (політика числа фрейму, множина лише де природна — candidateNumbers).
+// Чи бере фрейм це слово в цьому числі (політика числа фрейму, множина лише де природна, і лише форма, яку мова
+// вживає в цьому відмінку — candidateNumbers).
 // У називному дієслово узгоджується з групою («To je» / «To jsou»), тож число фрейму там суворе: brýle — лише в «To jsou».
 // plOk фрейму відкриває множину, якої загальне правило не дає (одиниці часу: «Strávil jsem tam celé dny»), — лише
 // у фразі, що дозволяє множину, і не для незлічуваних.
 function frameTakes(f: DeclFrame, noun: NounEntry, n: GrammaticalNumber, c: QuizCase): boolean {
   if (c === "nominativ" && f.num !== "any" && (f.num ?? "sg") !== n) return false;
-  return candidateNumbers(noun, f.num ?? "sg", () => 0, f.plOk).includes(n);
+  return candidateNumbers(noun, c, f.num ?? "sg", () => 0, f.plOk).includes(n);
 }
 
 // Фраза без підмета-власника (називний — сама група і є підметом; ownerless — «Je tu hodně…»): svůj сюди не можна.

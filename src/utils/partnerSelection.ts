@@ -1,6 +1,7 @@
 import { CzechCase, Gender, GrammaticalNumber, NounEntry, NounFilter } from "../types";
 import type { NounTag } from "../data/nounTags";
 import { CLUSTER_RULES, MEST_RULE, Needs, NumberPolicy, VocalDecision, VocalPrep } from "../data/prepositionPartners";
+import { skipReason, SkipRule } from "./quizCommon";
 
 // ─────────────── Чисті допоміжні функції добору партнерів (без випадковості, крім candidateNumbers) ───────────────
 // Дані — data/prepositionPartners.ts, теги — data/nounTags.ts, квіз — prepositionQuizEngine.ts.
@@ -50,13 +51,73 @@ export const NO_PLURAL: NounTag[] = ["collective", "oneSystem"];
 // Збірні (rodina) рахуються: «dvě rodiny».
 export const onlyOne = (n: NounEntry) => (n.sem ?? []).includes("oneSystem");
 const SINGULAR_ONLY: NounTag[] = ["meal", "weather", "activity", "time", ...NO_PLURAL];
+// Частина тіла, якої в людини одна (hlava, nos, krk, srdce: тег body без bodyMany). Її множина — це кілька людей,
+// тож поруч з одним власником («tvé krky», «Znáš dítě? Mluvíme o jeho krcích») вона безглузда: у фразах інших квізів
+// слово за замовчуванням лише в однині (відкрити множину може plOk фрази). Квіз «Відмінки» число вирішує своїми
+// фразами без власника («To jsou krky»), там цієї умови немає; давальний і орудний множини прибирає NOUN_USAGE_RULES.
+const SINGLE_BODY: Needs = { any: ["body"], none: ["bodyMany"] };
 export function pluralNatural(n: NounEntry): boolean {
-  return !n.uncountable && !(n.sem ?? []).some((t) => SINGULAR_ONLY.includes(t));
+  return !n.uncountable && !(n.sem ?? []).some((t) => SINGULAR_ONLY.includes(t)) && !matchesNeeds(n, SINGLE_BODY);
 }
 
 // Чи має слово це число (клітинка називного не «—»); лише множина — peníze, brýle, kalhoty.
 export const hasNumber = (n: NounEntry, num: GrammaticalNumber) => n.declension.nominativ[num] !== "—";
 export const pluralOnly = (n: NounEntry) => !hasNumber(n, "sg") && hasNumber(n, "pl");
+
+// ─────────────── Форми слова, яких у живій мові немає (усі квізи) ───────────────
+// ФАКТИ ПРО СЛОВО, а не рішення одного квізу: клітинка відмінок × число, яку мова не вживає («ledny», «k patru» —
+// кажуть «do patra», «másla»). Правило — за тегами, без id слів, тож нове слово з такими тегами виключається саме.
+// Читають УСІ квізи з одного місця: «Відмінки» не питає таку клітинку (NOUN_SKIP_RULES у data/nounFrames.ts —
+// це правила нижче + рішення самого квізу), а квізи, де іменник — слово-партнер у фразі («Прийменники»,
+// «Прикметники та займенники», порядкові й лічба «Числівників»), ніколи не ставлять його в таку клітинку
+// (candidateNumbers нижче — з відмінком; «Числівники» — formInUse на клітинці, яку вимагає числівник).
+// Оракул (scripts/check-quiz-coverage.ts) перевіряє кожну фразу кожного банку проти цих правил.
+// ПРАВИЛА ДОДАВАННЯ
+//  1. Сюди — лише те, що мова не вживає в будь-якій фразі (факт про слово), за рішенням Ніка, з причиною.
+//  2. «У квізі немає природної фрази» чи «квіз свідомо не питає» (кличний речей, «ve dne», «k roku» лише з числом) —
+//     НЕ сюди, а в список того квізу (NOUN_SKIP_RULES у data/nounFrames.ts після NOUN_USAGE_RULES): інакше правило
+//     заборонить правильні фрази в інших квізах («Mluvíme o večeru», «Před jedním dnem»).
+//  3. Порожні cases / numbers — усі відмінки / обидва числа.
+export interface NounCell {
+  noun: NounEntry;
+  c: CzechCase;
+  n: GrammaticalNumber;
+}
+interface TagSkip extends Needs {
+  cases?: CzechCase[];
+  numbers?: GrammaticalNumber[];
+  uncountable?: true; // лише незлічувані з одниною (поле uncountable; слова лише з множиною — peníze — не зачіпає)
+  withSg?: true; // лише слова, що мають однину (не ústa, brýle)
+  reason: string;
+}
+export const tagSkip = (s: TagSkip): SkipRule<NounCell> => ({
+  reason: s.reason,
+  applies: ({ noun, c, n }) =>
+    (!s.cases || s.cases.includes(c)) &&
+    (!s.numbers || s.numbers.includes(n)) &&
+    (!s.uncountable || (noun.uncountable && !pluralOnly(noun))) &&
+    (!s.withSg || !pluralOnly(noun)) &&
+    matchesNeeds(noun, s),
+});
+export const NOUN_USAGE_RULES: SkipRule<NounCell>[] = [
+  // Слова часу (Нік 2026-10-07): лише конструкції, що живуть у мові; «ledny», «k pondělím», «večery» в орудному — ні.
+  tagSkip({ any: ["month"], numbers: ["pl"], reason: "множина місяців (Нік: «ledny», «v listopadech» не вживаються)" }),
+  tagSkip({ any: ["season"], cases: ["dativ", "lokal", "instrumental"], numbers: ["pl"], reason: "пори року: давальний, місцевий, орудний множини (Нік: кажуть «v zimě»)" }),
+  tagSkip({ any: ["weekday"], cases: ["dativ", "instrumental"], numbers: ["pl"], reason: "дні тижня: давальний і орудний множини (Нік: не вживаються)" }),
+  tagSkip({ any: ["daySpan"], none: ["timeUnit"], cases: ["dativ", "instrumental"], numbers: ["pl"], reason: "частини доби: давальний і орудний множини (Нік: не вживаються)" }),
+  tagSkip({ any: ["dayPoint"], numbers: ["pl"], reason: "půlnoc, poledne: множина (Нік: моменти, не відрізки)" }),
+  tagSkip({ any: ["yearsPlural"], cases: ["dativ"], numbers: ["pl"], reason: "léto: давальний множини (Нік: не вживається)" }),
+  // Незлічувані (Нік 2026-10-07): множина — «сорти», у мові лише з прикметником; де вона жива, її дає тег із plOk фраз.
+  tagSkip({ uncountable: true, none: ["strongPl", "mineral"], numbers: ["pl"], reason: "незлічувані: множина (Нік: «másla», «oblečení» у мові не вживаються)" }),
+  tagSkip({ uncountable: true, any: ["mineral"], cases: ["dativ", "lokal", "instrumental"], numbers: ["pl"], reason: "voda: «minerální vody» лише в називному, родовому, знахідному" }),
+  tagSkip({ all: ["sky", "weather"], numbers: ["pl"], reason: "slunce: множина (Нік: «slunce / sluncí» — лише в астрономії)" }),
+  tagSkip({ ...SINGLE_BODY, withSg: true, cases: ["dativ", "instrumental"], numbers: ["pl"], reason: "частина тіла, якої в людини одна (hlava, nos, srdce, krk): давальний і орудний множини (Нік: природної фрази для всіх немає)" }),
+  tagSkip({ any: ["floor"], cases: ["dativ"], reason: "поверхи: давальний (Нік: кажуть «do patra / do přízemí», природної фрази з давальним немає)" }),
+  tagSkip({ any: ["floor"], none: ["ordered"], cases: ["instrumental"], numbers: ["pl"], reason: "přízemí: орудний множини (Нік: у домі одне, фраз немає)" }),
+  tagSkip({ any: ["oneSystem"], numbers: ["pl"], reason: "metro: множина (Нік: у місті одне; множину тренують інші слова)" }),
+];
+// Чи вживає мова цю форму слова (жодне правило NOUN_USAGE_RULES її не прибирає).
+export const formInUse = (noun: NounEntry, c: CzechCase, n: GrammaticalNumber) => !skipReason(NOUN_USAGE_RULES, { noun, c, n });
 
 // Які числа можна взяти для слова за політикою фрейму, у ВИПАДКОВОМУ порядку (перебирає той, хто викликає:
 // якщо перше число не дає контрасту форм, пробуємо друге — слово не карається за невдалий жереб).
@@ -64,8 +125,12 @@ export const pluralOnly = (n: NounEntry) => !hasNumber(n, "sg") && hasNumber(n, 
 // у «pl»-фреймі непридатне слово без множини або з неприродною множиною (pluralNatural). plOk фрейму — теги, для яких
 // У ЦІЙ фразі множина природна, хоча загальне правило її не дає («při cestách» — recurring, «celé dny» — timeUnit).
 // Тег із plOk — явне рішення, тож відкриває множину й незлічуваному («silné větry», «minerální vody»); так само в
-// усіх квізах (рушій «Відмінки» — pluralFits).
-export function candidateNumbers(n: NounEntry, policy: NumberPolicy, rnd: () => number = Math.random, plOk?: readonly NounTag[]): GrammaticalNumber[] {
+// усіх квізах (рушій «Відмінки» — pluralFits). c — відмінок, у якому слово стане у фразі: число, форму якого мова в
+// цьому відмінку не вживає (NOUN_USAGE_RULES — «k patru»), не повертається ніколи, навіть із plOk.
+export function candidateNumbers(n: NounEntry, c: CzechCase, policy: NumberPolicy, rnd: () => number = Math.random, plOk?: readonly NounTag[]): GrammaticalNumber[] {
+  return numbersByPolicy(n, policy, rnd, plOk).filter((num) => formInUse(n, c, num));
+}
+function numbersByPolicy(n: NounEntry, policy: NumberPolicy, rnd: () => number, plOk?: readonly NounTag[]): GrammaticalNumber[] {
   const sg = hasNumber(n, "sg");
   const pl = hasNumber(n, "pl");
   const natural = pluralNatural(n) || (!!plOk && (n.sem ?? []).some((t) => plOk.includes(t))); // тег із plOk — явне рішення, навіть для незлічуваного
