@@ -83,6 +83,7 @@ export type NounTag =
   | "overhead"
   | "floor"
   | "bodyMany"
+  | "noLooks"
   | "month"
   | "season"
   | "weekday"
@@ -155,6 +156,7 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
   overhead: "те, під чим можна стояти («Stojím pod stromem / mostem / sprchou / deštníkem»): strom, most, sprcha, deštník",
   floor: "поверх будинку («Nad přízemím je půda»; у множині «Výtah jezdí mezi patry» — лише разом з ordered): přízemí, patro",
   bodyMany: "частина тіла, якої в людини дві чи більше, тож множина природна про одну людину («Mám problém se zuby», «To škodí kolenům»; разом з body): ruka, noha, zub, kost, oko, ucho, koleno, rameno — НЕ hlava, nos, krk, srdce. Частина тіла БЕЗ bodyMany — одна в людини: у фразах інших квізів лише в однині («tvé krky» — ні; SINGLE_BODY, utils/partnerSelection.ts)",
+  noLooks: "частина тіла, яку не оцінюють за виглядом (разом з body): ні «hezká / krásná / čistá / špinavá», ні «Líbí se mi ___» — kost, srdce (внутрішні), hlava («Líbí se mi tvoje hlava» — дивно) — НЕ oko, ruka, nos, krk",
   month: "місяць календаря (leden … prosinec; разом з time). Ставиться ТОДІ Й ЛИШЕ ТОДІ, коли в слова є поле month (validateNounSem): множину місяців квіз «Відмінки» не питає («ledny», «v listopadech» у мові не вживаються)",
   season: "пора року, множина якої означає кілька таких пір («Jaké tu bývají zimy?», «Kolik zim jsi tu strávil?»; разом з time): zima, jaro, podzim — НЕ léto (його множина — «роки», тег yearsPlural)",
   weekday: "день тижня («Mám rád pátky», «O sobotách chodím plavat», «Ve středu mám volno»; разом з time): pondělí … neděle",
@@ -174,7 +176,7 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
 };
 
 // Теги-«самоцілі»: слово з таким тегом не має жодних інших (особа не буває будівлею, їжа — місцем тощо).
-// Винятки: body разом з bodyLevel / singleLevel / bodyMany, time разом зі своїми підтегами (timeUnit, dayPart, month…), document разом з carried (pas, doklad),
+// Винятки: body разом з bodyLevel / singleLevel / bodyMany / noLooks, time разом зі своїми підтегами (timeUnit, dayPart, month…), document разом з carried (pas, doklad),
 // person разом з collective (rodina), food разом з served / homemade, money разом з currency (koruna, euro); наскрізні теги (CROSS) — з будь-яким.
 const CROSS: NounTag[] = ["ordered", "recurring"];
 const SOLO: NounTag[] = ["person", "animal", "money", "food", "meal", "time", "weather", "abstract", "document", "body", "air"];
@@ -185,6 +187,7 @@ const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
   bodyLevel: ["body"],
   singleLevel: ["bodyLevel"],
   bodyMany: ["body"],
+  noLooks: ["body"],
   flower: ["plant"],
   month: ["time"],
   season: ["time"],
@@ -216,7 +219,7 @@ export function validateNounSem(n: Pick<NounEntry, "id" | "sem" | "month">): str
   for (const solo of SOLO) {
     if (!sem.includes(solo)) continue;
     const allowed: NounTag[] =
-      solo === "body" ? ["body", "bodyLevel", "singleLevel", "bodyMany"] : solo === "time" ? ["time", "timeUnit", "dayPart", "month", "season", "weekday", "daySpan", "dayPoint", "timeV", "yearsPlural"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade", "drink", "mineral"] : solo === "weather" ? ["weather", "strongPl", "weatherCause", "sky"] : solo === "money" ? ["money", "currency"] : [solo];
+      solo === "body" ? ["body", "bodyLevel", "singleLevel", "bodyMany", "noLooks"] : solo === "time" ? ["time", "timeUnit", "dayPart", "month", "season", "weekday", "daySpan", "dayPoint", "timeV", "yearsPlural"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade", "drink", "mineral"] : solo === "weather" ? ["weather", "strongPl", "weatherCause", "sky"] : solo === "money" ? ["money", "currency"] : [solo];
     const extra = sem.filter((t) => !allowed.includes(t) && !CROSS.includes(t));
     if (extra.length > 0) out.push(`${n.id}: тег «${solo}» не сполучається з ${extra.join(", ")}`);
   }

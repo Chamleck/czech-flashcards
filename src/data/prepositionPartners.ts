@@ -22,7 +22,9 @@ import type { NounTag } from "./nounTags";
 //     у рядку не пишемо — фраза для такого слова свідомо не ставиться.
 //  5. Множина слів часу, погоди, їжі, занять за замовчуванням вимкнена (pluralNatural); фраза, де вона природна для
 //     подій, що повторюються, відкриває її полем plOk: ["recurring"] («při cestách», «Zaplatil jsem za obědy»).
-//     Збірних (rodina) і metro (oneSystem) — теж (NO_PLURAL у utils/partnerSelection.ts).
+//     Збірних (rodina) і metro (oneSystem) — теж (NO_PLURAL у utils/partnerSelection.ts). Частина тіла, якої в людини
+//     одна (body без bodyMany: hlava, nos, krk, srdce), — теж лише однина. Форму, якої мова не вживає (NOUN_USAGE_RULES
+//     у utils/partnerSelection.ts: «k patru», множина місяців), рушій не поставить ніколи, навіть із plOk.
 //  6. Перед здачею — оракул scripts/check-quiz-coverage.ts --only=preps: «Помилок: 0».
 
 export interface Needs {

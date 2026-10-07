@@ -47,7 +47,9 @@ import type { SkipRule } from "../utils/quizCommon";
 //     множину (num "any" чи "pl"). Тег із plOk — явне рішення про це слово, тож він відкриває множину й незлічуваному
 //     (так само в усіх квізах, utils/partnerSelection.ts candidateNumbers). Погоду сюди не ставимо:
 //     природну множину має лише déšť, а «teplá slunce» — ні. Слова з тегами NO_PLURAL (utils/partnerSelection.ts:
-//     збірні — rodina, система, одна в місті, — metro) у множину не стають без plOk із їхнім тегом.
+//     збірні — rodina, система, одна в місті, — metro) у множину не стають без plOk із їхнім тегом; так само частина тіла,
+//     якої в людини одна (body без bodyMany: «tvé krky» — ні). Форму, якої мова не вживає (NOUN_USAGE_RULES,
+//     utils/partnerSelection.ts), рушій не поставить ніколи, навіть із plOk.
 //  9. Фрази з role "every" для їжі — лише в однині: všechen з незлічуваним («Zbavil jsem se vší kávy»); «po všech
 //     chlebech» неприродне. Перед všechen у фразі не став {v}/{k}/{s}/{z}: група vš- коливається (CLUSTER_RULES),
 //     слово в таку фразу не потрапить.
@@ -68,25 +70,27 @@ export interface DeclFrame extends NounFilter {
 }
 
 const NOT_THING: NounTag[] = ["time", "weather", "abstract", "activity"];
+// Частина тіла — не річ, яку шукають чи показують окремо («Kde je dobrý krk?», «Tady je nějaký nos»): її фрази нижче
+// (tag body) — «Lékař vyšetřil», «Dotkl se», «To škodí», «Co se stalo s».
 
 export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
   nominativ: [
     { text: "To je ___.", num: "sg", degrees: true },
     { text: "To jsou ___.", num: "pl", degrees: true },
-    { some: true, text: "Tady je ___.", num: "sg", none: NOT_THING },
-    { some: true, text: "Tady jsou ___.", num: "pl", none: NOT_THING },
-    { text: "Kde je ___?", num: "sg", countable: true, none: [...NOT_THING, "meal"] },
-    { text: "Kde jsou ___?", num: "pl", countable: true, none: [...NOT_THING, "meal"] },
-    { text: "Líbí se mi ___.", num: "any", degrees: true, evaluative: true, none: ["time", "abstract", "money", "document"] }, // líbí — і одн., і мн.
+    { some: true, text: "Tady je ___.", num: "sg", none: [...NOT_THING, "body"] },
+    { some: true, text: "Tady jsou ___.", num: "pl", none: [...NOT_THING, "body"] },
+    { text: "Kde je ___?", num: "sg", countable: true, none: [...NOT_THING, "meal", "body"] },
+    { text: "Kde jsou ___?", num: "pl", countable: true, none: [...NOT_THING, "meal", "body"] },
+    { text: "Líbí se mi ___.", num: "any", degrees: true, evaluative: true, none: ["time", "abstract", "money", "document", "noLooks"] }, // líbí — і одн., і мн.
     { text: "Chybí mi ___.", num: "any", evaluative: true, any: ["person", "animal", "carried"] },
     // заперечення: «Není tu žádný student», «Nejsou tu žádné knihy» (називний)
     { text: "Není tu ___.", num: "sg", role: "neg", any: ["person", "animal", "item", "vehicle", "food", "furniture", "building"] },
     { text: "Nejsou tu ___.", num: "pl", role: "neg", any: ["person", "animal", "item", "vehicle", "food", "furniture", "building"] },
     { text: "To byly ___.", num: "pl", qualitative: true, any: ["timeUnit"], plOk: ["timeUnit"] }, // to byly krásné dny, dlouhé noci
     // питання
-    { text: "___ je to {N}?", num: "sg", role: "question" },
-    { text: "___ jsou to {N}?", num: "pl", role: "question" },
-    { text: "___ {N} se ti líbí?", num: "any", role: "question", evaluative: true, none: ["time", "abstract", "money", "document"] },
+    { text: "___ je to {N}?", num: "sg", role: "question", none: ["body"] },
+    { text: "___ jsou to {N}?", num: "pl", role: "question", none: ["body"] },
+    { text: "___ {N} se ti líbí?", num: "any", role: "question", evaluative: true, none: ["time", "abstract", "money", "document", "noLooks"] },
     // узагальнення «кожен / усі» (každý, všechen — quiz.role "every")
     { text: "___ to ví.", num: "sg", role: "every", any: ["person"] }, // každý student to ví
     { text: "___ to vědí.", num: "pl", role: "every", any: ["person"] }, // všichni studenti to vědí
@@ -123,6 +127,7 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { text: "Nechodím do ___.", num: "pl", role: "neg", all: ["building", "workplace"], none: ["placeNa"] }, // do žádných kaváren
     { text: "Mám klíče od ___.", num: "any", role: "every", all: ["residence", "building"] }, // od každého domu, od všech hotelů (не «od každého přízemí»)
     { text: "Zbavil jsem se ___.", role: "every", any: ["food"] }, // vší kávy, všeho cukru
+    { text: "Dotkl se ___.", num: "any", any: ["body"] }, // jejího ramene, mé ruky, jejích kolen (SSJČ: «dotkl se nesměle její ruky»)
   ],
   dativ: [
     { text: "Věřím ___.", num: "any", evaluative: true, any: ["person"] },
@@ -148,6 +153,7 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { text: "___ {N} dáváš přednost?", num: "any", role: "question", any: ["item", "vehicle", "clothes"] }, // kterým autům
     { text: "Dal jsem nálepku ___.", num: "any", role: "every", any: ["item", "furniture", "carried"], none: ["food"] }, // každému pasu, všem židlím
     { text: "Díky ___ jsme nemuseli nakupovat.", role: "every", any: ["food"] }, // všemu cukru, vší rýži
+    { text: "To škodí ___.", num: "any", ownerless: true, any: ["body"] }, // tvým zubům, jejímu srdci («Neškoďte svému srdci» — МОЗ ЧР)
   ],
   akuzativ: [
     { some: true, text: "Vidím ___.", num: "any", countable: true, any: ["person", "animal", "item", "clothes", "vehicle", "building", "furniture", "outdoor", "nature"] },
@@ -175,7 +181,7 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { text: "Koupil jsem ___.", role: "every", any: ["food"] }, // všechen cukr, všechnu kávu
     { text: "Pamatuju si ___.", num: "any", any: ["timeUnit", "dayPart", "weather", "air"], plOk: ["timeUnit"] }, // ten nudný týden, ty dlouhé noci, ten svěží vzduch
     { text: "Strávil jsem tam ___.", num: "pl", any: ["timeUnit"], plOk: ["timeUnit"] }, // celé dny, dlouhé týdny
-    { text: "Lékař vyšetřil ___.", ownerless: true, any: ["body"] }, // zdravý zub, nemocné koleno
+    { text: "Lékař vyšetřil ___.", num: "any", ownerless: true, any: ["body"] }, // zdravý zub, nemocné koleno, její zuby
     { text: "Na zítra hlásí ___.", ownerless: true, any: ["weather"] }, // silný vítr, slabý déšť
   ],
   lokal: [
@@ -228,6 +234,8 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { text: "Nemám problém {s} ___.", num: "any", role: "neg", any: ["item", "document", "vehicle"] }, // se žádným autem
     { text: "Co uděláš {s} ___?", num: "any", role: "every", any: ["food", "item"] }, // s každým klíčem
     { text: "Naplnil jsem sklenici ___.", role: "every", any: ["food"] }, // vším cukrem, vší vodou, vší rýží
+    // Лише однина: орудний множини ruce / nohy / oči / uši — двоїна («tvýma rukama»), форм прикметника на -ma в даних немає.
+    { text: "Co se stalo {s} ___?", ownerless: true, any: ["body"] }, // s tvou rukou, s tím kolenem, s tvými ústy
   ],
 };
 

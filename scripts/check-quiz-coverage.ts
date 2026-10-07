@@ -129,7 +129,7 @@ function basic(r: Report, quiz: string, q: AnyQ): void {
 function vocal(r: Report, quiz: string, q: AnyQ): void {
   const m = (q.contextPhrase ?? "").match(/(?:^|\s)(v|ve|k|ke|s|se|z|ze) ___/i);
   if (!m) return;
-  if (/(bojím|bojíš|nebojím|ptám|jsem|jsi|vejdu|nevejdu|ti|mi|sis|napiješ|nenapiju) se ___/i.test(q.contextPhrase ?? "")) return;
+  if (/(bojím|bojíš|nebojím|ptám|jsem|jsi|vejdu|nevejdu|ti|mi|sis|napiješ|nenapiju|dotkl) se ___/i.test(q.contextPhrase ?? "")) return;
   const prep = m[1].toLowerCase()[0] as VocalPrep;
   const used = m[1].length === 2 ? "vocal" : "plain";
   for (const o of q.options) if (vocalDecision(prep, o) !== used) r.errors.push(`${quiz}: ${q.comboId}: вокалізація «${m[1]}» не підходить до «${o}» — «${q.contextPhrase}»`);
@@ -463,7 +463,8 @@ function checkNumerals(r: Report, gen: Gen<AnyQ & { blank?: string }>): void {
         const f = split(po.forms[c])[0];
         if (!f) continue;
         const qs: AnyQ[] = [];
-        for (let i = 0; i < 40; i++) qs.push(...forced(gen, `${cd.id}::${c}::pt`)); // пропуск — числівник чи іменник, навмання
+        // пропуск — числівник чи іменник, навмання: 40 вибірок, далі — доки форма не трапиться відповіддю (до 400)
+        for (let i = 0; i < 400 && (i < 40 || (qs.length > 0 && !qs.some((q) => q.correct === f))); i++) qs.push(...forced(gen, `${cd.id}::${c}::pt`));
         if (!qs.some((q) => q.correct === f)) gap(r, QUIZ, `${cd.id} ${c}: «${f}» (лише множина) не питається`);
         for (const q of qs) basic(r, QUIZ, q);
       }
@@ -496,8 +497,9 @@ function checkPrepositions(r: Report, gen: Gen<AnyQ>): void {
   const numbersOf = (qs: AnyQ[]) => new Set<string>(qs.map((q) => (/множина/.test(q.taskText) ? "мн." : /однина/.test(q.taskText) ? "одн." : "")));
   const need = (id: string, both: boolean) => {
     const qs: AnyQ[] = [];
-    // обидва числа: число обирається навмання (множина буває й у ~8 % питань комбо) — більше вибірок
-    for (let i = 0; i < (both ? 60 : 20); i++) qs.push(...forced(gen, id));
+    // обидва числа: число обирається навмання (множина буває й у ~8 % питань комбо) — більше вибірок, далі — доки не
+    // трапляться обидва числа (до 400), щоб рідкісне число не давало випадкової «дірки»
+    for (let i = 0; i < 400 && (i < (both ? 60 : 20) || (both && qs.length > 0 && !["одн.", "мн."].every((n) => numbersOf(qs).has(n)))); i++) qs.push(...forced(gen, id));
     if (qs.length === 0) return gap(r, QUIZ, `${id} не питається`);
     for (const q of qs) basic(r, QUIZ, q);
     if (both) for (const n of ["одн.", "мн."]) if (!numbersOf(qs).has(n)) gap(r, QUIZ, `${id} ${n} не питається`);
@@ -740,7 +742,10 @@ function checkDateTime(r: Report, gen: Gen<AnyQ>): void {
       const id = `date-${d.day}::${mode}::x`;
       const right = split(mode === "gen" ? d.gen : d.nom);
       const other = split(mode === "gen" ? d.nom : d.gen);
-      const qs = forcedN(gen, id, right.length > 1 ? 12 : TRIES);
+      // дублет (analytic / fused) обирається навмання: 12 вибірок, далі — доки кожен варіант не трапиться відповіддю (до
+      // 400; раніше фіксовані 12 інколи пропускали один варіант — випадкова «дірка» date-24, 2026-10-07)
+      const qs: AnyQ[] = [];
+      for (let i = 0; i < 400 && (i < (right.length > 1 ? 12 : TRIES) || (qs.length > 0 && !right.every((f) => qs.some((q) => q.correct === f)))); i++) qs.push(...forcedN(gen, id, 1));
       if (!inFocus(id)) continue;
       if (qs.length === 0) gap(r, QUIZ, `${id} не питається`);
       for (const f of right) if (qs.length > 0 && !qs.some((q) => q.correct === f)) gap(r, QUIZ, `${id}: варіант «${f}» не питається`);

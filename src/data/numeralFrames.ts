@@ -12,7 +12,8 @@ import type { DeclFrame, QuizCase } from "./declensionFrames";
 //  1. Фраза природна для КОЖНОГО іменника, що підпадає під її теги (any / all / none), і для будь-якої кількості:
 //     jeden, dva, pět, dvacet tři, а без max — і sto, tisíc, milion. Незлічувані іменники (uncountable) і слова, яких
 //     не буває кілька (тег oneSystem — metro), квіз не бере взагалі (countable у utils/numeralAgreementEngine.ts),
-//     тож виключати їх тегами у фразах не треба.
+//     тож виключати їх тегами у фразах не треба. Іменник, форму якого числівник вимагає, а мова її не вживає
+//     (NOUN_USAGE_RULES у utils/partnerSelection.ts), у лічбу теж не потрапляє.
 //  2. {V} — дієслово, що узгоджується з групою в називному: verb = [однина, множина]. Однина — після jeden, pět+,
 //     sto…, dvacet jeden; множина — після dva / tři / čtyři, dvacet dva…, dvoje (IJP id=792: «pět mužů přišlo»,
 //     «dva muži přišli»). Тому окремих фраз для однини й множини не треба.

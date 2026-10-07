@@ -23,10 +23,13 @@ import { NounEntry } from "../types";
 //       • місце ЗАВЖДИ має рівно один із placeV (в школі) чи placeNa (на пошті) — це лексична властивість
 //         слова; перевір за словником, а не за відчуттям;
 //       • особа, тварина, їжа, час, погода, гроші, документ, тіло, повітря — «самотні» теги (без інших; винятки:
-//         тіло + bodyLevel / singleLevel / bodyMany, час + timeUnit / dayPart / month / season / weekday / daySpan / dayPoint / timeV / yearsPlural, їжа + served / homemade / drink / mineral, погода + strongPl / weatherCause / sky, документ + carried — pas, doklad, гроші + currency — koruna, euro);
+//         тіло + bodyLevel / singleLevel / bodyMany / noLooks, час + timeUnit / dayPart / month / season / weekday / daySpan / dayPoint / timeV / yearsPlural, їжа + served / homemade / drink / mineral, погода + strongPl / weatherCause / sky, документ + carried — pas, doklad, гроші + currency — koruna, euro, особа + collective — rodina);
 //       • їжа: served — страва чи напій, який подають теплим або холодним (káva, polévka, maso: «teplá polévka»);
 //         homemade — буває домашнім (chléb, pivo, ovoce: «domácí chléb»); жодного — як cukr. Без них teplý / studený /
 //         domácí з цим словом не з'являться (і «studený cukr» теж) — це безпечно; зайвий тег дасть безглузду пару;
+//       • частина тіла: bodyMany — якщо в людини їх дві чи більше (ruka, zub); без нього частина вважається однією й у
+//         фразах інших квізів стоїть лише в однині («tvé krky» — ні). noLooks — якщо її не оцінюють за виглядом
+//         (kost, srdce, hlava): без «hezká / krásná / čistá / špinavá» і без «Líbí se mi ___»;
 //       • повітря (vzduch) — air, НЕ weather: weather бере квіз «Прийменники» у «při ___» («při vzduchu» — ні);
 //       • новий смисловий клас, для якого жоден тег не відділяє погані пари від добрих (як було з cukr і vzduch), —
 //         новий тег із поясненням у NOUN_TAG_DOC (data/nounTags.ts), а не виняток для слова: списків слів у коді немає;
@@ -350,7 +353,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "kost",
     category: "body",
-    sem: ["body", "bodyMany"],
+    sem: ["body", "bodyMany", "noLooks"],
     declension: {
       nominativ: { sg: "kost", pl: "kosti" },
       genitiv: { sg: "kosti", pl: "kostí" },
@@ -2652,7 +2655,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "body",
-    sem: ["body"],
+    sem: ["body", "noLooks"],
     declension: {
       nominativ: { sg: "hlava", pl: "hlavy" },
       genitiv: { sg: "hlavy", pl: "hlav" },
@@ -2748,7 +2751,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "body",
-    sem: ["body"],
+    sem: ["body", "noLooks"],
     declension: {
       nominativ: { sg: "srdce", pl: "srdce" },
       genitiv: { sg: "srdce", pl: "srdcí" },

@@ -46,7 +46,10 @@ const LENGTH: NounFilter = { any: ["timeUnit", "clothes", "path"], none: ["outdo
 const WIDTH: NounFilter = { any: ["furniture", "clothes", "path"], none: ["outdoor"] }; // široká postel, úzké kalhoty, široká cesta
 const DEPTH: NounFilter = { any: ["container"], none: ["vehicle", "clothes"] }; // hluboký talíř, hrnek, hluboká skříň
 const AGE: NounFilter = { none: ["time", "weather", "air", "meal", "activity", "abstract", "body", "food", "nature", "landform"] }; // не «staré moře»
-const LOOKS: NounFilter = { none: ["abstract", "document", "money", "activity", "meal", "food", "air"] };
+const LOOKS: NounFilter = { none: ["abstract", "document", "money", "activity", "meal", "food", "air", "noLooks"] }; // не «hezká kost / hlava»
+// Оцінка «добрий / поганий» з частиною тіла — лише сталі звороти («dobré srdce», «špatné oči»), не для всіх («dobrý krk»,
+// «dobrá kost»): частин тіла не беремо зовсім (Нік 2026-10-07).
+const GOOD_BAD: NounFilter = { none: ["body"] };
 const COLOR: NounFilter = { any: ["item", "clothes", "vehicle", "furniture"] };
 const COLOR_NEUTRAL: NounFilter = { any: ["item", "clothes", "vehicle", "furniture", "animal"] }; // černý pes, bílá kočka (не будівлі: «černá banka»)
 
@@ -1046,7 +1049,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "dobrý",
     pattern: "tvrdy",
     category: "quality",
-    fits: ANY,
+    fits: GOOD_BAD,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -1187,7 +1190,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "špatný",
     pattern: "tvrdy",
     category: "quality",
-    fits: ANY,
+    fits: GOOD_BAD,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -5876,7 +5879,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "čistý",
     pattern: "tvrdy",
     category: "quality",
-    fits: { any: ["item", "clothes", "vehicle", "furniture", "container", "placeV", "outdoor", "body", "building", "animal", "person", "air"], none: ["activity"] },
+    fits: { any: ["item", "clothes", "vehicle", "furniture", "container", "placeV", "outdoor", "body", "building", "animal", "person", "air"], none: ["activity", "noLooks"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -6017,7 +6020,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "špinavý",
     pattern: "tvrdy",
     category: "quality",
-    fits: { any: ["item", "clothes", "vehicle", "furniture", "container", "placeV", "outdoor", "body", "building", "animal", "person", "air"], none: ["activity"] },
+    fits: { any: ["item", "clothes", "vehicle", "furniture", "container", "placeV", "outdoor", "body", "building", "animal", "person", "air"], none: ["activity", "noLooks"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
