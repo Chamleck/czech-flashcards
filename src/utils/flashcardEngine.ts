@@ -200,7 +200,18 @@ function devCheckData(): void {
     for (const f of NOUN_FRAMES[c]) {
       const k = DEFAULT_NOUN_POOL.filter((n) => matchesNeeds(n, f)).length;
       if (k < 3) issues.push(`фраза «${f.text}» (${c}): лише ${k} іменників (потрібно ≥ 3)`);
+      if (/^\{[vksz]\}/.test(f.text)) issues.push(`фраза «${f.text}» (${c}): починається з прийменника — речення почнеться з малої літери`);
     }
+  // Свідомий виняток (NOUN_SKIP_RULES) не може стосуватися клітинки, під яку є фраза (правило 2 біля таблиці).
+  for (const n of DEFAULT_NOUN_POOL)
+    for (const c of CASE_ORDER)
+      for (const num of NUMBERS) {
+        const cell = n.declension[c][num];
+        if (!cell || cell === "—") continue;
+        const why = skipReason(NOUN_SKIP_RULES, { noun: n, c, n: num });
+        const f = why && NOUN_FRAMES[c].find((x) => frameFits(x, n, num));
+        if (f) issues.push(`${n.id} ${c} ${num}: виняток «${why}», але фраза «${f.text}» підходить`);
+      }
   // Без речення: жодна фраза не підійшла за тегами або всі відпали через вокалізацію (перебір у makeQuestion повний).
   const bare = defaultCombos()
     .filter((x) => !makeQuestion(x.entry, x.targetCase, x.targetNumber, "case", NO_FRAMES)?.frame)

@@ -23,7 +23,7 @@ import { NounEntry } from "../types";
 //       • місце ЗАВЖДИ має рівно один із placeV (в школі) чи placeNa (на пошті) — це лексична властивість
 //         слова; перевір за словником, а не за відчуттям;
 //       • особа, тварина, їжа, час, погода, гроші, документ, тіло, повітря — «самотні» теги (без інших; винятки:
-//         тіло + bodyLevel / singleLevel / bodyMany, час + timeUnit / dayPart, їжа + served / homemade, документ + carried — pas, doklad);
+//         тіло + bodyLevel / singleLevel / bodyMany, час + timeUnit / dayPart / month / season / weekday / daySpan / dayPoint / timeV / yearsPlural, їжа + served / homemade, документ + carried — pas, doklad);
 //       • їжа: served — страва чи напій, який подають теплим або холодним (káva, polévka, maso: «teplá polévka»);
 //         homemade — буває домашнім (chléb, pivo, ovoce: «domácí chléb»); жодного — як cukr. Без них teplý / studený /
 //         domácí з цим словом не з'являться (і «studený cukr» теж) — це безпечно; зайвий тег дасть безглузду пару;
@@ -1996,7 +1996,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "stavani",
     category: "days",
-    sem: ["time"],
+    sem: ["time", "weekday"],
     declension: {
       nominativ: { sg: "pondělí", pl: "pondělí" },
       genitiv: { sg: "pondělí", pl: "pondělí" },
@@ -2017,7 +2017,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "stavani",
     category: "days",
-    sem: ["time"],
+    sem: ["time", "weekday"],
     declension: {
       // Незмінне в однині так само, як pondělí — хоч і закінчується на -ý, не -í.
       nominativ: { sg: "úterý", pl: "úterý" },
@@ -2039,7 +2039,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "days",
-    sem: ["time"],
+    sem: ["time", "weekday"],
     declension: {
       nominativ: { sg: "středa", pl: "středy" },
       genitiv: { sg: "středy", pl: "střed" },
@@ -2060,7 +2060,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "days",
-    sem: ["time"],
+    sem: ["time", "weekday"],
     declension: {
       // Родовий "čtvrtka" — архаїчний виняток зразка hrad (звірено з ÚJČ), не "čtvrtku".
       nominativ: { sg: "čtvrtek", pl: "čtvrtky" },
@@ -2068,7 +2068,7 @@ export const NOUNS: NounEntry[] = [
       dativ: { sg: "čtvrtku", pl: "čtvrtkům" },
       akuzativ: { sg: "čtvrtek", pl: "čtvrtky" },
       vokativ: { sg: "čtvrtku", pl: "čtvrtky" },
-      lokal: { sg: "čtvrtku", pl: "čtvrtkách / čtvrtcích" },
+      lokal: { sg: "čtvrtku", pl: "čtvrtcích / čtvrtkách" },
       instrumental: { sg: "čtvrtkem", pl: "čtvrtky" },
     },
     exampleSentenceCz: "Ve čtvrtek jedeme na výlet.",
@@ -2082,14 +2082,14 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "days",
-    sem: ["time"],
+    sem: ["time", "weekday"],
     declension: {
       nominativ: { sg: "pátek", pl: "pátky" },
       genitiv: { sg: "pátku", pl: "pátků" },
       dativ: { sg: "pátku", pl: "pátkům" },
       akuzativ: { sg: "pátek", pl: "pátky" },
       vokativ: { sg: "pátku", pl: "pátky" },
-      lokal: { sg: "pátku", pl: "pátkách / pátcích" },
+      lokal: { sg: "pátku", pl: "pátcích / pátkách" },
       instrumental: { sg: "pátkem", pl: "pátky" },
     },
     exampleSentenceCz: "V pátek končí týden.",
@@ -2103,7 +2103,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "days",
-    sem: ["time"],
+    sem: ["time", "weekday"],
     declension: {
       nominativ: { sg: "sobota", pl: "soboty" },
       genitiv: { sg: "soboty", pl: "sobot" },
@@ -2124,7 +2124,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "days",
-    sem: ["time"],
+    sem: ["time", "weekday"],
     declension: {
       // Родовий множини "neděl" — нерегулярний виняток зразка růže (мало б бути "nedělí").
       nominativ: { sg: "neděle", pl: "neděle" },
@@ -2156,7 +2156,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "hrad",
     category: "months",
     month: { num: 1, maxDay: 31, ukGen: "січня" },
-    sem: ["time"],
+    sem: ["time", "month", "timeV"],
     declension: {
       nominativ: { sg: "leden", pl: "ledny" },
       genitiv: { sg: "ledna", pl: "lednů" },
@@ -2178,7 +2178,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "hrad",
     category: "months",
     month: { num: 2, maxDay: 29, ukGen: "лютого" },
-    sem: ["time"],
+    sem: ["time", "month", "timeV"],
     declension: {
       nominativ: { sg: "únor", pl: "únory" },
       genitiv: { sg: "února", pl: "únorů" },
@@ -2200,7 +2200,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "hrad",
     category: "months",
     month: { num: 3, maxDay: 31, ukGen: "березня" },
-    sem: ["time"],
+    sem: ["time", "month", "timeV"],
     declension: {
       nominativ: { sg: "březen", pl: "březny" },
       genitiv: { sg: "března", pl: "březnů" },
@@ -2222,7 +2222,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "hrad",
     category: "months",
     month: { num: 4, maxDay: 30, ukGen: "квітня" },
-    sem: ["time"],
+    sem: ["time", "month", "timeV"],
     declension: {
       nominativ: { sg: "duben", pl: "dubny" },
       genitiv: { sg: "dubna", pl: "dubnů" },
@@ -2244,7 +2244,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "hrad",
     category: "months",
     month: { num: 5, maxDay: 31, ukGen: "травня" },
-    sem: ["time"],
+    sem: ["time", "month", "timeV"],
     declension: {
       nominativ: { sg: "květen", pl: "květny" },
       genitiv: { sg: "května", pl: "květnů" },
@@ -2266,7 +2266,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "hrad",
     category: "months",
     month: { num: 6, maxDay: 30, ukGen: "червня" },
-    sem: ["time"],
+    sem: ["time", "month", "timeV"],
     declension: {
       nominativ: { sg: "červen", pl: "červny" },
       genitiv: { sg: "června", pl: "červnů" },
@@ -2288,7 +2288,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "stroj",
     category: "months",
     month: { num: 7, maxDay: 31, ukGen: "липня" },
-    sem: ["time"],
+    sem: ["time", "month", "timeV"],
     declension: {
       nominativ: { sg: "červenec", pl: "července" },
       genitiv: { sg: "července", pl: "červenců" },
@@ -2310,7 +2310,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "hrad",
     category: "months",
     month: { num: 8, maxDay: 31, ukGen: "серпня" },
-    sem: ["time"],
+    sem: ["time", "month", "timeV"],
     declension: {
       nominativ: { sg: "srpen", pl: "srpny" },
       genitiv: { sg: "srpna", pl: "srpnů" },
@@ -2332,7 +2332,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "stavani",
     category: "months",
     month: { num: 9, maxDay: 30, ukGen: "вересня" },
-    sem: ["time"],
+    sem: ["time", "month", "timeV"],
     declension: {
       // Повністю незмінне в однині — так само, як pondělí/nádraží.
       nominativ: { sg: "září", pl: "září" },
@@ -2355,7 +2355,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "hrad",
     category: "months",
     month: { num: 10, maxDay: 31, ukGen: "жовтня" },
-    sem: ["time"],
+    sem: ["time", "month", "timeV"],
     declension: {
       nominativ: { sg: "říjen", pl: "říjny" },
       genitiv: { sg: "října", pl: "říjnů" },
@@ -2377,7 +2377,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "hrad",
     category: "months",
     month: { num: 11, maxDay: 30, ukGen: "листопада" },
-    sem: ["time"],
+    sem: ["time", "month", "timeV"],
     declension: {
       // Єдиний місяць БЕЗ архаїчного -a у родовому — тут звичайний -u (17. listopadu).
       nominativ: { sg: "listopad", pl: "listopady" },
@@ -2400,7 +2400,7 @@ export const NOUNS: NounEntry[] = [
     pattern: "stroj",
     category: "months",
     month: { num: 12, maxDay: 31, ukGen: "грудня" },
-    sem: ["time"],
+    sem: ["time", "month", "timeV"],
     declension: {
       nominativ: { sg: "prosinec", pl: "prosince" },
       genitiv: { sg: "prosince", pl: "prosinců" },
@@ -4145,7 +4145,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "kost",
     category: "time",
-    sem: ["time", "timeUnit", "dayPart", "ordered"],
+    sem: ["time", "timeUnit", "dayPart", "ordered", "daySpan", "timeV"],
     declension: {
       nominativ: { sg: "noc", pl: "noci" },
       genitiv: { sg: "noci", pl: "nocí" },
@@ -4166,7 +4166,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "kost",
     category: "time",
-    sem: ["time", "dayPart"],
+    sem: ["time", "dayPart", "dayPoint"],
     declension: {
       nominativ: { sg: "půlnoc", pl: "půlnoci" },
       genitiv: { sg: "půlnoci", pl: "půlnocí" },
@@ -4187,7 +4187,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "time",
-    sem: ["time", "dayPart"],
+    sem: ["time", "dayPart", "dayPoint"],
     declension: {
       nominativ: { sg: "poledne", pl: "poledne" },
       genitiv: { sg: "poledne", pl: "polední" },
@@ -4208,7 +4208,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "time",
-    sem: ["time", "dayPart"],
+    sem: ["time", "dayPart", "daySpan"],
     declension: {
       nominativ: { sg: "dopoledne", pl: "dopoledne" },
       genitiv: { sg: "dopoledne", pl: "dopolední" },
@@ -4229,7 +4229,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "time",
-    sem: ["time", "dayPart"],
+    sem: ["time", "dayPart", "daySpan"],
     declension: {
       nominativ: { sg: "odpoledne", pl: "odpoledne" },
       genitiv: { sg: "odpoledne", pl: "odpolední" },
@@ -4250,7 +4250,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "time",
-    sem: ["time", "dayPart"],
+    sem: ["time", "dayPart", "daySpan"],
     declension: {
       nominativ: { sg: "ráno", pl: "rána" },
       genitiv: { sg: "rána", pl: "rán" },
@@ -4271,7 +4271,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "time",
-    sem: ["time", "dayPart"],
+    sem: ["time", "dayPart", "daySpan"],
     declension: {
       nominativ: { sg: "večer", pl: "večery" },
       genitiv: { sg: "večera", pl: "večerů" },
@@ -4452,7 +4452,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "months",
-    sem: ["time"],
+    sem: ["time", "timeV", "yearsPlural"],
     declension: {
       // пл. 2. п. «let» — та сама форма, що в «pět let» (роки)
       nominativ: { sg: "léto", pl: "léta" },
@@ -4475,7 +4475,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "months",
-    sem: ["time"],
+    sem: ["time", "season", "timeV"],
     declension: {
       nominativ: { sg: "zima", pl: "zimy" },
       genitiv: { sg: "zimy", pl: "zim" },
@@ -4497,7 +4497,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "months",
-    sem: ["time"],
+    sem: ["time", "season"],
     declension: {
       nominativ: { sg: "jaro", pl: "jara" },
       genitiv: { sg: "jara", pl: "jar" },
@@ -4519,7 +4519,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "months",
-    sem: ["time"],
+    sem: ["time", "season"],
     declension: {
       nominativ: { sg: "podzim", pl: "podzimy" },
       genitiv: { sg: "podzimu", pl: "podzimů" },

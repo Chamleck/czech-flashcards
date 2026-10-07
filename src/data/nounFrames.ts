@@ -28,7 +28,8 @@ import type { SkipRule } from "../utils/quizCommon";
 //     іменником у називному, має відповідати num: «To jsou ___» — лише "pl".
 //  4. {v} {k} {s} {z} — прийменник перед пропуском; ve / ke / se / ze за формою відповіді (CLUSTER_RULES у
 //     data/prepositionPartners.ts). Обидві кнопки мусять мати однаковий прийменник; невідома група приголосних —
-//     фраза для цієї форми не береться (не вгадуємо).
+//     фраза для цієї форми не береться (не вгадуємо). Фраза не починається з {v}/{k}/{s}/{z}: рушій не робить
+//     першу літеру великою («Mám volno ve středu», не «{v} ___ mám volno»; dev-збірка попереджає).
 //  5. Кличний — лише для осіб і тварин (теги person / animal): звертання до речі («stole!») квіз не питає.
 //  6. Після додавання фрази прочитай усі пари «фраза × іменник», що в неї потрапили; тег, що дає безглузду пару,
 //     прибери з вимоги. dev-збірка попереджає про фразу, в яку потрапляє менше 3 іменників.
@@ -55,7 +56,8 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "To jsou ___.", num: "pl", none: ["time", "weather"] },
     { text: "Kde jsou ___?", num: "pl", any: ["person", "animal", ...THINGS] },
     { text: "Tady jsou ___.", num: "pl", any: ["person", "animal", ...THINGS, "food", "furniture", "vehicle"], none: ["placeV"], plOk: ["collective"] }, // tady jsou rodiny
-    { text: "Utíkají ___.", num: "pl", any: ["timeUnit"] }, // utíkají dny, roky, hodiny
+    { text: "Utíkají ___.", num: "pl", any: ["timeUnit", "yearsPlural"] }, // utíkají dny, roky, hodiny, léta
+    { text: "Jaké tu bývají ___?", num: "pl", any: ["weekday", "season", "daySpan"] }, // neděle, zimy, večery
   ],
   genitiv: [
     { text: "Bojím se ___.", num: "any", any: ["person", "animal"] },
@@ -72,6 +74,8 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Do ___ to bude hotové.", any: ["time", "meal"], none: ["timeUnit"] }, // do pondělí, do léta, do půlnoci, do oběda
     { text: "Během ___ jsme mluvili.", num: "any", any: ["meal"] }, // během oběda, během obědů (множина — у recurring)
     { text: "Přišlo hodně ___.", num: "pl", any: ["person"], plOk: ["collective"] }, // hodně lidí, dětí, rodin
+    { text: "Kolik ___ jsi tu strávil?", num: "pl", any: ["weekday", "season", "daySpan"] }, // sobot, zim, večerů, nocí
+    { text: "Kolik ti je ___?", num: "pl", any: ["yearsPlural"] }, // let
   ],
   dativ: [
     { text: "Telefonuju ___.", num: "any", any: ["person"] },
@@ -121,6 +125,9 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Čekám na ___.", any: ["vehicle"] },
     { text: "Obleču si ___.", any: ["clothes"] },
     { text: "Zveme ___ na oslavu.", num: "any", any: ["person"], plOk: ["collective"] }, // kamaráda, sousedy, rodiny
+    { text: "Mám rád ___.", num: "pl", any: ["weekday", "season", "daySpan"] }, // pátky, podzimy, večery
+    { text: "Mám volno {v} ___.", any: ["weekday"] }, // v pondělí, ve středu, ve čtvrtek (знахідний; «ve středě» — ні)
+    { text: "Známe se už ___.", num: "pl", any: ["yearsPlural"] }, // léta
   ],
   vokativ: [
     { text: "Děkuju, ___!", num: "any", any: ["person"] },
@@ -136,6 +143,11 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Po ___ se vrátím.", any: ["meal", "time"], none: ["dayPart"] }, // po obědě, po roce, po pondělí, po létě
     { text: "V posledních ___ se to změnilo.", num: "pl", any: ["timeUnit"] }, // v posledních týdnech
     { text: "Sedím na ___.", any: ["seat"] },
+    { text: "O ___ chodím plavat.", num: "pl", any: ["weekday"] }, // o sobotách, o pátcích («v pátky» — теж правильно, тож не v)
+    { text: "Po ___ čtu.", num: "pl", any: ["daySpan"] }, // po večerech, po ránech, po nocích
+    { text: "Vrátil se o ___.", any: ["dayPoint"] }, // o půlnoci, o poledni
+    { text: "Co děláš {v} ___?", any: ["timeV"] }, // v lednu, v létě, v zimě, v noci
+    { text: "Po ___ jsme se zase viděli.", num: "pl", any: ["yearsPlural"] }, // po letech
     { text: "Leží to na ___.", any: ["surface"] },
   ],
   instrumental: [
@@ -163,6 +175,7 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Stojím pod ___.", any: ["overhead"] }, // pod stromem, mostem, sprchou, deštníkem
     { text: "Nad ___ je půda.", any: ["floor"] }, // nad přízemím, nad patrem
     { text: "Výtah jezdí mezi ___.", num: "pl", all: ["floor", "ordered"] }, // mezi patry (SSČ «s více patry»)
+    { text: "Byl jsem tam před pár ___.", num: "pl", any: ["timeUnit", "yearsPlural"] }, // před pár dny, týdny, lety
   ],
 };
 
@@ -191,4 +204,15 @@ const tagSkip = (s: TagSkip): SkipRule<NounCell> => ({
 });
 export const NOUN_SKIP_RULES: SkipRule<NounCell>[] = [
   tagSkip({ none: ["person", "animal"], cases: ["vokativ"], reason: "кличний не-особи (свідоме рішення)" }), // «stole!» — не звертання
+  // Слова часу (Нік 2026-10-07): лише конструкції, що живуть у мові; «ledny», «k pondělím», «večery» в орудному — ні.
+  tagSkip({ any: ["month"], numbers: ["pl"], reason: "множина місяців (Нік: «ledny», «v listopadech» не вживаються)" }),
+  tagSkip({ any: ["season"], cases: ["dativ", "lokal", "instrumental"], numbers: ["pl"], reason: "пори року: давальний, місцевий, орудний множини (Нік: кажуть «v zimě»)" }),
+  tagSkip({ any: ["weekday"], cases: ["dativ", "instrumental"], numbers: ["pl"], reason: "дні тижня: давальний і орудний множини (Нік: не вживаються)" }),
+  tagSkip({ any: ["daySpan"], none: ["timeUnit"], cases: ["dativ", "instrumental"], numbers: ["pl"], reason: "частини доби: давальний і орудний множини (Нік: не вживаються)" }),
+  tagSkip({ any: ["daySpan"], none: ["timeUnit"], cases: ["lokal"], numbers: ["sg"], reason: "частини доби: місцевий однини (Нік: «k ránu» — давальний, «v ránu» — ні)" }),
+  tagSkip({ any: ["dayPoint"], numbers: ["pl"], reason: "půlnoc, poledne: множина (Нік: моменти, не відрізки)" }),
+  tagSkip({ any: ["timeUnit"], cases: ["dativ"], reason: "одиниці часу: давальний (Нік: живий лише з числом — «k roku 2025»)" }),
+  tagSkip({ all: ["dayPart", "timeUnit"], cases: ["instrumental"], numbers: ["sg"], reason: "den, noc: орудний однини (Нік: лише «dnem i nocí»)" }),
+  tagSkip({ all: ["dayPart", "timeUnit"], none: ["timeV"], cases: ["lokal"], numbers: ["sg"], reason: "den: місцевий однини (Нік: «ve dne» — застаріла форма)" }),
+  tagSkip({ any: ["yearsPlural"], cases: ["dativ"], numbers: ["pl"], reason: "léto: давальний множини (Нік: не вживається)" }),
 ];

@@ -77,7 +77,14 @@ export type NounTag =
   | "sight"
   | "overhead"
   | "floor"
-  | "bodyMany";
+  | "bodyMany"
+  | "month"
+  | "season"
+  | "weekday"
+  | "daySpan"
+  | "dayPoint"
+  | "timeV"
+  | "yearsPlural";
 
 // Запис для КОЖНОГО тегу обов'язковий (Record): додав тег до NounTag — компілятор вимагає пояснення.
 export const NOUN_TAG_DOC: Record<NounTag, string> = {
@@ -134,10 +141,17 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
   overhead: "те, під чим можна стояти («Stojím pod stromem / mostem / sprchou / deštníkem»): strom, most, sprcha, deštník",
   floor: "поверх будинку («Nad přízemím je půda»; у множині «Výtah jezdí mezi patry» — лише разом з ordered): přízemí, patro",
   bodyMany: "частина тіла, якої в людини дві чи більше, тож множина природна про одну людину («Mám problém se zuby», «To škodí kolenům»; разом з body): ruka, noha, zub, kost, oko, ucho, koleno, rameno — НЕ hlava, nos, krk, srdce",
+  month: "місяць календаря (leden … prosinec; разом з time). Ставиться ТОДІ Й ЛИШЕ ТОДІ, коли в слова є поле month (validateNounSem): множину місяців квіз «Відмінки» не питає («ledny», «v listopadech» у мові не вживаються)",
+  season: "пора року, множина якої означає кілька таких пір («Jaké tu bývají zimy?», «Kolik zim jsi tu strávil?»; разом з time): zima, jaro, podzim — НЕ léto (його множина — «роки», тег yearsPlural)",
+  weekday: "день тижня («Mám rád pátky», «O sobotách chodím plavat», «Ve středu mám volno»; разом з time): pondělí … neděle",
+  daySpan: "частина доби, що триває й повторюється («Po večerech čtu», «Kolik nocí jsi tu strávil?»; разом з time): ráno, dopoledne, odpoledne, večer, noc — НЕ půlnoc, poledne (це моменти, dayPoint)",
+  dayPoint: "момент доби («Vrátil se o půlnoci / o poledni»; разом з time): půlnoc, poledne — множини квіз не питає",
+  timeV: "час, який кажуть із «v» + місцевим («Co děláš v lednu / v létě / v zimě / v noci?»; разом з time): місяці, léto, zima, noc — НЕ jaro («na jaře»), podzim («na podzim»), дні тижня («v pondělí» — знахідний)",
+  yearsPlural: "слово, множина якого означає «роки» («Kolik ti je let?», «před pár lety», «po letech», «Známe se už léta», «Utíkají léta»; українською так само «літа»; разом з time): léto",
 };
 
 // Теги-«самоцілі»: слово з таким тегом не має жодних інших (особа не буває будівлею, їжа — місцем тощо).
-// Винятки: body разом з bodyLevel / singleLevel / bodyMany, time разом з timeUnit і dayPart, document разом з carried (pas, doklad),
+// Винятки: body разом з bodyLevel / singleLevel / bodyMany, time разом зі своїми підтегами (timeUnit, dayPart, month…), document разом з carried (pas, doklad),
 // person разом з collective (rodina), food разом з served / homemade; наскрізні теги (CROSS) — з будь-яким.
 const CROSS: NounTag[] = ["ordered", "recurring"];
 const SOLO: NounTag[] = ["person", "animal", "money", "food", "meal", "time", "weather", "abstract", "document", "body", "air"];
@@ -149,6 +163,13 @@ const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
   singleLevel: ["bodyLevel"],
   bodyMany: ["body"],
   flower: ["plant"],
+  month: ["time"],
+  season: ["time"],
+  weekday: ["time"],
+  daySpan: ["time"],
+  dayPoint: ["time"],
+  timeV: ["time"],
+  yearsPlural: ["time"],
   timeUnit: ["time"],
   landform: ["outdoor"],
   served: ["food"],
@@ -157,7 +178,7 @@ const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
 
 // Перевірка набору тегів одного слова: список проблем (порожній — усе гаразд). Використовується у
 // dev-збірці (див. prepositionQuizEngine.ts), у релізі нічого не блокує.
-export function validateNounSem(n: Pick<NounEntry, "id" | "sem">): string[] {
+export function validateNounSem(n: Pick<NounEntry, "id" | "sem" | "month">): string[] {
   const out: string[] = [];
   const sem = n.sem ?? [];
   if (sem.length === 0) return [`${n.id}: порожній sem — слово не потрапить у фрази, що вимагають тегів`];
@@ -165,10 +186,11 @@ export function validateNounSem(n: Pick<NounEntry, "id" | "sem">): string[] {
   for (const solo of SOLO) {
     if (!sem.includes(solo)) continue;
     const allowed: NounTag[] =
-      solo === "body" ? ["body", "bodyLevel", "singleLevel", "bodyMany"] : solo === "time" ? ["time", "timeUnit", "dayPart"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade"] : [solo];
+      solo === "body" ? ["body", "bodyLevel", "singleLevel", "bodyMany"] : solo === "time" ? ["time", "timeUnit", "dayPart", "month", "season", "weekday", "daySpan", "dayPoint", "timeV", "yearsPlural"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade"] : [solo];
     const extra = sem.filter((t) => !allowed.includes(t) && !CROSS.includes(t));
     if (extra.length > 0) out.push(`${n.id}: тег «${solo}» не сполучається з ${extra.join(", ")}`);
   }
+  if (sem.includes("month") !== !!n.month) out.push(`${n.id}: тег month і поле month мають бути разом (обидва або жодного)`);
   if (sem.includes("placeV") && sem.includes("placeNa")) out.push(`${n.id}: placeV і placeNa одночасно (слово має ОДИН прийменник місця)`);
   for (const [tag, need] of Object.entries(REQUIRES) as [NounTag, NounTag[]][]) {
     if (sem.includes(tag) && !need.some((t) => sem.includes(t))) out.push(`${n.id}: тег «${tag}» потребує одного з: ${need.join(", ")}`);
