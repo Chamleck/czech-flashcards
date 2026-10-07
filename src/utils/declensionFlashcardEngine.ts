@@ -57,7 +57,8 @@ type DeclKind =
   | "interrogative-core"
   | "indefinite"
   | "indefinite-core"
-  | "possessive";
+  | "possessive"
+  | "ordinal"; // порядкові — питаються в квізі «Числівники» (utils/numeralAgreementEngine.ts) цим самим механізмом
 
 export interface DeclQuestion {
   kind: DeclKind;
@@ -143,17 +144,25 @@ const pluralByFrame = (tags: readonly string[], noun: NounEntry) =>
 // Фраза без підмета-власника (називний — сама група і є підметом; ownerless — «Je tu hodně…»): svůj сюди не можна.
 const ownerless = (f: DeclFrame, c: QuizCase) => c === "nominativ" || !!f.ownerless;
 
-// fit — у скількох звичайних фразах (усі відмінки) є слово; вага 1 / fit вирівнює частку слів, що підходять до
-// багатьох фраз (людина пасує майже всюди, «polštář» — у двох).
-const FIT = fitCounts(
-  NOUN_POOL,
-  QUIZ_CASES.flatMap((c) => DECL_FRAMES[c]).filter((f) => !f.role),
-  matchesFilter
-);
-const fitOf = (noun: NounEntry) => FIT.get(noun.id) ?? 1;
+// Банк фраз разом із вагою іменників: fit — у скількох звичайних фразах банку (усі відмінки) є слово; вага 1 / fit
+// вирівнює частку слів, що підходять до багатьох фраз (людина пасує майже всюди, «polštář» — у двох). Банк цього квізу —
+// DECL_FRAMES; інший квіз може скласти питання тим самим механізмом зі своїм банком (порядкові — ORDINAL_FRAMES).
+export interface FrameBank {
+  frames: Record<QuizCase, DeclFrame[]>;
+  fit: (noun: NounEntry) => number;
+}
+export function frameBank(frames: Record<QuizCase, DeclFrame[]>): FrameBank {
+  const fit = fitCounts(
+    NOUN_POOL,
+    QUIZ_CASES.flatMap((c) => frames[c]).filter((f) => !f.role),
+    matchesFilter
+  );
+  return { frames, fit: (noun) => fit.get(noun.id) ?? 1 };
+}
+const DECL_BANK = frameBank(DECL_FRAMES);
 
 // ─────────────── Тестовані слова з повною парадигмою ───────────────
-type AdjLikeKind = "adjective" | "pronoun" | "interrogative-adj" | "indefinite";
+type AdjLikeKind = "adjective" | "pronoun" | "interrogative-adj" | "indefinite" | "ordinal";
 
 interface Tested {
   id: string;
@@ -168,6 +177,9 @@ interface Tested {
   semClass?: AdjectiveEntry["semClass"]; // лише в прикметника: стан — не у фразах-оцінках, відносний — не у фразах qualitative
   baseCz?: string; // ступінь: показуємо базове слово, учень сам утворює ступінь
   baseUk?: string;
+  bank?: FrameBank; // банк фраз (за замовчуванням DECL_BANK цього квізу)
+  value?: number; // порядковий: число, яке слово називає (фрази з max)
+  noPartner?: true; // без слова-партнера (і випадкового, і того, що рятує вокалізацію): лише слово + іменник («Jedu prvním vlakem»)
 }
 
 const declinable = (p: PronounEntry): p is Extract<PronounEntry, { declinable: true }> => p.declinable;
@@ -258,6 +270,7 @@ function frameFitsWord(f: DeclFrame, t: Tested, c: QuizCase): boolean {
   if (t.degree && !f.degrees) return false;
   if (t.semClass === "state" && f.evaluative) return false;
   if (t.semClass === "relational" && f.qualitative) return false;
+  if (f.max !== undefined && (t.value === undefined || t.value > f.max)) return false;
   if (c === "nominativ" && t.quiz.nominative === false) return false;
   if (t.quiz.needsOwner && ownerless(f, c)) return false;
   return true;
@@ -333,7 +346,7 @@ function candidatesFor(t: Tested, g: Gender, c: QuizCase, n: GrammaticalNumber, 
   const target = formsOf(t.decl[g][c][n]);
   let cells: string[] | null = null;
   const dCells = () => (cells ??= usableCells(t.decl, g, c, n));
-  const frames = DECL_FRAMES[c].filter((f) => frameFitsWord(f, t, c));
+  const frames = (t.bank ?? DECL_BANK).frames[c].filter((f) => frameFitsWord(f, t, c));
   if (frames.length === 0) return [];
   const out: Candidate[] = [];
   for (const noun of NOUN_POOL) {
@@ -343,7 +356,7 @@ function candidatesFor(t: Tested, g: Gender, c: QuizCase, n: GrammaticalNumber, 
     for (const f of frames) {
       if (!matchesFilter(noun, f) || !frameTakes(f, noun, n, c)) continue;
       if (frameRenderable(f, target, dCells)) fs.push({ f, needsPartner: false });
-      else if (t.head === "adjective" && t.quiz.role !== "order" && leadPartners(f, noun, g, c, n).length > 0) fs.push({ f, needsPartner: true });
+      else if (t.head === "adjective" && t.quiz.role !== "order" && !t.noPartner && leadPartners(f, noun, g, c, n).length > 0) fs.push({ f, needsPartner: true });
     }
     if (fs.length > 0) {
       out.push({ noun, frames: fs });
@@ -358,7 +371,9 @@ function taskTextFor(t: Tested, g: Gender, c: CzechCase, n: GrammaticalNumber): 
   const kindLabel =
     t.kind === "interrogative-adj"
       ? "питальний займенник"
-      : t.kind !== "adjective"
+      : t.kind === "ordinal"
+        ? "числівник"
+        : t.kind !== "adjective"
         ? "займенник"
         : t.degree === "comparative"
           ? "прикметник (вищий ст.)"
@@ -392,7 +407,7 @@ function adjLikeQuestion(
     comboId: id,
     promptWord: t.baseCz ?? t.cz,
     promptUk: t.baseUk ?? t.uk,
-    promptLabel: t.kind === "adjective" ? "прикметник" : "займенник",
+    promptLabel: t.kind === "adjective" ? "прикметник" : t.kind === "ordinal" ? "числівник" : "займенник",
     taskText: taskTextFor(t, g, c, n),
     ...(contextPhrase ? { contextPhrase } : {}),
     correct,
@@ -427,7 +442,8 @@ function makeWithStyle(
   correct: string,
   distractors: string[]
 ): Built | null {
-  for (const { noun, frames } of freshWeightedOrder(cands, (x) => used.has(x.noun.id), (x) => fitOf(x.noun))) {
+  const fit = (t.bank ?? DECL_BANK).fit;
+  for (const { noun, frames } of freshWeightedOrder(cands, (x) => used.has(x.noun.id), (x) => fit(x.noun))) {
     const nf = nounForm(noun, c, n)!;
     for (const { f, needsPartner } of shuffle(frames)) {
       // Партнер: займенник перед тестованим прикметником / прикметник перед іменником після тестованого займенника.
@@ -439,7 +455,7 @@ function makeWithStyle(
       }
       // Питання — без партнера: «Za jakým přítelem jdeš?», не «Za jakým stejným přítelem…»; так само питання про порядок.
       // У фразі-оцінці партнер-прикметник не буває станом: не «Mám rád tvé nemocné koně».
-      else if (Math.random() < 0.5 && t.quiz.role !== "order" && f.role !== "question") {
+      else if (Math.random() < 0.5 && t.quiz.role !== "order" && f.role !== "question" && !t.noPartner) {
         const pool =
           t.head === "adjective"
             ? DETERMINER_PARTNERS.map((p) => determinerForm(p, noun, g, c, n, f))
@@ -466,7 +482,7 @@ function makeWithStyle(
   return null;
 }
 
-interface UnitCombo {
+export interface UnitCombo {
   id: string; // comboId (ваги)
   wordId: string; // «не те саме слово поспіль»
   kind: DeclKind; // баланс слотів за типом
@@ -481,6 +497,14 @@ function makeBare(t: Tested, g: Gender, c: QuizCase, n: GrammaticalNumber, id: s
   const correct = pickForm(formsOf(t.decl[g][c][n]), idx);
   const distractor = pickForm(formsOf(distractorCells(t.decl, g, c, n)[0]), idx);
   return { q: adjLikeQuestion(t, g, c, n, id, correct, distractor), nounIds: [] };
+}
+
+// Слова з таблицею прикметника, які питає інший квіз своїм банком фраз (порядкові в «Числівниках»): той самий
+// механізм — кожна клітинка, речення за тегами або без речення, дистрактор — інша форма того ж слова; без партнера.
+export function adjectiveTableUnits(words: AdjectiveEntry[], kind: "ordinal", bank: FrameBank): UnitCombo[] {
+  return adjLikeUnits(
+    words.map((a) => ({ id: a.id, kind, cz: a.cz, uk: a.uk, decl: a.declension, fits: a.fits, quiz: {}, head: "adjective", semClass: a.semClass, bank, value: a.value, noPartner: true }))
+  );
 }
 
 function adjLikeUnits(pool: Tested[]): UnitCombo[] {
@@ -559,7 +583,7 @@ const ONI_GENDERS = GENDER_ORDER.filter((g) => antecedentPool(g, "pl", PERSONAL_
 function buildAntecedent(g: Gender, n: GrammaticalNumber, used: Set<string>, spec: AnteSpec = PERSONAL_ANTE): string {
   const { partners } = spec;
   const pool = antecedentPool(g, n, spec);
-  const noun = freshWeightedOrder(pool, (x) => used.has(x.id), fitOf)[0];
+  const noun = freshWeightedOrder(pool, (x) => used.has(x.id), DECL_BANK.fit)[0];
   if (!noun) return "";
   used.add(noun.id);
   const parts: string[] = [];
@@ -778,7 +802,7 @@ function possessiveUnits(pool: Tested[]): UnitCombo[] {
             const before = new Set(scratch);
             const antecedent = buildAntecedent(randomOf(anteGenders)!, subj.n, scratch, ante);
             const anteIds = [...scratch].filter((x) => !before.has(x));
-            for (const { noun, frames } of freshWeightedOrder(cands, (x) => scratch.has(x.noun.id), (x) => fitOf(x.noun))) {
+            for (const { noun, frames } of freshWeightedOrder(cands, (x) => scratch.has(x.noun.id), (x) => DECL_BANK.fit(x.noun))) {
               if (anteIds.includes(noun.id)) continue; // не «Znáš toho kluka? Vidím jeho kluka»
               for (const { f, needsPartner } of shuffle(frames)) {
                 if (needsPartner) continue;

@@ -33,7 +33,8 @@ export const ADJ_CATEGORY_BY_KEY: Record<AdjectiveCategory, AdjCategoryMeta> = A
 
 // Категорії прикметників, виключені з загального квіза (тестування + партнер).
 // Порядкові живуть лише в розділі "Числівники", тож у квізі прикметників/
-// займенників вони не тестуються і не стають випадковим партнером.
+// займенників вони не тестуються і не стають випадковим партнером (питає їх квіз
+// «Числівники» — utils/numeralAgreementEngine.ts).
 export const ADJ_CATS_EXCLUDED_FROM_QUIZ = new Set<AdjectiveCategory>(
   ADJ_CATEGORIES.filter((c) => c.hiddenFromPartOfSpeech).map((c) => c.key)
 );

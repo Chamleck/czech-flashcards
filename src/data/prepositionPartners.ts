@@ -92,6 +92,7 @@ export const DUAL_FRAMES: Record<string, Frames> = {
       { text: "Jsem {p} ___", all: ["placeV"] },
       { text: "Bydlím {p} ___", all: ["residence", "placeV"] },
       { text: "Pracuji {p} ___", all: ["workplace", "placeV"] },
+      { text: "Lidé pracují {p} ___", all: ["workplace", "placeV"], num: "pl" }, // ve školách, v obchodech
     ],
   },
   "prep-nad": {

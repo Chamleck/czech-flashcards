@@ -58,6 +58,7 @@ export interface DeclFrame extends NounFilter {
   evaluative?: true; // оцінка / ставлення мовця (Mám rád, Líbí se mi, Chybí mi): без прикметників-станів (AdjectiveEntry.semClass "state")
   qualitative?: true; // без відносних прикметників (semClass "relational"): «k vysokým skříním», не «k celým domům»
   plOk?: NounTag[]; // множина природна в цій фразі для слів із цими тегами (правило 8): «Strávil jsem tam celé dny»
+  max?: number; // лише для порядкових (банк ORDINAL_FRAMES, data/numeralFrames.ts): найбільше value, за якого фраза природна
 }
 
 const NOT_THING: NounTag[] = ["time", "weather", "abstract", "activity"];

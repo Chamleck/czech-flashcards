@@ -21,6 +21,8 @@ import type { NounEntry } from "../types";
 //  3. Фрази всіх квізів, що беруть тег (data/prepositionPartners.ts, declensionFrames.ts, numeralFrames.ts,
 //     nounFrames.ts, поле fits у data/adjectives.ts), — перечитати; суперечливі набори ловить validateNounSem.
 //  4. Перед здачею — оракул scripts/check-quiz-coverage.ts (усі квізи): «Помилок: 0».
+//  5. Наскрізний тег (CROSS: ordered) описує не клас слова, а одну його властивість і сполучається з будь-яким
+//     тегом, навіть «самотнім» (den: time + timeUnit + ordered; host: person + ordered).
 
 export type NounTag =
   | "person"
@@ -61,7 +63,8 @@ export type NounTag =
   | "air"
   | "served"
   | "homemade"
-  | "landform";
+  | "landform"
+  | "ordered";
 
 // Запис для КОЖНОГО тегу обов'язковий (Record): додав тег до NounTag — компілятор вимагає пояснення.
 export const NOUN_TAG_DOC: Record<NounTag, string> = {
@@ -104,11 +107,13 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
   homemade: "їжа, що буває домашньою — приготованою чи вирощеною вдома («domácí chléb», «domácí vejce»): chléb, pivo, sýr, ovoce (НЕ voda, káva, cukr; разом з food)",
   air: "повітря, яким дихають і яке відчувають («svěží / čistý / teplý vzduch»): vzduch (НЕ weather — «při vzduchu» безглузде)",
   landform: "природний ландшафт, не створений людиною: moře, řeka, hora, les, pole — «staré / nové moře» неприродне (разом з outdoor)",
+  ordered: "природно рахується по порядку порядковим числівником від první до dvanáctý («Jsem tu teprve třetí den», «Jedu prvním vlakem», «Bydlím ve třetím patře», «Čekám na druhého hosta»): den, týden, rok, hodina, vlak, patro, dům, host (НЕ родичі — «dvanáctý manžel», НЕ речі без черги — «jedenácté oko»); наскрізний тег — сполучається з будь-яким",
 };
 
 // Теги-«самоцілі»: слово з таким тегом не має жодних інших (особа не буває будівлею, їжа — місцем тощо).
 // Винятки: body разом з bodyLevel, time разом з timeUnit і dayPart, document разом з carried (pas, doklad),
-// person разом з collective (rodina), food разом з served / homemade.
+// person разом з collective (rodina), food разом з served / homemade; наскрізні теги (CROSS) — з будь-яким.
+const CROSS: NounTag[] = ["ordered"];
 const SOLO: NounTag[] = ["person", "animal", "money", "food", "meal", "time", "weather", "abstract", "document", "body", "air"];
 // Теги, що ВИМАГАЮТЬ супутнього: (тег → хоча б один з переліку).
 const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
@@ -132,7 +137,7 @@ export function validateNounSem(n: Pick<NounEntry, "id" | "sem">): string[] {
     if (!sem.includes(solo)) continue;
     const allowed: NounTag[] =
       solo === "body" ? ["body", "bodyLevel"] : solo === "time" ? ["time", "timeUnit", "dayPart"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade"] : [solo];
-    const extra = sem.filter((t) => !allowed.includes(t));
+    const extra = sem.filter((t) => !allowed.includes(t) && !CROSS.includes(t));
     if (extra.length > 0) out.push(`${n.id}: тег «${solo}» не сполучається з ${extra.join(", ")}`);
   }
   if (sem.includes("placeV") && sem.includes("placeNa")) out.push(`${n.id}: placeV і placeNa одночасно (слово має ОДИН прийменник місця)`);

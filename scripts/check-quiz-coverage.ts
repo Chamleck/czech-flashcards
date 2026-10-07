@@ -61,9 +61,6 @@ const exclude = (r: Report, reason: string) => r.excluded.set(reason, (r.exclude
 
 // Відомі дірки: квіз + підрядок опису → причина (заплановано, не закрито). Закрив — прибери рядок.
 const KNOWN: { quiz: string; match: string; reason: string }[] = [
-  { quiz: "Числівники", match: "порядков", reason: "порядкові числівники (první, druhý…) — у квіз «Числівники» (рішення 2026-10-06)" },
-  { quiz: "Числівники", match: "card-dva instrumental чол. іст.", reason: "dva + чол. істот. іменник в орудному не трапляється — розібрати в рефакторі числівників" },
-  { quiz: "Прийменники", match: "prep-v::dual-location::lokal мн.", reason: "v + місцевий множини (ve školách) — фрази лише в однині, рефактор прийменників" },
 ];
 function gap(r: Report, quiz: string, msg: string): void {
   if (FOCUS && !FOCUS.some((p) => msg.includes(p))) return; // самоперевірка: решта слів не прогонялась
@@ -134,10 +131,7 @@ const NUMBERS: GrammaticalNumber[] = ["sg", "pl"];
 function testedWords(r: Report): Tested[] {
   const out: Tested[] = [];
   for (const a of ADJECTIVES) {
-    if (!adjQuizUsable(a.category)) {
-      gap(r, "Числівники", `порядковий ${a.cz}: усі клітинки`);
-      continue;
-    }
+    if (!adjQuizUsable(a.category)) continue; // порядкові — квіз «Числівники» (checkOrdinals)
     out.push({ id: a.id, decl: a.declension, quiz: {} });
     if (a.degrees && a.semClass === "quality" && a.quizDegrees) {
       out.push({ id: `${a.id}__comp`, decl: a.degrees.comparative.declension, quiz: {} });
@@ -169,30 +163,34 @@ function cellExists(r: Report, t: Tested, g: Gender, c: CzechCase, n: Grammatica
   return true;
 }
 
-function checkAdjPron(r: Report, gen: Gen<DeclQuestion>): void {
-  for (const t of testedWords(r)) {
-    const all = GENDER_ORDER.flatMap((g) => QUIZ_CASES.flatMap((c) => NUMBERS.map((n) => split(t.decl[g][c][n]))));
-    for (const g of GENDER_ORDER)
-      for (const c of QUIZ_CASES)
-        for (const n of NUMBERS) {
-          const target = split(t.decl[g][c][n]);
-          if (target.length === 0 || !cellExists(r, t, g, c, n)) continue;
-          if (!all.some((f) => f.length > 0 && f.every((x) => !target.includes(x)))) {
-            exclude(r, `${ADJ_QUIZ}: усі форми слова однакові — дистрактора немає`);
-            continue;
-          }
-          const id = `${t.id}::${g}_${c}::${n}`;
-          const qs = forced(gen, id);
-          if (qs.length === 0) gap(r, ADJ_QUIZ, `${id} не питається`);
-          for (const q of qs) {
-            basic(r, ADJ_QUIZ, q);
-            vocal(r, ADJ_QUIZ, q);
-            if (!target.includes(q.correct)) r.errors.push(`${ADJ_QUIZ}: ${id}: правильна «${q.correct}» не з клітинки (${target.join(" / ")})`);
-            const d = distractorOf(q);
-            if (d && target.includes(d)) r.errors.push(`${ADJ_QUIZ}: ${id}: дистрактор «${d}» — теж правильна форма`);
-          }
+// Слово з таблицею прикметника: кожна клітинка рід × відмінок × число питається, правильна — з клітинки,
+// дистрактор — не її форма. Спільне для «Прикметників та займенників» і порядкових у «Числівниках».
+function checkTableCells<Q extends AnyQ>(r: Report, quiz: string, t: Tested, gen: Gen<Q>): void {
+  const all = GENDER_ORDER.flatMap((g) => QUIZ_CASES.flatMap((c) => NUMBERS.map((n) => split(t.decl[g][c][n]))));
+  for (const g of GENDER_ORDER)
+    for (const c of QUIZ_CASES)
+      for (const n of NUMBERS) {
+        const target = split(t.decl[g][c][n]);
+        if (target.length === 0 || !cellExists(r, t, g, c, n)) continue;
+        if (!all.some((f) => f.length > 0 && f.every((x) => !target.includes(x)))) {
+          exclude(r, `${quiz}: усі форми слова однакові — дистрактора немає`);
+          continue;
         }
-  }
+        const id = `${t.id}::${g}_${c}::${n}`;
+        const qs = forced(gen, id);
+        if (qs.length === 0) gap(r, quiz, `${id} не питається`);
+        for (const q of qs) {
+          basic(r, quiz, q);
+          vocal(r, quiz, q);
+          if (!target.includes(q.correct)) r.errors.push(`${quiz}: ${id}: правильна «${q.correct}» не з клітинки (${target.join(" / ")})`);
+          const d = distractorOf(q);
+          if (d && target.includes(d)) r.errors.push(`${quiz}: ${id}: дистрактор «${d}» — теж правильна форма`);
+        }
+      }
+}
+
+function checkAdjPron(r: Report, gen: Gen<DeclQuestion>): void {
+  for (const t of testedWords(r)) checkTableCells(r, ADJ_QUIZ, t, gen);
   checkPersonal(r, gen);
   checkCore(r, gen);
   checkPossessive(r, gen);
@@ -327,15 +325,18 @@ function checkNouns(r: Report, gen: Gen<NounQuestion>): void {
 }
 
 // ═════════════ «Числівники» ═════════════
-function checkNumerals(r: Report, gen: Gen<AnyQ & { blank: string }>): void {
+function checkNumerals(r: Report, gen: Gen<AnyQ & { blank?: string }>): void {
   const QUIZ = "Числівники";
   const cases = QUIZ_CASES;
   for (const cd of CARDINALS) {
     for (const c of cases) {
       const id = `${cd.id}::${c}::x`;
       const asked = new Set<string>();
-      const qs: (AnyQ & { blank: string })[] = [];
-      for (let i = 0; i < 40; i++) qs.push(...forced(gen, id));
+      const qs: (AnyQ & { blank?: string })[] = [];
+      // рід іменника й пропуск обираються навмання (середній рід — ~3 % питань комбо): 40 вибірок, далі — доки не
+      // трапляться всі чотири роди іменника (до 400), щоб рідкісний рід не давав випадкової «дірки»
+      const nounGenders = () => new Set(qs.filter((q) => q.blank === "noun").map((q) => q.taskText.split(":")[1]?.split(",")[0]?.trim()));
+      for (let i = 0; i < 400 && (i < 40 || (qs.length > 0 && nounGenders().size < GENDER_ORDER.length)); i++) qs.push(...forced(gen, id));
       if (qs.length === 0) { gap(r, QUIZ, `${id} не питається`); continue; }
       for (const q of qs) { basic(r, QUIZ, q); if (q.blank === "numeral") asked.add(q.correct); }
       const forms = new Set<string>();
@@ -344,7 +345,8 @@ function checkNumerals(r: Report, gen: Gen<AnyQ & { blank: string }>): void {
       else if (cd.kind === "invariantDecl") forms.add(split(cd.forms[c])[0]);
       else forms.add(split(c === "nominativ" || c === "akuzativ" ? cd.direct : cd.oblique)[0]);
       for (const f of forms) if (f && !asked.has(f)) gap(r, QUIZ, `${cd.id} ${c}: форма «${f}» не питається`);
-      if (cd.kind === "gendered" || cd.kind === "twoForm") {
+      {
+        // кожен рід іменника — у кожного числівника (не лише в родових jeden / dva): «se čtyřmi bratry» теж
         const labels: Record<Gender, string> = { masc_anim: "чол. іст.", masc_inan: "чол. неіст.", fem: "жін.", neut: "сер." };
         for (const g of GENDER_ORDER)
           if (!qs.some((q) => q.blank === "noun" && q.taskText.includes(labels[g])))
@@ -374,6 +376,8 @@ function checkNumerals(r: Report, gen: Gen<AnyQ & { blank: string }>): void {
     if (qs.length === 0) gap(r, QUIZ, `складені на …${g} не питаються`);
     for (const q of qs) basic(r, QUIZ, q);
   }
+  // порядкові (první … dvanáctý): таблиця прикметника, кожна клітинка (рішення Ніка 2026-10-06)
+  for (const a of ADJECTIVES.filter((x) => x.category === "ordinal")) checkTableCells(r, QUIZ, { id: a.id, decl: a.declension, quiz: {} }, gen);
 }
 
 // ═════════════ «Прийменники» ═════════════
@@ -382,7 +386,8 @@ function checkPrepositions(r: Report, gen: Gen<AnyQ>): void {
   const numbersOf = (qs: AnyQ[]) => new Set<string>(qs.map((q) => (/множина/.test(q.taskText) ? "мн." : /однина/.test(q.taskText) ? "одн." : "")));
   const need = (id: string, both: boolean) => {
     const qs: AnyQ[] = [];
-    for (let i = 0; i < 20; i++) qs.push(...forced(gen, id));
+    // обидва числа: число обирається навмання (множина буває й у ~8 % питань комбо) — більше вибірок
+    for (let i = 0; i < (both ? 60 : 20); i++) qs.push(...forced(gen, id));
     if (qs.length === 0) return gap(r, QUIZ, `${id} не питається`);
     for (const q of qs) basic(r, QUIZ, q);
     if (both) for (const n of ["одн.", "мн."]) if (!numbersOf(qs).has(n)) gap(r, QUIZ, `${id} ${n} не питається`);
@@ -393,16 +398,20 @@ function checkPrepositions(r: Report, gen: Gen<AnyQ>): void {
       if (PREPOSITIONS.some((o) => o !== p && o.type === "fixed" && o.govCase === p.govCase)) need(`${p.id}::fixprep::${p.govCase}`, false);
       else exclude(r, `${QUIZ}: вибір прийменника — немає іншого з тим самим відмінком`);
     } else if (p.dual) {
-      need(`${p.id}::dual-motion::${p.dual.motion.govCase}`, false);
-      need(`${p.id}::dual-location::${p.dual.location.govCase}`, false);
+      for (const [side, gc] of [["motion", p.dual.motion.govCase], ["location", p.dual.location.govCase]] as const) {
+        const one = ONE_NUMBER_DUAL.find((x) => x.prep === p.id && (x.side === side || x.side === "both"));
+        if (one) exclude(r, `${QUIZ}: ${one.reason}`);
+        need(`${p.id}::dual-${side}::${gc}`, !one);
+      }
       if (p.dual.exchange) need(`${p.id}::za-exchange::${p.dual.exchange.govCase}`, false);
     }
   }
-  // число іменника в місцевому з v — окремо (відома дірка)
-  const vq: AnyQ[] = [];
-  for (let i = 0; i < 40; i++) vq.push(...forced(gen, "prep-v::dual-location::lokal"));
-  if (!numbersOf(vq).has("мн.")) gap(r, QUIZ, "prep-v::dual-location::lokal мн. не питається");
 }
+// Двоїсті прийменники питаються в ОБОХ числах; виняток — лише значення, де природне одне число (закритий список).
+const ONE_NUMBER_DUAL: { prep: string; side: "motion" | "location" | "both"; reason: string }[] = [
+  { prep: "prep-mezi", side: "both", reason: "mezi — лише множина (між двома й більше)" },
+  { prep: "prep-po", side: "motion", reason: "po + знахідний «до межі» — лише множина (po kolena, po ramena); однина (po pás, po krk) — слів немає в словнику" },
+];
 
 // ═════════════ «Дієслова» ═════════════
 // Форми, що належать дієслову (окремими словами): інфінітив, дієприкметники, теперішній, майбутній, наказовий.
@@ -733,7 +742,7 @@ function checkDateTime(r: Report, gen: Gen<AnyQ>): void {
 interface Gens {
   decl: Gen<DeclQuestion>;
   nouns: Gen<NounQuestion>;
-  numerals: Gen<AnyQ & { blank: string }>;
+  numerals: Gen<AnyQ & { blank?: string }>;
   preps: Gen<AnyQ>;
   verbs: Gen<AnyQ>;
   adverbs: Gen<AnyQ>;
@@ -775,8 +784,12 @@ function selfTest(): boolean {
     { name: "особовий: форма іншого регістру", only: ["decl"], focus: ["pp-ja::"], gens: { decl: mutate(REAL.decl, (q) => (q.comboId === "pp-ja::x_genitiv::0" ? { ...q, correct: "mne", options: ["mne", distractorOf(q) ?? "mi"] } : q)) } },
     { name: "хибна вокалізація (ve → v)", only: ["decl"], focus: ["velky::", "vysoky::", "vsechen"], gens: { decl: mutate(REAL.decl, (q) => (q.contextPhrase && / ve ___/.test(q.contextPhrase) ? { ...q, contextPhrase: q.contextPhrase.replace(" ve ___", " v ___") } : q)) } },
     { name: "хибна правильна відповідь в іменника", only: ["nouns"], focus: ["stul::"], gens: { nouns: mutate(REAL.nouns, (q) => (q.comboId.startsWith("stul::") ? swap(q) : q)) } },
+    { name: "прийменник: зникла множина (v + місцевий)", only: ["preps"], focus: ["prep-v::"], gens: { preps: mutate(REAL.preps, (q) => (q.comboId === "prep-v::dual-location::lokal" && /множина/.test(q.taskText) ? null : q)) } },
     { name: "зникло комбо прийменника (bez)", only: ["preps"], focus: ["prep-bez::"], gens: { preps: mutate(REAL.preps, (q) => (q.comboId.startsWith("prep-bez::") ? null : q)) } },
     { name: "числівник: зникла форма «pěti»", only: ["numerals"], focus: ["card-pet"], gens: { numerals: mutate(REAL.numerals, (q) => (q.correct === "pěti" ? null : q)) } },
+    { name: "числівник: зник рід іменника (dva + чол. істот. в орудному)", only: ["numerals"], focus: ["card-dva"], gens: { numerals: mutate(REAL.numerals, (q) => (q.comboId === "card-dva::instrumental::x" && q.taskText.includes("чол. іст.") ? null : q)) } },
+    { name: "порядковий: зникла клітинка (druhý жін. місцевий одн.)", only: ["numerals"], focus: ["ord-druhy"], gens: { numerals: mutate(REAL.numerals, (q) => (q.comboId === "ord-druhy::fem_lokal::sg" ? null : q)) } },
+    { name: "порядковий: хибна правильна відповідь (třetí)", only: ["numerals"], focus: ["ord-treti"], gens: { numerals: mutate(REAL.numerals, (q) => (q.comboId.startsWith("ord-treti::") ? swap(q) : q)) } },
     { name: "зникла форма дієслова", only: ["verbs"], focus: ["delat::"], gens: { verbs: mutate(REAL.verbs, (q) => (q.comboId === "delat::past::ja" ? null : q)) } },
     { name: "дієслово: друга половина дублета (jsi se) як дистрактор", only: ["verbs"], focus: ["ucit-se::"], gens: { verbs: mutate(REAL.verbs, (q) => (q.comboId === "ucit-se::past::ty" ? { ...q, options: [q.correct, "učil jsi se"] } : q)) } },
     { name: "вид: хибна правильна відповідь (psát)", only: ["verbs"], focus: ["psat::"], gens: { verbs: mutate(REAL.verbs, (q) => (q.comboId === "psat::aspect::x" ? swap(q) : q)) } },

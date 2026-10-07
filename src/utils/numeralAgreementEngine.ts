@@ -9,15 +9,17 @@ import {
   PluralOnlyForms,
 } from "../types";
 import { CARDINALS } from "../data/cardinals";
+import { ADJECTIVES } from "../data/adjectives";
 import { NOUNS } from "../data/nouns";
 import { nounUsableAsPartner } from "../data/categories";
-import { NUMERAL_FRAMES, NumeralFrame } from "../data/numeralFrames";
+import { NUMERAL_FRAMES, NumeralFrame, ORDINAL_FRAMES } from "../data/numeralFrames";
 import type { QuizCase } from "../data/declensionFrames";
 import type { VocalPrep } from "../data/prepositionPartners";
 import { matchesNeeds, freshWeightedOrder, acceptedForms, formOf, fitCounts, hasNumber, pluralOnly, sharedVocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
 import { firstForm, isUsableDistractor, once, shuffle, splitForms, topUpRound } from "./quizCommon";
 import { cardinalForms, isDirect } from "./numeralForms";
+import { adjectiveTableUnits, DeclQuestion, frameBank } from "./declensionFlashcardEngine";
 
 // ─────────────────── Узгодження числівник + іменник ───────────────────
 // Тестує ОДНЕ з двох слів групи (числівник або іменник) у реченні з data/numeralFrames.ts; друге слово показане
@@ -296,6 +298,9 @@ interface Built {
   nounId: string;
 }
 
+// Питання раунду: узгодження числівник + іменник або порядковий у групі з іменником (DeclQuestion, без поля blank).
+export type NumeralQuizQuestion = AgreementQuestion | DeclQuestion;
+
 type Side = { blank: "numeral"; numeral: NonNullable<Counter["numeral"]> } | { blank: "noun" };
 const sidesOf = (k: Counter): Side[] =>
   k.numeral ? [{ blank: "numeral", numeral: k.numeral }, { blank: "noun" }] : [{ blank: "noun" }];
@@ -397,20 +402,35 @@ function buildable(k: Counter, c: QuizCase): boolean {
 }
 
 // ─────────────────── Комбінації ───────────────────
-type NumKind = "base" | "hundreds" | "compound" | "plural-only";
+type NumKind = "base" | "hundreds" | "compound" | "plural-only" | "ordinal";
 
 interface Combo {
   id: string;
   wordId: string;
   kind: NumKind;
-  make: (used: ReadonlySet<string>) => Built | null;
+  make: (used: ReadonlySet<string>) => { q: NumeralQuizQuestion; nounIds: string[] } | null;
   buildable: () => boolean; // чи будується хоч одне питання (лише для переліку комбінацій)
 }
 
 // Один відмінок, одне лічильне слово (прості числівники, сотні, jedny / dvoje…).
 function singleCombo(id: string, wordId: string, kind: NumKind, k: Counter, c: QuizCase): Combo {
-  return { id, wordId, kind, make: (used) => build(k, c, id, used), buildable: () => buildable(k, c) };
+  return { id, wordId, kind, make: (used) => withNounIds(build(k, c, id, used)), buildable: () => buildable(k, c) };
 }
+const withNounIds = (b: Built | null) => b && { q: b.q, nounIds: [b.nounId] };
+
+// ═══════════════════ ПОРЯДКОВІ první … dvanáctý ═══════════════════
+// Таблиця прикметника (adjectives.ts, category "ordinal") — тим самим механізмом, що квіз «Прикметники та займенники»,
+// але зі своїм банком фраз ORDINAL_FRAMES (data/numeralFrames.ts): кожна клітинка рід × відмінок × число, речення
+// з іменником тегу ordered або без речення. comboId — як у прикметників: «ord-druhy::fem_lokal::sg».
+const ORDINAL_BANK = once(() => frameBank(ORDINAL_FRAMES));
+const ordinalCombos = (): Combo[] =>
+  adjectiveTableUnits(ADJECTIVES.filter((a) => a.category === "ordinal"), "ordinal", ORDINAL_BANK()).map((u) => ({
+    id: u.id,
+    wordId: u.wordId,
+    kind: "ordinal",
+    make: u.make,
+    buildable: () => true, // клітинка без фрази питається без речення
+  }));
 
 // ═══════════════════ СКЛАДЕНІ ЧИСЛА 21–99 ═══════════════════
 // Без окремих записів у cardinals.ts: десяток (dvacet…devadesát) + одиниця (jeden…devět). Вага помилок — за
@@ -437,7 +457,7 @@ function compoundCombo(group: number): Combo {
       for (const c of shuffle(QUIZ_CASES))
         for (const k of shuffle(counters)) {
           const b = build(k, c, id, used);
-          if (b) return b;
+          if (b) return withNounIds(b);
         }
       return null;
     },
@@ -459,6 +479,7 @@ function enumerateAll(): { combos: Combo[]; dropped: string[] } {
   }
   for (const h of HUNDRED_NOUNS) for (const c of QUIZ_CASES) all.push(singleCombo(comboId(h.id, c, "x"), h.id, "hundreds", hundredCounter(h), c));
   for (const g of [1, 2, 3, 4, 5]) all.push(compoundCombo(g));
+  all.push(...ordinalCombos());
   const combos = all.filter((x) => x.buildable());
   return { combos, dropped: all.filter((x) => !combos.includes(x)).map((x) => x.id) };
 }
@@ -487,25 +508,26 @@ if (typeof __DEV__ !== "undefined" && __DEV__) devCheckData();
 // ─────────────────── Сесія ───────────────────
 // Баланс: складених лише 5 груп проти десятків простих комбо — без мінімуму вони б випадали рідко. Форми для слів
 // лише з множиною мають 30 комбо на 2–3 іменники (brýle, kalhoty): вага 0,25 тримає їх близько одного питання на
-// два раунди, інакше ці кілька слів повторювалися б щораунду.
+// два раунди, інакше ці кілька слів повторювалися б щораунду. Порядкових — 576 комбо (клітинки таблиці) проти ~230
+// решти: рішення Ніка (2026-10-07) — близько двох на раунд, тож мінімум 2 і мала вага понад нього.
 const NUM_KIND_QUOTA: KindQuota<string> = {
   kindOf: (c) => (c as Combo).kind,
-  minSlots: { compound: 2 },
-  kindWeight: { "plural-only": 0.25 },
+  minSlots: { compound: 2, ordinal: 2 },
+  kindWeight: { "plural-only": 0.25, ordinal: 0.01 },
 };
 
 export function generateNumeralAgreementSession(
   count: number,
   pool: Combo[] = allNumeralCombos(),
   mistakes: MistakeStore = {}
-): AgreementQuestion[] {
+): NumeralQuizQuestion[] {
   const chosen = selectRoundCombos(pool, mistakes, count, (c) => c.wordId, undefined, NUM_KIND_QUOTA);
-  const questions: AgreementQuestion[] = [];
+  const questions: NumeralQuizQuestion[] = [];
   const used = new Set<string>(); // іменники раунду: той самий іменник не повторюється, поки є інші
   const take = (c: Combo) => {
     const b = c.make(used);
     if (!b) return;
-    used.add(b.nounId);
+    for (const id of b.nounIds) used.add(id);
     questions.push(b.q);
   };
   for (const c of chosen) take(c);

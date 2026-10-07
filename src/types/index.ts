@@ -171,7 +171,7 @@ interface AdjectiveBase {
   senseLabel?: string;
   secondSense?: { label: string; examples: GenderExamples };
   // Лише порядкові (category "ordinal"): яке число слово називає (druhý — 2). Квіз «Дата й час» за ним читає
-  // «půl druhé» (родовий жін. роду наступної години).
+  // «půl druhé» (родовий жін. роду наступної години); квіз «Числівники» — фрази з max (data/numeralFrames.ts).
   value?: number;
 }
 
