@@ -70,7 +70,14 @@ export type NounTag =
   | "sequencePart"
   | "line"
   | "nonVisual"
-  | "recurring";
+  | "recurring"
+  | "room"
+  | "plant"
+  | "flower"
+  | "sight"
+  | "overhead"
+  | "floor"
+  | "bodyMany";
 
 // Запис для КОЖНОГО тегу обов'язковий (Record): додав тег до NounTag — компілятор вимагає пояснення.
 export const NOUN_TAG_DOC: Record<NounTag, string> = {
@@ -120,10 +127,17 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
   nonVisual: "річ, яку не намалюєш і не сфотографуєш як предмет («Nakresli ročník» — ні): ročník, kapitola (НЕ stránka — «fotka stránky» природна)",
   recurring: "подія, що повторюється, тож множина природна («při cestách», «po lekcích», «silné deště»): cesta, lekce, oběd, snídaně, večeře, déšť — у множині його беруть лише фрази з plOk «recurring» (загальне правило pluralNatural для meal / weather / activity дає однину); наскрізний",
   ordered: "природно рахується по порядку порядковим числівником від první до dvanáctý («Jsem tu teprve třetí den», «Jedu prvním vlakem», «Bydlím ve třetím patře», «Čekám na druhého hosta»): den, týden, rok, hodina, vlak, patro, dům, host (НЕ родичі — «dvanáctý manžel», НЕ речі без черги — «jedenácté oko»); наскрізний тег — сполучається з будь-яким",
+  room: "кімната в будинку чи школі, до якої веде коридор («Chodba vede ke koupelně», «Stojím před třídou»): pokoj, kuchyně, koupelna, třída; у множинних фразах («Mezi pokoji je chodba», «Chodba vede ke třídám») — лише разом з ordered (нумеровані кімнати: pokoj, třída), бо кухня й ванна в квартирі одна",
+  plant: "рослина, яку поливають («Dej vodu květinám / stromům»): růže, květina, strom",
+  flower: "квітка, що пахне («Voní to růží»; разом з plant): růže, květina — НЕ strom («voní to stromem» неприродне)",
+  sight: "місце, заради якого приїжджають туристи («Turisté sem jezdí kvůli hradům / horám / řekám»): hrad, kostel, most, hora, les, park, zahrada, řeka — НЕ dům, ulice, moře («kvůli mořím» неприродне)",
+  overhead: "те, під чим можна стояти («Stojím pod stromem / mostem / sprchou / deštníkem»): strom, most, sprcha, deštník",
+  floor: "поверх будинку («Nad přízemím je půda»; у множині «Výtah jezdí mezi patry» — лише разом з ordered): přízemí, patro",
+  bodyMany: "частина тіла, якої в людини дві чи більше, тож множина природна про одну людину («Mám problém se zuby», «To škodí kolenům»; разом з body): ruka, noha, zub, kost, oko, ucho, koleno, rameno — НЕ hlava, nos, krk, srdce",
 };
 
 // Теги-«самоцілі»: слово з таким тегом не має жодних інших (особа не буває будівлею, їжа — місцем тощо).
-// Винятки: body разом з bodyLevel, time разом з timeUnit і dayPart, document разом з carried (pas, doklad),
+// Винятки: body разом з bodyLevel / singleLevel / bodyMany, time разом з timeUnit і dayPart, document разом з carried (pas, doklad),
 // person разом з collective (rodina), food разом з served / homemade; наскрізні теги (CROSS) — з будь-яким.
 const CROSS: NounTag[] = ["ordered", "recurring"];
 const SOLO: NounTag[] = ["person", "animal", "money", "food", "meal", "time", "weather", "abstract", "document", "body", "air"];
@@ -133,6 +147,8 @@ const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
   workplace: ["placeV", "placeNa"],
   bodyLevel: ["body"],
   singleLevel: ["bodyLevel"],
+  bodyMany: ["body"],
+  flower: ["plant"],
   timeUnit: ["time"],
   landform: ["outdoor"],
   served: ["food"],
@@ -149,7 +165,7 @@ export function validateNounSem(n: Pick<NounEntry, "id" | "sem">): string[] {
   for (const solo of SOLO) {
     if (!sem.includes(solo)) continue;
     const allowed: NounTag[] =
-      solo === "body" ? ["body", "bodyLevel", "singleLevel"] : solo === "time" ? ["time", "timeUnit", "dayPart"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade"] : [solo];
+      solo === "body" ? ["body", "bodyLevel", "singleLevel", "bodyMany"] : solo === "time" ? ["time", "timeUnit", "dayPart"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade"] : [solo];
     const extra = sem.filter((t) => !allowed.includes(t) && !CROSS.includes(t));
     if (extra.length > 0) out.push(`${n.id}: тег «${solo}» не сполучається з ${extra.join(", ")}`);
   }

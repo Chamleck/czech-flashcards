@@ -218,6 +218,7 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { text: "Byl jsem překvapený ___.", any: ["weather", "air"] }, // silným větrem, jarním deštěm, čistým vzduchem
     { some: true, text: "{s} ___ je problém.", num: "any", ownerless: true, any: ["item", "document", "vehicle"] }, // s tím starým počítačem
     { text: "{s} ___ {N} je problém?", num: "any", role: "question", any: ["item", "document", "vehicle"] }, // s jakými doklady
+    { text: "Mezi ___ {N} vybíráš?", num: "pl", role: "question", any: ["item"] }, // mezi kterými počítači (s + kt- коливається)
     { text: "Nemám problém {s} ___.", num: "any", role: "neg", any: ["item", "document", "vehicle"] }, // se žádným autem
     { text: "Co uděláš {s} ___?", num: "any", role: "every", any: ["food", "item"] }, // s každým klíčem
     { text: "Naplnil jsem sklenici ___.", role: "every", any: ["food"] }, // vším cukrem, vší vodou, vší rýží

@@ -54,9 +54,12 @@ function asked(n: NounEntry, c: CzechCase, num: GrammaticalNumber): boolean {
 }
 
 // ─────────────────── Фрази ───────────────────
-// Множина у фразі: не для незлічуваних (vody, masa) і збірних (rodiny), крім слів лише з множиною.
-function pluralFits(n: NounEntry): boolean {
-  return pluralOnly(n) || (!n.uncountable && !n.sem.includes("collective"));
+// Множина у фразі: не для незлічуваних (vody, masa) і збірних (rodiny), крім слів лише з множиною; збірним її
+// відкриває сама фраза полем plOk (правило 7 у шапці data/nounFrames.ts).
+function pluralFits(n: NounEntry, f: NounFrame): boolean {
+  if (pluralOnly(n)) return true;
+  if (n.uncountable) return false;
+  return !n.sem.includes("collective") || !!f.plOk?.some((t) => n.sem.includes(t));
 }
 
 // Чи годиться фраза для слова в цьому числі (правило 1 у шапці data/nounFrames.ts).
@@ -64,7 +67,7 @@ function frameFits(f: NounFrame, n: NounEntry, num: GrammaticalNumber): boolean 
   if (!matchesNeeds(n, f)) return false;
   const policy = f.num ?? "sg";
   if (num === "sg") return policy !== "pl";
-  if (!pluralFits(n)) return false;
+  if (!pluralFits(n, f)) return false;
   return policy !== "sg" || pluralOnly(n) || n.sem.includes("paired");
 }
 
