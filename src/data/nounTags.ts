@@ -93,7 +93,9 @@ export type NounTag =
   | "sky"
   | "mineral"
   | "oneSystem"
-  | "worksPl";
+  | "worksPl"
+  | "tableware"
+  | "currency";
 
 // Запис для КОЖНОГО тегу обов'язковий (Record): додав тег до NounTag — компілятор вимагає пояснення.
 export const NOUN_TAG_DOC: Record<NounTag, string> = {
@@ -163,12 +165,14 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
   sky: "небо й світило, до яких дивляться («Podíval se k nebi / ke slunci»; без weather — ще й «Spím pod širým nebem»): nebe, slunce",
   mineral: "вода, що буває мінеральною, — її множина природна з «minerální» («Pijeme minerální vody»; разом з food): voda",
   oneSystem: "система, яка в місті одна, тож множина неприродна в УСІХ квізах («kvůli metrům», «s jakými metry» — ні; pluralNatural, а в квізі «Відмінки» — правило NOUN_SKIP_RULES): metro (разом з vehicle)",
+  tableware: "столовий посуд і прибори, які миють («Myčka škodí nožům / sklenicím»; разом з item): talíř, nůž, lžíce, vidlička, hrnek, sklenice — НЕ taška, kniha",
+  currency: "валюта — одиниця грошей, курс якої рахують («Kurz dolaru ke koruně / k euru roste»; разом з money): koruna, euro — НЕ peníze (лише множина, не валюта)",
   worksPl: "робота, у множини якої значення «роботи» — природна з прикметником («Kvůli stavebním pracím je silnice zavřená», «Pomáhám mámě s domácími pracemi»; разом з activity): práce",
 };
 
 // Теги-«самоцілі»: слово з таким тегом не має жодних інших (особа не буває будівлею, їжа — місцем тощо).
 // Винятки: body разом з bodyLevel / singleLevel / bodyMany, time разом зі своїми підтегами (timeUnit, dayPart, month…), document разом з carried (pas, doklad),
-// person разом з collective (rodina), food разом з served / homemade; наскрізні теги (CROSS) — з будь-яким.
+// person разом з collective (rodina), food разом з served / homemade, money разом з currency (koruna, euro); наскрізні теги (CROSS) — з будь-яким.
 const CROSS: NounTag[] = ["ordered", "recurring"];
 const SOLO: NounTag[] = ["person", "animal", "money", "food", "meal", "time", "weather", "abstract", "document", "body", "air"];
 // Теги, що ВИМАГАЮТЬ супутнього: (тег → хоча б один з переліку).
@@ -191,6 +195,8 @@ const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
   mineral: ["food"],
   oneSystem: ["vehicle"],
   worksPl: ["activity"],
+  tableware: ["item"],
+  currency: ["money"],
   timeUnit: ["time"],
   landform: ["outdoor"],
   served: ["food"],
@@ -207,7 +213,7 @@ export function validateNounSem(n: Pick<NounEntry, "id" | "sem" | "month">): str
   for (const solo of SOLO) {
     if (!sem.includes(solo)) continue;
     const allowed: NounTag[] =
-      solo === "body" ? ["body", "bodyLevel", "singleLevel", "bodyMany"] : solo === "time" ? ["time", "timeUnit", "dayPart", "month", "season", "weekday", "daySpan", "dayPoint", "timeV", "yearsPlural"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade", "drink", "mineral"] : solo === "weather" ? ["weather", "strongPl", "weatherCause", "sky"] : [solo];
+      solo === "body" ? ["body", "bodyLevel", "singleLevel", "bodyMany"] : solo === "time" ? ["time", "timeUnit", "dayPart", "month", "season", "weekday", "daySpan", "dayPoint", "timeV", "yearsPlural"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade", "drink", "mineral"] : solo === "weather" ? ["weather", "strongPl", "weatherCause", "sky"] : solo === "money" ? ["money", "currency"] : [solo];
     const extra = sem.filter((t) => !allowed.includes(t) && !CROSS.includes(t));
     if (extra.length > 0) out.push(`${n.id}: тег «${solo}» не сполучається з ${extra.join(", ")}`);
   }

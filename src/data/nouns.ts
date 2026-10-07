@@ -23,7 +23,7 @@ import { NounEntry } from "../types";
 //       • місце ЗАВЖДИ має рівно один із placeV (в школі) чи placeNa (на пошті) — це лексична властивість
 //         слова; перевір за словником, а не за відчуттям;
 //       • особа, тварина, їжа, час, погода, гроші, документ, тіло, повітря — «самотні» теги (без інших; винятки:
-//         тіло + bodyLevel / singleLevel / bodyMany, час + timeUnit / dayPart / month / season / weekday / daySpan / dayPoint / timeV / yearsPlural, їжа + served / homemade / drink / mineral, погода + strongPl / weatherCause / sky, документ + carried — pas, doklad);
+//         тіло + bodyLevel / singleLevel / bodyMany, час + timeUnit / dayPart / month / season / weekday / daySpan / dayPoint / timeV / yearsPlural, їжа + served / homemade / drink / mineral, погода + strongPl / weatherCause / sky, документ + carried — pas, doklad, гроші + currency — koruna, euro);
 //       • їжа: served — страва чи напій, який подають теплим або холодним (káva, polévka, maso: «teplá polévka»);
 //         homemade — буває домашнім (chléb, pivo, ovoce: «domácí chléb»); жодного — як cukr. Без них teplý / studený /
 //         domácí з цим словом не з'являться (і «studený cukr» теж) — це безпечно; зайвий тег дасть безглузду пару;
@@ -938,7 +938,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "home",
-    sem: ["item", "surface", "container"],
+    sem: ["item", "surface", "container", "tableware"],
     declension: {
       nominativ: { sg: "talíř", pl: "talíře" },
       genitiv: { sg: "talíře", pl: "talířů" },
@@ -959,7 +959,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "home",
-    sem: ["item"],
+    sem: ["item", "tableware"],
     declension: {
       // ů→o в непрямих відмінках: nůž → nož-
       nominativ: { sg: "nůž", pl: "nože" },
@@ -3471,7 +3471,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "home",
-    sem: ["item"],
+    sem: ["item", "tableware"],
     declension: {
       nominativ: { sg: "lžíce", pl: "lžíce" },
       genitiv: { sg: "lžíce", pl: "lžic" },
@@ -3492,7 +3492,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "home",
-    sem: ["item"],
+    sem: ["item", "tableware"],
     declension: {
       nominativ: { sg: "vidlička", pl: "vidličky" },
       genitiv: { sg: "vidličky", pl: "vidliček" },
@@ -3513,7 +3513,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "home",
-    sem: ["item", "container"],
+    sem: ["item", "container", "tableware"],
     declension: {
       nominativ: { sg: "hrnek", pl: "hrnky" },
       genitiv: { sg: "hrnku", pl: "hrnků" },
@@ -3534,7 +3534,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "home",
-    sem: ["item", "container"],
+    sem: ["item", "container", "tableware"],
     declension: {
       // Той самий "підзразок ulice", що й lžíce: gen.pl "sklenic" (не "sklenicí"!).
       nominativ: { sg: "sklenice", pl: "sklenice" },
@@ -4301,7 +4301,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "city",
-    sem: ["money"],
+    sem: ["money", "currency"],
     declension: {
       nominativ: { sg: "koruna", pl: "koruny" },
       genitiv: { sg: "koruny", pl: "korun" },
@@ -4323,7 +4323,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "city",
-    sem: ["money"],
+    sem: ["money", "currency"],
     declension: {
       // пл. 2. п. «eur» (нульове закінчення), як «měst»
       nominativ: { sg: "euro", pl: "eura" },

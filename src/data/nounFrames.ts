@@ -125,8 +125,24 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Kvůli silným ___ jsme zůstali doma.", num: "pl", any: ["strongPl"], plOk: ["strongPl"] }, // dešťům, větrům
     { text: "Kvůli ___ jsme zůstali doma.", any: ["weatherCause"] }, // kvůli počasí, dešti, sněhu, větru
     { text: "Podíval se {k} ___.", any: ["sky"] }, // k nebi, ke slunci
+    { text: "Dávám přednost domácím ___.", num: "pl", any: ["homemade"] }, // kuřatům, jablkům, sýrům, vejcím (незлічувані — правило 1)
+    { text: "Díky společným ___ jsme se sblížili.", num: "pl", any: ["meal"] }, // snídaním, obědům, večeřím
+    { text: "Tohle patří k nejkrásnějším ___ v Evropě.", num: "pl", any: ["outdoor"], none: ["landform"] }, // městům, náměstím, silnicím
+    { text: "Tohle patří k nejkrásnějším ___ v Evropě.", num: "pl", all: ["landform"], none: ["path"] }, // mořím, řekám («polím» — ні)
+    { text: "Cesta vede k ___.", num: "pl", all: ["landform", "path"] }, // lesům, horám, polím («k» — не перед відповіддю)
+    { text: "Ke všem ___ vede cesta.", num: "pl", all: ["building", "residence"] }, // domům, stavením, hotelům
+    { text: "Hotel je oblíbený díky moderním ___.", num: "pl", any: ["room"], none: ["grade"] }, // pokojům, kuchyním, koupelnám
+    { text: "Byla tam dlouhá fronta {k} ___.", num: "pl", all: ["overhead", "placeV"] }, // ke sprchám (басейн, спортзал)
+    { text: "Díky teplé ___ jsem se zahřál.", all: ["overhead", "placeV"] }, // sprše
+    { text: "Kvůli ___ jsme se pohádali.", num: "pl", all: ["seat", "ordered"] }, // místům, sedadlům (у потязі, у кіно)
+    { text: "Ke všem ___ vedou schody.", num: "pl", any: ["line"] }, // řadám (стадіон, амфітеатр)
+    { text: "Jdi až k poslední ___.", all: ["line"] }, // řadě
+    { text: "Díky ___ je tu tepleji.", num: "any", all: ["surface", "seat", "space"], none: ["item", "furniture"] }, // koberci / kobercům
+    { text: "Myčka škodí ___.", num: "any", any: ["tableware"] }, // nožům, lžíci, hrnkům (k / s + lž-, hrn- коливається — тут без прийменника)
+    { text: "Díky ___ jsme našli cestu.", num: "any", any: ["nature"], none: ["plant", "sky", "weatherCause"] }, // hvězdě / hvězdám
+    { text: "Kurz dolaru {k} ___ roste.", any: ["currency"] }, // ke koruně, k euru
     { text: "Učitel poděkoval ___.", num: "any", any: ["grade"] }, // třídě / třídám, ročníku / ročníkům
-    { text: "Ke všem ___ jsou cvičení.", num: "pl", any: ["sequencePart"], none: ["line"] }, // kapitolám, stránkám
+    { text: "Přidej čísla ke všem ___.", num: "pl", any: ["sequencePart"], none: ["line"] }, // stránkám, kapitolám («ke» — за «všem», не за відповіддю)
     { text: "Kvůli všem těm ___ nemůžu spát.", num: "pl", any: ["drink"] }, // kávám, čajům, pivům
     { text: "Přidej ještě stovku k těm ___.", num: "pl", any: ["money"] }, // penězům, korunám, eurům
     { text: "Kvůli stavebním ___ je silnice zavřená.", num: "pl", any: ["worksPl"] }, // pracím
@@ -206,7 +222,7 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Vrátím se před ___.", any: ["meal", "time"], none: ["timeUnit"] }, // před obědem, před pondělím
     { text: "Mezi ___ je chodba.", num: "pl", all: ["room", "ordered"] }, // mezi pokoji, třídami
     { text: "Je to pod ___.", num: "any", any: ["item"] }, // pod lžící, pod hrnky (s + lž- / hrn- коливається)
-    { text: "Mezi ___ je ulička.", num: "pl", all: ["ordered"], any: ["seat", "line"], none: ["placeNa"] }, // mezi sedadly, řadami (SSČ)
+    { text: "Mezi ___ je málo místa.", num: "pl", all: ["ordered"], any: ["seat", "line"], none: ["placeNa"] }, // mezi sedadly, řadami (місце для ніг; «ulička mezi řadami» — ні)
     { text: "Mezi ___ je obrázek.", num: "pl", any: ["sequencePart"], none: ["line"] }, // mezi stránkami, kapitolami
     { text: "Mezi ___ je velký rozdíl.", num: "pl", any: ["grade"] }, // mezi ročníky, třídami
     { text: "Voní to ___.", any: ["flower"] }, // růží, květinou
@@ -220,6 +236,11 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Jedeme na výlet {s} ___.", any: ["grade"] }, // se třídou, s ročníkem
     { text: "Jsem hotový {s} ___.", any: ["sequencePart"], none: ["line"] }, // s kapitolou, se stránkou
     { text: "Pokoj je zalitý ___.", all: ["sky", "weather"] }, // sluncem
+    { text: "Hledám hotel s moderními ___.", num: "pl", any: ["room"], none: ["grade"] }, // pokoji, kuchyněmi, koupelnami
+    { text: "Hledám hotel s moderními ___.", num: "pl", all: ["overhead", "placeV"] }, // sprchami
+    { text: "Jsem spokojený {s} ___.", num: "any", all: ["seat", "ordered"] }, // s místem / místy, se sedadlem / sedadly
+    { text: "Za poslední ___ je východ.", all: ["line"] }, // řadou
+    { text: "Narodil se pod šťastnou ___.", any: ["nature"], none: ["plant", "sky", "weatherCause"] }, // hvězdou
     { text: "Pomáhám mámě s domácími ___.", num: "pl", any: ["worksPl"] }, // pracemi («s» — за «domácími», не за відповіддю)
   ],
 };
@@ -242,6 +263,7 @@ interface TagSkip extends Needs {
   cases?: CzechCase[];
   numbers?: GrammaticalNumber[];
   uncountable?: true; // лише незлічувані з одниною (поле uncountable; слова лише з множиною — peníze — не зачіпає)
+  withSg?: true; // лише слова, що мають однину (не ústa, brýle)
   reason: string;
 }
 const tagSkip = (s: TagSkip): SkipRule<NounCell> => ({
@@ -250,6 +272,7 @@ const tagSkip = (s: TagSkip): SkipRule<NounCell> => ({
     (!s.cases || s.cases.includes(c)) &&
     (!s.numbers || s.numbers.includes(n)) &&
     (!s.uncountable || (noun.uncountable && !pluralOnly(noun))) &&
+    (!s.withSg || !pluralOnly(noun)) &&
     matchesNeeds(noun, s),
 });
 export const NOUN_SKIP_RULES: SkipRule<NounCell>[] = [
@@ -270,5 +293,8 @@ export const NOUN_SKIP_RULES: SkipRule<NounCell>[] = [
   tagSkip({ uncountable: true, any: ["mineral"], cases: ["dativ", "lokal", "instrumental"], numbers: ["pl"], reason: "voda: «minerální vody» лише в називному, родовому, знахідному" }),
   tagSkip({ any: ["air"], cases: ["dativ"], numbers: ["sg"], reason: "vzduch: давальний (Нік: природної фрази немає)" }),
   tagSkip({ all: ["sky", "weather"], numbers: ["pl"], reason: "slunce: множина (Нік: «slunce / sluncí» — лише в астрономії)" }),
+  tagSkip({ any: ["body"], none: ["bodyMany"], withSg: true, cases: ["dativ", "instrumental"], numbers: ["pl"], reason: "частина тіла, якої в людини одна (hlava, nos, srdce, krk): давальний і орудний множини (Нік: природної фрази для всіх немає)" }),
+  tagSkip({ any: ["floor"], cases: ["dativ"], reason: "поверхи: давальний (Нік: кажуть «do patra / do přízemí», природної фрази з давальним немає)" }),
+  tagSkip({ any: ["floor"], none: ["ordered"], cases: ["instrumental"], numbers: ["pl"], reason: "přízemí: орудний множини (Нік: у домі одне, фраз немає)" }),
   tagSkip({ any: ["oneSystem"], numbers: ["pl"], reason: "metro: множина (Нік: у місті одне; множину тренують інші слова)" }),
 ];
