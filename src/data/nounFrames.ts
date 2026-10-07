@@ -1,6 +1,8 @@
-import type { CzechCase } from "../types";
+import type { CzechCase, GrammaticalNumber, NounEntry } from "../types";
 import type { Needs, NumberPolicy } from "./prepositionPartners";
 import type { NounTag } from "./nounTags";
+import { matchesNeeds } from "../utils/partnerSelection";
+import type { SkipRule } from "../utils/quizCommon";
 
 // ─────────────────────── ФРАЗИ КВІЗУ «ІМЕННИКИ» ───────────────────────
 // ДАНІ, а не логіка. Кожна фраза задає відмінок іменника через дієслово чи прийменник («Bojím se ___» — родовий,
@@ -163,3 +165,30 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Výtah jezdí mezi ___.", num: "pl", all: ["floor", "ordered"] }, // mezi patry (SSČ «s více patry»)
   ],
 };
+
+// ─────────────────────── ЩО КВІЗ «ВІДМІНКИ» СВІДОМО НЕ ПИТАЄ ───────────────────────
+// Рішення (не граматика): клітинка існує в мові, але квіз її не питає. Рядок = теги (any / all / none, як у фразах) +
+// відмінки + числа + причина; без id слів, тож нове слово з такими тегами виключається саме. Рушій (asked у
+// utils/flashcardEngine.ts) і оракул (scripts/check-quiz-coverage.ts) читають ці самі правила (skipReason, utils/quizCommon.ts).
+// ПРАВИЛА ДОДАВАННЯ
+//  1. Новий рядок — лише за рішенням Ніка, з причиною, яку друкує оракул; не замість фрази, якої просто ще немає
+//     (клітинку без природної фрази квіз питає без речення).
+//  2. Рядок не може виключати клітинку, під яку є фраза (dev-збірка попереджає).
+//  3. Порожні cases / numbers — усі відмінки / обидва числа.
+export interface NounCell {
+  noun: NounEntry;
+  c: CzechCase;
+  n: GrammaticalNumber;
+}
+interface TagSkip extends Needs {
+  cases?: CzechCase[];
+  numbers?: GrammaticalNumber[];
+  reason: string;
+}
+const tagSkip = (s: TagSkip): SkipRule<NounCell> => ({
+  reason: s.reason,
+  applies: ({ noun, c, n }) => (!s.cases || s.cases.includes(c)) && (!s.numbers || s.numbers.includes(n)) && matchesNeeds(noun, s),
+});
+export const NOUN_SKIP_RULES: SkipRule<NounCell>[] = [
+  tagSkip({ none: ["person", "animal"], cases: ["vokativ"], reason: "кличний не-особи (свідоме рішення)" }), // «stole!» — не звертання
+];

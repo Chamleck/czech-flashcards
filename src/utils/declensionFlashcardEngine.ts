@@ -20,13 +20,14 @@ import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS, PERSONAL_QUIZ_FORMS } from "../data/personalPronouns";
 import { INTERROGATIVE_ADJ, INTERROGATIVE_CORE } from "../data/interrogativePronouns";
 import { INDEFINITE_ADJ, INDEFINITE_CORE } from "../data/indefinitePronouns";
-import { NOUNS } from "../data/nouns";
 import { adjQuizUsable } from "../data/adjectiveCategories";
-import { nounUsableAsPartner } from "../data/categories";
 import {
   ANTECEDENT_FRAME,
   OWNER_FRAME,
+  DECL_CELL_SKIPS,
   DECL_FRAMES,
+  DECL_NOUN_POOL,
+  DECL_WORD_SKIPS,
   DeclFrame,
   PERSONAL_FRAMES,
   PersonalFrame,
@@ -36,7 +37,7 @@ import {
 import type { VocalPrep } from "../data/prepositionPartners";
 import { agreementGender, candidateNumbers, fitCounts, freshWeightedOrder, matchesFilter, sharedVocalDecision, vocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
-import { NUMBER_LABEL, capitalize, firstForm, formsOf, isRealOtherForm, once, randomOf, shuffle, topUpRound } from "./quizCommon";
+import { NUMBER_LABEL, capitalize, firstForm, formsOf, isRealOtherForm, once, randomOf, shuffle, skipReason, topUpRound } from "./quizCommon";
 
 // ═══════════════════ КВІЗ «ПРИКМЕТНИКИ ТА ЗАЙМЕННИКИ» ═══════════════════
 // Знання — у даних: смислові теги іменників (data/nounTags.ts), fits прикметників (data/adjectives.ts), лексичні
@@ -121,8 +122,8 @@ function usableCells(decl: FullDeclension, g: Gender, c: QuizCase, n: Grammatica
 const pickForm = (forms: string[], idx: number) => forms[Math.min(idx, forms.length - 1)];
 
 // ─────────────── Іменники-партнери ───────────────
-// Дні, місяці, сотні (unsuitableAsPartner) — не носії чужих фраз.
-const NOUN_POOL: NounEntry[] = NOUNS.filter((n) => nounUsableAsPartner(n.category));
+// Дні, місяці, сотні (unsuitableAsPartner) — не носії чужих фраз (пул визначено в data/declensionFrames.ts).
+const NOUN_POOL: NounEntry[] = DECL_NOUN_POOL;
 
 function nounForm(noun: NounEntry, c: QuizCase, n: GrammaticalNumber): string | null {
   const cell = noun.declension[c][n];
@@ -184,22 +185,17 @@ const declinable = (p: PronounEntry): p is Extract<PronounEntry, { declinable: t
 function buildTestedPool(): Tested[] {
   const adj: Tested[] = ADJECTIVES.filter((a) => adjQuizUsable(a.category)).flatMap((a) => {
     const base: Tested = { id: a.id, kind: "adjective", cz: a.cz, uk: a.uk, decl: a.declension, fits: a.fits, quiz: {}, head: "adjective", semClass: a.semClass };
-    if (a.semClass !== "quality" || !a.quizDegrees) return [base];
-    const deg = (d: "comparative" | "superlative", suffix: string): Tested => ({
-      ...base,
-      id: `${a.id}${suffix}`,
-      cz: a.degrees![d].cz,
-      uk: a.degrees![d].uk,
-      decl: a.degrees![d].declension,
-      degree: d,
-      baseCz: a.cz,
-      baseUk: a.uk,
-    });
-    return [base, deg("comparative", "__comp"), deg("superlative", "__super")];
+    const degrees = a.degrees;
+    if (!degrees) return [base];
+    const deg = (d: "comparative" | "superlative", suffix: string): Tested[] =>
+      skipReason(DECL_WORD_SKIPS, { kind: "adjective", adjective: a, degree: d })
+        ? []
+        : [{ ...base, id: `${a.id}${suffix}`, cz: degrees[d].cz, uk: degrees[d].uk, decl: degrees[d].declension, degree: d, baseCz: a.cz, baseUk: a.uk }];
+    return [base, ...deg("comparative", "__comp"), ...deg("superlative", "__super")];
   });
   // jeho / jejich незмінні — не тестуються (одна форма), лише партнери.
   const pron = (list: PronounEntry[], kind: AdjLikeKind): Tested[] =>
-    list.filter(declinable).filter((p) => !p.quiz?.skip).map((p) => ({
+    list.filter(declinable).filter((p) => !skipReason(DECL_WORD_SKIPS, { kind: "pronoun", pronoun: p })).map((p) => ({
       id: p.id,
       kind,
       cz: p.cz,
@@ -220,32 +216,19 @@ const DETERMINER_PARTNERS: PronounEntry[] = [...PRONOUNS, ...INDEFINITE_ADJ].fil
 // poslední, stejný, cizí… суперечать займеннику: «nějaké poslední divadlo», «tvá cizí eura».
 const ADJECTIVE_PARTNERS: AdjectiveEntry[] = ADJECTIVES.filter((a) => adjQuizUsable(a.category) && a.semClass !== "relational");
 
-// Обмеження слова-займенника на число й відмінок (дані: quiz.num, quiz.massSg, quiz.nominative).
-// Обмеження самого слова, без іменника: лише це число (každý), svůj не в називному, quiz.nominative = false.
-function wordAllows(q: PronounQuiz, c: QuizCase, n: GrammaticalNumber): boolean {
-  if (q.num && q.num !== n) return false;
-  if (q.needsOwner && c === "nominativ") return false;
-  if (c === "nominativ" && q.nominative === false) return false;
-  return true;
-}
-function quizAllows(q: PronounQuiz, noun: NounEntry, c: QuizCase, n: GrammaticalNumber, f?: DeclFrame): boolean {
-  if (!wordAllows(q, c, n)) return false;
+// Чи стоїть слово в цій клітинці з цим іменником: клітинку квіз питає (DECL_CELL_SKIPS, data/declensionFrames.ts), svůj —
+// лише у фразі з власником, однина všechen — лише з незлічуваним іменником (сама клітинка є, але не з будь-яким).
+function quizAllows(q: PronounQuiz, noun: NounEntry, g: Gender, c: QuizCase, n: GrammaticalNumber, f?: DeclFrame): boolean {
+  if (skipReason(DECL_CELL_SKIPS, { quiz: q, g, c, n })) return false;
   if (q.needsOwner && f && ownerless(f, c)) return false;
   if (q.massSg && n === "sg" && !noun.uncountable) return false;
-  return true;
-}
-// Клітинка, яку треба питати (з реченням чи без): форма існує в мові. Однина všechen — лише з незлічуваним іменником,
-// тож у роді, де незлічуваних немає (чол. істот.: «všechen pes» — ні), клітинки немає.
-function cellAllowed(t: Tested, g: Gender, c: QuizCase, n: GrammaticalNumber): boolean {
-  if (!wordAllows(t.quiz, c, n)) return false;
-  if (t.quiz.massSg && n === "sg" && !NOUN_POOL.some((x) => x.uncountable && agreementGender(x, n) === g)) return false;
   return true;
 }
 
 function determinerForm(p: PronounEntry, noun: NounEntry, g: Gender, c: QuizCase, n: GrammaticalNumber, f?: DeclFrame): string | null {
   if (!matchesFilter(noun, p.quiz?.fits ?? {})) return null;
   if (!p.declinable) return p.invariantForm;
-  if (!quizAllows(p.quiz ?? {}, noun, c, n, f)) return null;
+  if (!quizAllows(p.quiz ?? {}, noun, g, c, n, f)) return null;
   const cell = p.declension[g][c][n];
   return !cell || cell === "—" ? null : firstForm(cell);
 }
@@ -348,7 +331,7 @@ function candidatesFor(t: Tested, g: Gender, c: QuizCase, n: GrammaticalNumber, 
   const out: Candidate[] = [];
   for (const noun of NOUN_POOL) {
     if (agreementGender(noun, n) !== g || nounForm(noun, c, n) === null) continue;
-    if (!matchesFilter(noun, t.fits) || !quizAllows(t.quiz, noun, c, n)) continue;
+    if (!matchesFilter(noun, t.fits) || !quizAllows(t.quiz, noun, g, c, n)) continue;
     const fs: Candidate["frames"] = [];
     for (const f of frames) {
       if (!matchesFilter(noun, f) || !frameTakes(f, noun, n, c)) continue;
@@ -510,7 +493,8 @@ function adjLikeUnits(pool: Tested[]): UnitCombo[] {
     for (const g of GENDER_ORDER) {
       for (const c of QUIZ_CASES) {
         for (const n of NUMBERS) {
-          if (formsOf(t.decl[g][c][n]).length === 0 || !hasDistractorCell(t.decl, g, c, n) || !cellAllowed(t, g, c, n)) continue;
+          if (formsOf(t.decl[g][c][n]).length === 0 || !hasDistractorCell(t.decl, g, c, n)) continue;
+          if (skipReason(DECL_CELL_SKIPS, { quiz: t.quiz, g, c, n })) continue; // свідомі винятки (data/declensionFrames.ts)
           const id = comboId(t.id, `${g}_${c}`, n);
           const inSentence = candidatesFor(t, g, c, n, true).length > 0;
           // Повний список кандидатів — при першому питанні цього комбо, далі з пам'яті.

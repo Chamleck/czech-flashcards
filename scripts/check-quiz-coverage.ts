@@ -30,6 +30,9 @@ import { generateVerbSession } from "../src/utils/verbFlashcardEngine";
 import { generateAdverbSession } from "../src/utils/adverbQuizEngine";
 import { generateDateTimeSession } from "../src/utils/datetimeEngine";
 import { acceptedForms, vocalDecision } from "../src/utils/partnerSelection";
+import { skipReason } from "../src/utils/quizCommon";
+import { NOUN_SKIP_RULES } from "../src/data/nounFrames";
+import { DECL_CELL_SKIPS, DECL_WORD_SKIPS, QuizCase } from "../src/data/declensionFrames";
 import { PAST_SUBJECT_ORDER, IMPERATIVE_ORDER, presentForm, futureForm, pastForm, imperativeForm } from "../src/utils/verbForms";
 import type { VocalPrep } from "../src/data/prepositionPartners";
 import { ADJECTIVES } from "../src/data/adjectives";
@@ -42,7 +45,7 @@ import { VERBS } from "../src/data/verbs";
 import { BYT_FUTURE } from "../src/data/auxVerbs";
 import { ADVERBS } from "../src/data/adverbs";
 import { INTERROGATIVE_ADVERBS } from "../src/data/interrogativeAdverbs";
-import { DAY_PARTS } from "../src/data/timeforms";
+import { DAY_PARTS, TIME_SKIP_RULES } from "../src/data/timeforms";
 import { PREPOSITIONS } from "../src/data/prepositions";
 import { CARDINALS } from "../src/data/cardinals";
 import { DATE_ORDINALS } from "../src/data/dates";
@@ -133,18 +136,23 @@ function testedWords(r: Report): Tested[] {
   for (const a of ADJECTIVES) {
     if (!adjQuizUsable(a.category)) continue; // порядкові — квіз «Числівники» (checkOrdinals)
     out.push({ id: a.id, decl: a.declension, quiz: {} });
-    if (a.degrees && a.semClass === "quality" && a.quizDegrees) {
-      out.push({ id: `${a.id}__comp`, decl: a.degrees.comparative.declension, quiz: {} });
-      out.push({ id: `${a.id}__super`, decl: a.degrees.superlative.declension, quiz: {} });
-    } else if (a.degrees) exclude(r, `${ADJ_QUIZ}: ступені не питаються (quizDegrees: false / не якісний)`);
+    if (!a.degrees) continue;
+    let why: string | null = null; // свідомий виняток — одне правило з data/declensionFrames.ts, один раз на слово
+    for (const [d, suffix] of [["comparative", "__comp"], ["superlative", "__super"]] as const) {
+      const skip = skipReason(DECL_WORD_SKIPS, { kind: "adjective", adjective: a, degree: d });
+      if (skip) why = skip;
+      else out.push({ id: `${a.id}${suffix}`, decl: a.degrees[d].declension, quiz: {} });
+    }
+    if (why) exclude(r, `${ADJ_QUIZ}: ${why}`);
   }
   for (const p of [...PRONOUNS, ...INTERROGATIVE_ADJ, ...INDEFINITE_ADJ] as PronounEntry[]) {
     if (!p.declinable) {
       exclude(r, `${ADJ_QUIZ}: незмінне слово — відмінювати нічого (jeho, jejich; їх тренує «чий?»)`);
       continue;
     }
-    if (p.quiz?.skip) {
-      exclude(r, `${ADJ_QUIZ}: quiz.skip (sám — свідоме рішення)`);
+    const why = skipReason(DECL_WORD_SKIPS, { kind: "pronoun", pronoun: p });
+    if (why) {
+      exclude(r, `${ADJ_QUIZ}: ${why}`);
       continue;
     }
     out.push({ id: p.id, decl: p.declension, quiz: p.quiz ?? {} });
@@ -152,14 +160,10 @@ function testedWords(r: Report): Tested[] {
   return out;
 }
 
-// Клітинка існує в мові (а не лише в таблиці): обмеження слова й наявність незлічуваного іменника для massSg.
-function cellExists(r: Report, t: Tested, g: Gender, c: CzechCase, n: GrammaticalNumber): boolean {
-  const q = t.quiz;
-  if (q.num && q.num !== n) return exclude(r, `${ADJ_QUIZ}: лише ${q.num} (quiz.num: každý, kolikátý)`), false;
-  if (q.needsOwner && c === "nominativ") return exclude(r, `${ADJ_QUIZ}: svůj у називному (без власника)`), false;
-  if (q.nominative === false && c === "nominativ") return exclude(r, `${ADJ_QUIZ}: quiz.nominative = false`), false;
-  if (q.massSg && n === "sg" && !NOUNS.some((x) => x.uncountable && x.gender === g))
-    return exclude(r, `${ADJ_QUIZ}: všechen в однині без незлічуваних іменників цього роду (чол. істот.)`), false;
+// Клітинку квіз питає, якщо жодне свідоме правило (data/declensionFrames.ts) її не прибирає; причину друкуємо.
+function cellExists(r: Report, t: Tested, g: Gender, c: QuizCase, n: GrammaticalNumber): boolean {
+  const why = skipReason(DECL_CELL_SKIPS, { quiz: t.quiz, g, c, n });
+  if (why) return exclude(r, `${ADJ_QUIZ}: ${why}`), false;
   return true;
 }
 
@@ -309,7 +313,8 @@ function checkNouns(r: Report, gen: Gen<NounQuestion>): void {
         if (split(n.declension[c][num]).length === 0) continue;
         if (NOUN_CATS_EXCLUDED_FROM_QUIZ.has(n.category)) { exclude(r, `${QUIZ}: категорія ${n.category} — тренує інший квіз`); continue; }
         if (c === "nominativ" && (num === "sg" || pt)) { exclude(r, `${QUIZ}: заголовок картки`); continue; }
-        if (c === "vokativ" && !(n.sem ?? []).some((t) => t === "person" || t === "animal")) { exclude(r, `${QUIZ}: кличний не-особи (свідоме рішення)`); continue; }
+        const why = skipReason(NOUN_SKIP_RULES, { noun: n, c, n: num });
+        if (why) { exclude(r, `${QUIZ}: ${why}`); continue; }
         const id = `${n.id}::${c}::${num}`;
         const qs = forced(gen, id);
         if (qs.length === 0) gap(r, QUIZ, `${id} не питається`);
@@ -333,17 +338,19 @@ function checkNumerals(r: Report, gen: Gen<AnyQ & { blank?: string }>): void {
       const id = `${cd.id}::${c}::x`;
       const asked = new Set<string>();
       const qs: (AnyQ & { blank?: string })[] = [];
-      // рід іменника й пропуск обираються навмання (середній рід — ~3 % питань комбо): 40 вибірок, далі — доки не
-      // трапляться всі чотири роди іменника (до 400), щоб рідкісний рід не давав випадкової «дірки»
-      const nounGenders = () => new Set(qs.filter((q) => q.blank === "noun").map((q) => q.taskText.split(":")[1]?.split(",")[0]?.trim()));
-      for (let i = 0; i < 400 && (i < 40 || (qs.length > 0 && nounGenders().size < GENDER_ORDER.length)); i++) qs.push(...forced(gen, id));
-      if (qs.length === 0) { gap(r, QUIZ, `${id} не питається`); continue; }
-      for (const q of qs) { basic(r, QUIZ, q); if (q.blank === "numeral") asked.add(q.correct); }
       const forms = new Set<string>();
       if (cd.kind === "gendered") for (const g of GENDER_ORDER) forms.add(split(cd.declension[g][c].sg)[0]);
       else if (cd.kind === "twoForm") { forms.add(split(cd.forms[c].masc)[0]); forms.add(split(cd.forms[c].femNeut)[0]); }
       else if (cd.kind === "invariantDecl") forms.add(split(cd.forms[c])[0]);
       else forms.add(split(c === "nominativ" || c === "akuzativ" ? cd.direct : cd.oblique)[0]);
+      // рід іменника й пропуск обираються навмання (середній рід — ~3 % питань комбо): 40 вибірок, далі — доки не
+      // трапляться всі чотири роди іменника І кожна форма числівника як відповідь (до 400), щоб рідкісний рід
+      // (jedno — середній) не давав випадкової «дірки»
+      const nounGenders = () => new Set(qs.filter((q) => q.blank === "noun").map((q) => q.taskText.split(":")[1]?.split(",")[0]?.trim()));
+      const formsSeen = () => [...forms].every((f) => !f || qs.some((q) => q.blank === "numeral" && q.correct === f));
+      for (let i = 0; i < 400 && (i < 40 || (qs.length > 0 && (nounGenders().size < GENDER_ORDER.length || !formsSeen()))); i++) qs.push(...forced(gen, id));
+      if (qs.length === 0) { gap(r, QUIZ, `${id} не питається`); continue; }
+      for (const q of qs) { basic(r, QUIZ, q); if (q.blank === "numeral") asked.add(q.correct); }
       for (const f of forms) if (f && !asked.has(f)) gap(r, QUIZ, `${cd.id} ${c}: форма «${f}» не питається`);
       {
         // кожен рід іменника — у кожного числівника (не лише в родових jeden / dva): «se čtyřmi bratry» теж
@@ -669,8 +676,8 @@ function checkDateTime(r: Report, gen: Gen<AnyQ>): void {
     const valid = allReadings(sys);
     for (let h = sys === "formal" ? 0 : 1; h <= (sys === "formal" ? 23 : 12); h++)
       for (let m = 0; m < 60; m += 5) {
-        if (sys === "formal" && h === 0) { exclude(r, `${QUIZ}: офіційне 0:xx — у джерелі лише розмовне (půl jedné) і «půlnoc»`); continue; }
-        if (sys === "formal" && m > 0 && m < 10 && h < 5) { exclude(r, `${QUIZ}: офіційне 1:05–4:05 — узгодження «dvě hodiny pět minut» у джерелі немає`); continue; }
+        const why = skipReason(TIME_SKIP_RULES, { sys, h24: h, m });
+        if (why) { exclude(r, `${QUIZ}: ${why}`); continue; }
         const id = `time-${sys}-${h}-${m}::${sys}::x`;
         const qs = forced(gen, id);
         if (inFocus(id) && qs.length === 0) gap(r, QUIZ, `${id} не питається`);

@@ -1,6 +1,10 @@
-import type { CzechCase, NounFilter } from "../types";
+import type { AdjectiveEntry, CzechCase, Gender, GrammaticalNumber, NounEntry, NounFilter, PronounEntry, PronounQuiz } from "../types";
 import type { NumberPolicy } from "./prepositionPartners";
 import type { NounTag } from "./nounTags";
+import { NOUNS } from "./nouns";
+import { nounUsableAsPartner } from "./categories";
+import { agreementGender } from "../utils/partnerSelection";
+import type { SkipRule } from "../utils/quizCommon";
 
 // ─────────────────────── ФРАЗИ КВІЗУ «ПРИКМЕТНИКИ ТА ЗАЙМЕННИКИ» ───────────────────────
 // ДАНІ, а не логіка. Кожна фраза задає відмінок через дієслово чи прийменник («Věřím ___» — давальний, «Bydlím v ___»
@@ -279,3 +283,43 @@ export const REFLEXIVE_FRAMES: Partial<Record<QuizCase, ReflexiveFrame[]>> = {
   lokal: [{ reg: 1, frame: { pre: "Mluvím ", post: ".", prep: "o" }, form: "sobě" }],
   instrumental: [{ reg: 1, frame: { pre: "Vezmi si to ", post: ".", prep: "s" }, form: "sebou" }],
 };
+
+// ─────────────────────── ЩО КВІЗ «ПРИКМЕТНИКИ ТА ЗАЙМЕННИКИ» СВІДОМО НЕ ПИТАЄ ───────────────────────
+// Рішення про слово записане в його даних (поля quiz.* займенника, quizDegrees прикметника); що з цього випливає для
+// квізу — лише тут, одним правилом з причиною. Рушій (utils/declensionFlashcardEngine.ts) і оракул
+// (scripts/check-quiz-coverage.ts) читають ці самі правила (skipReason, utils/quizCommon.ts), нічого не повторюючи.
+// Два рівні: слово цілком (DECL_WORD_SKIPS) і окрема клітинка рід × відмінок × число (DECL_CELL_SKIPS). Ті самі правила
+// клітинок діють і для слова-партнера (займенник перед іменником не стоїть у формі, якої квіз не питає).
+// ПРАВИЛА ДОДАВАННЯ: нове поле quiz.*, що прибирає клітинки, — новий рядок тут з причиною (поле — у типі PronounQuiz).
+
+// Іменники, які квіз ставить у фрази (дні, місяці, сотні не є носіями чужих фраз).
+export const DECL_NOUN_POOL: NounEntry[] = NOUNS.filter((n) => nounUsableAsPartner(n.category));
+
+export type DeclWord =
+  | { kind: "adjective"; adjective: AdjectiveEntry; degree?: "comparative" | "superlative" }
+  | { kind: "pronoun"; pronoun: PronounEntry };
+export const DECL_WORD_SKIPS: SkipRule<DeclWord>[] = [
+  {
+    reason: "ступені не питаються (quizDegrees: false / не якісний)",
+    applies: (w) => w.kind === "adjective" && !!w.degree && !(w.adjective.semClass === "quality" && w.adjective.quizDegrees),
+  },
+  { reason: "quiz.skip (sám — свідоме рішення)", applies: (w) => w.kind === "pronoun" && !!w.pronoun.quiz?.skip },
+];
+
+export interface DeclCell {
+  quiz: PronounQuiz;
+  g: Gender;
+  c: QuizCase;
+  n: GrammaticalNumber;
+}
+// Роди, у яких є хоч один незлічуваний іменник (однина všechen — лише з ним: «všechen čas», «všechna voda»).
+const MASS_GENDERS = new Set<Gender>(DECL_NOUN_POOL.filter((x) => x.uncountable).map((x) => agreementGender(x, "sg")));
+export const DECL_CELL_SKIPS: SkipRule<DeclCell>[] = [
+  { reason: "лише одне число (quiz.num: každý, kolikátý)", applies: ({ quiz, n }) => !!quiz.num && quiz.num !== n },
+  { reason: "svůj у називному (без власника)", applies: ({ quiz, c }) => !!quiz.needsOwner && c === "nominativ" },
+  { reason: "quiz.nominative = false", applies: ({ quiz, c }) => quiz.nominative === false && c === "nominativ" },
+  {
+    reason: "všechen в однині без незлічуваних іменників цього роду (чол. істот.)",
+    applies: ({ quiz, g, n }) => !!quiz.massSg && n === "sg" && !MASS_GENDERS.has(g),
+  },
+];

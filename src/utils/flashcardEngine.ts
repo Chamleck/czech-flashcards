@@ -7,11 +7,10 @@ import {
 } from "../types";
 import { NOUNS } from "../data/nouns";
 import { nounQuizTestable } from "../data/categories";
-import { NOUN_FRAMES, NounFrame } from "../data/nounFrames";
-import type { NounTag } from "../data/nounTags";
+import { NOUN_FRAMES, NOUN_SKIP_RULES, NounFrame } from "../data/nounFrames";
 import { matchesNeeds, acceptedForms, freshWeightedOrder, hasNumber, pluralOnly, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
-import { NUMBER_LABEL, formsOf, isUsableDistractor, once, shuffle, splitForms, topUpRound } from "./quizCommon";
+import { NUMBER_LABEL, formsOf, isUsableDistractor, once, shuffle, skipReason, splitForms, topUpRound } from "./quizCommon";
 
 // ─────────────────── Квіз «Іменники»: форма іменника за відмінком і числом ───────────────────
 // Атомарна одиниця — «слово + відмінок + число» (comboId). Питання — речення з data/nounFrames.ts, де пропуск —
@@ -43,13 +42,11 @@ function headlineNumber(n: NounEntry): GrammaticalNumber {
   return hasNumber(n, "sg") ? "sg" : "pl";
 }
 
-const ADDRESSABLE: NounTag[] = ["person", "animal"];
-
 function asked(n: NounEntry, c: CzechCase, num: GrammaticalNumber): boolean {
   const cell = n.declension[c][num];
   if (!cell || cell === "—") return false; // форма не існує (однина peníze)
   if (c === "nominativ" && num === headlineNumber(n)) return false; // відповідь стояла б у заголовку
-  if (c === "vokativ" && !n.sem.some((t) => ADDRESSABLE.includes(t))) return false; // «stole!» — не звертання
+  if (skipReason(NOUN_SKIP_RULES, { noun: n, c, n: num })) return false; // свідомі винятки (data/nounFrames.ts)
   return true;
 }
 

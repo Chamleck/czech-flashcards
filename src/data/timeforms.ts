@@ -2,7 +2,8 @@ import type { CzechCase, NounEntry } from "../types";
 import { NOUNS } from "./nouns";
 import { ADJECTIVES } from "./adjectives";
 import { cardinalByValue, cardinalForms } from "../utils/numeralForms";
-import { firstForm } from "../utils/quizCommon";
+import { firstForm, skipReason } from "../utils/quizCommon";
+import type { SkipRule } from "../utils/quizCommon";
 
 // ─────────────────────────── ЧАС ДОБИ ───────────────────────────
 // Дві повністю різні системи називання часу (звірено з czechonline.org
@@ -123,15 +124,31 @@ export interface TimePoint {
   m: number; // 0..59
 }
 
+// ─────────────── Що квіз «Час і дата» свідомо не питає ───────────────
+// Читання, якого немає в джерелі, квіз не вгадує: правило з причиною тут, одне для рушія (readings нижче дають null) і
+// для оракула (scripts/check-quiz-coverage.ts друкує ту саму причину). Нове обмеження — новий рядок з причиною.
+// Рядок 0:xx водночас тримає читання: числівника «nula» для години в словнику немає, без рядка formal24 упаде (fail-fast).
+export interface TimeCell {
+  sys: "formal" | "colloquial";
+  h24: number;
+  m: number;
+}
+export const TIME_SKIP_RULES: SkipRule<TimeCell>[] = [
+  { reason: "офіційне 0:xx — у джерелі лише розмовне (půl jedné) і «půlnoc»", applies: ({ sys, h24 }) => sys === "formal" && h24 === 0 },
+  {
+    reason: "офіційне 1:05–4:05 — узгодження «dvě hodiny pět minut» у джерелі немає",
+    applies: ({ sys, h24, m }) => sys === "formal" && h24 >= 1 && h24 <= 4 && m > 0 && m < 10,
+  },
+];
+
 // ─────────────── Формальна 24-год ───────────────
 // «patnáct dvacet» (15:20; mozaika.eu: «Je jedna dvacet»). Ціла година — зі словом hodina: «Je sedmnáct hodin».
-// Мінути 1–9 — «sedmnáct hodin pět minut» (mozaika.eu); для годин 1–4 так узгоджене читання («dvě hodiny pět minut»,
-// Je чи Jsou?) у джерелі не трапляється — null, квіз не питає. Година 0 — у джерелі лише розмовне (půl jedné,
-// čtvrt na jednu) і «půlnoc» — null.
+// Мінути 1–9 — «sedmnáct hodin pět minut» (mozaika.eu). Години 1–4 з хвилинами 1–9 і година 0 — читання в джерелі
+// немає (TIME_SKIP_RULES вище) — null, квіз не питає.
 function formal24(tp: TimePoint): string | null {
-  if (tp.h24 === 0) return null;
+  if (skipReason(TIME_SKIP_RULES, { sys: "formal", ...tp })) return null; // немає джерела (правила вище)
   if (tp.m === 0) return counted(HOUR, tp.h24, "nominativ");
-  if (tp.m < 10) return tp.h24 < 5 ? null : `${counted(HOUR, tp.h24, "nominativ")} ${counted(MINUTE, tp.m, "nominativ")}`;
+  if (tp.m < 10) return `${counted(HOUR, tp.h24, "nominativ")} ${counted(MINUTE, tp.m, "nominativ")}`;
   return `${plainNumber(tp.h24)} ${plainNumber(tp.m)}`;
 }
 
