@@ -64,7 +64,13 @@ export type NounTag =
   | "served"
   | "homemade"
   | "landform"
-  | "ordered";
+  | "ordered"
+  | "singleLevel"
+  | "grade"
+  | "sequencePart"
+  | "line"
+  | "nonVisual"
+  | "recurring";
 
 // Запис для КОЖНОГО тегу обов'язковий (Record): додав тег до NounTag — компілятор вимагає пояснення.
 export const NOUN_TAG_DOC: Record<NounTag, string> = {
@@ -107,19 +113,26 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
   homemade: "їжа, що буває домашньою — приготованою чи вирощеною вдома («domácí chléb», «domácí vejce»): chléb, pivo, sýr, ovoce (НЕ voda, káva, cukr; разом з food)",
   air: "повітря, яким дихають і яке відчувають («svěží / čistý / teplý vzduch»): vzduch (НЕ weather — «při vzduchu» безглузде)",
   landform: "природний ландшафт, не створений людиною: moře, řeka, hora, les, pole — «staré / nové moře» неприродне (разом з outdoor)",
+  singleLevel: "частина тіла — рівень, до якого щось сягає, ОДНА, не пара («až po krk»; у множинних фразах «po kolena» її немає; разом з body і bodyLevel): krk",
+  grade: "шкільний рівень — клас чи рік навчання («chodí do třetí třídy», «je v druhém ročníku», «deváté ročníky jely na výlet»): třída, ročník",
+  sequencePart: "частина тексту чи впорядкованого цілого без власних просторових фраз: kapitola, stránka, řada — «zajímavá kapitola», «první řada»; НЕ abstract («vysoká cena» — так, «vysoká stránka» — ні)",
+  line: "ряд чи черга, у якій стоять або сидять («stát v řadě», «sedět v první řadě»): řada (згодом fronta, kolona)",
+  nonVisual: "річ, яку не намалюєш і не сфотографуєш як предмет («Nakresli ročník» — ні): ročník, kapitola (НЕ stránka — «fotka stránky» природна)",
+  recurring: "подія, що повторюється, тож множина природна («při cestách», «po lekcích», «silné deště»): cesta, lekce, oběd, snídaně, večeře, déšť — у множині його беруть лише фрази з plOk «recurring» (загальне правило pluralNatural для meal / weather / activity дає однину); наскрізний",
   ordered: "природно рахується по порядку порядковим числівником від první до dvanáctý («Jsem tu teprve třetí den», «Jedu prvním vlakem», «Bydlím ve třetím patře», «Čekám na druhého hosta»): den, týden, rok, hodina, vlak, patro, dům, host (НЕ родичі — «dvanáctý manžel», НЕ речі без черги — «jedenácté oko»); наскрізний тег — сполучається з будь-яким",
 };
 
 // Теги-«самоцілі»: слово з таким тегом не має жодних інших (особа не буває будівлею, їжа — місцем тощо).
 // Винятки: body разом з bodyLevel, time разом з timeUnit і dayPart, document разом з carried (pas, doklad),
 // person разом з collective (rodina), food разом з served / homemade; наскрізні теги (CROSS) — з будь-яким.
-const CROSS: NounTag[] = ["ordered"];
+const CROSS: NounTag[] = ["ordered", "recurring"];
 const SOLO: NounTag[] = ["person", "animal", "money", "food", "meal", "time", "weather", "abstract", "document", "body", "air"];
 // Теги, що ВИМАГАЮТЬ супутнього: (тег → хоча б один з переліку).
 const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
   residence: ["placeV", "placeNa"],
   workplace: ["placeV", "placeNa"],
   bodyLevel: ["body"],
+  singleLevel: ["bodyLevel"],
   timeUnit: ["time"],
   landform: ["outdoor"],
   served: ["food"],
@@ -136,7 +149,7 @@ export function validateNounSem(n: Pick<NounEntry, "id" | "sem">): string[] {
   for (const solo of SOLO) {
     if (!sem.includes(solo)) continue;
     const allowed: NounTag[] =
-      solo === "body" ? ["body", "bodyLevel"] : solo === "time" ? ["time", "timeUnit", "dayPart"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade"] : [solo];
+      solo === "body" ? ["body", "bodyLevel", "singleLevel"] : solo === "time" ? ["time", "timeUnit", "dayPart"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade"] : [solo];
     const extra = sem.filter((t) => !allowed.includes(t) && !CROSS.includes(t));
     if (extra.length > 0) out.push(`${n.id}: тег «${solo}» не сполучається з ${extra.join(", ")}`);
   }

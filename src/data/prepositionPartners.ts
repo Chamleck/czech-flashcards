@@ -20,7 +20,9 @@ import type { NounTag } from "./nounTags";
 //  3. Лише теги, без id слів. Коли жоден тег не відділяє погані пари від добрих — новий тег у data/nounTags.ts.
 //  4. Вокалізація {p}: невідома група приголосних — рядок у CLUSTER_RULES за IJP; де IJP фіксує коливання, прийменник
 //     у рядку не пишемо — фраза для такого слова свідомо не ставиться.
-//  5. Перед здачею — оракул scripts/check-quiz-coverage.ts --only=preps: «Помилок: 0».
+//  5. Множина слів часу, погоди, їжі, занять за замовчуванням вимкнена (pluralNatural); фраза, де вона природна для
+//     подій, що повторюються, відкриває її полем plOk: ["recurring"] («při cestách», «Zaplatil jsem za obědy»).
+//  6. Перед здачею — оракул scripts/check-quiz-coverage.ts --only=preps: «Помилок: 0».
 
 export interface Needs {
   any?: NounTag[];
@@ -37,6 +39,7 @@ export type NumberPolicy = "sg" | "pl" | "any";
 export interface Frame extends Needs {
   text: string; // «{p}» — місце прийменника (з вокалізацією), «___» — пропуск для форми іменника
   num?: NumberPolicy; // за замовчуванням "sg"
+  plOk?: NounTag[]; // теги, для яких у ЦІЙ фразі природна множина, хоча загальне правило її не дає («při cestách» — recurring)
 }
 
 type Frames = { motion: Frame[]; location: Frame[] };
@@ -61,7 +64,8 @@ export const DUAL_FRAMES: Record<string, Frames> = {
     motion: [
       { text: "Opřel to {p} ___", any: ["support"], num: "any" },
       { text: "Zakopl {p} ___", any: ["surface", "item"], none: ["opening"], num: "any" }, // не «o okno»
-      { text: "Požádal {p} ___", any: ["food", "money", "document", "item"] },
+      { text: "Požádal {p} ___", any: ["food", "money", "document", "item"] }, // o chléb, o klíč
+      { text: "Požádal {p} ___", any: ["money", "document", "item"], num: "pl" }, // o klíče, o doklady (не «o polévky»)
     ],
     location: [
       { text: "Mluvíme {p} ___", num: "any" },
@@ -70,11 +74,12 @@ export const DUAL_FRAMES: Record<string, Frames> = {
     ],
   },
   "prep-po": {
-    // po + akuzativ = «до якої межі» (po kolena, po ramena): лише частини тіла, множина (idiomatická)
+    // po + akuzativ = «до якої межі»: парні частини тіла — у множині (po kolena, po ramena), одна — в однині (po krk)
     motion: [
-      { text: "Voda sahá {p} ___", any: ["bodyLevel"], num: "pl" },
-      { text: "Zapadl až {p} ___", any: ["bodyLevel"], num: "pl" },
-      { text: "Sníh mu sahá {p} ___", any: ["bodyLevel"], num: "pl" },
+      { text: "Voda sahá {p} ___", any: ["bodyLevel"], none: ["singleLevel"], num: "pl" },
+      { text: "Zapadl až {p} ___", any: ["bodyLevel"], none: ["singleLevel"], num: "pl" },
+      { text: "Sníh mu sahá {p} ___", any: ["bodyLevel"], none: ["singleLevel"], num: "pl" },
+      { text: "Voda mu sahala až {p} ___", all: ["bodyLevel", "singleLevel"] }, // až po krk (SSČ: «mít něčeho až po krk»)
     ],
     location: [
       { text: "Chodím {p} ___", any: ["path", "building"], num: "any" },
@@ -102,7 +107,8 @@ export const DUAL_FRAMES: Record<string, Frames> = {
     ],
     location: [
       { text: "Obraz visí {p} ___", any: ["furniture", "opening"], num: "any" },
-      { text: "Slunce je {p} ___", any: ["outdoor", "building"] },
+      { text: "Slunce je {p} ___", any: ["outdoor", "building"] }, // nad domem, nad městem
+      { text: "Slunce je {p} ___", any: ["landform"], num: "pl" }, // nad horami, nad lesy (не «nad divadly»)
       { text: "Bydlím {p} ___", any: ["workplace"] },
     ],
   },
@@ -122,7 +128,7 @@ export const DUAL_FRAMES: Record<string, Frames> = {
     motion: [
       { text: "Postavil auto {p} ___", any: ["building"], num: "any" },
       { text: "Zastavil se {p} ___", any: ["building"], num: "any" },
-      { text: "Předstoupil {p} ___", any: ["person"] },
+      { text: "Předstoupil {p} ___", any: ["person"], num: "any" }, // před učitele, před hosty
     ],
     location: [
       { text: "Auto stojí {p} ___", any: ["building"], num: "any" },
@@ -158,7 +164,7 @@ export const DUAL_FRAMES: Record<string, Frames> = {
 };
 
 // «za» = обмін / ціна (знахідний): те, за що реально платять.
-export const EXCHANGE_FRAMES: Frame[] = [{ text: "Zaplatil jsem {p} ___", any: ["food", "meal", "item", "vehicle"], num: "any" }];
+export const EXCHANGE_FRAMES: Frame[] = [{ text: "Zaplatil jsem {p} ___", any: ["food", "meal", "item", "vehicle"], num: "any", plOk: ["recurring"] }]; // za obědy
 
 // ─────────── Фіксовані прийменники ───────────
 // Кожен фіксований прийменник має свої фрейми (той самий механізм, що й у двоїстих). «Вузькі» (do, z, u, k…)
@@ -176,13 +182,17 @@ export const FIXED_FRAMES: Record<string, Frame[]> = {
   "prep-vedle": [{ text: "{p} ___", any: ["building", "person", "surface", "opening", "outdoor", "support"], num: "any" }],
   "prep-kolem": [{ text: "{p} ___", any: ["building", "outdoor", "support"], num: "any" }],
   "prep-k": [{ text: "{p} ___", any: ["person", "building", "placeV", "placeNa", "outdoor", "meal"], num: "any" }], // k lékaři, k nádraží, k obědu
-  "prep-mimo": [{ text: "{p} ___", any: ["building", "outdoor"] }], // mimo město, mimo školu (не кімнати: «mimo sprchu»)
+  // mimo + 4. = «поза, за межами» (SSČ: «bydlí mimo Prahu»), НЕ укр. «мимо» (проходити мимо — jít kolem + 2.)
+  "prep-mimo": [
+    { text: "{p} ___", any: ["building", "outdoor"] }, // mimo město, mimo školu (не кімнати: «mimo sprchu»)
+    { text: "{p} ___", any: ["outdoor"], num: "pl" }, // mimo města, mimo silnice (не «mimo divadla»)
+  ],
   "prep-pres": [{ text: "{p} ___", any: ["path", "outdoor", "opening", "timeUnit"], num: "any" }], // přes most, přes týden (не «přes televizi»)
   "prep-skrz": [{ text: "{p} ___", any: ["opening", "outdoor", "weather", "building"], num: "any" }], // skrz okno, skrz déšť (НЕ час: «skrz minutu» — ні)
-  "prep-pri": [{ text: "{p} ___", any: ["activity", "meal", "weather"], num: "any" }], // při práci, při obědě, při dešti
+  "prep-pri": [{ text: "{p} ___", any: ["activity", "meal", "weather"], num: "any", plOk: ["recurring"] }], // při práci, při obědě, při dešti; множина — у слів recurring: při cestách, při deštích
   // ── широкі ──
   "prep-bez": [
-    { text: "Odešel {p} ___", any: ["carried", "clothes", "money"] }, // bez klíče, bez kabátu, bez peněz
+    { text: "Odešel {p} ___", any: ["carried", "clothes", "money"], num: "any" }, // bez klíče, bez klíčů, bez kabátu, bez peněz
     { text: "Jsem tady {p} ___", any: ["person"], num: "any" }, // bez kamaráda, bez dětí
   ],
   "prep-od": [
@@ -214,10 +224,11 @@ export const FIXED_FRAMES: Record<string, Frame[]> = {
   "prep-pro": [
     { text: "Mám dárek {p} ___", any: ["person"], num: "any" }, // pro mámu, pro děti
     { text: "Jdu {p} ___", any: ["food", "carried"] }, // pro chléb, pro klíč (сходити по щось)
+    { text: "Jdu {p} ___", any: ["carried"], num: "pl" }, // pro klíče, pro tašky (не «pro polévky»)
   ],
   "prep-s": [
     { text: "Jdu tam {p} ___", any: ["person"], num: "any" }, // s kamarádem, se ženou, s dětmi
-    { text: "Přišel {p} ___", any: ["carried"] }, // s deštníkem, s taškou
+    { text: "Přišel {p} ___", any: ["carried"], num: "any" }, // s deštníkem, s taškami
   ],
 };
 

@@ -1272,7 +1272,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
               { word: "já", wordId: "pp-ja", kind: "pronouns" },
               { text: ", " },
               { word: "ty", wordId: "pp-ty", kind: "pronouns" },
-              { text: " та se мають короткий (приклонка) і довгий твар: mě/mne, mi/mně, tě/tebe, ti/tobě, se/sebe, si/sobě. Короткий стоїть усередині речення (Vidím tě), довгий — на початку, під наголосом і завжди після прийменника (pro tebe, beze mě)." },
+              { text: " та se мають коротку (приклонка) і довгу форму: mi/mně, tě/tebe, ti/tobě, se/sebe, si/sobě. Короткий стоїть усередині речення (Vidím tě), довгий — на початку, під наголосом і завжди після прийменника (pro tebe). У «já» в родовому й знахідному форма mě годиться всюди, і після прийменника (beze mě, pro mě); mne — книжний варіант тієї самої форми." },
             ],
           },
           {

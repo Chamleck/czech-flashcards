@@ -135,11 +135,8 @@ function nounForm(noun: NounEntry, c: QuizCase, n: GrammaticalNumber): string | 
 // у фразі, що дозволяє множину, і не для незлічуваних.
 function frameTakes(f: DeclFrame, noun: NounEntry, n: GrammaticalNumber, c: QuizCase): boolean {
   if (c === "nominativ" && f.num !== "any" && (f.num ?? "sg") !== n) return false;
-  if (n === "pl" && f.plOk && (f.num ?? "sg") !== "sg" && pluralByFrame(f.plOk, noun)) return true;
-  return candidateNumbers(noun, f.num ?? "sg", () => 0).includes(n);
+  return candidateNumbers(noun, f.num ?? "sg", () => 0, f.plOk).includes(n);
 }
-const pluralByFrame = (tags: readonly string[], noun: NounEntry) =>
-  !noun.uncountable && noun.declension.nominativ.pl !== "—" && (noun.sem ?? []).some((t) => tags.includes(t));
 
 // Фраза без підмета-власника (називний — сама група і є підметом; ownerless — «Je tu hodně…»): svůj сюди не можна.
 const ownerless = (f: DeclFrame, c: QuizCase) => c === "nominativ" || !!f.ownerless;
@@ -687,8 +684,12 @@ function personalUnits(): UnitCombo[] {
       const decl: PersonalDeclension = entry.declension;
       // Одна форма на відмінок (my, vy — колонка b «—»): форма та сама з прийменником і без, тож на відмінок одне
       // питання — у фразі без прийменника, а місцевий і орудний (лише з прийменником) — у фразі з ним (o nás, s námi).
+      // Коли в цьому відмінку обидві колонки починаються ТІЄЮ САМОЮ формою (já: mě | mě / mne — нейтральне mě і з
+      // прийменником, книжне mne лише прийнятне), обидва питання лишаються (без прийменника й після нього: «Vidíš mě?»,
+      // «Mám dárek pro mě»), але без підпису регістру — «довгий» з відповіддю mě заплутав би.
       const single = entry.columns.b === "—";
       const getForm = (c: QuizCase, r: Reg) => firstForm(r === 0 || single ? decl[c].a : decl[c].b);
+      const oneForm = (c: QuizCase) => single || getForm(c, 0) === getForm(c, 1);
       for (const c of PP_QUIZ_CASES) {
         for (const r of [0, 1] as Reg[]) {
           const cf = PERSONAL_FRAMES[c]?.[r];
@@ -701,8 +702,8 @@ function personalUnits(): UnitCombo[] {
             wordId: entry.id,
             correct: form,
             forms: otherForms(getForm, c),
-            avoid: [getForm(c, 0), getForm(c, 1)],
-            taskText: ppTaskText(null, c, single ? null : r, false),
+            avoid: [...formsOf(decl[c].a), ...formsOf(decl[c].b)], // усі форми відмінка (й книжне mne) — не дистрактори
+            taskText: ppTaskText(null, c, oneForm(c) ? null : r, false),
             context: () => fillPersonal(frame, form),
             promptWord: entry.cz,
             promptUk: entry.uk,

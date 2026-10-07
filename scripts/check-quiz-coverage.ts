@@ -371,10 +371,16 @@ function checkNumerals(r: Report, gen: Gen<AnyQ & { blank?: string }>): void {
       if (qs.length === 0) gap(r, QUIZ, `${h.id} ${c} (сотні й тисячі) не питається`);
       for (const q of qs) basic(r, QUIZ, q);
     }
+  // складені: рід іменника — у кожній групі останньої цифри (dvacet jeden / jedna / jedno, dvacet dva / dvě)
+  const GENDER_LABELS = ["чол. іст.", "чол. неіст.", "жін.", "сер."];
+  const genderOf = (q: AnyQ & { blank?: string }) => (q.blank === "noun" ? GENDER_LABELS.find((l) => q.taskText.includes(`: ${l},`)) : undefined);
   for (const g of [1, 2, 3, 4, 5]) {
-    const qs = forced(gen, `compound-${g}`);
+    const qs: (AnyQ & { blank?: string })[] = [];
+    for (let i = 0; i < 400 && (i < 3 || (qs.length > 0 && new Set(qs.map(genderOf).filter(Boolean)).size < GENDER_LABELS.length)); i++) qs.push(...forced(gen, `compound-${g}`));
     if (qs.length === 0) gap(r, QUIZ, `складені на …${g} не питаються`);
     for (const q of qs) basic(r, QUIZ, q);
+    const seen = new Set(qs.map(genderOf));
+    for (const l of GENDER_LABELS) if (qs.length > 0 && !seen.has(l)) gap(r, QUIZ, `складені на …${g}: іменник роду «${l}» не питається`);
   }
   // порядкові (první … dvanáctý): таблиця прикметника, кожна клітинка (рішення Ніка 2026-10-06)
   for (const a of ADJECTIVES.filter((x) => x.category === "ordinal")) checkTableCells(r, QUIZ, { id: a.id, decl: a.declension, quiz: {} }, gen);
@@ -394,7 +400,9 @@ function checkPrepositions(r: Report, gen: Gen<AnyQ>): void {
   };
   for (const p of PREPOSITIONS) {
     if (p.type === "fixed") {
-      need(`${p.id}::fixnoun::${p.govCase}`, false);
+      const one = ONE_NUMBER_FIXED.find((x) => x.prep === p.id);
+      if (one) exclude(r, `${QUIZ}: ${one.reason}`);
+      need(`${p.id}::fixnoun::${p.govCase}`, !one);
       if (PREPOSITIONS.some((o) => o !== p && o.type === "fixed" && o.govCase === p.govCase)) need(`${p.id}::fixprep::${p.govCase}`, false);
       else exclude(r, `${QUIZ}: вибір прийменника — немає іншого з тим самим відмінком`);
     } else if (p.dual) {
@@ -403,14 +411,16 @@ function checkPrepositions(r: Report, gen: Gen<AnyQ>): void {
         if (one) exclude(r, `${QUIZ}: ${one.reason}`);
         need(`${p.id}::dual-${side}::${gc}`, !one);
       }
-      if (p.dual.exchange) need(`${p.id}::za-exchange::${p.dual.exchange.govCase}`, false);
+      if (p.dual.exchange) need(`${p.id}::za-exchange::${p.dual.exchange.govCase}`, true);
     }
   }
 }
-// Двоїсті прийменники питаються в ОБОХ числах; виняток — лише значення, де природне одне число (закритий список).
+// Форма іменника після прийменника питається в ОБОХ числах; виняток — лише значення, де природне одне число
+// (закритий список). Вибір самого прийменника (fixprep) — про прийменник, число іменника там не перевіряємо.
+// (Порожній: mimo — «mimo velká města», při — «při cestách» мають і множину.)
+const ONE_NUMBER_FIXED: { prep: string; reason: string }[] = [];
 const ONE_NUMBER_DUAL: { prep: string; side: "motion" | "location" | "both"; reason: string }[] = [
   { prep: "prep-mezi", side: "both", reason: "mezi — лише множина (між двома й більше)" },
-  { prep: "prep-po", side: "motion", reason: "po + знахідний «до межі» — лише множина (po kolena, po ramena); однина (po pás, po krk) — слів немає в словнику" },
 ];
 
 // ═════════════ «Дієслова» ═════════════
@@ -785,6 +795,10 @@ function selfTest(): boolean {
     { name: "хибна вокалізація (ve → v)", only: ["decl"], focus: ["velky::", "vysoky::", "vsechen"], gens: { decl: mutate(REAL.decl, (q) => (q.contextPhrase && / ve ___/.test(q.contextPhrase) ? { ...q, contextPhrase: q.contextPhrase.replace(" ve ___", " v ___") } : q)) } },
     { name: "хибна правильна відповідь в іменника", only: ["nouns"], focus: ["stul::"], gens: { nouns: mutate(REAL.nouns, (q) => (q.comboId.startsWith("stul::") ? swap(q) : q)) } },
     { name: "прийменник: зникла множина (v + місцевий)", only: ["preps"], focus: ["prep-v::"], gens: { preps: mutate(REAL.preps, (q) => (q.comboId === "prep-v::dual-location::lokal" && /множина/.test(q.taskText) ? null : q)) } },
+    { name: "прийменник: зникла однина (po + знахідний, až po krk)", only: ["preps"], focus: ["prep-po::"], gens: { preps: mutate(REAL.preps, (q) => (q.comboId === "prep-po::dual-motion::akuzativ" && /однина/.test(q.taskText) ? null : q)) } },
+    { name: "особовий já: книжне mne як правильна", only: ["decl"], focus: ["pp-ja::"], gens: { decl: mutate(REAL.decl, (q) => (q.comboId === "pp-ja::x_akuzativ::0" ? { ...q, correct: "mne", options: ["mne", distractorOf(q) ?? "mi"] } : q)) } },
+    { name: "прийменник: зникла множина (při)", only: ["preps"], focus: ["prep-pri::"], gens: { preps: mutate(REAL.preps, (q) => (q.comboId === "prep-pri::fixnoun::lokal" && /множина/.test(q.taskText) ? null : q)) } },
+    { name: "прийменник: зникла множина (mimo)", only: ["preps"], focus: ["prep-mimo::"], gens: { preps: mutate(REAL.preps, (q) => (q.comboId === "prep-mimo::fixnoun::akuzativ" && /множина/.test(q.taskText) ? null : q)) } },
     { name: "зникло комбо прийменника (bez)", only: ["preps"], focus: ["prep-bez::"], gens: { preps: mutate(REAL.preps, (q) => (q.comboId.startsWith("prep-bez::") ? null : q)) } },
     { name: "числівник: зникла форма «pěti»", only: ["numerals"], focus: ["card-pet"], gens: { numerals: mutate(REAL.numerals, (q) => (q.correct === "pěti" ? null : q)) } },
     { name: "числівник: зник рід іменника (dva + чол. істот. в орудному)", only: ["numerals"], focus: ["card-dva"], gens: { numerals: mutate(REAL.numerals, (q) => (q.comboId === "card-dva::instrumental::x" && q.taskText.includes("чол. іст.") ? null : q)) } },

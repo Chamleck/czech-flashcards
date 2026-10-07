@@ -144,7 +144,7 @@ function pickPartner<T>(
 ): PartnerPick<T> | null {
   for (const noun of partnerOrder(unionPool(prepId, kind, frames), used)) {
     for (const frame of shuffle(frames.filter((f) => matchesNeeds(noun, f)))) {
-      for (const num of candidateNumbers(noun, frame.num ?? "sg")) {
+      for (const num of candidateNumbers(noun, frame.num ?? "sg", Math.random, frame.plOk)) {
         const data = tryForm(noun, num);
         if (data) return { noun, frame, num, data };
       }

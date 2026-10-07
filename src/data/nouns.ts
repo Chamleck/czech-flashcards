@@ -23,7 +23,7 @@ import { NounEntry } from "../types";
 //       • місце ЗАВЖДИ має рівно один із placeV (в школі) чи placeNa (на пошті) — це лексична властивість
 //         слова; перевір за словником, а не за відчуттям;
 //       • особа, тварина, їжа, час, погода, гроші, документ, тіло, повітря — «самотні» теги (без інших; винятки:
-//         тіло + bodyLevel, час + timeUnit / dayPart, їжа + served / homemade, документ + carried — pas, doklad);
+//         тіло + bodyLevel / singleLevel, час + timeUnit / dayPart, їжа + served / homemade, документ + carried — pas, doklad);
 //       • їжа: served — страва чи напій, який подають теплим або холодним (káva, polévka, maso: «teplá polévka»);
 //         homemade — буває домашнім (chléb, pivo, ovoce: «domácí chléb»); жодного — як cukr. Без них teplý / studený /
 //         domácí з цим словом не з'являться (і «studený cukr» теж) — це безпечно; зайвий тег дасть безглузду пару;
@@ -1578,7 +1578,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "transport",
-    sem: ["placeNa", "path", "activity"],
+    sem: ["placeNa", "path", "activity", "recurring"],
     declension: {
       nominativ: { sg: "cesta", pl: "cesty" },
       genitiv: { sg: "cesty", pl: "cest" },
@@ -3102,7 +3102,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "food",
-    sem: ["meal"],
+    sem: ["meal", "recurring"],
     declension: {
       nominativ: { sg: "snídaně", pl: "snídaně" },
       genitiv: { sg: "snídaně", pl: "snídaní" },
@@ -3123,7 +3123,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "food",
-    sem: ["meal"],
+    sem: ["meal", "recurring"],
     declension: {
       nominativ: { sg: "oběd", pl: "obědy" },
       genitiv: { sg: "oběda", pl: "obědů" },
@@ -3145,7 +3145,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "food",
-    sem: ["meal"],
+    sem: ["meal", "recurring"],
     declension: {
       nominativ: { sg: "večeře", pl: "večeře" },
       genitiv: { sg: "večeře", pl: "večeří" },
@@ -3277,7 +3277,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "nature",
-    sem: ["weather"],
+    sem: ["weather", "recurring"],
     declension: {
       // Довге é лише в nom./akuz., усі непрямі відмінки — коротке e (deště, dešti).
       // Звірено Naše řeč (журнал ÚJČ): "ve všech nepřímých pádech základovou
@@ -4555,4 +4555,209 @@ export const NOUNS: NounEntry[] = [
     exampleSentenceUk: "Наступного місяця я їду додому.",
   },
 
+  // ─────────────── krk (партія «порядок», 2026-10-07; форми: IJP + MorfFlex) ───────────────
+  {
+    id: "krk",
+    uncountable: false,
+    uk: "шия, горло",
+    cz: "krk",
+    gender: "masc_inan",
+    pattern: "hrad",
+    category: "body",
+    sem: ["body", "bodyLevel", "singleLevel"],
+    declension: {
+      // 6. мн. «krcích» (k → c); кличний «krku» (IJP)
+      nominativ: { sg: "krk", pl: "krky" },
+      genitiv: { sg: "krku", pl: "krků" },
+      dativ: { sg: "krku", pl: "krkům" },
+      akuzativ: { sg: "krk", pl: "krky" },
+      vokativ: { sg: "krku", pl: "krky" },
+      lokal: { sg: "krku", pl: "krcích" },
+      instrumental: { sg: "krkem", pl: "krky" },
+    },
+    exampleSentenceCz: "Bolí mě v krku.",
+    exampleSentenceUk: "У мене болить горло.",
+  },
+  // ─────────────── místo (партія «порядок», 2026-10-07; форми: IJP + MorfFlex) ───────────────
+  {
+    id: "misto",
+    uncountable: false,
+    uk: "місце",
+    cz: "místo",
+    gender: "neut",
+    pattern: "mesto",
+    category: "city",
+    sem: ["placeNa", "seat", "ordered"],
+    declension: {
+      // «na místě» (IJP), 2. мн. «míst»
+      nominativ: { sg: "místo", pl: "místa" },
+      genitiv: { sg: "místa", pl: "míst" },
+      dativ: { sg: "místu", pl: "místům" },
+      akuzativ: { sg: "místo", pl: "místa" },
+      vokativ: { sg: "místo", pl: "místa" },
+      lokal: { sg: "místě", pl: "místech" },
+      instrumental: { sg: "místem", pl: "místy" },
+    },
+    exampleSentenceCz: "Je tu ještě volné místo?",
+    exampleSentenceUk: "Тут ще є вільне місце?",
+  },
+  // ─────────────── řada (партія «порядок», 2026-10-07; форми: IJP + MorfFlex) ───────────────
+  {
+    id: "rada",
+    uncountable: false,
+    uk: "ряд",
+    cz: "řada",
+    gender: "fem",
+    pattern: "zena",
+    category: "city",
+    sem: ["sequencePart", "line", "ordered"],
+    declension: {
+      nominativ: { sg: "řada", pl: "řady" },
+      genitiv: { sg: "řady", pl: "řad" },
+      dativ: { sg: "řadě", pl: "řadám" },
+      akuzativ: { sg: "řadu", pl: "řady" },
+      vokativ: { sg: "řado", pl: "řady" },
+      lokal: { sg: "řadě", pl: "řadách" },
+      instrumental: { sg: "řadou", pl: "řadami" },
+    },
+    exampleSentenceCz: "Sedíme v první řadě.",
+    exampleSentenceUk: "Ми сидимо в першому ряду.",
+  },
+  // ─────────────── třída (партія «порядок», 2026-10-07; форми: IJP + MorfFlex) ───────────────
+  {
+    id: "trida",
+    uncountable: false,
+    uk: "клас",
+    cz: "třída",
+    gender: "fem",
+    pattern: "zena",
+    category: "education",
+    sem: ["placeV", "grade", "ordered"],
+    declension: {
+      // і клас-кімната: «ve třídě», і рівень навчання: «do třetí třídy»
+      nominativ: { sg: "třída", pl: "třídy" },
+      genitiv: { sg: "třídy", pl: "tříd" },
+      dativ: { sg: "třídě", pl: "třídám" },
+      akuzativ: { sg: "třídu", pl: "třídy" },
+      vokativ: { sg: "třído", pl: "třídy" },
+      lokal: { sg: "třídě", pl: "třídách" },
+      instrumental: { sg: "třídou", pl: "třídami" },
+    },
+    exampleSentenceCz: "Dcera chodí do třetí třídy.",
+    exampleSentenceUk: "Донька ходить у третій клас.",
+  },
+  // ─────────────── stránka (партія «порядок», 2026-10-07; форми: IJP + MorfFlex) ───────────────
+  {
+    id: "stranka",
+    uncountable: false,
+    uk: "сторінка",
+    cz: "stránka",
+    gender: "fem",
+    pattern: "zena",
+    category: "education",
+    sem: ["sequencePart", "ordered"],
+    declension: {
+      // 2. мн. «stránek» (вставне -e-), 3. і 6. одн. «stránce» (k → c)
+      nominativ: { sg: "stránka", pl: "stránky" },
+      genitiv: { sg: "stránky", pl: "stránek" },
+      dativ: { sg: "stránce", pl: "stránkám" },
+      akuzativ: { sg: "stránku", pl: "stránky" },
+      vokativ: { sg: "stránko", pl: "stránky" },
+      lokal: { sg: "stránce", pl: "stránkách" },
+      instrumental: { sg: "stránkou", pl: "stránkami" },
+    },
+    exampleSentenceCz: "Na první stránce je obrázek.",
+    exampleSentenceUk: "На першій сторінці є малюнок.",
+  },
+  // ─────────────── lekce (партія «порядок», 2026-10-07; форми: IJP + MorfFlex) ───────────────
+  {
+    id: "lekce",
+    uncountable: false,
+    uk: "урок (заняття)",
+    cz: "lekce",
+    gender: "fem",
+    pattern: "ruze",
+    category: "education",
+    sem: ["activity", "ordered", "recurring"],
+    declension: {
+      nominativ: { sg: "lekce", pl: "lekce" },
+      genitiv: { sg: "lekce", pl: "lekcí" },
+      dativ: { sg: "lekci", pl: "lekcím" },
+      akuzativ: { sg: "lekci", pl: "lekce" },
+      vokativ: { sg: "lekce", pl: "lekce" },
+      lokal: { sg: "lekci", pl: "lekcích" },
+      instrumental: { sg: "lekcí", pl: "lekcemi" },
+    },
+    exampleSentenceCz: "Lekce začíná v devět.",
+    exampleSentenceUk: "Урок починається о дев'ятій.",
+  },
+  // ─────────────── kapitola (партія «порядок», 2026-10-07; форми: IJP + MorfFlex) ───────────────
+  {
+    id: "kapitola",
+    uncountable: false,
+    uk: "розділ",
+    cz: "kapitola",
+    gender: "fem",
+    pattern: "zena",
+    category: "education",
+    sem: ["sequencePart", "ordered", "nonVisual"],
+    declension: {
+      nominativ: { sg: "kapitola", pl: "kapitoly" },
+      genitiv: { sg: "kapitoly", pl: "kapitol" },
+      dativ: { sg: "kapitole", pl: "kapitolám" },
+      akuzativ: { sg: "kapitolu", pl: "kapitoly" },
+      vokativ: { sg: "kapitolo", pl: "kapitoly" },
+      lokal: { sg: "kapitole", pl: "kapitolách" },
+      instrumental: { sg: "kapitolou", pl: "kapitolami" },
+    },
+    exampleSentenceCz: "Přečetl jsem první kapitolu.",
+    exampleSentenceUk: "Я прочитав перший розділ.",
+  },
+  // ─────────────── ročník (партія «порядок», 2026-10-07; форми: IJP + MorfFlex) ───────────────
+  {
+    id: "rocnik",
+    uncountable: false,
+    uk: "курс (рік навчання)",
+    cz: "ročník",
+    gender: "masc_inan",
+    pattern: "hrad",
+    category: "education",
+    sem: ["grade", "ordered", "nonVisual"],
+    declension: {
+      // 6. мн. «ročnících» (k → c)
+      nominativ: { sg: "ročník", pl: "ročníky" },
+      genitiv: { sg: "ročníku", pl: "ročníků" },
+      dativ: { sg: "ročníku", pl: "ročníkům" },
+      akuzativ: { sg: "ročník", pl: "ročníky" },
+      vokativ: { sg: "ročníku", pl: "ročníky" },
+      lokal: { sg: "ročníku", pl: "ročnících" },
+      instrumental: { sg: "ročníkem", pl: "ročníky" },
+    },
+    exampleSentenceCz: "Syn je v druhém ročníku.",
+    exampleSentenceUk: "Син на другому курсі.",
+  },
+  // ─────────────── sedadlo (партія «порядок», 2026-10-07; форми: IJP + MorfFlex) ───────────────
+  {
+    id: "sedadlo",
+    uncountable: false,
+    uk: "сидіння",
+    cz: "sedadlo",
+    gender: "neut",
+    pattern: "mesto",
+    category: "transport",
+    sem: ["seat", "ordered"],
+    declension: {
+      // 2. мн. «sedadel»; 6. одн. «sedadle», прийнятне й «sedadlu» (IJP) — у variants
+      nominativ: { sg: "sedadlo", pl: "sedadla" },
+      genitiv: { sg: "sedadla", pl: "sedadel" },
+      dativ: { sg: "sedadlu", pl: "sedadlům" },
+      akuzativ: { sg: "sedadlo", pl: "sedadla" },
+      vokativ: { sg: "sedadlo", pl: "sedadla" },
+      lokal: { sg: "sedadle", pl: "sedadlech" },
+      instrumental: { sg: "sedadlem", pl: "sedadly" },
+    },
+    variants: { lokal: { sg: ["sedadlu"] } },
+    exampleSentenceCz: "Sedím na zadním sedadle.",
+    exampleSentenceUk: "Я сиджу на задньому сидінні.",
+  },
 ];

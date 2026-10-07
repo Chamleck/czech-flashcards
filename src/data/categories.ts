@@ -31,6 +31,7 @@ export const CATEGORIES: CategoryMeta[] = [
   { key: "time", icon: "hourglassNotDone", title: "Час" },
   { key: "body", icon: "flexedBiceps", title: "Тіло" },
   { key: "work", icon: "briefcase", title: "Робота" },
+  { key: "education", icon: "books", title: "Навчання" },
 ];
 
 export const CATEGORY_BY_KEY: Record<WordCategory, CategoryMeta> = CATEGORIES.reduce(

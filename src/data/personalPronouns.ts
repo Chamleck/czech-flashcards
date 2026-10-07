@@ -46,11 +46,14 @@ export const PERSONAL_QUIZ_FORMS: {
 const d = (a: string, b: string) => ({ a, b });
 
 // ── 1-ша особа однини ──
+// Родовий і знахідний: нейтральне mě правильне в будь-якій позиції (і після прийменника: pro mě, ode mě), книжне
+// mne — стилістичний варіант (Naše řeč 44, 1961, «K tvarům mně, mě — mi, mne» і стан. редакції: «tvar mne jako knižní»).
+// Тому в довгій колонці спершу mě: квіз питає mě, mne лише приймає (ніколи не дистрактор).
 const JA: PersonalDeclension = {
   nominativ: d("já", "—"),
-  genitiv: d("mě", "mne"),
+  genitiv: d("mě", "mě / mne"),
   dativ: d("mi", "mně"),
-  akuzativ: d("mě", "mne"),
+  akuzativ: d("mě", "mě / mne"),
   vokativ: d("—", "—"),
   lokal: d("—", "mně"),
   instrumental: d("—", "mnou"),

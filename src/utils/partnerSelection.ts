@@ -41,7 +41,9 @@ export function freshWeightedOrder<T>(items: T[], isUsed: (t: T) => boolean, fit
     .map((x) => x.t);
 }
 
-// Множина природна не завжди: «po obědech», «při deštích», «do týdnů», «od rodin» звучать дивно.
+// Множина природна не завжди: «po obědech», «do týdnů», «od rodin» звучать дивно — тому теги часу, погоди, їжі-події,
+// занять і збірних за замовчуванням лише в однині. Фраза, де множина таких слів природна («při cestách», «Zaplatil jsem
+// za obědy»), відкриває її сама полем plOk (теги, напр. recurring / timeUnit) — див. candidateNumbers.
 const SINGULAR_ONLY: NounTag[] = ["meal", "weather", "activity", "time", "collective"];
 export function pluralNatural(n: NounEntry): boolean {
   return !n.uncountable && !(n.sem ?? []).some((t) => SINGULAR_ONLY.includes(t));
@@ -54,13 +56,16 @@ export const pluralOnly = (n: NounEntry) => !hasNumber(n, "sg") && hasNumber(n, 
 // Які числа можна взяти для слова за політикою фрейму, у ВИПАДКОВОМУ порядку (перебирає той, хто викликає:
 // якщо перше число не дає контрасту форм, пробуємо друге — слово не карається за невдалий жереб).
 // Слово лише з множиною (peníze, brýle) і парна річ (boty, ponožky — тег paired) беруть множину навіть у «sg»-фреймі;
-// у «pl»-фреймі непридатне слово без множини або з неприродною множиною (pluralNatural).
-export function candidateNumbers(n: NounEntry, policy: NumberPolicy, rnd: () => number = Math.random): GrammaticalNumber[] {
+// у «pl»-фреймі непридатне слово без множини або з неприродною множиною (pluralNatural). plOk фрейму — теги, для яких
+// У ЦІЙ фразі множина природна, хоча загальне правило її не дає («při cestách» — recurring, «celé dny» — timeUnit);
+// незлічуваних не стосується.
+export function candidateNumbers(n: NounEntry, policy: NumberPolicy, rnd: () => number = Math.random, plOk?: readonly NounTag[]): GrammaticalNumber[] {
   const sg = hasNumber(n, "sg");
   const pl = hasNumber(n, "pl");
-  if (policy === "pl") return pl && (pluralNatural(n) || !sg) ? ["pl"] : []; // не «mezi rodinami», не «mezi oblečeními»
+  const natural = pluralNatural(n) || (!n.uncountable && !!plOk && (n.sem ?? []).some((t) => plOk.includes(t)));
+  if (policy === "pl") return pl && (natural || !sg) ? ["pl"] : []; // не «mezi rodinami», не «mezi oblečeními»
   if (!sg || (pl && (n.sem ?? []).includes("paired"))) return pl ? ["pl"] : [];
-  if (policy === "sg" || !pl || !pluralNatural(n)) return ["sg"];
+  if (policy === "sg" || !pl || !natural) return ["sg"];
   return rnd() < 0.5 ? ["sg", "pl"] : ["pl", "sg"];
 }
 

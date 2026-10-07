@@ -36,7 +36,7 @@ export const FLASHCARD_CATEGORIES: FlashcardCategory[] = [
     id: "numerals",
     icon: "numbers",
     title: "Числівники",
-    subtitle: "Узгодження з іменником (1, 2-4, 5+)",
+    subtitle: "Узгодження з іменником, порядкові",
     ready: true,
   },
   {

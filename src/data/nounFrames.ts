@@ -39,7 +39,7 @@ export interface NounFrame extends Needs {
 // Предмети й речі, які можна шукати чи взяти.
 const THINGS: NounTag[] = ["item", "carried", "clothes", "document", "money"];
 // Те, що не намалюєш і не сфотографуєш як річ.
-const NOT_PICTURED: NounTag[] = ["time", "weather", "air", "abstract", "activity"];
+const NOT_PICTURED: NounTag[] = ["time", "weather", "air", "abstract", "activity", "nonVisual"]; // не «Nakresli ročník / kapitolu»
 
 export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
   // Називний однини — словникова форма (заголовок картки), квіз його не питає; тут лише множина.
@@ -62,7 +62,7 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Nemám dost ___.", num: "pl", any: ["money"] },
     { text: "Během ___ se to změnilo.", num: "any", any: ["timeUnit"] }, // během týdne / během let
     { text: "Do ___ to bude hotové.", any: ["time", "meal"], none: ["timeUnit"] }, // do pondělí, do léta, do půlnoci, do oběda
-    { text: "Během ___ jsme mluvili.", any: ["meal"] }, // během oběda
+    { text: "Během ___ jsme mluvili.", num: "any", any: ["meal"] }, // během oběda, během obědů (множина — у recurring)
   ],
   dativ: [
     { text: "Telefonuju ___.", num: "any", any: ["person"] },
@@ -72,11 +72,12 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Díky ___ jsem to zvládl.", any: ["vehicle"] }, // díky autu; «díky metrům» — ні
     { text: "Přišel jsem pozdě kvůli ___.", num: "any", any: ["person", "animal", "document", "carried"] },
     { text: "Přišel jsem pozdě kvůli ___.", any: ["vehicle", "activity", "weather"] }, // kvůli autobusu, práci, dešti
+    { text: "Přišel jsem pozdě kvůli ___.", num: "pl", any: ["vehicle"], none: ["placeV"] }, // kvůli autobusům, vlakům
     { text: "Jdu {k} ___.", num: "any", any: ["person"] },
     { text: "Jdu {k} ___.", any: ["building", "furniture", "outdoor", "path", "support"] },
     { text: "Polož to {k} ___.", num: "any", any: ["item", "carried", "clothes", "furniture", "opening"] }, // k oknu, ke knihám
     { text: "Přilož si led {k} ___.", any: ["body"] },
-    { text: "Přilož si led {k} ___.", num: "pl", any: ["bodyLevel"] }, // k očím, ke kolenům
+    { text: "Přilož si led {k} ___.", num: "pl", any: ["bodyLevel"], none: ["singleLevel"] }, // k očím, ke kolenům
     { text: "Nemám nic proti ___.", num: "any", any: ["person", "animal"] },
     { text: "Nemám nic proti ___.", any: ["food", "meal", "weather", "vehicle", "activity", "abstract", "outdoor", "building", "time"], none: ["timeUnit"] }, // proti pivu, proti zimě
     { text: "Co si dáš {k} ___?", any: ["food", "meal"] },
@@ -112,6 +113,7 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Čtu o ___.", num: "any", none: ["time", "weather"] },
     { text: "Jsem {v} ___.", any: ["placeV"] },
     { text: "Jsem na ___.", any: ["placeNa"] },
+    { text: "Stojím {v} ___.", any: ["line"] }, // v řadě (у черзі)
     { text: "Po ___ se vrátím.", any: ["meal", "time"], none: ["dayPart"] }, // po obědě, po roce, po pondělí, po létě
     { text: "V posledních ___ se to změnilo.", num: "pl", any: ["timeUnit"] }, // v posledních týdnech
     { text: "Sedím na ___.", any: ["seat"] },
@@ -120,14 +122,15 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
   instrumental: [
     { text: "Mluvím {s} ___.", num: "any", any: ["person"] },
     { text: "Jsem rád mezi ___.", num: "pl", any: ["person"] },
-    { text: "Stojím před ___.", num: "any", any: ["person"] },
+    { text: "Stojím před ___.", num: "any", any: ["person", "animal"] }, // před učiteli, před ptáky
     { text: "Stojím před ___.", any: ["building", "vehicle", "furniture", "opening", "outdoor", "support"], none: ["activity"] }, // не «před přízemím»
-    { text: "Je to mezi ___.", num: "pl", any: ["building", "outdoor", "furniture", "nature"], none: ["weather"] }, // mezi domy, mezi stromy
+    { text: "Je to mezi ___.", num: "pl", any: ["building", "outdoor", "furniture", "nature", "opening"], none: ["weather"] }, // mezi domy, mezi stromy, mezi okny
     { text: "Je to mezi ___.", num: "pl", any: ["vehicle"], none: ["placeV"] }, // mezi auty
     { text: "Leží to pod ___.", any: ["space"] }, // pod stolem, pod stromem
     { text: "Mám problém {s} ___.", any: ["body", "item", "vehicle", "money", "activity", "person"] }, // s autem, s prací
-    { text: "Mám problém {s} ___.", num: "pl", any: ["bodyLevel", "item", "person", "vehicle"], none: ["placeV"] }, // s očima, s klíči, s auty
+    { text: "Mám problém {s} ___.", num: "pl", any: ["bodyLevel", "item", "person", "vehicle"], none: ["placeV", "singleLevel"] }, // s očima, s klíči, s auty
     { text: "Jsem spokojený {s} ___.", any: ["abstract", "activity", "meal"] }, // s cenou, s prací
+    { text: "Jsem spokojený {s} ___.", num: "pl", any: ["recurring"], none: ["weather"] }, // s lekcemi, s obědy, s cestami
     { text: "Cestuju ___.", all: ["vehicle", "container"] }, // vlakem, autem (не «kolem» — читається як «навколо»)
     { text: "Co budeš dělat {s} ___?", num: "any", any: ["animal", "furniture", ...THINGS, "food"] },
     { text: "Byl jsem tam před ___.", num: "any", any: ["timeUnit"], none: ["dayPart"] }, // před hodinou, před lety

@@ -109,43 +109,58 @@ export const NUMERAL_FRAMES: Record<QuizCase, NumeralFrame[]> = {
 //     první … dvanáctý.
 //  2. max — найбільше value порядкового, з яким фраза ще природна. Множина порядкових природна майже лише з první
 //     («V prvních dnech to bylo těžké», «první hosté»), тож множинні фрази мають max: 1; інші порядкові в множині
-//     питаються без речення. Транспорт — max: 3 (první / druhý / třetí vlak дня; «jedenáctým autobusem» — ні:
+//     питаються без речення, крім шкільних рівнів (grade: «deváté ročníky», «v devátých třídách» — множина природна з
+//     будь-яким порядковим до 9; max: 9 — у школі 9 класів). Транспорт — max: 3 (první / druhý / třetí vlak дня; «jedenáctým autobusem» — ні:
 //     номер лінії кажуть інакше, «autobusem číslo jedenáct»).
 //  3. Множина одиниць часу — через plOk: ["timeUnit"] (загальне правило pluralNatural її не дає).
 //  4. Клітинка без жодної фрази питається без речення (повне покриття), тож фраза потрібна не для покриття, а для
 //     природного контексту. Після додавання прочитай усі пари «фраза × іменник × порядковий» і запусти оракул
 //     scripts/check-quiz-coverage.ts --only=numerals: «Помилок: 0».
+//  5. Шкільний рівень (grade) — лише у фразах з max: 9 (у школі 9 класів): загальні фрази мають none: ["grade"].
 export const ORDINAL_FRAMES: Record<QuizCase, DeclFrame[]> = {
   nominativ: [
     // без «už»: «To je už první den» суперечить собі
-    { text: "Tohle je ___.", num: "sg", all: ["ordered"], none: ["vehicle"] }, // tohle je třetí den / páté patro
+    { text: "Tohle je ___.", num: "sg", all: ["ordered"], none: ["vehicle", "grade"] }, // tohle je třetí den / páté patro
     { text: "Tohle je ___.", num: "sg", max: 3, all: ["ordered", "vehicle"] }, // tohle je druhý vlak
-    { text: "Kde je ___?", num: "sg", all: ["ordered"], none: ["time", "vehicle"] }, // kde je třetí patro / druhý host
-    { text: "Tohle jsou ___.", num: "pl", max: 1, all: ["ordered"], none: ["residence", "building", "path"], plOk: ["timeUnit"] }, // první hosté, první dny
+    { text: "Kde je ___?", num: "sg", all: ["ordered"], none: ["time", "vehicle", "grade"] }, // kde je třetí patro / druhý host
+    { text: "Na zájezd jede ___.", num: "sg", max: 9, all: ["ordered", "grade"] }, // třetí třída, devátý ročník
+    { text: "Tohle jsou ___.", num: "pl", max: 1, all: ["ordered"], none: ["residence", "building", "path", "grade"], plOk: ["timeUnit"] }, // první hosté, první dny
+    { text: "Na zájezd jedou ___.", num: "pl", max: 9, all: ["ordered", "grade"] }, // deváté ročníky (SSČ: «deváté ročníky jely na zájezd»), třetí třídy
   ],
   genitiv: [
-    { text: "Od ___ tu pracuji.", all: ["ordered", "timeUnit"] }, // od prvního dne, od druhého týdne
-    { text: "Šel jsem do ___.", all: ["ordered", "placeV"] }, // do třetího patra, do druhého obchodu
+    { text: "Od ___ se to zlepšilo.", all: ["ordered", "timeUnit"] }, // od prvního dne, od šesté noci, od třetí minuty
+    { text: "Šel jsem do ___.", all: ["ordered", "placeV"], none: ["grade"] }, // do třetího patra, do druhého obchodu
     { text: "Vystoupil jsem {z} ___.", max: 3, all: ["ordered", "vehicle"] }, // z prvního vlaku, ze třetího autobusu
     { text: "Zahnul jsem do ___.", all: ["ordered", "path"] }, // do druhé ulice
     { text: "Mám dárek od ___.", all: ["ordered", "person"] }, // od prvního hosta
+    { text: "Syn chodí do ___.", max: 9, all: ["ordered", "grade"] }, // do třetí třídy, do druhého ročníku
+    { text: "Žáci ___ psali test.", num: "any", max: 9, all: ["ordered", "grade"] }, // žáci třetí třídy, devátých ročníků
     { text: "Během ___ se toho hodně stalo.", num: "pl", max: 1, all: ["ordered", "timeUnit"], plOk: ["timeUnit"] }, // během prvních dnů
   ],
   dativ: [
     { text: "Dal jsem klíč ___.", all: ["ordered", "person"] }, // prvnímu hostovi
     { text: "Došel jsem {k} ___.", all: ["ordered"], any: ["building", "path"] }, // k druhému domu, ke třetí ulici
     { text: "Díky ___ jsem to stihl.", max: 3, all: ["ordered", "vehicle"] }, // díky prvnímu vlaku
+    { text: "Učitelka dala úkol ___.", num: "any", max: 9, all: ["ordered", "grade"] }, // třetí třídě, devátým ročníkům
   ],
   akuzativ: [
     { text: "Jsem tu teprve ___.", all: ["ordered", "timeUnit"] }, // teprve první den, teprve druhou hodinu
     { text: "Čekám na ___.", all: ["ordered", "person"] }, // na prvního hosta, na pátého žáka
     { text: "Čekám na ___.", max: 3, all: ["ordered", "vehicle"] }, // na druhý vlak
+    { text: "Učím ___.", num: "any", max: 9, all: ["ordered", "grade"] }, // třetí třídu, deváté ročníky
+    { text: "Obsadil ___.", all: ["ordered", "placeNa"] }, // třetí místo
     { text: "Pamatuju si ___.", num: "pl", max: 1, all: ["ordered"], any: ["timeUnit", "person"], plOk: ["timeUnit"] }, // první dny, první hosty
   ],
   lokal: [
     { text: "Bydlím {v} ___.", all: ["ordered", "residence"] }, // ve třetím patře, v druhém domě
     { text: "{v} ___ se toho hodně stalo.", all: ["ordered", "timeUnit"], none: ["dayPart"] }, // v prvním týdnu, v druhém roce
     { text: "Mluvili jsme o ___.", all: ["ordered", "person"] }, // o prvním hostovi
+    { text: "Syn je {v} ___.", max: 9, all: ["ordered", "grade"] }, // ve třetí třídě, v druhém ročníku
+    { text: "{v} ___ se učí angličtina.", num: "any", max: 9, all: ["ordered", "grade"] }, // v devátých třídách
+    { text: "Sedím na ___.", all: ["ordered", "seat"] }, // na druhém místě, na třetím sedadle
+    { text: "Sedíme {v} ___.", all: ["ordered", "line"] }, // v první řadě, ve třetí řadě
+    { text: "Skončil na ___.", all: ["ordered", "placeNa"] }, // na třetím místě
+    { text: "Po ___ jsem šel domů.", all: ["ordered", "activity"] }, // po první lekci
     { text: "{v} ___ to bylo těžké.", num: "pl", max: 1, all: ["ordered", "timeUnit"], plOk: ["timeUnit"] }, // v prvních dnech
   ],
   instrumental: [
@@ -153,5 +168,6 @@ export const ORDINAL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { text: "Za ___ je park.", all: ["ordered"], any: ["building", "path"] }, // za třetím domem, za druhou ulicí
     { text: "Mluvil jsem {s} ___.", all: ["ordered", "person"] }, // s prvním hostem, se třetím studentem
     { text: "Mluvil jsem {s} ___.", num: "pl", max: 1, all: ["ordered", "person"] }, // s prvními hosty
+    { text: "Jeli jsme na zájezd {s} ___.", num: "any", max: 9, all: ["ordered", "grade"] }, // se třetí třídou, s devátými ročníky
   ],
 };

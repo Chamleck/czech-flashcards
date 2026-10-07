@@ -61,7 +61,8 @@ export type WordCategory =
   | "numbers"
   | "time"
   | "body"
-  | "work";
+  | "work"
+  | "education";
 
 // Повна парадигма відмінювання: 7 відмінків x 2 числа
 export type DeclensionTable = Record<CzechCase, { sg: string; pl: string }>;
@@ -258,7 +259,7 @@ export type PronounEntry = DeclinablePronoun | IndeclinablePronoun;
 // пари «однина/множина» кожна клітинка несе пару ВАРІАНТНИХ форм. Зміст пари
 // залежить від слова, тому колонки підписуються індивідуально (columns):
 //   • já / ty / se — «короткий» (приклонка: mě, mi, tě, se…) vs
-//     «довгий / після прийменника» (наголошений: mne, mně, tebe, sebe…);
+//     «довгий / після прийменника» (наголошений: mně, tebe, sebe…; у já в 2. і 4. відмінку — mě / mne, mne книжне);
 //   • on / ona / oni — «без прийменника» (j-форма: jeho, jemu, jí…) vs
 //     «після прийменника» (n-форма: něho, němu, ní…).
 // Клітинка, де відповідної форми немає, позначається "—".
