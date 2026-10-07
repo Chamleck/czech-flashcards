@@ -15,7 +15,7 @@ import { nounUsableAsPartner } from "../data/categories";
 import { NUMERAL_FRAMES, NumeralFrame, ORDINAL_FRAMES } from "../data/numeralFrames";
 import type { QuizCase } from "../data/declensionFrames";
 import type { VocalPrep } from "../data/prepositionPartners";
-import { matchesNeeds, freshWeightedOrder, acceptedForms, formOf, fitCounts, hasNumber, pluralOnly, sharedVocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
+import { matchesNeeds, freshWeightedOrder, acceptedForms, formOf, fitCounts, hasNumber, onlyOne, pluralOnly, sharedVocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
 import { firstForm, isUsableDistractor, once, shuffle, splitForms, topUpRound } from "./quizCommon";
 import { cardinalForms, isDirect } from "./numeralForms";
@@ -96,7 +96,7 @@ function cardinalNounDistractors(card: CardinalEntry, c: CzechCase): Cell[] {
   return [{ c, n: "sg" }, ...otherCases(c).map((x) => ({ c: x, n: "pl" as const }))];
 }
 
-const countable = (n: NounEntry) => !n.uncountable;
+const countable = (n: NounEntry) => !n.uncountable && !onlyOne(n); // не voda, не metro
 const bothNumbers = (n: NounEntry) => hasNumber(n, "sg") && hasNumber(n, "pl");
 
 function simpleCounter(card: CardinalEntry): Counter {

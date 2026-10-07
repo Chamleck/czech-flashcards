@@ -46,7 +46,8 @@ import type { SkipRule } from "../utils/quizCommon";
 //     її не дає: одиниці часу («Strávil jsem tam celé dny», «Během posledních týdnů…»). Фраза мусить дозволяти
 //     множину (num "any" чи "pl"). Тег із plOk — явне рішення про це слово, тож він відкриває множину й незлічуваному
 //     (так само в усіх квізах, utils/partnerSelection.ts candidateNumbers). Погоду сюди не ставимо:
-//     природну множину має лише déšť, а «teplá slunce» — ні.
+//     природну множину має лише déšť, а «teplá slunce» — ні. Слова з тегами NO_PLURAL (utils/partnerSelection.ts:
+//     збірні — rodina, система, одна в місті, — metro) у множину не стають без plOk із їхнім тегом.
 //  9. Фрази з role "every" для їжі — лише в однині: všechen з незлічуваним («Zbavil jsem se vší kávy»); «po všech
 //     chlebech» неприродне. Перед všechen у фразі не став {v}/{k}/{s}/{z}: група vš- коливається (CLUSTER_RULES),
 //     слово в таку фразу не потрапить.

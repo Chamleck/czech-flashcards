@@ -42,9 +42,14 @@ export function freshWeightedOrder<T>(items: T[], isUsed: (t: T) => boolean, fit
 }
 
 // Множина природна не завжди: «po obědech», «do týdnů», «od rodin» звучать дивно — тому теги часу, погоди, їжі-події,
-// занять і збірних за замовчуванням лише в однині. Фраза, де множина таких слів природна («při cestách», «Zaplatil jsem
+// занять і збірних за замовчуванням лише в однині. NO_PLURAL — слова, множина яких неприродна в УСІХ квізах (і в
+// «Відмінках», де число вирішують фрази): збірні (rodina — множину відкриває лише plOk фрази) і система, одна в місті (metro). Фраза, де множина таких слів природна («při cestách», «Zaplatil jsem
 // za obědy»), відкриває її сама полем plOk (теги, напр. recurring / timeUnit) — див. candidateNumbers.
-const SINGULAR_ONLY: NounTag[] = ["meal", "weather", "activity", "time", "collective"];
+export const NO_PLURAL: NounTag[] = ["collective", "oneSystem"];
+// Слова, яких не буває кілька (oneSystem — metro): ні множини, ні лічби; квіз «Числівники» їх не бере («dvě metra» — ні).
+// Збірні (rodina) рахуються: «dvě rodiny».
+export const onlyOne = (n: NounEntry) => (n.sem ?? []).includes("oneSystem");
+const SINGULAR_ONLY: NounTag[] = ["meal", "weather", "activity", "time", ...NO_PLURAL];
 export function pluralNatural(n: NounEntry): boolean {
   return !n.uncountable && !(n.sem ?? []).some((t) => SINGULAR_ONLY.includes(t));
 }

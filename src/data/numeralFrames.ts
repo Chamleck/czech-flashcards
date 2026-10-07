@@ -10,8 +10,9 @@ import type { DeclFrame, QuizCase } from "./declensionFrames";
 //
 // ПРАВИЛА ДОДАВАННЯ ФРАЗ
 //  1. Фраза природна для КОЖНОГО іменника, що підпадає під її теги (any / all / none), і для будь-якої кількості:
-//     jeden, dva, pět, dvacet tři, а без max — і sto, tisíc, milion. Незлічувані іменники (uncountable) квіз
-//     не бере взагалі.
+//     jeden, dva, pět, dvacet tři, а без max — і sto, tisíc, milion. Незлічувані іменники (uncountable) і слова, яких
+//     не буває кілька (тег oneSystem — metro), квіз не бере взагалі (countable у utils/numeralAgreementEngine.ts),
+//     тож виключати їх тегами у фразах не треба.
 //  2. {V} — дієслово, що узгоджується з групою в називному: verb = [однина, множина]. Однина — після jeden, pět+,
 //     sto…, dvacet jeden; множина — після dva / tři / čtyři, dvacet dva…, dvoje (IJP id=792: «pět mužů přišlo»,
 //     «dva muži přišli»). Тому окремих фраз для однини й множини не треба.
@@ -51,8 +52,7 @@ export const NUMERAL_FRAMES: Record<QuizCase, NumeralFrame[]> = {
     { text: "Mám ___.", any: ["animal"], max: 1000 },
     { text: "Mám ___.", any: ["carried", "money"] },
     { text: "Koupil jsem ___.", any: ["item", "food", "clothes"], none: ["support"] },
-    // metro (vehicle + placeV) у множині неприродне: «dvě metra»
-    { text: "Vidím ___.", any: ["animal", "vehicle"], none: ["placeV"], max: 1000 },
+    { text: "Vidím ___.", any: ["animal", "vehicle"], max: 1000 },
     { text: "Z okna vidím ___.", any: ["building"] },
     { text: "Čekám už ___.", any: ["timeUnit"], max: 99 },
   ],
@@ -68,17 +68,17 @@ export const NUMERAL_FRAMES: Record<QuizCase, NumeralFrame[]> = {
     { text: "Díky ___ jsme to zvládli.", any: ["person"], max: 1000 },
     { text: "Dávám jídlo ___.", any: ["animal"], max: 99 },
     { text: "Naproti ___ je park.", any: ["building"], max: 99 },
-    { text: "Přišel jsem pozdě kvůli ___.", any: ["vehicle"], none: ["placeV"], max: 99 },
+    { text: "Přišel jsem pozdě kvůli ___.", any: ["vehicle"], max: 99 },
     { text: "Kvůli ___ jsem se vrátil domů.", any: ["carried"], max: 99 },
-    { text: "Kvůli ___ je tu hluk.", any: ["vehicle"], none: ["placeV"] },
+    { text: "Kvůli ___ je tu hluk.", any: ["vehicle"] },
   ],
   lokal: [
     { text: "Mluvili jsme o ___.", any: ["person", "animal"], max: 1000 },
     { text: "Psal jsem o ___.", any: ["vehicle", "building"], none: ["placeV"] },
     { text: "Na ___ je skvrna.", any: ["item", "clothes", "carried"], none: ["support", "furniture"], max: 99 },
     { text: "Odešel po ___.", any: ["timeUnit"], max: 99 },
-    // metro, práce, škola-діяльність — «byl jsem ve dvou metrech» неприродне
-    { text: "Byl jsem {v} ___.", all: ["placeV"], none: ["vehicle", "activity"], max: 99 },
+    // práce, škola-діяльність — «byl jsem ve dvou pracích» неприродне (metro квіз не бере взагалі — правило 1)
+    { text: "Byl jsem {v} ___.", all: ["placeV"], none: ["activity"], max: 99 },
   ],
   instrumental: [
     { text: "Šel jsem tam {s} ___.", any: ["person", "animal"], max: 99 },

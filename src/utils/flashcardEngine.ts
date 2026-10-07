@@ -8,7 +8,7 @@ import {
 import { NOUNS } from "../data/nouns";
 import { nounQuizTestable } from "../data/categories";
 import { NOUN_FRAMES, NOUN_SKIP_RULES, NounFrame } from "../data/nounFrames";
-import { matchesNeeds, acceptedForms, freshWeightedOrder, hasNumber, pluralOnly, vocalizeSlot } from "./partnerSelection";
+import { matchesNeeds, acceptedForms, freshWeightedOrder, hasNumber, NO_PLURAL, pluralOnly, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
 import { NUMBER_LABEL, formsOf, isUsableDistractor, once, shuffle, skipReason, splitForms, topUpRound } from "./quizCommon";
 
@@ -51,11 +51,11 @@ function asked(n: NounEntry, c: CzechCase, num: GrammaticalNumber): boolean {
 }
 
 // ─────────────────── Фрази ───────────────────
-// Множина у фразі: не для незлічуваних (vody, masa) і збірних (rodiny), крім слів лише з множиною; її відкриває
+// Множина у фразі: не для незлічуваних (vody, masa), збірних (rodiny) і metro (NO_PLURAL), крім слів лише з множиною; її відкриває
 // сама фраза полем plOk — тег слова з plOk (правило 7 у шапці data/nounFrames.ts).
 function pluralFits(n: NounEntry, f: NounFrame): boolean {
   if (pluralOnly(n) || f.plOk?.some((t) => n.sem.includes(t))) return true;
-  return !n.uncountable && !n.sem.includes("collective");
+  return !n.uncountable && !n.sem.some((t) => NO_PLURAL.includes(t));
 }
 
 // Чи годиться фраза для слова в цьому числі (правило 1 у шапці data/nounFrames.ts).

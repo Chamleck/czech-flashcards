@@ -19,8 +19,8 @@ import type { SkipRule } from "../utils/quizCommon";
 //  1. Фраза природна для КОЖНОГО іменника, що підпадає під її теги (any / all / none), у кожному числі, яке
 //     дозволяє num: "sg" (за замовчуванням) — однина, а слова лише з множиною (peníze, brýle) і парні речі
 //     (boty — тег paired) беруться в ній і в множині; "pl" — лише множина; "any" — обидва числа. Множину
-//     незлічуваних слів (uncountable: voda, maso) і збірних (collective: rodina) рушій у фрази не ставить — крім
-//     фраз, чиє поле plOk містить тег слова (правило 7).
+//     незлічуваних слів (uncountable: voda, maso), збірних (collective: rodina) і metro (oneSystem — NO_PLURAL у
+//     utils/partnerSelection.ts) рушій у фрази не ставить — крім фраз, чиє поле plOk містить тег слова (правило 7).
 //  2. Дієслово чи прийменник фрази керує в цьому значенні РІВНО ОДНИМ відмінком, інакше дистрактор теж буде
 //     правильним: не «volat» (volám kamaráda / kamarádovi), не «na / o / za / před» там, де можливий і знахідний
 //     («Postav to před dům»), не «s» із родовим («s kopce»). Тому: «Jsem na ___» (спокій, місцевий), «Jdu na ___»
@@ -76,7 +76,7 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Nemám dost ___.", num: "pl", any: ["money"] },
     { text: "Během ___ se to změnilo.", num: "any", any: ["timeUnit"] }, // během týdne / během let
     { text: "Do ___ to bude hotové.", any: ["time", "meal"], none: ["timeUnit"] }, // do pondělí, do léta, do půlnoci, do oběda
-    { text: "Během ___ jsme mluvili.", num: "any", any: ["meal"] }, // během oběda, během obědů (множина — у recurring)
+    { text: "Během ___ jsme mluvili.", num: "any", any: ["meal", "recurring"], none: ["weather"] }, // během oběda / obědů, cesty / cest, lekce / lekcí (не «během dešťů»)
     { text: "Přišlo hodně ___.", num: "pl", any: ["person"], plOk: ["collective"] }, // hodně lidí, dětí, rodin
     { text: "Kolik ___ jsi tu strávil?", num: "pl", any: ["weekday", "season", "daySpan"] }, // sobot, zim, večerů, nocí
     { text: "Kolik ti je ___?", num: "pl", any: ["yearsPlural"] }, // let
@@ -84,6 +84,15 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Kolik ___ denně vypiješ?", num: "pl", any: ["drink"] }, // káv, čajů, piv
     { text: "Je tu hodně minerálních ___.", num: "pl", any: ["mineral"], plOk: ["mineral"] }, // vod
     { text: "Nemám dost ___.", any: ["air"] }, // vzduchu
+    { text: "Bez ___ to nejde.", any: ["document"] }, // bez pasu, dokladu, adresy, účtu
+    { text: "Tady je seznam ___.", num: "pl", any: ["document"] }, // seznam pasů, dokladů, adres, účtů
+    { text: "Zaplatil jsem polovinu ___.", any: ["abstract"] }, // polovinu ceny
+    { text: "Bojím se růstu ___.", num: "pl", any: ["abstract"] }, // růst cen
+    { text: "Vystřídal jsem několik ___.", num: "pl", all: ["activity", "placeV"] }, // několik škol, prací
+    { text: "Jsem na konci ___.", any: ["sequencePart"] }, // na konci kapitoly, stránky, řady
+    { text: "Kolik ___ má ta kniha?", num: "pl", any: ["sequencePart"], none: ["line"] }, // kapitol, stránek
+    { text: "Polovina ___ nepřišla.", any: ["grade"] }, // polovina třídy, ročníku
+    { text: "Přišli studenti všech ___.", num: "pl", any: ["grade"] }, // všech tříd, ročníků
   ],
   dativ: [
     { text: "Telefonuju ___.", num: "any", any: ["person"] },
@@ -116,6 +125,11 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Kvůli silným ___ jsme zůstali doma.", num: "pl", any: ["strongPl"], plOk: ["strongPl"] }, // dešťům, větrům
     { text: "Kvůli ___ jsme zůstali doma.", any: ["weatherCause"] }, // kvůli počasí, dešti, sněhu, větru
     { text: "Podíval se {k} ___.", any: ["sky"] }, // k nebi, ke slunci
+    { text: "Učitel poděkoval ___.", num: "any", any: ["grade"] }, // třídě / třídám, ročníku / ročníkům
+    { text: "Ke všem ___ jsou cvičení.", num: "pl", any: ["sequencePart"], none: ["line"] }, // kapitolám, stránkám
+    { text: "Kvůli všem těm ___ nemůžu spát.", num: "pl", any: ["drink"] }, // kávám, čajům, pivům
+    { text: "Přidej ještě stovku k těm ___.", num: "pl", any: ["money"] }, // penězům, korunám, eurům
+    { text: "Kvůli stavebním ___ je silnice zavřená.", num: "pl", any: ["worksPl"] }, // pracím
   ],
   akuzativ: [
     { text: "Nakresli ___!", num: "any", none: [...NOT_PICTURED, "document"] },
@@ -143,10 +157,18 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Objednal jsem ___ pro všechny.", num: "pl", any: ["drink"] }, // kávy, čaje, piva
     { text: "Pijeme minerální ___.", num: "pl", any: ["mineral"], plOk: ["mineral"] }, // vody
     { text: "Půjdu na ___.", any: ["air"] }, // na vzduch (SSČ «jít na vzduch»)
+    { text: "Zeptal jsem se na ___.", any: ["abstract"] }, // na cenu
+    { text: "Porovnávám ___.", num: "pl", any: ["abstract"] }, // ceny
+    { text: "Mám rád ___.", num: "pl", all: ["activity", "recurring"] }, // cesty, lekce
+    { text: "Často jsem měnil ___.", num: "pl", all: ["activity", "placeV"] }, // školy, práce
+    { text: "Musel opakovat ___.", any: ["grade"] }, // ročník, třídu
+    { text: "Ve škole spojili ___.", num: "pl", any: ["grade"] }, // třídy, ročníky
+    { text: "Na zítra si přečti ___.", num: "any", any: ["sequencePart"], none: ["line"] }, // kapitolu / kapitoly, stránku / stránky
   ],
   vokativ: [
     { text: "Děkuju, ___!", num: "any", any: ["person"] },
     { text: "Ahoj, ___!", num: "any", any: ["animal"] }, // ahoj, pse; ahoj, kočky
+    { text: "Milé ___, vítáme vás!", num: "pl", all: ["collective"], plOk: ["collective"] }, // milé rodiny (звертання школи / садка)
   ],
   lokal: [
     { text: "Mluvíme o ___.", num: "any", none: ["time", "weather"], plOk: ["collective"] }, // o rodinách
@@ -154,7 +176,7 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Čtu o ___.", num: "any", none: ["time", "weather"] },
     { text: "Jsem {v} ___.", any: ["placeV"] },
     { text: "Jsem na ___.", any: ["placeNa"] },
-    { text: "Stojím {v} ___.", any: ["line"] }, // v řadě (у черзі)
+    { text: "Stojím {v} ___.", any: ["line", "room"] }, // v řadě (у черзі), v kuchyni, ve třídě
     { text: "Po ___ se vrátím.", any: ["meal", "time"], none: ["dayPart"] }, // po obědě, po roce, po pondělí, po létě
     { text: "V posledních ___ se to změnilo.", num: "pl", any: ["timeUnit"] }, // v posledních týdnech
     { text: "Sedím na ___.", any: ["seat"] },
@@ -195,6 +217,10 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Bojovali jsme se silnými ___.", num: "pl", any: ["strongPl"], plOk: ["strongPl"] }, // «se» — за «silnými», не за відповіддю
     { text: "Balon je naplněný ___.", any: ["air"] }, // vzduchem (SSČ «balon plněný vzduchem»)
     { text: "Spím pod širým ___.", all: ["sky"], none: ["weather"] }, // nebem (SSČ «spát pod širým nebem»)
+    { text: "Jedeme na výlet {s} ___.", any: ["grade"] }, // se třídou, s ročníkem
+    { text: "Jsem hotový {s} ___.", any: ["sequencePart"], none: ["line"] }, // s kapitolou, se stránkou
+    { text: "Pokoj je zalitý ___.", all: ["sky", "weather"] }, // sluncem
+    { text: "Pomáhám mámě s domácími ___.", num: "pl", any: ["worksPl"] }, // pracemi («s» — за «domácími», не за відповіддю)
   ],
 };
 
@@ -243,4 +269,6 @@ export const NOUN_SKIP_RULES: SkipRule<NounCell>[] = [
   tagSkip({ uncountable: true, none: ["strongPl", "mineral"], numbers: ["pl"], reason: "незлічувані: множина (Нік: «másla», «oblečení» у мові не вживаються)" }),
   tagSkip({ uncountable: true, any: ["mineral"], cases: ["dativ", "lokal", "instrumental"], numbers: ["pl"], reason: "voda: «minerální vody» лише в називному, родовому, знахідному" }),
   tagSkip({ any: ["air"], cases: ["dativ"], numbers: ["sg"], reason: "vzduch: давальний (Нік: природної фрази немає)" }),
+  tagSkip({ all: ["sky", "weather"], numbers: ["pl"], reason: "slunce: множина (Нік: «slunce / sluncí» — лише в астрономії)" }),
+  tagSkip({ any: ["oneSystem"], numbers: ["pl"], reason: "metro: множина (Нік: у місті одне; множину тренують інші слова)" }),
 ];

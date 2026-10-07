@@ -30,6 +30,8 @@ import { NounEntry } from "../types";
 //       • повітря (vzduch) — air, НЕ weather: weather бере квіз «Прийменники» у «při ___» («při vzduchu» — ні);
 //       • новий смисловий клас, для якого жоден тег не відділяє погані пари від добрих (як було з cukr і vzduch), —
 //         новий тег із поясненням у NOUN_TAG_DOC (data/nounTags.ts), а не виняток для слова: списків слів у коді немає;
+//       • слово, множина якого неприродна в усіх квізах (система, одна в місті, — metro), — тег oneSystem: квізи
+//         беруть його лише в однині (pluralNatural; у квізі «Відмінки» — правило NOUN_SKIP_RULES);
 //       • dev-збірка пише в консоль, якщо набір тегів суперечливий (validateNounSem).
 //  4. variants (необов'язково) — прийнятні, але НЕ показані на картці форми клітинки, що збігаються з формою
 //     ІНШОГО відмінка цього слова (родовий kostel: kostela, але вживають і kostelu = давальний). Квіз не подасть
@@ -1539,7 +1541,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "transport",
-    sem: ["vehicle", "container", "placeV"],
+    sem: ["vehicle", "container", "placeV", "oneSystem"],
     declension: {
       nominativ: { sg: "metro", pl: "metra" },
       genitiv: { sg: "metra", pl: "meter" },
@@ -2765,7 +2767,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "ruze",
     category: "work",
-    sem: ["activity", "placeV"],
+    sem: ["activity", "placeV", "worksPl"],
     declension: {
       nominativ: { sg: "práce", pl: "práce" },
       genitiv: { sg: "práce", pl: "prací" },

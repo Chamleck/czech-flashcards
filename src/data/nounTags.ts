@@ -15,8 +15,10 @@ import type { NounEntry } from "../types";
 // кілька тегів. Не ставимо тег «про всяк випадок»: кожен тег — це обіцянка, що фрази з ним природні.
 //
 // ПРАВИЛА ДОДАВАННЯ ТЕГУ
-//  1. Новий тег — лише коли жоден наявний не відділяє погані пари від добрих (так з'явилися air, served, homemade);
-//     не виняток для одного слова.
+//  1. Новий тег — лише коли жоден наявний не відділяє погані пари від добрих (так з'явилися air, served, homemade).
+//     Тег може стояти й на одному слові, якщо описує ПОВЕДІНКУ, яку матиме будь-яке майбутнє слово того ж класу
+//     (strongPl, mineral, worksPl — множина живе лише з прикметником; oneSystem — множини немає в жодному квізі), а не
+//     виняток заради однієї фрази чи одного слова.
 //  2. Пояснення й приклади — у NOUN_TAG_DOC; тег ставиться всім словам nouns.ts, яких він стосується.
 //  3. Фрази всіх квізів, що беруть тег (data/prepositionPartners.ts, declensionFrames.ts, numeralFrames.ts,
 //     nounFrames.ts, поле fits у data/adjectives.ts), — перечитати; суперечливі набори ловить validateNounSem.
@@ -89,7 +91,9 @@ export type NounTag =
   | "drink"
   | "weatherCause"
   | "sky"
-  | "mineral";
+  | "mineral"
+  | "oneSystem"
+  | "worksPl";
 
 // Запис для КОЖНОГО тегу обов'язковий (Record): додав тег до NounTag — компілятор вимагає пояснення.
 export const NOUN_TAG_DOC: Record<NounTag, string> = {
@@ -158,6 +162,8 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
   weatherCause: "погода як причина чи перешкода («Kvůli počasí / dešti jsme zůstali doma», «Mám problém se sněhem»): počasí, déšť, sníh, vítr — НЕ slunce",
   sky: "небо й світило, до яких дивляться («Podíval se k nebi / ke slunci»; без weather — ще й «Spím pod širým nebem»): nebe, slunce",
   mineral: "вода, що буває мінеральною, — її множина природна з «minerální» («Pijeme minerální vody»; разом з food): voda",
+  oneSystem: "система, яка в місті одна, тож множина неприродна в УСІХ квізах («kvůli metrům», «s jakými metry» — ні; pluralNatural, а в квізі «Відмінки» — правило NOUN_SKIP_RULES): metro (разом з vehicle)",
+  worksPl: "робота, у множини якої значення «роботи» — природна з прикметником («Kvůli stavebním pracím je silnice zavřená», «Pomáhám mámě s domácími pracemi»; разом з activity): práce",
 };
 
 // Теги-«самоцілі»: слово з таким тегом не має жодних інших (особа не буває будівлею, їжа — місцем тощо).
@@ -183,6 +189,8 @@ const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
   strongPl: ["weather"],
   drink: ["food"],
   mineral: ["food"],
+  oneSystem: ["vehicle"],
+  worksPl: ["activity"],
   timeUnit: ["time"],
   landform: ["outdoor"],
   served: ["food"],

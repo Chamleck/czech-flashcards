@@ -17,7 +17,13 @@
 //     — НЕ жодна прийнятна форма цієї клітинки (усі дублети й variants); 2 різні варіанти; один пропуск; жодних «{…}»,
 //     «undefined», «—»; прийменник перед пропуском вокалізований однаково для обох кнопок; у «чий?» власник з першого
 //     речення однозначний і визначає відповідь.
-//  3. Відомі дірки (KNOWN) — заплановані, але ще не закриті роботи (roadmap). Друкуються окремо; закрив — прибери рядок.
+//  3. Множина слів NO_PLURAL (utils/partnerSelection.ts: збірні — rodina, система, одна в місті, — metro): у квізі
+//     «Іменники» їхня множина питається лише у фразах, чиє plOk містить їхній тег (інакше клітинку прибирає
+//     NOUN_SKIP_RULES); у «Прийменниках», «Прикметниках та займенниках» і порядкових «Числівників» число обирає лише
+//     candidateNumbers — для кожної фрази цих банків вона не дає таким словам множини без plOk. Межа: другий шлях
+//     вибору числа в рушії в обхід candidateNumbers ця перевірка не побачить. Лічбу «Числівників» (metro не
+//     рахується) тримає countable у рушії; тут не перевіряється.
+//  4. Відомі дірки (KNOWN) — заплановані, але ще не закриті роботи (roadmap). Друкуються окремо; закрив — прибери рядок.
 //
 // Природність речень оракул не оцінює: її перевіряє читання пар «фраза × слово» (правила в шапках data-файлів).
 
@@ -29,10 +35,12 @@ import { generatePrepositionSession } from "../src/utils/prepositionQuizEngine";
 import { generateVerbSession } from "../src/utils/verbFlashcardEngine";
 import { generateAdverbSession } from "../src/utils/adverbQuizEngine";
 import { generateDateTimeSession } from "../src/utils/datetimeEngine";
-import { acceptedForms, vocalDecision } from "../src/utils/partnerSelection";
+import { acceptedForms, candidateNumbers, hasNumber, NO_PLURAL, vocalDecision } from "../src/utils/partnerSelection";
 import { skipReason } from "../src/utils/quizCommon";
-import { NOUN_SKIP_RULES } from "../src/data/nounFrames";
-import { DECL_CELL_SKIPS, DECL_WORD_SKIPS, QuizCase } from "../src/data/declensionFrames";
+import { NOUN_FRAMES, NOUN_SKIP_RULES } from "../src/data/nounFrames";
+import { ANTECEDENT_FRAME, DECL_CELL_SKIPS, DECL_FRAMES, DECL_WORD_SKIPS, OWNER_FRAME, QuizCase } from "../src/data/declensionFrames";
+import { DUAL_FRAMES, EXCHANGE_FRAMES, FIXED_FRAMES } from "../src/data/prepositionPartners";
+import { ORDINAL_FRAMES } from "../src/data/numeralFrames";
 import { PAST_SUBJECT_ORDER, IMPERATIVE_ORDER, presentForm, futureForm, pastForm, imperativeForm } from "../src/utils/verbForms";
 import type { VocalPrep } from "../src/data/prepositionPartners";
 import { ADJECTIVES } from "../src/data/adjectives";
@@ -325,6 +333,48 @@ function checkNouns(r: Report, gen: Gen<NounQuestion>): void {
           const d = distractorOf(q);
           if (d && acc.includes(d)) r.errors.push(`${QUIZ}: ${id}: дистрактор «${d}» — прийнятна форма клітинки`);
         }
+      }
+  }
+}
+
+// ═════════════ Множина слів NO_PLURAL (rodina, metro) ═════════════
+// Самоперевірка підміняє вибір числа (NUMBERS_OF), щоб показати, що перевірка банків ловить множину без plOk.
+let NUMBERS_OF: typeof candidateNumbers = candidateNumbers;
+const noPluralTags = (n: NounEntry) => n.sem.filter((t) => NO_PLURAL.includes(t));
+const escapeRe = (s: string) => s.replace(/[.*+?^$()|[\]\\{}]/g, "\\$&");
+// Фраза квізу «Іменники» з {v}{k}{s}{z} → шаблон, що приймає і вокалізований прийменник.
+const frameRe = (text: string) => new RegExp(`^${escapeRe(text).replace(/\\\{[vksz]\\\}/g, "\\S+")}$`);
+
+function checkNoPluralNouns(r: Report, gen: Gen<NounQuestion>): void {
+  const QUIZ = "Іменники";
+  for (const n of NOUNS) {
+    const tags = noPluralTags(n);
+    if (tags.length === 0 || !hasNumber(n, "sg") || NOUN_CATS_EXCLUDED_FROM_QUIZ.has(n.category)) continue;
+    for (const c of CASE_ORDER) {
+      if (split(n.declension[c].pl).length === 0 || skipReason(NOUN_SKIP_RULES, { noun: n, c, n: "pl" })) continue;
+      const ok = NOUN_FRAMES[c].filter((f) => f.plOk?.some((t) => tags.includes(t))).map((f) => frameRe(f.text));
+      const id = `${n.id}::${c}::pl`;
+      for (const q of forced(gen, id))
+        if (!q.contextPhrase || !ok.some((re) => re.test(q.contextPhrase!)))
+          r.errors.push(`${QUIZ}: ${id}: множина слова з ${tags.join(", ")} не у фразі з plOk — «${q.contextPhrase ?? "без речення"}»`);
+    }
+  }
+}
+
+function checkNoPluralBanks(r: Report): void {
+  const banks: [string, { text: string; num?: "sg" | "pl" | "any"; plOk?: NounEntry["sem"] }[]][] = [
+    ["Прийменники", [...Object.values(DUAL_FRAMES).flatMap((f) => [...f.motion, ...f.location]), ...EXCHANGE_FRAMES, ...Object.values(FIXED_FRAMES).flat()]],
+    [ADJ_QUIZ, [...Object.values(DECL_FRAMES).flat(), ANTECEDENT_FRAME, OWNER_FRAME]],
+    ["Числівники (порядкові)", Object.values(ORDINAL_FRAMES).flat()],
+  ];
+  for (const n of NOUNS) {
+    const tags = noPluralTags(n);
+    if (tags.length === 0 || !hasNumber(n, "sg") || !hasNumber(n, "pl")) continue;
+    for (const [quiz, frames] of banks)
+      for (const f of frames) {
+        if (f.plOk?.some((t) => tags.includes(t))) continue;
+        const pl = [0, 0.99].some((x) => NUMBERS_OF(n, f.num ?? "sg", () => x, f.plOk).includes("pl"));
+        if (pl) r.errors.push(`${quiz}: ${n.id} (${tags.join(", ")}) у множині у фразі «${f.text}» без plOk`);
       }
   }
 }
@@ -780,6 +830,8 @@ function runAll(g: Gens, only?: (keyof Gens)[]): Report {
   const on = (k: keyof Gens) => !only || only.includes(k);
   if (on("decl")) checkAdjPron(r, g.decl);
   if (on("nouns")) checkNouns(r, g.nouns);
+  if (on("nouns")) checkNoPluralNouns(r, g.nouns);
+  if (on("decl") || on("preps") || on("numerals")) checkNoPluralBanks(r);
   if (on("numerals")) checkNumerals(r, g.numerals);
   if (on("preps")) checkPrepositions(r, g.preps);
   if (on("verbs")) checkVerbs(r, g.verbs);
@@ -792,7 +844,10 @@ function runAll(g: Gens, only?: (keyof Gens)[]): Report {
 function selfTest(): boolean {
   const mutate = <Q extends AnyQ>(gen: Gen<Q>, f: (q: Q) => Q | null): Gen<Q> => (s) => gen(s).map(f).filter((q): q is Q => q !== null);
   const swap = <Q extends AnyQ>(q: Q): Q => ({ ...q, correct: distractorOf(q) ?? q.correct });
-  const cases: { name: string; only: (keyof Gens)[]; focus: string[]; gens: Partial<Gens> }[] = [
+  const withoutOneSystem: typeof candidateNumbers = (n, ...rest) => candidateNumbers({ ...n, sem: n.sem.filter((t) => t !== "oneSystem") }, ...rest);
+  const cases: { name: string; only: (keyof Gens)[]; focus: string[]; gens: Partial<Gens>; numbersOf?: typeof candidateNumbers }[] = [
+    { name: "NO_PLURAL: metro у множині (вибір числа без тегу oneSystem)", only: ["preps"], focus: ["metro"], gens: {}, numbersOf: withoutOneSystem },
+    { name: "NO_PLURAL: rodina в множині у фразі без plOk", only: ["nouns"], focus: ["rodina::"], gens: { nouns: mutate(REAL.nouns, (q) => (q.comboId === "rodina::lokal::pl" ? { ...q, contextPhrase: "Čtu o ___." } : q)) } },
     { name: "зникла клітинка (velký чол. істот. орудний мн.)", only: ["decl"], focus: ["velky::"], gens: { decl: mutate(REAL.decl, (q) => (q.comboId === "velky::masc_anim_instrumental::pl" ? null : q)) } },
     { name: "хибна правильна відповідь у прикметника", only: ["decl"], focus: ["stary::"], gens: { decl: mutate(REAL.decl, (q) => (q.comboId.startsWith("stary::") ? swap(q) : q)) } },
     { name: "дійсна форма як дистрактор (pán: páni / pánové)", only: ["nouns"], focus: ["muz-pan::"], gens: { nouns: mutate(REAL.nouns, (q) => (q.comboId === "muz-pan::nominativ::pl" ? { ...q, options: [q.correct, q.correct === "páni" ? "pánové" : "páni"] } : q)) } },
@@ -845,7 +900,9 @@ function selfTest(): boolean {
     Math.random = seeded(20261006);
     const base = runAll(REAL, t.only).errors.length;
     Math.random = seeded(20261006);
+    NUMBERS_OF = t.numbersOf ?? candidateNumbers;
     const r = runAll({ ...REAL, ...t.gens }, t.only);
+    NUMBERS_OF = candidateNumbers;
     Math.random = realRandom;
     FOCUS = null;
     const caught = r.errors.length > base;
