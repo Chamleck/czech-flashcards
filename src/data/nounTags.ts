@@ -84,7 +84,12 @@ export type NounTag =
   | "daySpan"
   | "dayPoint"
   | "timeV"
-  | "yearsPlural";
+  | "yearsPlural"
+  | "strongPl"
+  | "drink"
+  | "weatherCause"
+  | "sky"
+  | "mineral";
 
 // Запис для КОЖНОГО тегу обов'язковий (Record): додав тег до NounTag — компілятор вимагає пояснення.
 export const NOUN_TAG_DOC: Record<NounTag, string> = {
@@ -148,6 +153,11 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
   dayPoint: "момент доби («Vrátil se o půlnoci / o poledni»; разом з time): půlnoc, poledne — множини квіз не питає",
   timeV: "час, який кажуть із «v» + місцевим («Co děláš v lednu / v létě / v zimě / v noci?»; разом з time): місяці, léto, zima, noc — НЕ jaro («na jaře»), podzim («na podzim»), дні тижня («v pondělí» — знахідний)",
   yearsPlural: "слово, множина якого означає «роки» («Kolik ti je let?», «před pár lety», «po letech», «Známe se už léta», «Utíkají léta»; українською так само «літа»; разом з time): léto",
+  strongPl: "погода, у якої множина природна з «silný» («Očekávají se silné větry», «Kvůli silným dešťům…»; разом з weather). Лише чол. неістота чи жін. рід — фрази мають «silné» у наз. / знах. множини: déšť, vítr — НЕ sníh («silné sněhy» — ні), slunce",
+  drink: "напій, який замовляють і п'ють порціями, тож множина — «порції» («Kolik káv denně vypiješ?», «Objednal jsem kávy pro všechny»; разом з food; слово злічуване): káva, čaj, pivo — НЕ voda («kolik vod» — ні)",
+  weatherCause: "погода як причина чи перешкода («Kvůli počasí / dešti jsme zůstali doma», «Mám problém se sněhem»): počasí, déšť, sníh, vítr — НЕ slunce",
+  sky: "небо й світило, до яких дивляться («Podíval se k nebi / ke slunci»; без weather — ще й «Spím pod širým nebem»): nebe, slunce",
+  mineral: "вода, що буває мінеральною, — її множина природна з «minerální» («Pijeme minerální vody»; разом з food): voda",
 };
 
 // Теги-«самоцілі»: слово з таким тегом не має жодних інших (особа не буває будівлею, їжа — місцем тощо).
@@ -170,6 +180,9 @@ const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
   dayPoint: ["time"],
   timeV: ["time"],
   yearsPlural: ["time"],
+  strongPl: ["weather"],
+  drink: ["food"],
+  mineral: ["food"],
   timeUnit: ["time"],
   landform: ["outdoor"],
   served: ["food"],
@@ -186,7 +199,7 @@ export function validateNounSem(n: Pick<NounEntry, "id" | "sem" | "month">): str
   for (const solo of SOLO) {
     if (!sem.includes(solo)) continue;
     const allowed: NounTag[] =
-      solo === "body" ? ["body", "bodyLevel", "singleLevel", "bodyMany"] : solo === "time" ? ["time", "timeUnit", "dayPart", "month", "season", "weekday", "daySpan", "dayPoint", "timeV", "yearsPlural"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade"] : [solo];
+      solo === "body" ? ["body", "bodyLevel", "singleLevel", "bodyMany"] : solo === "time" ? ["time", "timeUnit", "dayPart", "month", "season", "weekday", "daySpan", "dayPoint", "timeV", "yearsPlural"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade", "drink", "mineral"] : solo === "weather" ? ["weather", "strongPl", "weatherCause", "sky"] : [solo];
     const extra = sem.filter((t) => !allowed.includes(t) && !CROSS.includes(t));
     if (extra.length > 0) out.push(`${n.id}: тег «${solo}» не сполучається з ${extra.join(", ")}`);
   }

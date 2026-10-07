@@ -51,12 +51,11 @@ function asked(n: NounEntry, c: CzechCase, num: GrammaticalNumber): boolean {
 }
 
 // ─────────────────── Фрази ───────────────────
-// Множина у фразі: не для незлічуваних (vody, masa) і збірних (rodiny), крім слів лише з множиною; збірним її
-// відкриває сама фраза полем plOk (правило 7 у шапці data/nounFrames.ts).
+// Множина у фразі: не для незлічуваних (vody, masa) і збірних (rodiny), крім слів лише з множиною; її відкриває
+// сама фраза полем plOk — тег слова з plOk (правило 7 у шапці data/nounFrames.ts).
 function pluralFits(n: NounEntry, f: NounFrame): boolean {
-  if (pluralOnly(n)) return true;
-  if (n.uncountable) return false;
-  return !n.sem.includes("collective") || !!f.plOk?.some((t) => n.sem.includes(t));
+  if (pluralOnly(n) || f.plOk?.some((t) => n.sem.includes(t))) return true;
+  return !n.uncountable && !n.sem.includes("collective");
 }
 
 // Чи годиться фраза для слова в цьому числі (правило 1 у шапці data/nounFrames.ts).

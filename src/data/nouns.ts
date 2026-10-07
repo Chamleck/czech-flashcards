@@ -23,7 +23,7 @@ import { NounEntry } from "../types";
 //       • місце ЗАВЖДИ має рівно один із placeV (в школі) чи placeNa (на пошті) — це лексична властивість
 //         слова; перевір за словником, а не за відчуттям;
 //       • особа, тварина, їжа, час, погода, гроші, документ, тіло, повітря — «самотні» теги (без інших; винятки:
-//         тіло + bodyLevel / singleLevel / bodyMany, час + timeUnit / dayPart / month / season / weekday / daySpan / dayPoint / timeV / yearsPlural, їжа + served / homemade, документ + carried — pas, doklad);
+//         тіло + bodyLevel / singleLevel / bodyMany, час + timeUnit / dayPart / month / season / weekday / daySpan / dayPoint / timeV / yearsPlural, їжа + served / homemade / drink / mineral, погода + strongPl / weatherCause / sky, документ + carried — pas, doklad);
 //       • їжа: served — страва чи напій, який подають теплим або холодним (káva, polévka, maso: «teplá polévka»);
 //         homemade — буває домашнім (chléb, pivo, ovoce: «domácí chléb»); жодного — як cukr. Без них teplý / studený /
 //         domácí з цим словом не з'являться (і «studený cukr» теж) — це безпечно; зайвий тег дасть безглузду пару;
@@ -46,12 +46,15 @@ import { NounEntry } from "../types";
 //     прикметниками (поле fits у data/adjectives.ts). Після додавання прочитай і ці фрази та пари.
 //  9. Квіз «Числівники» теж бере іменник за тегами (data/numeralFrames.ts). uncountable — ОБОВ'ЯЗКОВЕ рішення (без
 //     нього проєкт не збереться): true — слово не рахують штуками (voda, rýže, peníze), у цей квіз воно не потрапляє,
-//     а в множинних фразах інших квізів не стоїть; false — звичайний злічуваний іменник. Слово лише з множиною (вся однина «—») квіз сам
+//     а в множинних фразах інших квізів не стоїть (крім фраз із plOk, що містить його тег: «minerální vody»);
+//     false — звичайний злічуваний іменник (káva — порції: «dvě kávy»). Слово лише з множиною (вся однина «—») квіз сам
 //     рахує через jedny / dvoje / troje / čtvery (поле pluralOnly у data/cardinals.ts) і через pět+: окремо нічого
 //     не позначай. Після додавання прочитай фрази цього квізу, куди слово потрапило.
-// 10. Квіз «Іменники» питає саме слово в реченнях з data/nounFrames.ts, теж за тегами. Не питає називний однини
-//     (заголовок картки; у слів лише з множиною — називний множини) і кличний слів без тегу person / animal.
-//     Якщо під теги слова в якомусь відмінку й числі не підійшла жодна фраза, квіз питає форму без речення —
+// 10. Квіз «Відмінки» (у коді — «Іменники», utils/flashcardEngine.ts) питає саме слово в реченнях з
+//     data/nounFrames.ts, теж за тегами. Не питає називний однини (заголовок картки; у слів лише з множиною — називний
+//     множини) і клітинки, які прибирають правила NOUN_SKIP_RULES у тому ж файлі (кличний не-особи, неприродні
+//     форми слів часу й незлічуваних — за тегами й полем uncountable, тож нове слово з тим самим тегом виключається
+//     саме). Якщо під теги слова в якомусь відмінку й числі не підійшла жодна фраза, квіз питає форму без речення —
 //     dev-збірка друкує такі комбінації; прочитай фрази, куди слово потрапило, і за потреби додай фразу
 //     (правила — у шапці data/nounFrames.ts).
 // 11. Форми — за двома джерелами (IJP + en.wiktionary / MorfFlex); дублет, де обидві форми правильні, НЕ подаємо через
@@ -270,13 +273,13 @@ export const NOUNS: NounEntry[] = [
   },
   {
     id: "kava",
-    uncountable: true,
+    uncountable: false,
     uk: "кава",
     cz: "káva",
     gender: "fem",
     pattern: "zena",
     category: "food",
-    sem: ["food", "served"],
+    sem: ["food", "served", "drink"],
     declension: {
       nominativ: { sg: "káva", pl: "kávy" },
       genitiv: { sg: "kávy", pl: "káv" },
@@ -1042,7 +1045,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "food",
-    sem: ["food", "served", "homemade"],
+    sem: ["food", "served", "homemade", "drink"],
     declension: {
       nominativ: { sg: "pivo", pl: "piva" },
       genitiv: { sg: "piva", pl: "piv" },
@@ -1107,7 +1110,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "food",
-    sem: ["food", "served"],
+    sem: ["food", "served", "mineral"],
     declension: {
       nominativ: { sg: "voda", pl: "vody" },
       genitiv: { sg: "vody", pl: "vod" },
@@ -1128,7 +1131,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "food",
-    sem: ["food", "served"],
+    sem: ["food", "served", "drink"],
     declension: {
       nominativ: { sg: "čaj", pl: "čaje" },
       genitiv: { sg: "čaje", pl: "čajů" },
@@ -2804,7 +2807,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "stavani",
     category: "nature",
-    sem: ["nature"],
+    sem: ["nature", "weatherCause"],
     declension: {
       nominativ: { sg: "počasí", pl: "počasí" },
       genitiv: { sg: "počasí", pl: "počasí" },
@@ -2825,7 +2828,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "nature",
-    sem: ["weather"],
+    sem: ["weather", "sky"],
     declension: {
       nominativ: { sg: "slunce", pl: "slunce" },
       genitiv: { sg: "slunce", pl: "sluncí" },
@@ -3277,7 +3280,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "stroj",
     category: "nature",
-    sem: ["weather", "recurring"],
+    sem: ["weather", "recurring", "strongPl", "weatherCause"],
     declension: {
       // Довге é лише в nom./akuz., усі непрямі відмінки — коротке e (deště, dešti).
       // Звірено Naše řeč (журнал ÚJČ): "ve všech nepřímých pádech základovou
@@ -3301,7 +3304,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "nature",
-    sem: ["weather"],
+    sem: ["weather", "weatherCause"],
     declension: {
       // Довге í лише в nom./akuz., непрямі відмінки — коротке e (sněhu, sněhem).
       // Лок.мн. "snězích" (h→z, м'якшення) — звірено напряму dobryslovnik.cz.
@@ -3325,7 +3328,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_inan",
     pattern: "hrad",
     category: "nature",
-    sem: ["weather"],
+    sem: ["weather", "strongPl", "weatherCause"],
     declension: {
       // Довге í лише в nom./akuz., непрямі відмінки — коротке e (větru, větrem),
       // той самий тип, що sníh.
@@ -3348,7 +3351,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "more",
     category: "nature",
-    sem: ["nature"],
+    sem: ["nature", "sky"],
     declension: {
       // Регулярний more-тип (як moře/srdce). УВАГА: множина "nebesa" — ОКРЕМЕ слово
       // (небеса/канделябр над ліжком), не звичайна множина nebe — не плутати.

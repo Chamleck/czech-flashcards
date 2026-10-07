@@ -1,7 +1,7 @@
 import type { CzechCase, GrammaticalNumber, NounEntry } from "../types";
 import type { Needs, NumberPolicy } from "./prepositionPartners";
 import type { NounTag } from "./nounTags";
-import { matchesNeeds } from "../utils/partnerSelection";
+import { matchesNeeds, pluralOnly } from "../utils/partnerSelection";
 import type { SkipRule } from "../utils/quizCommon";
 
 // ─────────────────────── ФРАЗИ КВІЗУ «ІМЕННИКИ» ───────────────────────
@@ -19,7 +19,8 @@ import type { SkipRule } from "../utils/quizCommon";
 //  1. Фраза природна для КОЖНОГО іменника, що підпадає під її теги (any / all / none), у кожному числі, яке
 //     дозволяє num: "sg" (за замовчуванням) — однина, а слова лише з множиною (peníze, brýle) і парні речі
 //     (boty — тег paired) беруться в ній і в множині; "pl" — лише множина; "any" — обидва числа. Множину
-//     незлічуваних слів (uncountable: voda, maso) і збірних (collective: rodina) рушій у фрази не ставить.
+//     незлічуваних слів (uncountable: voda, maso) і збірних (collective: rodina) рушій у фрази не ставить — крім
+//     фраз, чиє поле plOk містить тег слова (правило 7).
 //  2. Дієслово чи прийменник фрази керує в цьому значенні РІВНО ОДНИМ відмінком, інакше дистрактор теж буде
 //     правильним: не «volat» (volám kamaráda / kamarádovi), не «na / o / za / před» там, де можливий і знахідний
 //     («Postav to před dům»), не «s» із родовим («s kopce»). Тому: «Jsem na ___» (спокій, місцевий), «Jdu na ___»
@@ -35,9 +36,9 @@ import type { SkipRule } from "../utils/quizCommon";
 //     прибери з вимоги. dev-збірка попереджає про фразу, в яку потрапляє менше 3 іменників.
 //  7. plOk — теги, для яких У ЦІЙ фразі природна множина, хоча за правилом 1 її немає: збірне rodina стоїть у
 //     множині лише там, де «кілька родин» звучить природно («Mluvím s rodinami», «Přišlo hodně rodin»), а не в
-//     «Mám dárek od ___» («od rodin» — ні). Фраза мусить дозволяти множину (num "any" чи "pl"); незлічувані
-//     (uncountable) множини не отримують і тут. Механізм той самий, що в квізах «Прийменники» й «Прикметники та
-//     займенники» (поле plOk їхніх фраз).
+//     «Mám dárek od ___» («od rodin» — ні). Фраза мусить дозволяти множину (num "any" чи "pl"). Тег із plOk — явне
+//     рішення, тож відкриває множину й незлічуваному («Pijeme minerální vody», «silné větry»). Механізм і зміст той
+//     самий, що в квізах «Прийменники» й «Прикметники та займенники» (поле plOk їхніх фраз, candidateNumbers).
 
 export interface NounFrame extends Needs {
   text: string; // «___» — пропуск для форми іменника
@@ -58,6 +59,9 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Tady jsou ___.", num: "pl", any: ["person", "animal", ...THINGS, "food", "furniture", "vehicle"], none: ["placeV"], plOk: ["collective"] }, // tady jsou rodiny
     { text: "Utíkají ___.", num: "pl", any: ["timeUnit", "yearsPlural"] }, // utíkají dny, roky, hodiny, léta
     { text: "Jaké tu bývají ___?", num: "pl", any: ["weekday", "season", "daySpan"] }, // neděle, zimy, večery
+    { text: "Očekávají se silné ___.", num: "pl", any: ["strongPl"], plOk: ["strongPl"] }, // silné deště, větry
+    { text: "Na stole jsou ___.", num: "pl", any: ["drink"] }, // kávy, čaje, piva (порції)
+    { text: "Minerální ___ jsou zdravé.", num: "pl", any: ["mineral"], plOk: ["mineral"] }, // minerální vody
   ],
   genitiv: [
     { text: "Bojím se ___.", num: "any", any: ["person", "animal"] },
@@ -76,6 +80,10 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Přišlo hodně ___.", num: "pl", any: ["person"], plOk: ["collective"] }, // hodně lidí, dětí, rodin
     { text: "Kolik ___ jsi tu strávil?", num: "pl", any: ["weekday", "season", "daySpan"] }, // sobot, zim, večerů, nocí
     { text: "Kolik ti je ___?", num: "pl", any: ["yearsPlural"] }, // let
+    { text: "Bojím se silných ___.", num: "pl", any: ["strongPl"], plOk: ["strongPl"] }, // silných dešťů, větrů
+    { text: "Kolik ___ denně vypiješ?", num: "pl", any: ["drink"] }, // káv, čajů, piv
+    { text: "Je tu hodně minerálních ___.", num: "pl", any: ["mineral"], plOk: ["mineral"] }, // vod
+    { text: "Nemám dost ___.", any: ["air"] }, // vzduchu
   ],
   dativ: [
     { text: "Telefonuju ___.", num: "any", any: ["person"] },
@@ -105,6 +113,9 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Turisté sem jezdí kvůli ___.", num: "pl", any: ["sight"] }, // kvůli hradům, horám, řekám
     { text: "Díky ___ jsem se hodně naučil.", num: "pl", all: ["activity", "recurring"] }, // díky lekcím, cestám
     { text: "Kvůli ___ nic nekupuju.", num: "pl", any: ["abstract"] }, // kvůli cenám
+    { text: "Kvůli silným ___ jsme zůstali doma.", num: "pl", any: ["strongPl"], plOk: ["strongPl"] }, // dešťům, větrům
+    { text: "Kvůli ___ jsme zůstali doma.", any: ["weatherCause"] }, // kvůli počasí, dešti, sněhu, větru
+    { text: "Podíval se {k} ___.", any: ["sky"] }, // k nebi, ke slunci
   ],
   akuzativ: [
     { text: "Nakresli ___!", num: "any", none: [...NOT_PICTURED, "document"] },
@@ -128,6 +139,10 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Mám rád ___.", num: "pl", any: ["weekday", "season", "daySpan"] }, // pátky, podzimy, večery
     { text: "Mám volno {v} ___.", any: ["weekday"] }, // v pondělí, ve středu, ve čtvrtek (знахідний; «ve středě» — ні)
     { text: "Známe se už ___.", num: "pl", any: ["yearsPlural"] }, // léta
+    { text: "Zažili jsme silné ___.", num: "pl", any: ["strongPl"], plOk: ["strongPl"] }, // deště, větry
+    { text: "Objednal jsem ___ pro všechny.", num: "pl", any: ["drink"] }, // kávy, čaje, piva
+    { text: "Pijeme minerální ___.", num: "pl", any: ["mineral"], plOk: ["mineral"] }, // vody
+    { text: "Půjdu na ___.", any: ["air"] }, // na vzduch (SSČ «jít na vzduch»)
   ],
   vokativ: [
     { text: "Děkuju, ___!", num: "any", any: ["person"] },
@@ -148,6 +163,7 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Vrátil se o ___.", any: ["dayPoint"] }, // o půlnoci, o poledni
     { text: "Co děláš {v} ___?", any: ["timeV"] }, // v lednu, v létě, v zimě, v noci
     { text: "Po ___ jsme se zase viděli.", num: "pl", any: ["yearsPlural"] }, // po letech
+    { text: "Mluví se o silných ___.", num: "pl", any: ["strongPl"], plOk: ["strongPl"] }, // dešťích, větrech
     { text: "Leží to na ___.", any: ["surface"] },
   ],
   instrumental: [
@@ -158,7 +174,7 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Je to mezi ___.", num: "pl", any: ["building", "outdoor", "furniture", "nature", "opening"], none: ["weather"] }, // mezi domy, mezi stromy, mezi okny
     { text: "Je to mezi ___.", num: "pl", any: ["vehicle"], none: ["placeV"] }, // mezi auty
     { text: "Leží to pod ___.", num: "any", any: ["space"] }, // pod stolem, pod stromem, pod sedadly
-    { text: "Mám problém {s} ___.", any: ["body", "item", "vehicle", "money", "activity", "person"] }, // s autem, s prací
+    { text: "Mám problém {s} ___.", any: ["body", "item", "vehicle", "money", "activity", "person", "weatherCause"] }, // s autem, s prací, s počasím
     { text: "Mám problém {s} ___.", num: "pl", any: ["bodyLevel", "bodyMany", "item", "person", "vehicle"], none: ["placeV", "singleLevel"] }, // s očima, se zuby, s klíči
     { text: "Jsem spokojený {s} ___.", any: ["abstract", "activity", "meal"] }, // s cenou, s prací
     { text: "Jsem spokojený {s} ___.", num: "pl", any: ["recurring", "abstract"], none: ["weather"] }, // s lekcemi, s obědy, s cenami
@@ -176,6 +192,9 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Nad ___ je půda.", any: ["floor"] }, // nad přízemím, nad patrem
     { text: "Výtah jezdí mezi ___.", num: "pl", all: ["floor", "ordered"] }, // mezi patry (SSČ «s více patry»)
     { text: "Byl jsem tam před pár ___.", num: "pl", any: ["timeUnit", "yearsPlural"] }, // před pár dny, týdny, lety
+    { text: "Bojovali jsme se silnými ___.", num: "pl", any: ["strongPl"], plOk: ["strongPl"] }, // «se» — за «silnými», не за відповіддю
+    { text: "Balon je naplněný ___.", any: ["air"] }, // vzduchem (SSČ «balon plněný vzduchem»)
+    { text: "Spím pod širým ___.", all: ["sky"], none: ["weather"] }, // nebem (SSČ «spát pod širým nebem»)
   ],
 };
 
@@ -196,11 +215,16 @@ export interface NounCell {
 interface TagSkip extends Needs {
   cases?: CzechCase[];
   numbers?: GrammaticalNumber[];
+  uncountable?: true; // лише незлічувані з одниною (поле uncountable; слова лише з множиною — peníze — не зачіпає)
   reason: string;
 }
 const tagSkip = (s: TagSkip): SkipRule<NounCell> => ({
   reason: s.reason,
-  applies: ({ noun, c, n }) => (!s.cases || s.cases.includes(c)) && (!s.numbers || s.numbers.includes(n)) && matchesNeeds(noun, s),
+  applies: ({ noun, c, n }) =>
+    (!s.cases || s.cases.includes(c)) &&
+    (!s.numbers || s.numbers.includes(n)) &&
+    (!s.uncountable || (noun.uncountable && !pluralOnly(noun))) &&
+    matchesNeeds(noun, s),
 });
 export const NOUN_SKIP_RULES: SkipRule<NounCell>[] = [
   tagSkip({ none: ["person", "animal"], cases: ["vokativ"], reason: "кличний не-особи (свідоме рішення)" }), // «stole!» — не звертання
@@ -215,4 +239,8 @@ export const NOUN_SKIP_RULES: SkipRule<NounCell>[] = [
   tagSkip({ all: ["dayPart", "timeUnit"], cases: ["instrumental"], numbers: ["sg"], reason: "den, noc: орудний однини (Нік: лише «dnem i nocí»)" }),
   tagSkip({ all: ["dayPart", "timeUnit"], none: ["timeV"], cases: ["lokal"], numbers: ["sg"], reason: "den: місцевий однини (Нік: «ve dne» — застаріла форма)" }),
   tagSkip({ any: ["yearsPlural"], cases: ["dativ"], numbers: ["pl"], reason: "léto: давальний множини (Нік: не вживається)" }),
+  // Незлічувані (Нік 2026-10-07): множина — «сорти», у мові лише з прикметником; де вона жива, її дає тег із plOk фраз.
+  tagSkip({ uncountable: true, none: ["strongPl", "mineral"], numbers: ["pl"], reason: "незлічувані: множина (Нік: «másla», «oblečení» у мові не вживаються)" }),
+  tagSkip({ uncountable: true, any: ["mineral"], cases: ["dativ", "lokal", "instrumental"], numbers: ["pl"], reason: "voda: «minerální vody» лише в називному, родовому, знахідному" }),
+  tagSkip({ any: ["air"], cases: ["dativ"], numbers: ["sg"], reason: "vzduch: давальний (Нік: природної фрази немає)" }),
 ];

@@ -57,12 +57,13 @@ export const pluralOnly = (n: NounEntry) => !hasNumber(n, "sg") && hasNumber(n, 
 // якщо перше число не дає контрасту форм, пробуємо друге — слово не карається за невдалий жереб).
 // Слово лише з множиною (peníze, brýle) і парна річ (boty, ponožky — тег paired) беруть множину навіть у «sg»-фреймі;
 // у «pl»-фреймі непридатне слово без множини або з неприродною множиною (pluralNatural). plOk фрейму — теги, для яких
-// У ЦІЙ фразі множина природна, хоча загальне правило її не дає («při cestách» — recurring, «celé dny» — timeUnit);
-// незлічуваних не стосується.
+// У ЦІЙ фразі множина природна, хоча загальне правило її не дає («při cestách» — recurring, «celé dny» — timeUnit).
+// Тег із plOk — явне рішення, тож відкриває множину й незлічуваному («silné větry», «minerální vody»); так само в
+// усіх квізах (рушій «Відмінки» — pluralFits).
 export function candidateNumbers(n: NounEntry, policy: NumberPolicy, rnd: () => number = Math.random, plOk?: readonly NounTag[]): GrammaticalNumber[] {
   const sg = hasNumber(n, "sg");
   const pl = hasNumber(n, "pl");
-  const natural = pluralNatural(n) || (!n.uncountable && !!plOk && (n.sem ?? []).some((t) => plOk.includes(t)));
+  const natural = pluralNatural(n) || (!!plOk && (n.sem ?? []).some((t) => plOk.includes(t))); // тег із plOk — явне рішення, навіть для незлічуваного
   if (policy === "pl") return pl && (natural || !sg) ? ["pl"] : []; // не «mezi rodinami», не «mezi oblečeními»
   if (!sg || (pl && (n.sem ?? []).includes("paired"))) return pl ? ["pl"] : [];
   if (policy === "sg" || !pl || !natural) return ["sg"];
