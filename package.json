@@ -6,12 +6,7 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
-    "check:arch": "npx --yes esbuild@0.25 scripts/check-architecture.ts --bundle --platform=node --format=cjs --charset=utf8 --outfile=node_modules/.check-architecture.cjs --log-level=error && node node_modules/.check-architecture.cjs",
-    "report:frames": "npx --yes esbuild@0.25 scripts/report-frames.ts --bundle --platform=node --format=cjs --charset=utf8 --outfile=node_modules/.report-frames.cjs --log-level=error && node node_modules/.report-frames.cjs",
-    "check:quiz": "npx --yes esbuild@0.25 scripts/check-quiz-coverage.ts --bundle --platform=node --format=cjs --charset=utf8 --outfile=node_modules/.check-quiz-coverage.cjs --log-level=error && node node_modules/.check-quiz-coverage.cjs",
-    "check": "npm run typecheck && npm run check:arch"
+    "web": "expo start --web"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",

@@ -1,6 +1,7 @@
 // Звіт по фразах квізів: які іменники й якого роду бере кожна фраза і що виключає кожен її тег.
 // Інформаційний (код виходу 0): допомагає людині побачити милиці, яких не бачить жоден автоматичний тест.
-// Запуск:  npm run report:frames -- [--bank=ordinals|numerals] [--filter=текст фрази]
+// Запуск:  npx esbuild scripts/report-frames.ts --bundle --platform=node --format=cjs --charset=utf8 --outfile=node_modules/.report-frames.cjs
+//          && node node_modules/.report-frames.cjs [--bank=ordinals|numerals] [--filter=текст фрази]
 //
 // ЩО ДИВИТИСЬ (правило A5 у docs/ENGINEERING_PRINCIPLES.md):
 //  • «роди» — якщо фраза стоїть у називному множини й у ній узгоджується присудок, а родів більше одного, фраза не

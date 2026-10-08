@@ -1,6 +1,6 @@
 // Архітектурний гейт: автоматично перевіряє правила з docs/ENGINEERING_PRINCIPLES.md, які можна перевірити механічно.
-// Запуск:  npm run check:arch   (або: npx esbuild scripts/check-architecture.ts --bundle --platform=node --format=cjs
-//          --outfile=node_modules/.check-architecture.cjs && node node_modules/.check-architecture.cjs)
+// Запуск:  npx esbuild scripts/check-architecture.ts --bundle --platform=node --format=cjs
+//          --charset=utf8 --outfile=node_modules/.check-architecture.cjs && node node_modules/.check-architecture.cjs
 //   --update-baseline   записати поточні знахідки як відомий борг (лише з рішення Ніка; список лише скорочується)
 //   --verbose           друкувати також відомий борг
 //
@@ -356,7 +356,7 @@ if (args.has("--verbose") && debt.length) {
 }
 if (debt.length) console.log(`\nВідомий борг (baseline): ${debt.length} — ${JSON.stringify(byRule(debt))}`);
 if (stale.length) {
-  console.log(`\nbaseline застарів (${stale.length} рядків уже виправлено) — онови: npm run check:arch -- --update-baseline`);
+  console.log(`\nbaseline застарів (${stale.length} рядків уже виправлено) — онови: node node_modules/.check-architecture.cjs --update-baseline`);
   for (const k of stale.slice(0, 10)) console.log("  ✓ " + k);
 }
 if (fresh.length) {
