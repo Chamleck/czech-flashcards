@@ -1,7 +1,13 @@
 import { CzechCase, Gender, GrammaticalNumber, NounEntry, NounFilter } from "../types";
 import type { NounTag } from "../data/nounTags";
 import { CLUSTER_RULES, MEST_RULE, Needs, NumberPolicy, VocalDecision, VocalPrep } from "../data/prepositionPartners";
+import { NOUNS } from "../data/nouns";
+import { nounUsableAsPartner } from "../data/categories";
 import { skipReason, SkipRule } from "./quizCommon";
+
+// Іменники-партнери: слова, яких квізи ставлять у чужі фрази (не дні, місяці, сотні). Єдиний пул для «Прикметників та
+// займенників», «Числівників» і «Прийменників»; незлічувані тут є — «Числівники» відсіюють їх самі (countable).
+export const PARTNER_NOUNS: NounEntry[] = NOUNS.filter((n) => nounUsableAsPartner(n.category));
 
 // ─────────────── Чисті допоміжні функції добору партнерів (без випадковості, крім candidateNumbers) ───────────────
 // Дані — data/prepositionPartners.ts, теги — data/nounTags.ts, квіз — prepositionQuizEngine.ts.
@@ -163,7 +169,7 @@ export function disjoint(a: string[], b: string[]): boolean {
 const VOWELS = "aáeéěiíoóuúůyý";
 
 // Початкова група приголосних слова («škola» → «š», «sklenice» → «skl», «chléb» → «chl»).
-export function initialCluster(word: string): string {
+function initialCluster(word: string): string {
   const w = word.toLowerCase();
   let i = 0;
   while (i < w.length && !VOWELS.includes(w[i])) i++;

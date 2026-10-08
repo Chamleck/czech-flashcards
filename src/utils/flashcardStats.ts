@@ -53,7 +53,7 @@ function roundAccuracy(r: RoundResult): number {
 
 // Чи новий раунд кращий за поточний рекорд:
 // спершу за точністю, при рівній точності — за кількістю відповідей.
-export function isBetterRound(candidate: RoundResult, best: RoundResult | null): boolean {
+function isBetterRound(candidate: RoundResult, best: RoundResult | null): boolean {
   if (!best) return candidate.answered > 0;
   const ca = roundAccuracy(candidate);
   const ba = roundAccuracy(best);

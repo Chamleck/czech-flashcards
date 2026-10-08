@@ -138,6 +138,7 @@ export type GenderExamples = Record<Gender, { cz: string; uk: string }>;
 
 // Порядок родів для перемикача-табів у картці розкриття.
 export const GENDER_ORDER: Gender[] = ["masc_anim", "masc_inan", "fem", "neut"];
+export const NUMBER_ORDER: GrammaticalNumber[] = ["sg", "pl"];
 
 // Короткі підписи родів для табів (повні — у GENDER_LABEL з theme).
 export const GENDER_SHORT: Record<Gender, string> = {
@@ -270,6 +271,8 @@ export type PronounEntry = DeclinablePronoun | IndeclinablePronoun;
 // дієслова, НЕ парадигма. Тут же (займенник se/sebe) зберігаємо повне відмінювання
 // зворотного займенника. Перетину даних немає — це різні сутності.
 export type PronounDuo = { a: string; b: string };
+// Клітинка таблиці з двома колонками (a / b): один конструктор для всіх таблиць займенників.
+export const duo = (a: string, b: string): PronounDuo => ({ a, b });
 export type PersonalDeclension = Record<CzechCase, PronounDuo>;
 export type PronounColumnLabels = { a: string; b: string };
 
@@ -318,14 +321,8 @@ export type PersonalPronounEntry = PlainPersonalPronoun | GenderedPersonalPronou
 // зберігають ОДНУ форму на відмінок, не пару sg/pl.
 
 // Порядок відмінків для числівникових таблиць (без вокатива).
-export const NUMERAL_CASE_ORDER: CzechCase[] = [
-  "nominativ",
-  "genitiv",
-  "dativ",
-  "akuzativ",
-  "lokal",
-  "instrumental",
-];
+// Один перелік для всіх квізів і числівникових таблиць (QUIZ_CASES у data/declensionFrames.ts — той самий).
+export const NUMERAL_CASE_ORDER: CzechCase[] = CASE_ORDER.filter((c) => c !== "vokativ");
 
 // Форми для іменників, що мають ЛИШЕ множину (kalhoty, brýle): з ними замість jeden / dva / oba / tři / čtyři
 // кажуть jedny / dvoje / oboje / troje / čtvery (IJP: «u pomnožných jmen význam číslovky základní»; dvoje kalhoty =
@@ -530,6 +527,8 @@ export const PERSON_LABELS: Record<VerbPerson, { cz: string; uk: string }> = {
   vy: { cz: "vy", uk: "ви" },
   oni: { cz: "oni/ony", uk: "вони" },
 };
+// Підписи рядків таблиці дієвідмінювання (я / ти / він …) — одна таблиця для картки дієслова й умовної частки.
+export const PERSON_ROW_LABELS = PERSON_ORDER.map((p) => PERSON_LABELS[p]);
 
 // Форми дієслова для однієї особи (усі 6 осіб)
 export type PersonForms = Record<VerbPerson, string>;

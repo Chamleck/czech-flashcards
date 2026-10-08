@@ -16,11 +16,11 @@ function storeKey(categoryId: string): string {
 // Максимум зарезервованих слотів під помилки в одному раунді (з 12). Гарантує,
 // що помилкові комбінації реально повертаються (вага ×3 у величезному пулі майже
 // непомітна). Решта раунду — звичайний зважений пул.
-export const MAX_MISTAKE_SLOTS = 5;
+const MAX_MISTAKE_SLOTS = 5;
 
 // Базова вага звичайної комбінації. Після помилки — множимо на BOOST.
-export const BASE_WEIGHT = 1;
-export const BOOST_WEIGHT = 3; // помилкова комбінація випадає ~втричі частіше (не гарантовано)
+const BASE_WEIGHT = 1;
+const BOOST_WEIGHT = 3; // помилкова комбінація випадає ~втричі частіше (не гарантовано)
 // Скільки правильних відповідей поспіль повертають вагу до норми (затухання).
 const DECAY_AFTER = 2;
 
@@ -52,7 +52,7 @@ export async function saveMistakes(categoryId: string, store: MistakeStore): Pro
 }
 
 // Вага комбінації: підвищена, якщо вона в активному списку помилок, інакше базова.
-export function weightFor(store: MistakeStore, id: string): number {
+function weightFor(store: MistakeStore, id: string): number {
   return id in store ? BOOST_WEIGHT : BASE_WEIGHT;
 }
 

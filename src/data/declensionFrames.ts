@@ -1,9 +1,8 @@
-import type { AdjectiveEntry, CzechCase, Gender, GrammaticalNumber, NounEntry, NounFilter, PronounEntry, PronounQuiz } from "../types";
+import type { AdjectiveEntry, CzechCase, Gender, GrammaticalNumber, NounFilter, PronounEntry, PronounQuiz } from "../types";
 import type { NumberPolicy } from "./prepositionPartners";
 import type { NounTag } from "./nounTags";
-import { NOUNS } from "./nouns";
-import { nounUsableAsPartner } from "./categories";
-import { agreementGender } from "../utils/partnerSelection";
+import { NUMERAL_CASE_ORDER } from "../types";
+import { PARTNER_NOUNS, agreementGender } from "../utils/partnerSelection";
 import type { SkipRule } from "../utils/quizCommon";
 
 // ─────────────────────── ФРАЗИ КВІЗУ «ПРИКМЕТНИКИ ТА ЗАЙМЕННИКИ» ───────────────────────
@@ -67,6 +66,18 @@ export interface DeclFrame extends NounFilter {
   qualitative?: true; // без відносних прикметників (semClass "relational"): «k vysokým skříním», не «k celým domům»
   plOk?: NounTag[]; // множина природна в цій фразі для слів із цими тегами (правило 8): «Strávil jsem tam celé dny»
   max?: number; // лише для порядкових (банк ORDINAL_FRAMES, data/numeralFrames.ts): найбільше value, за якого фраза природна
+  // Фраза БЕЗ іменника: у «___» стоїть лише порядковий, що називає людей («Dojeli jsme druzí», «Skončili jsme dvanáctí»).
+  // Значення — рід і число клітинки, яку фраза питає (підмет фрази їх задає); іменник-партнера немає, тож теги
+  // (all / any / none) не діють. Лише в банку ORDINAL_FRAMES; без {v}{k}{s}{z} перед пропуском.
+  standalone?: { gender: Gender; num: GrammaticalNumber };
+}
+
+// Клітинка порядкового для свідомих винятків (ORDINAL_BARE_SKIPS у data/numeralFrames.ts): value — число, яке слово називає.
+export interface ValueCell {
+  value: number;
+  g: Gender;
+  c: QuizCase;
+  n: GrammaticalNumber;
 }
 
 const NOT_THING: NounTag[] = ["time", "weather", "abstract", "activity"];
@@ -302,8 +313,10 @@ export const REFLEXIVE_FRAMES: Partial<Record<QuizCase, ReflexiveFrame[]>> = {
 // клітинок діють і для слова-партнера (займенник перед іменником не стоїть у формі, якої квіз не питає).
 // ПРАВИЛА ДОДАВАННЯ: нове поле quiz.*, що прибирає клітинки, — новий рядок тут з причиною (поле — у типі PronounQuiz).
 
-// Іменники, які квіз ставить у фрази (дні, місяці, сотні не є носіями чужих фраз).
-export const DECL_NOUN_POOL: NounEntry[] = NOUNS.filter((n) => nounUsableAsPartner(n.category));
+// Відмінки квізів: без вокатива (у займенників він «—», у прикметників дублює називний). Єдиний перелік — NUMERAL_CASE_ORDER.
+export const QUIZ_CASES = NUMERAL_CASE_ORDER as QuizCase[];
+// Непрямі відмінки (без називного): особові займенники й групи прийменників.
+export const OBLIQUE_CASES = QUIZ_CASES.filter((c) => c !== "nominativ");
 
 export type DeclWord =
   | { kind: "adjective"; adjective: AdjectiveEntry; degree?: "comparative" | "superlative" }
@@ -323,7 +336,7 @@ export interface DeclCell {
   n: GrammaticalNumber;
 }
 // Роди, у яких є хоч один незлічуваний іменник (однина všechen — лише з ним: «všechen čas», «všechna voda»).
-const MASS_GENDERS = new Set<Gender>(DECL_NOUN_POOL.filter((x) => x.uncountable).map((x) => agreementGender(x, "sg")));
+const MASS_GENDERS = new Set<Gender>(PARTNER_NOUNS.filter((x) => x.uncountable).map((x) => agreementGender(x, "sg")));
 export const DECL_CELL_SKIPS: SkipRule<DeclCell>[] = [
   { reason: "лише одне число (quiz.num: každý, kolikátý)", applies: ({ quiz, n }) => !!quiz.num && quiz.num !== n },
   { reason: "svůj у називному (без власника)", applies: ({ quiz, c }) => !!quiz.needsOwner && c === "nominativ" },

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import { VerbEntry, PERSON_ORDER, PERSON_LABELS } from "../types";
+import { VerbEntry, PERSON_ORDER, PERSON_ROW_LABELS } from "../types";
 import { VERBS } from "../data/verbs";
 import { theme } from "../utils/theme";
 import { TileEmoji } from "./TileEmoji";
@@ -57,7 +57,6 @@ const MODE_META: Record<Mode, { label: string; color: string }> = {
 };
 
 // Стандартні підписи 6 осіб (для теп./мин./майб.).
-const PERSON_ROW_LABELS = PERSON_ORDER.map((p) => PERSON_LABELS[p]);
 // Підписи 3 осіб наказового способу.
 const IMPERATIVE_ROW_LABELS = IMPERATIVE_ORDER.map((p) => IMPERATIVE_LABELS[p]);
 

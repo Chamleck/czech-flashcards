@@ -31,6 +31,10 @@
 //     клітинки під правилом.
 //  5. Відомі дірки (KNOWN) — заплановані, але ще не закриті роботи (roadmap). Друкуються окремо; закрив — прибери рядок.
 //
+//  6. Порядкові «Числівників»: клітинка без природної фрази, яку прибирає ORDINAL_BARE_SKIPS (множина від 7), друкується як
+//     ВИНЯТОК із причиною; питання без речення для неї — ПОМИЛКА. Фрази без іменника (DeclFrame.standalone, гонки) мусять
+//     з'являтись у кожного порядкового 2–12 у називному множини чол. істот.
+//
 // Природність речень оракул не оцінює: її перевіряє читання пар «фраза × слово» (правила в шапках data-файлів).
 
 import type { MistakeStore } from "../src/utils/flashcardWeights";
@@ -42,11 +46,11 @@ import { generateVerbSession } from "../src/utils/verbFlashcardEngine";
 import { generateAdverbSession } from "../src/utils/adverbQuizEngine";
 import { generateDateTimeSession } from "../src/utils/datetimeEngine";
 import { acceptedForms, candidateNumbers, hasNumber, NO_PLURAL, NOUN_USAGE_RULES, vocalDecision } from "../src/utils/partnerSelection";
-import { skipReason } from "../src/utils/quizCommon";
+import { skipReason, SkipRule } from "../src/utils/quizCommon";
 import { NOUN_FRAMES, NOUN_SKIP_RULES } from "../src/data/nounFrames";
-import { ANTECEDENT_FRAME, DECL_CELL_SKIPS, DECL_FRAMES, DECL_WORD_SKIPS, OWNER_FRAME, QuizCase } from "../src/data/declensionFrames";
+import { ANTECEDENT_FRAME, DECL_CELL_SKIPS, DECL_FRAMES, DECL_WORD_SKIPS, OWNER_FRAME, QUIZ_CASES, QuizCase, ValueCell } from "../src/data/declensionFrames";
 import { DUAL_FRAMES, EXCHANGE_FRAMES, FIXED_FRAMES } from "../src/data/prepositionPartners";
-import { ORDINAL_FRAMES } from "../src/data/numeralFrames";
+import { ORDINAL_BARE_SKIPS, ORDINAL_FRAMES } from "../src/data/numeralFrames";
 import { PAST_SUBJECT_ORDER, IMPERATIVE_ORDER, presentForm, futureForm, pastForm, imperativeForm } from "../src/utils/verbForms";
 import type { VocalPrep } from "../src/data/prepositionPartners";
 import { ADJECTIVES } from "../src/data/adjectives";
@@ -65,7 +69,7 @@ import { CARDINALS } from "../src/data/cardinals";
 import { DATE_ORDINALS } from "../src/data/dates";
 import { NOUN_CATS_EXCLUDED_FROM_QUIZ } from "../src/data/categories";
 import { adjQuizUsable } from "../src/data/adjectiveCategories";
-import { AdverbSense, CASE_ORDER, CzechCase, FullDeclension, Gender, GENDER_ORDER, GrammaticalNumber, NounEntry, PERSON_ORDER, PronounEntry, PronounQuiz, VerbEntry } from "../src/types";
+import { AdverbSense, CASE_ORDER, CzechCase, FullDeclension, Gender, GENDER_ORDER, GrammaticalNumber, NounEntry, NUMBER_ORDER, PERSON_ORDER, PronounEntry, PronounQuiz, VerbEntry } from "../src/types";
 
 // ─────────────── Звіт ───────────────
 interface Report {
@@ -140,10 +144,10 @@ interface Tested {
   id: string;
   decl: FullDeclension;
   quiz: PronounQuiz;
+  value?: number; // порядковий: число, яке слово називає
+  bareSkips?: SkipRule<ValueCell>[]; // порядковий: клітинки без природної фрази, яких без речення не питаємо (ORDINAL_BARE_SKIPS)
 }
 const ADJ_QUIZ = "Прикметники та займенники";
-const QUIZ_CASES = CASE_ORDER.filter((c) => c !== "vokativ");
-const NUMBERS: GrammaticalNumber[] = ["sg", "pl"];
 
 function testedWords(r: Report): Tested[] {
   const out: Tested[] = [];
@@ -184,10 +188,10 @@ function cellExists(r: Report, t: Tested, g: Gender, c: QuizCase, n: Grammatical
 // Слово з таблицею прикметника: кожна клітинка рід × відмінок × число питається, правильна — з клітинки,
 // дистрактор — не її форма. Спільне для «Прикметників та займенників» і порядкових у «Числівниках».
 function checkTableCells<Q extends AnyQ>(r: Report, quiz: string, t: Tested, gen: Gen<Q>): void {
-  const all = GENDER_ORDER.flatMap((g) => QUIZ_CASES.flatMap((c) => NUMBERS.map((n) => split(t.decl[g][c][n]))));
+  const all = GENDER_ORDER.flatMap((g) => QUIZ_CASES.flatMap((c) => NUMBER_ORDER.map((n) => split(t.decl[g][c][n]))));
   for (const g of GENDER_ORDER)
     for (const c of QUIZ_CASES)
-      for (const n of NUMBERS) {
+      for (const n of NUMBER_ORDER) {
         const target = split(t.decl[g][c][n]);
         if (target.length === 0 || !cellExists(r, t, g, c, n)) continue;
         if (!all.some((f) => f.length > 0 && f.every((x) => !target.includes(x)))) {
@@ -196,8 +200,11 @@ function checkTableCells<Q extends AnyQ>(r: Report, quiz: string, t: Tested, gen
         }
         const id = `${t.id}::${g}_${c}::${n}`;
         const qs = forced(gen, id);
-        if (qs.length === 0) gap(r, quiz, `${id} не питається`);
+        // свідомий виняток порядкових: клітинка без природної фрази без речення не питається (з причиною)
+        const bareWhy = t.bareSkips && t.value !== undefined ? skipReason(t.bareSkips, { value: t.value, g, c: c as QuizCase, n }) : null;
+        if (qs.length === 0) bareWhy ? exclude(r, `${quiz}: ${bareWhy}`) : gap(r, quiz, `${id} не питається`);
         for (const q of qs) {
+          if (bareWhy && !q.contextPhrase) r.errors.push(`${quiz}: ${id}: питається без речення, хоч правило її прибирає — ${bareWhy}`);
           basic(r, quiz, q);
           vocal(r, quiz, q);
           if (!target.includes(q.correct)) r.errors.push(`${quiz}: ${id}: правильна «${q.correct}» не з клітинки (${target.join(" / ")})`);
@@ -297,7 +304,7 @@ function checkPossessive(r: Report, gen: Gen<DeclQuestion>): void {
         const last = m[1].split(" ").pop()!;
         const found = new Set<string>();
         for (const x of NOUNS)
-          for (const nn of NUMBERS)
+          for (const nn of NUMBER_ORDER)
             if (split(x.declension.akuzativ[nn]).includes(last)) {
               const gg = nn === "pl" && x.plGender ? x.plGender : x.gender;
               found.add(nn === "pl" ? "pl" : gg === "fem" ? "f" : "m");
@@ -323,7 +330,7 @@ function checkNouns(r: Report, gen: Gen<NounQuestion>): void {
   for (const n of NOUNS) {
     const pt = n.declension.nominativ.sg === "—";
     for (const c of CASE_ORDER)
-      for (const num of NUMBERS) {
+      for (const num of NUMBER_ORDER) {
         if (split(n.declension[c][num]).length === 0) continue;
         if (NOUN_CATS_EXCLUDED_FROM_QUIZ.has(n.category)) { exclude(r, `${QUIZ}: категорія ${n.category} — тренує інший квіз`); continue; }
         if (c === "nominativ" && (num === "sg" || pt)) { exclude(r, `${QUIZ}: заголовок картки`); continue; }
@@ -381,7 +388,8 @@ function carrierFrames(): CarrierFrame[] {
   }
   for (const [c, fs] of Object.entries(DECL_FRAMES)) for (const f of fs) out.push({ quiz: ADJ_QUIZ, c: c as CzechCase, f });
   for (const f of [ANTECEDENT_FRAME, OWNER_FRAME]) out.push({ quiz: ADJ_QUIZ, c: "akuzativ", f });
-  for (const [c, fs] of Object.entries(ORDINAL_FRAMES)) for (const f of fs) out.push({ quiz: "Числівники (порядкові)", c: c as CzechCase, f });
+  // фраза без іменника (standalone) іменника-партнера не має — перевіряти її проти слів нічого
+  for (const [c, fs] of Object.entries(ORDINAL_FRAMES)) for (const f of fs) if (!f.standalone) out.push({ quiz: "Числівники (порядкові)", c: c as CzechCase, f });
   return out;
 }
 
@@ -418,7 +426,7 @@ function checkUsageNumerals(r: Report, gen: Gen<AnyQ & { blank?: string }>): voi
     for (const q of gen({})) {
       if (q.blank !== "noun") continue;
       const cells = NOUNS.filter((n) => n.cz === q.promptWord).flatMap((n) =>
-        CASE_ORDER.flatMap((c) => NUMBERS.filter((num) => acceptedForms(n, c, num).includes(q.correct)).map((num) => ({ noun: n, c, n: num })))
+        CASE_ORDER.flatMap((c) => NUMBER_ORDER.filter((num) => acceptedForms(n, c, num).includes(q.correct)).map((num) => ({ noun: n, c, n: num })))
       );
       const used = cells.filter((x) => !skipReason(NOUN_USAGE_RULES, x));
       if (cells.length > 0 && used.length === 0)
@@ -488,7 +496,14 @@ function checkNumerals(r: Report, gen: Gen<AnyQ & { blank?: string }>): void {
     for (const l of GENDER_LABELS) if (qs.length > 0 && !seen.has(l)) gap(r, QUIZ, `складені на …${g}: іменник роду «${l}» не питається`);
   }
   // порядкові (první … dvanáctý): таблиця прикметника, кожна клітинка (рішення Ніка 2026-10-06)
-  for (const a of ADJECTIVES.filter((x) => x.category === "ordinal")) checkTableCells(r, QUIZ, { id: a.id, decl: a.declension, quiz: {} }, gen);
+  for (const a of ADJECTIVES.filter((x) => x.category === "ordinal")) checkTableCells(r, QUIZ, { id: a.id, decl: a.declension, quiz: {}, value: a.value, bareSkips: ORDINAL_BARE_SKIPS }, gen);
+  // фрази без іменника (гонки: «Dojeli jsme druzí»): кожне число 2–12 у називному множини чол. істот. справді дає такі питання
+  const alone = Object.values(ORDINAL_FRAMES).flat().filter((f) => f.standalone);
+  for (const a of ADJECTIVES.filter((x) => x.category === "ordinal" && (x.value ?? 0) > 1)) {
+    const id = `${a.id}::masc_anim_nominativ::pl`;
+    const texts = new Set(forcedN(gen, id, 80).map((q) => q.contextPhrase ?? ""));
+    for (const f of alone) if (!texts.has(f.text)) gap(r, QUIZ, `${id}: фраза без іменника «${f.text}» не з'явилась`);
+  }
 }
 
 // ═════════════ «Прийменники» ═════════════
@@ -922,6 +937,7 @@ function selfTest(): boolean {
     { name: "числівник: зникла форма «pěti»", only: ["numerals"], focus: ["card-pet"], gens: { numerals: mutate(REAL.numerals, (q) => (q.correct === "pěti" ? null : q)) } },
     { name: "числівник: зник рід іменника (dva + чол. істот. в орудному)", only: ["numerals"], focus: ["card-dva"], gens: { numerals: mutate(REAL.numerals, (q) => (q.comboId === "card-dva::instrumental::x" && q.taskText.includes("чол. іст.") ? null : q)) } },
     { name: "порядковий: зникла клітинка (druhý жін. місцевий одн.)", only: ["numerals"], focus: ["ord-druhy"], gens: { numerals: mutate(REAL.numerals, (q) => (q.comboId === "ord-druhy::fem_lokal::sg" ? null : q)) } },
+    { name: "порядковий: клітинка під правилом ORDINAL_BARE_SKIPS питається без речення (osmý, множина)", only: ["numerals"], focus: ["ord-osmy"], gens: { numerals: (s) => (s["ord-osmy::masc_anim_genitiv::pl"] ? [{ ...REAL.numerals({ "ord-druhy::fem_lokal::sg": 1 })[0], comboId: "ord-osmy::masc_anim_genitiv::pl", contextPhrase: undefined, correct: "osmých", options: ["osmých", "osmým"] } as never] : REAL.numerals(s)) } },
     { name: "порядковий: хибна правильна відповідь (třetí)", only: ["numerals"], focus: ["ord-treti"], gens: { numerals: mutate(REAL.numerals, (q) => (q.comboId.startsWith("ord-treti::") ? swap(q) : q)) } },
     { name: "зникла форма дієслова", only: ["verbs"], focus: ["delat::"], gens: { verbs: mutate(REAL.verbs, (q) => (q.comboId === "delat::past::ja" ? null : q)) } },
     { name: "дієслово: друга половина дублета (jsi se) як дистрактор", only: ["verbs"], focus: ["ucit-se::"], gens: { verbs: mutate(REAL.verbs, (q) => (q.comboId === "ucit-se::past::ty" ? { ...q, options: [q.correct, "učil jsi se"] } : q)) } },

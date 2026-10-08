@@ -13,6 +13,7 @@ import { CATEGORIES } from "../data/categories";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
+import { MISTAKE_DECK_TITLE } from "../data/groupTitles";
 
 type Props = NativeStackScreenProps<RootStackParamList, "WordCategories">;
 
@@ -41,7 +42,7 @@ export function WordCategoriesScreen({ navigation }: Props) {
   function startMistakes() {
     const ids = NOUNS.filter((n) => mistakeIds.has(n.id)).map((n) => n.id);
     if (ids.length === 0) return;
-    navigation.navigate("WordSession", { title: "Повторити помилки", entryIds: ids, isMistakeRepeat: true });
+    navigation.navigate("WordSession", { title: MISTAKE_DECK_TITLE, entryIds: ids, isMistakeRepeat: true });
   }
 
   // Тап по категорії: тренування — сесія зі всіма словами; перегляд — список слів.

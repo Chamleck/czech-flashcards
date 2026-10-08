@@ -1,4 +1,4 @@
-import { PersonalPronounEntry, PersonalDeclension, Gender } from "../types";
+import { PersonalPronounEntry, PersonalDeclension, Gender, duo } from "../types";
 
 // Особові займенники: já, ty, on/ona/ono, my, vy, oni/ony/ona, se.
 // Парадигма нерегулярна — виверено за джерелами: czechonline.org (таблиця
@@ -43,111 +43,110 @@ export const PERSONAL_QUIZ_FORMS: {
   pl: { genitiv: ["jich", "nich"], dativ: ["jim", "nim"], akuzativ: ["je", "ně"], lokal: ["—", "nich"], instrumental: ["jimi", "nimi"] },
 };
 
-const d = (a: string, b: string) => ({ a, b });
 
 // ── 1-ша особа однини ──
 // Родовий і знахідний: нейтральне mě правильне в будь-якій позиції (і після прийменника: pro mě, ode mě), книжне
 // mne — стилістичний варіант (Naše řeč 44, 1961, «K tvarům mně, mě — mi, mne» і стан. редакції: «tvar mne jako knižní»).
 // Тому в довгій колонці спершу mě: квіз питає mě, mne лише приймає (ніколи не дистрактор).
 const JA: PersonalDeclension = {
-  nominativ: d("já", "—"),
-  genitiv: d("mě", "mě / mne"),
-  dativ: d("mi", "mně"),
-  akuzativ: d("mě", "mě / mne"),
-  vokativ: d("—", "—"),
-  lokal: d("—", "mně"),
-  instrumental: d("—", "mnou"),
+  nominativ: duo("já", "—"),
+  genitiv: duo("mě", "mě / mne"),
+  dativ: duo("mi", "mně"),
+  akuzativ: duo("mě", "mě / mne"),
+  vokativ: duo("—", "—"),
+  lokal: duo("—", "mně"),
+  instrumental: duo("—", "mnou"),
 };
 
 // ── 2-га особа однини ──
 const TY: PersonalDeclension = {
-  nominativ: d("ty", "—"),
-  genitiv: d("tě", "tebe"),
-  dativ: d("ti", "tobě"),
-  akuzativ: d("tě", "tebe"),
-  vokativ: d("—", "—"),
-  lokal: d("—", "tobě"),
-  instrumental: d("—", "tebou"),
+  nominativ: duo("ty", "—"),
+  genitiv: duo("tě", "tebe"),
+  dativ: duo("ti", "tobě"),
+  akuzativ: duo("tě", "tebe"),
+  vokativ: duo("—", "—"),
+  lokal: duo("—", "tobě"),
+  instrumental: duo("—", "tebou"),
 };
 
 // ── Зворотний (немає називного) ──
 const SE: PersonalDeclension = {
-  nominativ: d("—", "—"),
-  genitiv: d("—", "sebe"),
-  dativ: d("si", "sobě"),
-  akuzativ: d("se", "sebe"),
-  vokativ: d("—", "—"),
-  lokal: d("—", "sobě"),
-  instrumental: d("—", "sebou"),
+  nominativ: duo("—", "—"),
+  genitiv: duo("—", "sebe"),
+  dativ: duo("si", "sobě"),
+  akuzativ: duo("se", "sebe"),
+  vokativ: duo("—", "—"),
+  lokal: duo("—", "sobě"),
+  instrumental: duo("—", "sebou"),
 };
 
 // ── 1-ша / 2-га особа множини (одна форма на відмінок → колонка b скрізь "—") ──
 const MY: PersonalDeclension = {
-  nominativ: d("my", "—"),
-  genitiv: d("nás", "—"),
-  dativ: d("nám", "—"),
-  akuzativ: d("nás", "—"),
-  vokativ: d("—", "—"),
-  lokal: d("nás", "—"),
-  instrumental: d("námi", "—"),
+  nominativ: duo("my", "—"),
+  genitiv: duo("nás", "—"),
+  dativ: duo("nám", "—"),
+  akuzativ: duo("nás", "—"),
+  vokativ: duo("—", "—"),
+  lokal: duo("nás", "—"),
+  instrumental: duo("námi", "—"),
 };
 
 const VY: PersonalDeclension = {
-  nominativ: d("vy", "—"),
-  genitiv: d("vás", "—"),
-  dativ: d("vám", "—"),
-  akuzativ: d("vás", "—"),
-  vokativ: d("—", "—"),
-  lokal: d("vás", "—"),
-  instrumental: d("vámi", "—"),
+  nominativ: duo("vy", "—"),
+  genitiv: duo("vás", "—"),
+  dativ: duo("vám", "—"),
+  akuzativ: duo("vás", "—"),
+  vokativ: duo("—", "—"),
+  lokal: duo("vás", "—"),
+  instrumental: duo("vámi", "—"),
 };
 
 // ── 3-тя особа однини (за родом) ──
 // Чоловічий (on) — істот. і неістот. форми однакові.
 const ON_MASC: PersonalDeclension = {
-  nominativ: d("on", "—"),
-  genitiv: d("jeho / ho", "něho / něj"),
-  dativ: d("jemu / mu", "němu"),
-  akuzativ: d("jeho / ho / jej", "něho / něj"),
-  vokativ: d("—", "—"),
-  lokal: d("—", "něm"),
-  instrumental: d("jím", "ním"),
+  nominativ: duo("on", "—"),
+  genitiv: duo("jeho / ho", "něho / něj"),
+  dativ: duo("jemu / mu", "němu"),
+  akuzativ: duo("jeho / ho / jej", "něho / něj"),
+  vokativ: duo("—", "—"),
+  lokal: duo("—", "něm"),
+  instrumental: duo("jím", "ním"),
 };
 
 // Середній (ono) — як on, крім знахідного (je / ho → ně / něj).
 const ONO_NEUT: PersonalDeclension = {
-  nominativ: d("ono", "—"),
-  genitiv: d("jeho / ho", "něho / něj"),
-  dativ: d("jemu / mu", "němu"),
-  akuzativ: d("je / ho", "ně / něj"),
-  vokativ: d("—", "—"),
-  lokal: d("—", "něm"),
-  instrumental: d("jím", "ním"),
+  nominativ: duo("ono", "—"),
+  genitiv: duo("jeho / ho", "něho / něj"),
+  dativ: duo("jemu / mu", "němu"),
+  akuzativ: duo("je / ho", "ně / něj"),
+  vokativ: duo("—", "—"),
+  lokal: duo("—", "něm"),
+  instrumental: duo("jím", "ním"),
 };
 
 // Жіночий (ona одн.) — увага на правопис: акузатив ji/ni (короткий i),
 // решта jí/ní (довгий í).
 const ONA_FEM: PersonalDeclension = {
-  nominativ: d("ona", "—"),
-  genitiv: d("jí", "ní"),
-  dativ: d("jí", "ní"),
-  akuzativ: d("ji", "ni"),
-  vokativ: d("—", "—"),
-  lokal: d("—", "ní"),
-  instrumental: d("jí", "ní"),
+  nominativ: duo("ona", "—"),
+  genitiv: duo("jí", "ní"),
+  dativ: duo("jí", "ní"),
+  akuzativ: duo("ji", "ni"),
+  vokativ: duo("—", "—"),
+  lokal: duo("—", "ní"),
+  instrumental: duo("jí", "ní"),
 };
 
 // ── 3-тя особа множини (за родом різниться ЛИШЕ називний) ──
 const PL_BODY = {
-  genitiv: d("jich", "nich"),
-  dativ: d("jim", "nim"),
-  akuzativ: d("je", "ně"),
-  vokativ: d("—", "—"),
-  lokal: d("—", "nich"),
-  instrumental: d("jimi", "nimi"),
+  genitiv: duo("jich", "nich"),
+  dativ: duo("jim", "nim"),
+  akuzativ: duo("je", "ně"),
+  vokativ: duo("—", "—"),
+  lokal: duo("—", "nich"),
+  instrumental: duo("jimi", "nimi"),
 };
 const oniPl = (nom: string): PersonalDeclension => ({
-  nominativ: d(nom, "—"),
+  nominativ: duo(nom, "—"),
   ...PL_BODY,
 });
 

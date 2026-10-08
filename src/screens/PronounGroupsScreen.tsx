@@ -11,7 +11,7 @@ import { PosEmoji } from "../components/PosEmoji";
 import { PRONOUNS } from "../data/pronouns";
 import { PERSONAL_PRONOUNS } from "../data/personalPronouns";
 import { INDEFINITE_ALL } from "../data/indefinitePronouns";
-import { PRONOUN_GROUP_TITLE, PERSONAL_GROUP_TITLE, INDEFINITE_GROUP_TITLE } from "../data/groupTitles";
+import { PRONOUN_GROUP_TITLE, PERSONAL_GROUP_TITLE, INDEFINITE_GROUP_TITLE, MISTAKE_DECK_TITLE } from "../data/groupTitles";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { ALL_PRONOUN_MIXED_IDS } from "../utils/pronounEntries";
 import { plural } from "../utils/plural";
@@ -48,7 +48,7 @@ export function PronounGroupsScreen({ navigation }: Props) {
   function startMistakes() {
     const ids = ALL_PRONOUN_MIXED_IDS.filter((id) => mistakeIds.has(id));
     if (ids.length === 0) return;
-    navigation.navigate("DeclSession", { title: "Повторити помилки", kind: "pronoun-mixed", entryIds: ids, isMistakeRepeat: true });
+    navigation.navigate("DeclSession", { title: MISTAKE_DECK_TITLE, kind: "pronoun-mixed", entryIds: ids, isMistakeRepeat: true });
   }
 
   // Тап по групі: тренування — сесія; перегляд — список слів групи.

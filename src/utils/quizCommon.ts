@@ -38,7 +38,7 @@ export function randomOf<T>(arr: readonly T[]): T | null {
 // від правильної відповіді й візуально. Результат запам'ятовується: функцію викликають десятки тисяч разів на тих
 // самих формах словника.
 const collapsed = new Map<string, string>();
-export function collapseVowelLength(s: string): string {
+function collapseVowelLength(s: string): string {
   let r = collapsed.get(s);
   if (r === undefined) {
     r = s

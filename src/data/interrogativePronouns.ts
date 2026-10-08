@@ -1,4 +1,4 @@
-import { PronounEntry, PersonalPronounEntry, PersonalDeclension } from "../types";
+import { PronounEntry, PersonalPronounEntry, PersonalDeclension, duo } from "../types";
 
 // Питальні займенники (zájmena tázací) — закрите множина з 5 слів за
 // czechency.org: kdo, co, jaký, který, čí (+ конструкція "co za", не карткою).
@@ -232,27 +232,26 @@ export const INTERROGATIVE_ADJ: PronounEntry[] = [
 // kdo/co: без роду, одна форма на відмінок — переюзаємо PersonalDeclension
 // (пара {a,b}, b завжди "—") і PersonalPronounCard, той самий патерн, що вже
 // є для my/vy (columns.b === "—" → одна колонка в таблиці).
-const d = (a: string, b: string) => ({ a, b });
 const COLS_ONE = { a: "форма", b: "—" };
 
 const KDO: PersonalDeclension = {
-  nominativ: d("kdo", "—"),
-  genitiv: d("koho", "—"),
-  dativ: d("komu", "—"),
-  akuzativ: d("koho", "—"),
-  vokativ: d("—", "—"),
-  lokal: d("kom", "—"),
-  instrumental: d("kým", "—"),
+  nominativ: duo("kdo", "—"),
+  genitiv: duo("koho", "—"),
+  dativ: duo("komu", "—"),
+  akuzativ: duo("koho", "—"),
+  vokativ: duo("—", "—"),
+  lokal: duo("kom", "—"),
+  instrumental: duo("kým", "—"),
 };
 
 const CO: PersonalDeclension = {
-  nominativ: d("co", "—"),
-  genitiv: d("čeho", "—"),
-  dativ: d("čemu", "—"),
-  akuzativ: d("co", "—"),
-  vokativ: d("—", "—"),
-  lokal: d("čem", "—"),
-  instrumental: d("čím", "—"),
+  nominativ: duo("co", "—"),
+  genitiv: duo("čeho", "—"),
+  dativ: duo("čemu", "—"),
+  akuzativ: duo("co", "—"),
+  vokativ: duo("—", "—"),
+  lokal: duo("čem", "—"),
+  instrumental: duo("čím", "—"),
 };
 
 export const INTERROGATIVE_CORE: PersonalPronounEntry[] = [

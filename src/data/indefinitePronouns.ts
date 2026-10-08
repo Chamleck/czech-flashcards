@@ -1,4 +1,4 @@
-import { PersonalPronounEntry, PronounEntry } from "../types";
+import { PersonalPronounEntry, PronounEntry, duo } from "../types";
 
 // Неозначені, заперечні й означальні займенники — окрема група в розділі «Займенники».
 // Форми звірено: en.wiktionary (таблиці відмінювання) + dl1.cuni.cz / ÚJČ (подвійне заперечення);
@@ -22,7 +22,6 @@ import { PersonalPronounEntry, PronounEntry } from "../types";
 // (types/index.ts): слова з родом беруть фрази з data/declensionFrames.ts, слова без роду — власні речення quizFrames.
 // Перед здачею — оракул scripts/check-quiz-coverage.ts --only=decl: «Помилок: 0».
 
-const d = (a: string, b: string) => ({ a, b });
 const COLS_ONE = { a: "форма", b: "—" };
 
 export const INDEFINITE_CORE: PersonalPronounEntry[] = [
@@ -41,13 +40,13 @@ export const INDEFINITE_CORE: PersonalPronounEntry[] = [
     columns: COLS_ONE,
     gendered: false,
     declension: {
-      nominativ: d("někdo", "—"),
-      genitiv: d("někoho", "—"),
-      dativ: d("někomu", "—"),
-      akuzativ: d("někoho", "—"),
-      vokativ: d("—", "—"),
-      lokal: d("někom", "—"),
-      instrumental: d("někým", "—"),
+      nominativ: duo("někdo", "—"),
+      genitiv: duo("někoho", "—"),
+      dativ: duo("někomu", "—"),
+      akuzativ: duo("někoho", "—"),
+      vokativ: duo("—", "—"),
+      lokal: duo("někom", "—"),
+      instrumental: duo("někým", "—"),
     },
     exampleCz: "Někdo klepe na dveře.",
     exampleUk: "Хтось стукає у двері.",
@@ -68,13 +67,13 @@ export const INDEFINITE_CORE: PersonalPronounEntry[] = [
     columns: COLS_ONE,
     gendered: false,
     declension: {
-      nominativ: d("nikdo", "—"),
-      genitiv: d("nikoho", "—"),
-      dativ: d("nikomu", "—"),
-      akuzativ: d("nikoho", "—"),
-      vokativ: d("—", "—"),
-      lokal: d("nikom", "—"),
-      instrumental: d("nikým", "—"),
+      nominativ: duo("nikdo", "—"),
+      genitiv: duo("nikoho", "—"),
+      dativ: duo("nikomu", "—"),
+      akuzativ: duo("nikoho", "—"),
+      vokativ: duo("—", "—"),
+      lokal: duo("nikom", "—"),
+      instrumental: duo("nikým", "—"),
     },
     exampleCz: "Nikdo nepřišel.",
     exampleUk: "Ніхто не прийшов.",
@@ -94,13 +93,13 @@ export const INDEFINITE_CORE: PersonalPronounEntry[] = [
     columns: COLS_ONE,
     gendered: false,
     declension: {
-      nominativ: d("něco", "—"),
-      genitiv: d("něčeho", "—"),
-      dativ: d("něčemu", "—"),
-      akuzativ: d("něco", "—"),
-      vokativ: d("—", "—"),
-      lokal: d("něčem", "—"),
-      instrumental: d("něčím", "—"),
+      nominativ: duo("něco", "—"),
+      genitiv: duo("něčeho", "—"),
+      dativ: duo("něčemu", "—"),
+      akuzativ: duo("něco", "—"),
+      vokativ: duo("—", "—"),
+      lokal: duo("něčem", "—"),
+      instrumental: duo("něčím", "—"),
     },
     exampleCz: "Něco jsem zapomněl.",
     exampleUk: "Я щось забув.",
@@ -121,13 +120,13 @@ export const INDEFINITE_CORE: PersonalPronounEntry[] = [
     columns: COLS_ONE,
     gendered: false,
     declension: {
-      nominativ: d("nic", "—"),
-      genitiv: d("ničeho", "—"),
-      dativ: d("ničemu", "—"),
-      akuzativ: d("nic", "—"),
-      vokativ: d("—", "—"),
-      lokal: d("ničem", "—"),
-      instrumental: d("ničím", "—"),
+      nominativ: duo("nic", "—"),
+      genitiv: duo("ničeho", "—"),
+      dativ: duo("ničemu", "—"),
+      akuzativ: duo("nic", "—"),
+      vokativ: duo("—", "—"),
+      lokal: duo("ničem", "—"),
+      instrumental: duo("ničím", "—"),
     },
     exampleCz: "Nic nevidím.",
     exampleUk: "Я нічого не бачу.",

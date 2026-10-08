@@ -44,3 +44,6 @@ export const INTERROGATIVE_ADVERBS_TITLE = "Прислівники";
 export const INTERROGATIVE_MISC_TITLE = "Інші";
 export const CONJUNCTIONS_TITLE = "Сполучники";
 export const SERVICE_ADVERBS_TITLE = "Загальні прислівники";
+
+// Плашка і заголовок екрана «повторити помилки» — один текст для всіх розділів (MistakeDeckCard і навігація).
+export const MISTAKE_DECK_TITLE = "Повторити помилки";

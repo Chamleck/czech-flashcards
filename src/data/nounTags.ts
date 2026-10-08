@@ -70,6 +70,7 @@ export type NounTag =
   | "homemade"
   | "landform"
   | "ordered"
+  | "ranking"
   | "singleLevel"
   | "grade"
   | "sequencePart"
@@ -149,6 +150,7 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
   nonVisual: "річ, яку не намалюєш і не сфотографуєш як предмет («Nakresli ročník» — ні): ročník, kapitola (НЕ stránka — «fotka stránky» природна)",
   recurring: "подія, що повторюється, тож множина природна («při cestách», «po lekcích», «silné deště»): cesta, lekce, oběd, snídaně, večeře, déšť — у множині його беруть лише фрази з plOk «recurring» (загальне правило pluralNatural для meal / weather / activity дає однину); наскрізний",
   ordered: "природно рахується по порядку порядковим числівником від první до dvanáctý («Jsem tu teprve třetí den», «Jedu prvním vlakem», «Bydlím ve třetím patře», «Čekám na druhého hosta»): den, týden, rok, hodina, vlak, patro, dům, host (НЕ родичі — «dvanáctý manžel», НЕ речі без черги — «jedenácté oko»); наскрізний тег — сполучається з будь-яким",
+  ranking: "місце в рейтингу чи на подіумі, яке посідають і можуть ділити («Skončili jsme na třetím místě», «První místa obsadili…»; майбутні слова: příčka, umístění); не сидіння й не місце-простір — для них seat / space; потребує placeNa",
   room: "кімната в будинку чи школі, до якої веде коридор («Chodba vede ke koupelně», «Stojím před třídou»): pokoj, kuchyně, koupelna, třída; у множинних фразах («Mezi pokoji je chodba», «Chodba vede ke třídám») — лише разом з ordered (нумеровані кімнати: pokoj, třída), бо кухня й ванна в квартирі одна",
   plant: "рослина, яку поливають («Dej vodu květinám / stromům»): růže, květina, strom",
   flower: "квітка, що пахне («Voní to růží»; разом з plant): růže, květina — НЕ strom («voní to stromem» неприродне)",
@@ -207,6 +209,7 @@ const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
   landform: ["outdoor"],
   served: ["food"],
   homemade: ["food"],
+  ranking: ["placeNa"],
 };
 
 // Перевірка набору тегів одного слова: список проблем (порожній — усе гаразд). Використовується у

@@ -16,7 +16,7 @@ import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { ALL_NUMERAL_IDS } from "../utils/numeralEntries";
-import { NUMERAL_CARDINAL_TITLE, NUMERAL_ORDINAL_TITLE, NUMERAL_HUNDREDS_TITLE } from "../data/groupTitles";
+import { NUMERAL_CARDINAL_TITLE, NUMERAL_ORDINAL_TITLE, NUMERAL_HUNDREDS_TITLE, MISTAKE_DECK_TITLE } from "../data/groupTitles";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Numerals">;
 
@@ -95,7 +95,7 @@ export function NumeralsScreen({ navigation }: Props) {
     const ids = ALL_NUMERAL_IDS.filter((id) => mistakeIds.has(id));
     if (ids.length === 0) return;
     navigation.navigate("DeclSession", {
-      title: "Повторити помилки",
+      title: MISTAKE_DECK_TITLE,
       kind: "numeral-mixed",
       entryIds: ids,
       isMistakeRepeat: true,

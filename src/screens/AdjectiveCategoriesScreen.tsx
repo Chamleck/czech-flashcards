@@ -13,6 +13,7 @@ import { ADJ_CATEGORIES } from "../data/adjectiveCategories";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
 import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
+import { MISTAKE_DECK_TITLE } from "../data/groupTitles";
 
 type Props = NativeStackScreenProps<RootStackParamList, "AdjectiveCategories">;
 
@@ -39,7 +40,7 @@ export function AdjectiveCategoriesScreen({ navigation }: Props) {
   function startMistakes() {
     const ids = ADJECTIVES.filter((a) => mistakeIds.has(a.id)).map((a) => a.id);
     if (ids.length === 0) return;
-    navigation.navigate("DeclSession", { title: "Повторити помилки", kind: "adjective", entryIds: ids, isMistakeRepeat: true });
+    navigation.navigate("DeclSession", { title: MISTAKE_DECK_TITLE, kind: "adjective", entryIds: ids, isMistakeRepeat: true });
   }
 
   function onCategory(key: string, title: string) {

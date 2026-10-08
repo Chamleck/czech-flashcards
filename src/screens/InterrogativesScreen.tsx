@@ -11,7 +11,7 @@ import { PosEmoji } from "../components/PosEmoji";
 import { ALL_INTERROGATIVE_IDS } from "../utils/interrogativeEntries";
 import { INTERROGATIVE_ADVERBS } from "../data/interrogativeAdverbs";
 import { INTERROGATIVE_MISC } from "../data/interrogativeMisc";
-import { INTERROGATIVE_PRONOUNS_TITLE, INTERROGATIVE_ADVERBS_TITLE, INTERROGATIVE_MISC_TITLE } from "../data/groupTitles";
+import { INTERROGATIVE_PRONOUNS_TITLE, INTERROGATIVE_ADVERBS_TITLE, INTERROGATIVE_MISC_TITLE, MISTAKE_DECK_TITLE } from "../data/groupTitles";
 import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
@@ -70,7 +70,7 @@ export function InterrogativesScreen({ navigation }: Props) {
   function startMistakes() {
     const ids = ALL_INTERROGATIVE_IDS.filter((id) => mistakeIds.has(id));
     if (ids.length === 0) return;
-    navigation.navigate("DeclSession", { title: "Повторити помилки", kind: "interrogative", entryIds: ids, isMistakeRepeat: true });
+    navigation.navigate("DeclSession", { title: MISTAKE_DECK_TITLE, kind: "interrogative", entryIds: ids, isMistakeRepeat: true });
   }
 
   function openPronouns() {

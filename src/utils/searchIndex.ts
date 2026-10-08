@@ -83,7 +83,7 @@ export interface SearchEntry {
 // Діакритично-нечутлива нормалізація (á→a, č→c, ř→r…) — NFD-декомпозиція +
 // видалення комбінувальних діакритичних знаків. Стандартний прийом,
 // коректно розкладає й ů (кільце), і háček, і čárka.
-export function normalize(s: string): string {
+function normalize(s: string): string {
   return s
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")

@@ -3,8 +3,7 @@ import {
   CzechCase,
   CASE_ORDER,
   CASE_LABELS,
-  GrammaticalNumber,
-} from "../types";
+  GrammaticalNumber, NUMBER_ORDER } from "../types";
 import { NOUNS } from "../data/nouns";
 import { nounQuizTestable } from "../data/categories";
 import { NOUN_FRAMES, NOUN_SKIP_RULES, NounFrame } from "../data/nounFrames";
@@ -32,7 +31,6 @@ export interface Question {
   options: string[]; // [правильна, дистрактор] — вже перемішані
 }
 
-const NUMBERS: GrammaticalNumber[] = ["sg", "pl"];
 
 const other = (n: GrammaticalNumber): GrammaticalNumber => (n === "sg" ? "pl" : "sg");
 
@@ -81,7 +79,7 @@ function distractorCandidates(
   const numberCells: [CzechCase, GrammaticalNumber][] = [[c, other(num)]];
   const caseCells = shuffle(CASE_ORDER.filter((x) => x !== c)).map((x): [CzechCase, GrammaticalNumber] => [x, num]);
   const rest: [CzechCase, GrammaticalNumber][] = [];
-  for (const x of CASE_ORDER) for (const y of NUMBERS) rest.push([x, y]);
+  for (const x of CASE_ORDER) for (const y of NUMBER_ORDER) rest.push([x, y]);
   const ordered = kind === "number" ? [...numberCells, ...caseCells, ...rest] : [...caseCells, ...numberCells, ...rest];
   const seen = new Set<string>();
   const out: string[] = [];
@@ -98,7 +96,7 @@ function distractorCandidates(
 // Чи дасть distractorCandidates хоч один варіант (без випадковості — для переліку комбінацій): та сама перевірка
 // по всіх клітинках парадигми.
 function hasDistractor(n: NounEntry, correct: string, accepted: string[]): boolean {
-  return CASE_ORDER.some((x) => NUMBERS.some((y) => formsOf(n.declension[x][y]).some((d) => isUsableDistractor(correct, d, accepted))));
+  return CASE_ORDER.some((x) => NUMBER_ORDER.some((y) => formsOf(n.declension[x][y]).some((d) => isUsableDistractor(correct, d, accepted))));
 }
 
 // ─────────────────── Питання ───────────────────
@@ -173,7 +171,7 @@ function enumerateCombos(pool: NounEntry[]): Combo[] {
   const combos: Combo[] = [];
   for (const entry of pool) {
     for (const c of CASE_ORDER) {
-      for (const n of NUMBERS) {
+      for (const n of NUMBER_ORDER) {
         if (!asked(entry, c, n)) continue;
         const accepted = acceptedForms(entry, c, n);
         if (splitForms(entry.declension[c][n]).some((correct) => hasDistractor(entry, correct, accepted))) {
@@ -204,7 +202,7 @@ function devCheckData(): void {
   // Свідомий виняток (NOUN_SKIP_RULES) не може стосуватися клітинки, під яку є фраза (правило 2 біля таблиці).
   for (const n of DEFAULT_NOUN_POOL)
     for (const c of CASE_ORDER)
-      for (const num of NUMBERS) {
+      for (const num of NUMBER_ORDER) {
         const cell = n.declension[c][num];
         if (!cell || cell === "—") continue;
         const why = skipReason(NOUN_SKIP_RULES, { noun: n, c, n: num });

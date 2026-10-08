@@ -11,10 +11,11 @@ import { SectionHeader } from "../components/SectionHeader";
 import { PosEmoji } from "../components/PosEmoji";
 import { PosEmojiName } from "../components/icons/posEmoji";
 import { PREPOSITIONS } from "../data/prepositions";
-import { PREP_DUAL_TITLE } from "../data/groupTitles";
+import { PREP_DUAL_TITLE, MISTAKE_DECK_TITLE } from "../data/groupTitles";
 import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
+import { OBLIQUE_CASES } from "../data/declensionFrames";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Prepositions">;
 
@@ -26,14 +27,13 @@ type Props = NativeStackScreenProps<RootStackParamList, "Prepositions">;
 const ALL_PREP_IDS = PREPOSITIONS.map((p) => p.id);
 
 // Фіксовані — групуємо за відмінком (кожен має рівно один govCase).
-const GROUP_CASES: CzechCase[] = ["genitiv", "dativ", "akuzativ", "lokal", "instrumental"];
 
 interface Group {
   gCase: CzechCase;
   ids: string[];
 }
 
-const GROUPS: Group[] = GROUP_CASES.map((c) => ({
+const GROUPS: Group[] = OBLIQUE_CASES.map((c) => ({
   gCase: c,
   ids: PREPOSITIONS.filter((p) => p.type === "fixed" && p.govCase === c).map((p) => p.id),
 })).filter((g) => g.ids.length > 0);
@@ -77,7 +77,7 @@ export function PrepositionsScreen({ navigation }: Props) {
   function startMistakes() {
     const ids = ALL_PREP_IDS.filter((id) => mistakeIds.has(id));
     if (ids.length === 0) return;
-    navigation.navigate("PrepositionSession", { title: "Повторити помилки", entryIds: ids, isMistakeRepeat: true });
+    navigation.navigate("PrepositionSession", { title: MISTAKE_DECK_TITLE, entryIds: ids, isMistakeRepeat: true });
   }
 
   function openGroup(g: Group) {

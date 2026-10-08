@@ -76,8 +76,11 @@ import { NounEntry } from "../types";
 // 14. ordered — чи рахується слово по порядку порядковим числівником (první … dvanáctý): «Jsem tu teprve třetí den»,
 //     «Jedu prvním vlakem», «Bydlím ve třetím patře», «Čekám na druhého hosta». Лише такі слова квіз «Числівники»
 //     ставить у фрази з порядковими (ORDINAL_FRAMES, data/numeralFrames.ts). Без тегу — безпечно (клітинка
-//     порядкового питається з іншим словом або без речення); зайвий тег дає «jedenácté oko», «dvanáctý manžel».
-//     Тег наскрізний: сполучається з будь-яким. Після додавання прочитай фрази з порядковими, куди слово потрапило.
+//     порядкового питається з іншим словом, або без речення, або (множина від 7 без природної фрази) не питається:
+//     ORDINAL_BARE_SKIPS); зайвий тег дає «jedenácté oko», «dvanáctý manžel». Розподільні множинні фрази («třetí sedadla
+//     v každé řadě») беруть слово за ordered + його клас (seat+space, person, building, sequencePart без line), ранжування —
+//     за ranking. Тег наскрізний: сполучається з будь-яким. Після додавання прочитай фрази з порядковими, куди слово
+//     потрапило (усі множинні — до ORDINAL_PLURAL_MAX).
 //
 export const NOUNS: NounEntry[] = [
   // ─────────────── pán (чол. істот., твердий) ───────────────
@@ -4597,7 +4600,7 @@ export const NOUNS: NounEntry[] = [
     gender: "neut",
     pattern: "mesto",
     category: "city",
-    sem: ["placeNa", "seat", "ordered"],
+    sem: ["placeNa", "seat", "ordered", "ranking"],
     declension: {
       // «na místě» (IJP), 2. мн. «míst»
       nominativ: { sg: "místo", pl: "místa" },

@@ -35,7 +35,7 @@ export const ADJ_CATEGORY_BY_KEY: Record<AdjectiveCategory, AdjCategoryMeta> = A
 // Порядкові живуть лише в розділі "Числівники", тож у квізі прикметників/
 // займенників вони не тестуються і не стають випадковим партнером (питає їх квіз
 // «Числівники» — utils/numeralAgreementEngine.ts).
-export const ADJ_CATS_EXCLUDED_FROM_QUIZ = new Set<AdjectiveCategory>(
+const ADJ_CATS_EXCLUDED_FROM_QUIZ = new Set<AdjectiveCategory>(
   ADJ_CATEGORIES.filter((c) => c.hiddenFromPartOfSpeech).map((c) => c.key)
 );
 

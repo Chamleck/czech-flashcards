@@ -2,10 +2,9 @@ import { CzechCase, NounEntry, PrepositionEntry, CASE_LABELS, GrammaticalNumber,
 import { PREPOSITIONS } from "../data/prepositions";
 import { NOUNS } from "../data/nouns";
 import { COLS_NP, PERSONAL_PRONOUNS } from "../data/personalPronouns";
-import { nounUsableAsPartner } from "../data/categories";
 import { validateNounSem } from "../data/nounTags";
 import { CONFUSABLE_PREP_PAIRS, DUAL_FRAMES, EXCHANGE_FRAMES, FIXED_FRAMES, Frame, Needs, PRONOUN_FRAMES } from "../data/prepositionPartners";
-import { acceptedForms, candidateNumbers, disjoint, fitCounts, formOf, freshWeightedOrder, matchesNeeds, vocalizedPrep } from "./partnerSelection";
+import { PARTNER_NOUNS, acceptedForms, candidateNumbers, disjoint, fitCounts, formOf, freshWeightedOrder, matchesNeeds, vocalizedPrep } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
 import { NUMBER_LABEL, formsOf, isUsableDistractor, once, shuffle, topUpRound } from "./quizCommon";
 
@@ -60,13 +59,12 @@ function caseTail(c: CzechCase, n: GrammaticalNumber): string {
 // ─────────────── Пули партнерів ───────────────
 // Партнер-пул: ті самі фільтри, що в numeral (не декоративні категорії: дні, місяці, числівники).
 // Незлічувані лишаємо — «bez másla» цілком нормально (на відміну від «osm mas» у числівниках).
-const PARTNER_POOL = NOUNS.filter((n) => nounUsableAsPartner(n.category));
 
 const needsPools = new Map<string, NounEntry[]>();
 function poolForNeeds(key: string, needs: Needs): NounEntry[] {
   let p = needsPools.get(key);
   if (!p) {
-    p = PARTNER_POOL.filter((n) => matchesNeeds(n, needs));
+    p = PARTNER_NOUNS.filter((n) => matchesNeeds(n, needs));
     needsPools.set(key, p);
   }
   return p;
@@ -116,7 +114,7 @@ function allPools(): NounEntry[][] {
 // У скількох пулах є слово. most чи dům підходять до більшості просторових фраз і без поправки займали б помітну
 // частку всіх питань; вага 1 / fit вирівнює частку слова у квізі. Рахується з даних, тож нові слова й фрейми
 // враховуються самі.
-const FIT = once(() => fitCounts(PARTNER_POOL, allPools(), (n, pool) => pool.includes(n)));
+const FIT = once(() => fitCounts(PARTNER_NOUNS, allPools(), (n, pool) => pool.includes(n)));
 const fitCount = (nounId: string) => FIT().get(nounId) ?? 1;
 
 // Порядок перебору кандидатів: спершу слова, яких ще не було в раунді, всередині вага 1 / fit (freshWeightedOrder).

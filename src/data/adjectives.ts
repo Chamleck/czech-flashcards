@@ -33,7 +33,8 @@ import { AdjectiveEntry, NounFilter } from "../types";
 //     (запуск у шапці скрипта): «Помилок: 0».
 //  8. Порядкові (category "ordinal") — ОБОВ'ЯЗКОВО value: число, яке слово називає. Квіз «Дата й час» за ним читає
 //     «půl druhé» (родовий жін. роду наступної години, 2–12) і звіряє з ним дані дат (data/dates.ts); квіз «Числівники»
-//     питає КОЖНУ клітинку таблиці порядкового (фрази ORDINAL_FRAMES у data/numeralFrames.ts, поле max — за value).
+//     питає кожну клітинку таблиці порядкового (фрази ORDINAL_FRAMES у data/numeralFrames.ts, поле max — за value), крім множини
+//     від 7 без природної фрази (ORDINAL_BARE_SKIPS там само — свідомий виняток із причиною; її читає й оракул).
 const ANY: NounFilter = {};
 const ANIMATE: NounFilter = { any: ["person", "animal"] };
 const PERSON: NounFilter = { any: ["person"] };

@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
-import { ConditionalConjunctionEntry, PERSON_ORDER, PERSON_LABELS } from "../types";
+import { ConditionalConjunctionEntry, PERSON_ORDER, PERSON_ROW_LABELS } from "../types";
 import { theme } from "../utils/theme";
 import { PosEmoji } from "./PosEmoji";
 import { TileEmoji } from "./TileEmoji";
@@ -26,7 +26,6 @@ interface Props {
 // розділу "Службові слова", кольорової ролі (як рід/клас) тут нема.
 const ACCENT = "#d98cbf";
 
-const PERSON_ROW_LABELS = PERSON_ORDER.map((p) => PERSON_LABELS[p]);
 
 export function ConditionalParticleCard({ entry, revealed, onReveal, navigation, linkMode }: Props) {
   const rows = PERSON_ORDER.map((p) => ({ cz: entry.paradigm[p] }));

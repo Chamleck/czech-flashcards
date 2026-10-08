@@ -9,7 +9,7 @@ import { EditButton } from "../components/EditButton";
 import { MistakeDeckCard } from "../components/MistakeDeckCard";
 import { PosEmoji } from "../components/PosEmoji";
 import { ADVERBS } from "../data/adverbs";
-import { ADVERBS_GROUP_TITLE } from "../data/groupTitles";
+import { ADVERBS_GROUP_TITLE, MISTAKE_DECK_TITLE } from "../data/groupTitles";
 import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
@@ -45,7 +45,7 @@ export function AdverbsScreen({ navigation }: Props) {
   function startMistakes() {
     const ids = ALL_ADVERB_IDS.filter((id) => mistakeIds.has(id));
     if (ids.length === 0) return;
-    navigation.navigate("AdverbSession", { title: "Повторити помилки", entryIds: ids, isMistakeRepeat: true });
+    navigation.navigate("AdverbSession", { title: MISTAKE_DECK_TITLE, entryIds: ids, isMistakeRepeat: true });
   }
 
   function openAll() {

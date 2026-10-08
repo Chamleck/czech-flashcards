@@ -6,16 +6,14 @@ import {
   Gender,
   NounEntry,
   GrammaticalNumber,
-  PluralOnlyForms,
-} from "../types";
+  PluralOnlyForms, GENDER_ORDER } from "../types";
 import { CARDINALS } from "../data/cardinals";
 import { ADJECTIVES } from "../data/adjectives";
 import { NOUNS } from "../data/nouns";
-import { nounUsableAsPartner } from "../data/categories";
-import { NUMERAL_FRAMES, NumeralFrame, ORDINAL_FRAMES } from "../data/numeralFrames";
-import type { QuizCase } from "../data/declensionFrames";
+import { NUMERAL_FRAMES, NumeralFrame, ORDINAL_BARE_SKIPS, ORDINAL_FRAMES } from "../data/numeralFrames";
+import { QUIZ_CASES, type QuizCase } from "../data/declensionFrames";
 import type { VocalPrep } from "../data/prepositionPartners";
-import { matchesNeeds, freshWeightedOrder, acceptedForms, formInUse, formOf, fitCounts, hasNumber, onlyOne, pluralOnly, sharedVocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
+import { PARTNER_NOUNS, matchesNeeds, freshWeightedOrder, acceptedForms, formInUse, formOf, fitCounts, hasNumber, onlyOne, pluralOnly, sharedVocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
 import { firstForm, isUsableDistractor, once, shuffle, splitForms, topUpRound } from "./quizCommon";
 import { cardinalForms, isDirect } from "./numeralForms";
@@ -50,8 +48,6 @@ export interface AgreementQuestion {
   options: string[];
 }
 
-const QUIZ_CASES = NUMERAL_CASE_ORDER as QuizCase[];
-const GENDERS: Gender[] = ["masc_anim", "masc_inan", "fem", "neut"];
 
 // ─────────────────── Лічильне слово ───────────────────
 // Усе, що квізу треба знати про числівник: його форми, які клітинки іменника він вимагає і з якими іменниками
@@ -108,7 +104,7 @@ function simpleCounter(card: CardinalEntry): Counter {
       distractors: (c, g) => {
         const out = otherCases(c).map((x) => cardinalForms(card, x, g)[0]);
         // інший рід у тому самому відмінку: jeden ↔ jednoho, dva ↔ dvě
-        if (card.kind === "gendered" || card.kind === "twoForm") for (const og of GENDERS) out.push(cardinalForms(card, c, og)[0]);
+        if (card.kind === "gendered" || card.kind === "twoForm") for (const og of GENDER_ORDER) out.push(cardinalForms(card, c, og)[0]);
         return out;
       },
     },
@@ -160,7 +156,7 @@ function compoundCounter(decade: CardinalEntry, unit: CardinalEntry, group: numb
       // показуємо повністю відмінювану (вона переважає), решту не подаємо як помилку.
       const extra: string[] = [];
       for (const dc of NUMERAL_CASE_ORDER)
-        for (const og of GENDERS) extra.push(`${cardinalForms(decade, dc, og)[0]} ${cardinalForms(unit, "nominativ", og)[0]}`);
+        for (const og of GENDER_ORDER) extra.push(`${cardinalForms(decade, dc, og)[0]} ${cardinalForms(unit, "nominativ", og)[0]}`);
       return [...shown, ...extra.filter((x) => !shown.includes(x))];
     },
     numeral: {
@@ -169,7 +165,7 @@ function compoundCounter(decade: CardinalEntry, unit: CardinalEntry, group: numb
       distractors: (c, g) => {
         const oc = otherCases(c);
         const out = [...oc.map((x) => join(x, x, g)), ...oc.map((x) => join(c, x, g))];
-        if (unit.kind === "gendered" || unit.kind === "twoForm") for (const og of GENDERS) out.push(join(c, c, og));
+        if (unit.kind === "gendered" || unit.kind === "twoForm") for (const og of GENDER_ORDER) out.push(join(c, c, og));
         return out;
       },
     },
@@ -255,15 +251,14 @@ function pluralOnlyCounter(card: CardinalEntry, po: PluralOnlyForms): Counter {
 }
 
 // ─────────────────── Іменники й фрази ───────────────────
-// Партнери: не дні/місяці/сотні (nounUsableAsPartner); незлічувані відсіює Counter.accepts.
-const NOUN_POOL = NOUNS.filter((n) => nounUsableAsPartner(n.category));
+// Партнери: не дні/місяці/сотні (PARTNER_NOUNS); незлічувані відсіює Counter.accepts.
 const HUNDRED_NOUNS = NOUNS.filter((n) => n.category === "numbers");
 
 const frameFits = (f: NumeralFrame, k: Counter, n: NounEntry) =>
   matchesNeeds(n, f) && (!f.many || k.many) && (f.max === undefined || k.value <= f.max);
 
 // fit — у скількох фразах слово може з'явитися (з даних): вага 1/fit вирівнює частоту слів.
-const FIT = fitCounts(NOUN_POOL, QUIZ_CASES.flatMap((c) => NUMERAL_FRAMES[c]), matchesNeeds);
+const FIT = fitCounts(PARTNER_NOUNS, QUIZ_CASES.flatMap((c) => NUMERAL_FRAMES[c]), matchesNeeds);
 
 interface Candidate {
   noun: NounEntry;
@@ -276,7 +271,7 @@ function candidatesFor(k: Counter, c: QuizCase): Candidate[] {
   if (!out) {
     out = [];
     const cell = k.cell(c);
-    for (const noun of NOUN_POOL) {
+    for (const noun of PARTNER_NOUNS) {
       if (!k.accepts(noun) || !formInUse(noun, cell.c, cell.n)) continue; // форма, якої мова не вживає (NOUN_USAGE_RULES), — ні
       const frames = NUMERAL_FRAMES[c].filter((f) => frameFits(f, k, noun));
       if (frames.length > 0) out.push({ noun, frames });
@@ -422,10 +417,11 @@ const withNounIds = (b: Built | null) => b && { q: b.q, nounIds: [b.nounId] };
 // ═══════════════════ ПОРЯДКОВІ první … dvanáctý ═══════════════════
 // Таблиця прикметника (adjectives.ts, category "ordinal") — тим самим механізмом, що квіз «Прикметники та займенники»,
 // але зі своїм банком фраз ORDINAL_FRAMES (data/numeralFrames.ts): кожна клітинка рід × відмінок × число, речення
-// з іменником тегу ordered або без речення. comboId — як у прикметників: «ord-druhy::fem_lokal::sg».
+// з іменником тегу ordered, фраза без іменника (гонки) або без речення; множина від 7 без природної фрази не питається
+// (ORDINAL_BARE_SKIPS). comboId — як у прикметників: «ord-druhy::fem_lokal::sg».
 const ORDINAL_BANK = once(() => frameBank(ORDINAL_FRAMES));
 const ordinalCombos = (): Combo[] =>
-  adjectiveTableUnits(ADJECTIVES.filter((a) => a.category === "ordinal"), "ordinal", ORDINAL_BANK()).map((u) => ({
+  adjectiveTableUnits(ADJECTIVES.filter((a) => a.category === "ordinal"), "ordinal", ORDINAL_BANK(), ORDINAL_BARE_SKIPS).map((u) => ({
     id: u.id,
     wordId: u.wordId,
     kind: "ordinal",
@@ -498,7 +494,7 @@ function devCheckData(): void {
   const issues: string[] = [];
   for (const c of QUIZ_CASES)
     for (const f of NUMERAL_FRAMES[c]) {
-      const k = NOUN_POOL.filter((n) => countable(n) && matchesNeeds(n, f)).length;
+      const k = PARTNER_NOUNS.filter((n) => countable(n) && matchesNeeds(n, f)).length;
       if (k < 3) issues.push(`фраза «${f.text}» (${c}): лише ${k} іменників (потрібно ≥ 3)`);
     }
   for (const h of HUNDRED_NOUNS) if (h.numeralValue === undefined) issues.push(`${h.id}: немає numeralValue`);
@@ -509,7 +505,7 @@ if (typeof __DEV__ !== "undefined" && __DEV__) devCheckData();
 // ─────────────────── Сесія ───────────────────
 // Баланс: складених лише 5 груп проти десятків простих комбо — без мінімуму вони б випадали рідко. Форми для слів
 // лише з множиною мають 30 комбо на 2–3 іменники (brýle, kalhoty): вага 0,25 тримає їх близько одного питання на
-// два раунди, інакше ці кілька слів повторювалися б щораунду. Порядкових — 576 комбо (клітинки таблиці) проти ~230
+// два раунди, інакше ці кілька слів повторювалися б щораунду. Порядкових — 474 комбо (клітинки таблиці без ORDINAL_BARE_SKIPS) проти ~230
 // решти: рішення Ніка (2026-10-07) — близько двох на раунд, тож мінімум 2 і мала вага понад нього.
 const NUM_KIND_QUOTA: KindQuota<string> = {
   kindOf: (c) => (c as Combo).kind,

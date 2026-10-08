@@ -3,6 +3,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { theme } from "../utils/theme";
 import { plural } from "../utils/plural";
 import RotateCcw from "lucide-react-native/icons/rotate-ccw";
+import { MISTAKE_DECK_TITLE } from "../data/groupTitles";
 
 // Плашка "Повторити помилки" — раніше була скопійована дослівно в 8 екранах
 // (Слова/Дієслова/Прикметники/Займенники/Прислівники/Числівники/Прийменники/
@@ -28,7 +29,7 @@ export function MistakeDeckCard({ count, wordForms, onPress }: Props) {
     >
       <RotateCcw size={26} color={theme.colors.coral} strokeWidth={2.5} />
       <View style={{ flex: 1 }}>
-        <Text style={styles.title}>Повторити помилки</Text>
+        <Text style={styles.title}>{MISTAKE_DECK_TITLE}</Text>
         <Text style={styles.sub}>
           {count === 0 ? `Поки що немає ${many} на повторення` : `${count} ${plural(count, one, few, many)} чекає`}
         </Text>

@@ -10,7 +10,7 @@ import { MistakeDeckCard } from "../components/MistakeDeckCard";
 import { PosEmoji } from "../components/PosEmoji";
 import { CONJUNCTIONS } from "../data/conjunctions";
 import { SERVICE_ADVERBS } from "../data/serviceAdverbs";
-import { CONJUNCTIONS_TITLE, SERVICE_ADVERBS_TITLE } from "../data/groupTitles";
+import { CONJUNCTIONS_TITLE, SERVICE_ADVERBS_TITLE, MISTAKE_DECK_TITLE } from "../data/groupTitles";
 import { plural } from "../utils/plural";
 import { ModeToggle, BrowseMode } from "../components/ModeToggle";
 import { loadProgressFrom, getMistakeIds, PROGRESS_KEYS } from "../utils/progress";
@@ -60,7 +60,7 @@ export function ServiceWordsScreen({ navigation }: Props) {
   function startMistakes() {
     const ids = ALL_SERVICE_WORD_IDS.filter((id) => mistakeIds.has(id));
     if (ids.length === 0) return;
-    navigation.navigate("DeclSession", { title: "Повторити помилки", kind: "service-word", entryIds: ids, isMistakeRepeat: true });
+    navigation.navigate("DeclSession", { title: MISTAKE_DECK_TITLE, kind: "service-word", entryIds: ids, isMistakeRepeat: true });
   }
 
   function openConjunctions() {

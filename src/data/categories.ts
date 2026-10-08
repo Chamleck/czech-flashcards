@@ -49,7 +49,7 @@ export const NOUN_CATS_EXCLUDED_FROM_QUIZ = new Set<WordCategory>(
 
 // Категорії іменників, непридатні лише як партнер/носій у чужому реченні
 // (але легально тестуються у своєму розділі). Включає й повністю приховані.
-export const NOUN_CATS_UNSUITABLE_AS_PARTNER = new Set<WordCategory>(
+const NOUN_CATS_UNSUITABLE_AS_PARTNER = new Set<WordCategory>(
   CATEGORIES.filter((c) => c.hiddenFromPartOfSpeech || c.unsuitableAsPartner).map((c) => c.key)
 );
 

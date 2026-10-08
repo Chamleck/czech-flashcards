@@ -27,7 +27,7 @@ export const ALL_NUMERAL_IDS: string[] = [
   ...NOUNS.filter((n) => n.category === "numbers").map((n) => n.id),
 ];
 
-export function numeralCardType(id: string): NumeralCardType | null {
+function numeralCardType(id: string): NumeralCardType | null {
   if (id.startsWith("card-")) return "cardinal";
   if (id.startsWith("ord-")) return "ordinal";
   if (id.startsWith("num-")) return "hundreds";
