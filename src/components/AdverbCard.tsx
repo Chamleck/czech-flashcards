@@ -7,6 +7,7 @@ import { TileEmoji } from "./TileEmoji";
 import { Speakable } from "./Speakable";
 import { InfoBanner } from "./InfoBanner";
 import { rolesOf, senseLabel } from "../data/interrogativeAdverbs";
+import { ExampleRow } from "./ExampleRow";
 
 interface Props {
   entry: SpatialAdverbEntry;
@@ -27,17 +28,6 @@ function accentFor(sense: AdverbSense): string {
 
 // Один приклад-рядок з озвученням. Speakable — сиблінг у View (не в <Text>),
 // той самий патерн, що в PrepositionCard/FlashCard.
-function ExampleRow({ id, cz, uk }: { id: string; cz: string; uk: string }) {
-  return (
-    <View style={styles.example}>
-      <View style={styles.exampleRow}>
-        <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
-        <Speakable id={id} text={cz} style={styles.exampleCz} />
-      </View>
-      <Text style={styles.exampleUk}>{uk}</Text>
-    </View>
-  );
-}
 
 // Блок одного сенсу: заголовок ("де?") + слово + приклади. Кожен sense —
 // самостійне слово (vlevo/doleva/zleva — три РІЗНІ слова, не форми одного),
@@ -120,14 +110,4 @@ const styles = StyleSheet.create({
   },
   senseHeading: { fontSize: 14, fontWeight: "700" },
   senseWord: { fontSize: 26, fontWeight: "800", marginVertical: 2 },
-  example: {
-    marginTop: theme.space(2),
-    marginBottom: theme.space(1),
-    backgroundColor: theme.colors.bgElevated,
-    borderRadius: theme.radius.md,
-    padding: theme.space(3.5),
-  },
-  exampleRow: { flexDirection: "row", alignItems: "baseline", gap: 5 },
-  exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600", flex: 1 },
-  exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
 });

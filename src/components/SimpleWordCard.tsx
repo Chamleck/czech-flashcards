@@ -8,6 +8,7 @@ import { Speakable } from "./Speakable";
 import { InfoBanner } from "./InfoBanner";
 import { AppNav } from "./ClickableWord";
 import { renderNoteWithLinks } from "./NoteLinks";
+import { ExampleRow } from "./ExampleRow";
 
 interface Props {
   entry: InvariantWordEntry;
@@ -29,18 +30,6 @@ interface Props {
 // для розфарбовування, і власний колір дає розділу "Питальні" візуальну
 // єдність, відмінну від відповідей на ці питання (vlevo/tam тощо).
 const ACCENT = "#d98cbf";
-
-function ExampleRow({ id, cz, uk }: { id: string; cz: string; uk: string }) {
-  return (
-    <View style={styles.example}>
-      <View style={styles.exampleRow}>
-        <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
-        <Speakable id={id} text={cz} style={styles.exampleCz} />
-      </View>
-      <Text style={styles.exampleUk}>{uk}</Text>
-    </View>
-  );
-}
 
 export function SimpleWordCard({ entry, revealed, onReveal, navigation, linkMode }: Props) {
   return (
@@ -116,14 +105,4 @@ const styles = StyleSheet.create({
   answerLabel: { color: theme.colors.textDim, fontSize: 13 },
   answerLabelRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   answerWord: { fontSize: 28, fontWeight: "800", marginVertical: 2, color: ACCENT },
-  example: {
-    marginTop: theme.space(2),
-    marginBottom: theme.space(1),
-    backgroundColor: theme.colors.bgElevated,
-    borderRadius: theme.radius.md,
-    padding: theme.space(3.5),
-  },
-  exampleRow: { flexDirection: "row", alignItems: "baseline", gap: 5 },
-  exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600", flex: 1 },
-  exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
 });

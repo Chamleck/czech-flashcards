@@ -84,7 +84,9 @@ npx esbuild scripts/report-frames.ts --bundle --platform=node --format=cjs --cha
 
 ## Відомий борг (на момент запису)
 
-`scripts/architecture-baseline.json` (10 рядків): `any` у `AdjPronounCard.tsx`, `BrowseCardScreen.tsx`, `linkNavigation.ts` (A5);
-імпорти `@react-navigation/*` у `linkNavigation.ts` (A8); однакова функція `ExampleRow` у `AdverbCard`, `PrepositionCard`, `SimpleWordCard` і
-однакові блоки `styles` у групах екранів (A1) — виправляється окремою UI-гілкою з порівнянням стилів сусідів. Усе інше, знайдене прогонами (дубль хелпера `d`, рядок «Повторити помилки»
-×9, мертві експорти, повторювані пороги `max`, `PERSON_ROW_LABELS` ×2, список непрямих відмінків ×2), виправлено.
+`scripts/architecture-baseline.json` (7 рядків): `any` у `AdjPronounCard.tsx`, `BrowseCardScreen.tsx`, `linkNavigation.ts` (A5);
+імпорти `@react-navigation/*` у `linkNavigation.ts` (A8); однакова розкладка екранів списків у двох групах (`AdjectiveCategories`,
+`PronounGroups`, `VerbCategories` і `Adverbs`, `Interrogatives`, `Numerals`, `Prepositions`, `ServiceWords`: ті самі 7 стилів під різними
+назвами ключів) — виправляється окремою гілкою (варіант 2 із пропозиції ui-dedup).
+Усе інше, знайдене прогонами (дубль хелпера `d`, рядок «Повторити помилки» ×9, мертві експорти, повторювані пороги `max`,
+`PERSON_ROW_LABELS` ×2, список непрямих відмінків ×2, `ExampleRow` ×3, стилі сесійних екранів ×5, `subtypeTag` ×3), виправлено.

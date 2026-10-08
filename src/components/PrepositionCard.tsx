@@ -7,6 +7,7 @@ import { SegmentTabs } from "./SegmentTabs";
 import { PosEmoji } from "./PosEmoji";
 import { TileEmoji } from "./TileEmoji";
 import { InfoBanner } from "./InfoBanner";
+import { ExampleRow } from "./ExampleRow";
 
 interface Props {
   entry: PrepositionEntry;
@@ -16,17 +17,6 @@ interface Props {
 
 // Один приклад-рядок з озвученням. Speakable — СИБЛІНГ у View row (ніколи не
 // вкладений у <Text>), згідно з правилом проєкту про незалежну opacity.
-function ExampleRow({ id, cz, uk }: { id: string; cz: string; uk: string }) {
-  return (
-    <View style={styles.example}>
-      <View style={styles.exampleRow}>
-        <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
-        <Speakable id={id} text={cz} style={styles.exampleCz} />
-      </View>
-      <Text style={styles.exampleUk}>{uk}</Text>
-    </View>
-  );
-}
 
 // Блок одного "сенсу" дуального прийменника: заголовок + відмінок + приклади.
 function SenseBlock({
@@ -219,14 +209,4 @@ const styles = StyleSheet.create({
   },
   senseHeading: { fontSize: 16, fontWeight: "800", marginBottom: 2 },
   senseCase: { color: theme.colors.textFaint, fontSize: 13, marginBottom: theme.space(2) },
-  example: {
-    marginTop: theme.space(2),
-    marginBottom: theme.space(1),
-    backgroundColor: theme.colors.bgElevated,
-    borderRadius: theme.radius.md,
-    padding: theme.space(3.5),
-  },
-  exampleRow: { flexDirection: "row", alignItems: "baseline", gap: 5 },
-  exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600", flex: 1 },
-  exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
 });

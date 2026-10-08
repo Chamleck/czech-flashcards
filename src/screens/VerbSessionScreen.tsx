@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, CardProgress, VerbEntry } from "../types";
@@ -17,6 +17,7 @@ import {
   PROGRESS_KEYS,
 } from "../utils/progress";
 import { stopSpeech, useStopSpeechOnUnmount } from "../utils/useSpeech";
+import { sessionStyles } from "./sessionStyles";
 
 type Props = NativeStackScreenProps<RootStackParamList, "VerbSession">;
 
@@ -55,7 +56,7 @@ export function VerbSessionScreen({ route, navigation }: Props) {
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
           {queue.length > 0 && (
-            <Text style={styles.counter}>
+            <Text style={sessionStyles.counter}>
               {finished ? queue.length : idx + 1} / {queue.length}
             </Text>
           )}
@@ -67,8 +68,8 @@ export function VerbSessionScreen({ route, navigation }: Props) {
 
   if (!loaded) {
     return (
-      <View style={styles.safe}>
-        <Text style={styles.loading}>Завантаження…</Text>
+      <View style={sessionStyles.safe}>
+        <Text style={sessionStyles.loading}>Завантаження…</Text>
       </View>
     );
   }
@@ -91,28 +92,28 @@ export function VerbSessionScreen({ route, navigation }: Props) {
 
   if (finished) {
     return (
-      <View style={styles.safe}>
-        <View style={styles.doneWrap}>
+      <View style={sessionStyles.safe}>
+        <View style={sessionStyles.doneWrap}>
           <PosEmoji name="partyPopper" size={64} />
-          <Text style={styles.doneTitle}>Готово!</Text>
-          <Text style={styles.doneText}>
+          <Text style={sessionStyles.doneTitle}>Готово!</Text>
+          <Text style={sessionStyles.doneText}>
             Пройдено карток: {stats.done}{"\n"}
             {isMistakeRepeat ? "Вивчено" : "Знав одразу"}: {stats.known}
           </Text>
           <Pressable
-            style={styles.againBtn}
+            style={sessionStyles.againBtn}
             onPress={() => {
               setIdx(0);
               setStats({ done: 0, known: 0 });
             }}
           >
-            <View style={styles.btnRow}>
+            <View style={sessionStyles.btnRow}>
             <RotateCcw size={16} color="#3a1f00" strokeWidth={2.5} />
-            <Text style={styles.againText}>Ще раз</Text>
+            <Text style={sessionStyles.againText}>Ще раз</Text>
           </View>
           </Pressable>
-          <Pressable style={styles.backHome} onPress={() => navigation.goBack()}>
-            <Text style={styles.backHomeText}>Назад</Text>
+          <Pressable style={sessionStyles.backHome} onPress={() => navigation.goBack()}>
+            <Text style={sessionStyles.backHomeText}>Назад</Text>
           </Pressable>
         </View>
       </View>
@@ -120,23 +121,23 @@ export function VerbSessionScreen({ route, navigation }: Props) {
   }
 
   return (
-    <View style={styles.safe}>
-      <View style={styles.cardArea}>
+    <View style={sessionStyles.safe}>
+      <View style={sessionStyles.cardArea}>
         <VerbCard entry={current} revealed={revealed} onReveal={() => setRevealed(true)} navigation={navigation} />
       </View>
 
       {revealed && (
-        <View style={[styles.actions, { paddingBottom: insets.bottom + theme.space(4) }]}>
-          <Pressable style={[styles.actionBtn, styles.dontKnow]} onPress={() => answer(false)}>
-            <View style={styles.btnRow}>
+        <View style={[sessionStyles.actions, { paddingBottom: insets.bottom + theme.space(4) }]}>
+          <Pressable style={[sessionStyles.actionBtn, sessionStyles.dontKnow]} onPress={() => answer(false)}>
+            <View style={sessionStyles.btnRow}>
               <RotateCcw size={16} color="#1a1020" strokeWidth={2.5} />
-              <Text style={styles.actionText}>Ще повторити</Text>
+              <Text style={sessionStyles.actionText}>Ще повторити</Text>
             </View>
           </Pressable>
-          <Pressable style={[styles.actionBtn, styles.know]} onPress={() => answer(true)}>
-            <View style={styles.btnRow}>
+          <Pressable style={[sessionStyles.actionBtn, sessionStyles.know]} onPress={() => answer(true)}>
+            <View style={sessionStyles.btnRow}>
               <CheckIcon size={16} color="#1a1020" strokeWidth={2.5} />
-              <Text style={styles.actionText}>Знаю</Text>
+              <Text style={sessionStyles.actionText}>Знаю</Text>
             </View>
           </Pressable>
         </View>
@@ -144,29 +145,3 @@ export function VerbSessionScreen({ route, navigation }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: theme.colors.bg },
-  loading: { color: theme.colors.textDim, textAlign: "center", marginTop: 40 },
-  counter: { color: theme.colors.textDim, fontSize: 15, fontWeight: "700" },
-  cardArea: { flex: 1, paddingHorizontal: theme.space(4), paddingTop: theme.space(2) },
-  actions: { flexDirection: "row", gap: theme.space(3), padding: theme.space(4) },
-  actionBtn: { flex: 1, paddingVertical: theme.space(4), borderRadius: theme.radius.md, alignItems: "center" },
-  btnRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-  dontKnow: { backgroundColor: theme.colors.coral },
-  know: { backgroundColor: theme.colors.mint },
-  actionText: { color: "#1a1020", fontWeight: "800", fontSize: 15 },
-  doneWrap: { flex: 1, justifyContent: "center", alignItems: "center", padding: theme.space(6) },
-  doneTitle: { color: theme.colors.text, fontSize: 26, fontWeight: "800", marginTop: 8 },
-  doneText: { color: theme.colors.textDim, fontSize: 16, textAlign: "center", marginTop: 12, lineHeight: 24 },
-  againBtn: {
-    marginTop: theme.space(6),
-    backgroundColor: theme.colors.honey,
-    paddingVertical: theme.space(3.5),
-    paddingHorizontal: theme.space(8),
-    borderRadius: theme.radius.md,
-  },
-  againText: { color: "#3a1f00", fontWeight: "800", fontSize: 16 },
-  backHome: { marginTop: theme.space(4) },
-  backHomeText: { color: theme.colors.lilac, fontSize: 15, fontWeight: "700" },
-});

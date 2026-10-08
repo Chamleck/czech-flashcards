@@ -1,11 +1,8 @@
 {
   "about": "Відомий архітектурний борг (scripts/check-architecture.ts). Список лише скорочується; новий рядок — лише за рішенням Ніка.",
   "known": [
-    "A1|функція|src/components/AdverbCard.tsx:ExampleRow,src/components/PrepositionCard.tsx:ExampleRow,src/components/SimpleWordCard.tsx:ExampleRow",
     "A1|ініціалізатор константи|src/screens/AdjectiveCategoriesScreen.tsx:styles,src/screens/PronounGroupsScreen.tsx:styles,src/screens/VerbCategoriesScreen.tsx:styles",
-    "A1|ініціалізатор константи|src/screens/AdverbSessionScreen.tsx:styles,src/screens/DeclSessionScreen.tsx:styles,src/screens/PrepositionSessionScreen.tsx:styles,src/screens/VerbSessionScreen.tsx:styles,src/screens/WordSessionScreen.tsx:styles",
     "A1|ініціалізатор константи|src/screens/AdverbsScreen.tsx:styles,src/screens/InterrogativesScreen.tsx:styles,src/screens/NumeralsScreen.tsx:styles,src/screens/PrepositionsScreen.tsx:styles,src/screens/ServiceWordsScreen.tsx:styles",
-    "A1|ініціалізатор константи|src/screens/IndefinitePronounSelectionScreen.tsx:styles,src/screens/PersonalPronounSelectionScreen.tsx:styles,src/screens/PronounSelectionScreen.tsx:styles",
     "A5|any|src/components/AdjPronounCard.tsx",
     "A5|any|src/screens/BrowseCardScreen.tsx",
     "A5|any|src/utils/linkNavigation.ts",
