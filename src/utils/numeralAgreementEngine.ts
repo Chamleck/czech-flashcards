@@ -5,6 +5,7 @@ import {
   NUMERAL_CASE_ORDER,
   Gender,
   NounEntry,
+  QuizNoun,
   GrammaticalNumber,
   PluralOnlyForms, GENDER_ORDER } from "../types";
 import { CARDINALS } from "../data/cardinals";
@@ -13,7 +14,7 @@ import { NOUNS } from "../data/nouns";
 import { NUMERAL_FRAMES, NumeralFrame, ORDINAL_BARE_SKIPS, ORDINAL_FRAMES } from "../data/numeralFrames";
 import { QUIZ_CASES, type QuizCase } from "../data/declensionFrames";
 import type { VocalPrep } from "../data/prepositionPartners";
-import { PARTNER_NOUNS, matchesNeeds, freshWeightedOrder, acceptedForms, formInUse, formOf, fitCounts, hasNumber, onlyOne, pluralOnly, sharedVocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
+import { PARTNER_NOUNS, distinctWords, matchesNeeds, freshWeightedOrder, acceptedForms, formInUse, formOf, fitCounts, hasNumber, onlyOne, pluralOnly, sharedVocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
 import { firstForm, isUsableDistractor, once, shuffle, splitForms, topUpRound } from "./quizCommon";
 import { cardinalForms, isDirect } from "./numeralForms";
@@ -70,7 +71,7 @@ interface Counter {
   many: boolean; // кількість від двох (фрази з mezi)
   value: number; // найбільша кількість, яку це слово означає (фрази з max: data/numeralFrames.ts)
   cases?: QuizCase[]; // лише ці відмінки (інакше всі)
-  accepts: (n: NounEntry) => boolean;
+  accepts: (n: QuizNoun) => boolean;
 }
 
 const otherCases = (c: CzechCase) => shuffle(NUMERAL_CASE_ORDER.filter((x) => x !== c));
@@ -92,8 +93,8 @@ function cardinalNounDistractors(card: CardinalEntry, c: CzechCase): Cell[] {
   return [{ c, n: "sg" }, ...otherCases(c).map((x) => ({ c: x, n: "pl" as const }))];
 }
 
-const countable = (n: NounEntry) => !n.uncountable && !onlyOne(n); // не voda, не metro
-const bothNumbers = (n: NounEntry) => hasNumber(n, "sg") && hasNumber(n, "pl");
+const countable = (n: QuizNoun) => !n.uncountable && !onlyOne(n); // не voda, не metro
+const bothNumbers = (n: QuizNoun) => hasNumber(n, "sg") && hasNumber(n, "pl");
 
 function simpleCounter(card: CardinalEntry): Counter {
   return {
@@ -254,14 +255,14 @@ function pluralOnlyCounter(card: CardinalEntry, po: PluralOnlyForms): Counter {
 // Партнери: не дні/місяці/сотні (PARTNER_NOUNS); незлічувані відсіює Counter.accepts.
 const HUNDRED_NOUNS = NOUNS.filter((n) => n.category === "numbers");
 
-const frameFits = (f: NumeralFrame, k: Counter, n: NounEntry) =>
+const frameFits = (f: NumeralFrame, k: Counter, n: QuizNoun) =>
   matchesNeeds(n, f) && (!f.many || k.many) && (f.max === undefined || k.value <= f.max);
 
 // fit — у скількох фразах слово може з'явитися (з даних): вага 1/fit вирівнює частоту слів.
 const FIT = fitCounts(PARTNER_NOUNS, QUIZ_CASES.flatMap((c) => NUMERAL_FRAMES[c]), matchesNeeds);
 
 interface Candidate {
-  noun: NounEntry;
+  noun: QuizNoun;
   frames: NumeralFrame[];
 }
 const candCache = new Map<string, Candidate[]>();
@@ -304,7 +305,7 @@ const sidesOf = (k: Counter): Side[] =>
 // Пара «пропуск + іменник»: показані форми й придатні дистрактори за пріоритетом; null — форми немає.
 interface Prepared {
   side: Side;
-  noun: NounEntry;
+  noun: QuizNoun;
   cell: Cell;
   numShown: string;
   nounShown: string;
@@ -312,7 +313,7 @@ interface Prepared {
   correct: string;
   distractors: string[];
 }
-function prepare(k: Counter, c: QuizCase, side: Side, noun: NounEntry): Prepared | null {
+function prepare(k: Counter, c: QuizCase, side: Side, noun: QuizNoun): Prepared | null {
   const numAcc = k.forms(c, noun.gender);
   const numShown = numAcc[0];
   const cell = k.cell(c);
@@ -352,7 +353,7 @@ function build(k: Counter, c: QuizCase, id: string, used: ReadonlySet<string>): 
   if (k.cases && !k.cases.includes(c)) return null;
   const cands = candidatesFor(k, c);
   for (const side of shuffle(sidesOf(k))) {
-    for (const { noun, frames } of freshWeightedOrder(cands, (x) => used.has(x.noun.id), (x) => FIT.get(x.noun.id) ?? 1)) {
+    for (const { noun, frames } of freshWeightedOrder(cands, (x) => used.has(x.noun.id), (x) => FIT.get(x.noun.id) ?? 1, (x) => x.noun.id)) {
       const p = prepare(k, c, side, noun);
       if (!p) continue;
       for (const f of shuffle(frames)) {
@@ -494,7 +495,7 @@ function devCheckData(): void {
   const issues: string[] = [];
   for (const c of QUIZ_CASES)
     for (const f of NUMERAL_FRAMES[c]) {
-      const k = PARTNER_NOUNS.filter((n) => countable(n) && matchesNeeds(n, f)).length;
+      const k = distinctWords(PARTNER_NOUNS.filter((n) => countable(n) && matchesNeeds(n, f)));
       if (k < 3) issues.push(`фраза «${f.text}» (${c}): лише ${k} іменників (потрібно ≥ 3)`);
     }
   for (const h of HUNDRED_NOUNS) if (h.numeralValue === undefined) issues.push(`${h.id}: немає numeralValue`);

@@ -35,6 +35,11 @@ import { AdjectiveEntry, NounFilter } from "../types";
 //     «půl druhé» (родовий жін. роду наступної години, 2–12) і звіряє з ним дані дат (data/dates.ts); квіз «Числівники»
 //     питає кожну клітинку таблиці порядкового (фрази ORDINAL_FRAMES у data/numeralFrames.ts, поле max — за value), крім множини
 //     від 7 без природної фрази (ORDINAL_BARE_SKIPS там само — свідомий виняток із причиною; її читає й оракул).
+//  9. Багатозначне слово (těžký — вага / переносно: складно) — один запис: замість examples поле senses (щонайменше два
+//     значення, основне — перше), у кожного label (підпис над прикладом на картці) і examples на кожен рід. Значення
+//     прикметника обирає іменник («těžká taška» / «těžká práce»), тож fits — одне на слово і покриває всі значення.
+//     Переклад uk — один (якщо українською теж одне слово: «важкий»), інакше варіанти через « / » («керівний /
+//     керівник»), не через «;».
 const ANY: NounFilter = {};
 const ANIMATE: NounFilter = { any: ["person", "animal"] };
 const PERSON: NounFilter = { any: ["person"] };
@@ -6202,22 +6207,26 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "těžkým", pl: "těžkými" },
       },
     },
-    examples: {
-      masc_anim: { cz: "Kůň je těžký.", uk: "Кінь важкий." },
-      masc_inan: { cz: "Kufr je těžký.", uk: "Валіза важка." },
-      fem: { cz: "Taška je těžká.", uk: "Сумка важка." },
-      neut: { cz: "Závaží je těžké.", uk: "Гиря важка." },
-    },
-    senseLabel: "вага",
-    secondSense: {
-      label: "переносно: складно",
-      examples: {
-        masc_anim: { cz: "Ten soupeř je těžký.", uk: "Той суперник важкий." },
-        masc_inan: { cz: "Ten úkol je těžký.", uk: "Те завдання важке." },
-        fem: { cz: "Ta zkouška je těžká.", uk: "Той іспит важкий." },
-        neut: { cz: "To rozhodnutí je těžké.", uk: "Те рішення важке." },
+    senses: [
+      {
+        label: "вага",
+        examples: {
+          masc_anim: { cz: "Kůň je těžký.", uk: "Кінь важкий." },
+          masc_inan: { cz: "Kufr je těžký.", uk: "Валіза важка." },
+          fem: { cz: "Taška je těžká.", uk: "Сумка важка." },
+          neut: { cz: "Závaží je těžké.", uk: "Гиря важка." },
+        },
       },
-    },
+      {
+        label: "переносно: складно",
+        examples: {
+          masc_anim: { cz: "Ten soupeř je těžký.", uk: "Той суперник важкий." },
+          masc_inan: { cz: "Ten úkol je těžký.", uk: "Те завдання важке." },
+          fem: { cz: "Ta zkouška je těžká.", uk: "Той іспит важкий." },
+          neut: { cz: "To rozhodnutí je těžké.", uk: "Те рішення важке." },
+        },
+      },
+    ],
     degrees: {
       comparative: {
         cz: "těžší",
@@ -6353,22 +6362,26 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "lehkým", pl: "lehkými" },
       },
     },
-    examples: {
-      masc_anim: { cz: "Pták je lehký.", uk: "Птах легкий." },
-      masc_inan: { cz: "Kufr je lehký.", uk: "Валіза легка." },
-      fem: { cz: "Taška je lehká.", uk: "Сумка легка." },
-      neut: { cz: "Pírko je lehké.", uk: "Пір'їнка легка." },
-    },
-    senseLabel: "вага",
-    secondSense: {
-      label: "переносно: легко",
-      examples: {
-        masc_anim: { cz: "Ten soupeř je lehký.", uk: "Той суперник легкий." },
-        masc_inan: { cz: "Ten test je lehký.", uk: "Той тест легкий." },
-        fem: { cz: "Ta otázka je lehká.", uk: "Те питання легке." },
-        neut: { cz: "To cvičení je lehké.", uk: "Та вправа легка." },
+    senses: [
+      {
+        label: "вага",
+        examples: {
+          masc_anim: { cz: "Pták je lehký.", uk: "Птах легкий." },
+          masc_inan: { cz: "Kufr je lehký.", uk: "Валіза легка." },
+          fem: { cz: "Taška je lehká.", uk: "Сумка легка." },
+          neut: { cz: "Pírko je lehké.", uk: "Пір'їнка легка." },
+        },
       },
-    },
+      {
+        label: "переносно: легко",
+        examples: {
+          masc_anim: { cz: "Ten soupeř je lehký.", uk: "Той суперник легкий." },
+          masc_inan: { cz: "Ten test je lehký.", uk: "Той тест легкий." },
+          fem: { cz: "Ta otázka je lehká.", uk: "Те питання легке." },
+          neut: { cz: "To cvičení je lehké.", uk: "Та вправа легка." },
+        },
+      },
+    ],
     degrees: {
       comparative: {
         cz: "lehčí",
@@ -8055,22 +8068,26 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "šťastným", pl: "šťastnými" },
       },
     },
-    examples: {
-      masc_anim: { cz: "Ten muž je šťastný.", uk: "Той чоловік щасливий." },
-      masc_inan: { cz: "Ten život je šťastný.", uk: "Те життя щасливе." },
-      fem: { cz: "Ta rodina je šťastná.", uk: "Та родина щаслива." },
-      neut: { cz: "To dítě je šťastné.", uk: "Та дитина щаслива." },
-    },
-    senseLabel: "щасливий (емоція)",
-    secondSense: {
-      label: "переносно: удачливий",
-      examples: {
-        masc_anim: { cz: "Ten hráč je šťastný.", uk: "Той гравець удачливий." },
-        masc_inan: { cz: "Ten den je šťastný.", uk: "Той день щасливий (вдалий)." },
-        fem: { cz: "Ta náhoda je šťastná.", uk: "Той збіг щасливий (вдалий)." },
-        neut: { cz: "To číslo je šťastné.", uk: "Те число щасливе." },
+    senses: [
+      {
+        label: "щасливий (емоція)",
+        examples: {
+          masc_anim: { cz: "Ten muž je šťastný.", uk: "Той чоловік щасливий." },
+          masc_inan: { cz: "Ten život je šťastný.", uk: "Те життя щасливе." },
+          fem: { cz: "Ta rodina je šťastná.", uk: "Та родина щаслива." },
+          neut: { cz: "To dítě je šťastné.", uk: "Та дитина щаслива." },
+        },
       },
-    },
+      {
+        label: "переносно: удачливий",
+        examples: {
+          masc_anim: { cz: "Ten hráč je šťastný.", uk: "Той гравець удачливий." },
+          masc_inan: { cz: "Ten den je šťastný.", uk: "Той день щасливий (вдалий)." },
+          fem: { cz: "Ta náhoda je šťastná.", uk: "Той збіг щасливий (вдалий)." },
+          neut: { cz: "To číslo je šťastné.", uk: "Те число щасливе." },
+        },
+      },
+    ],
     degrees: {
       comparative: {
         cz: "šťastnější",
@@ -8206,22 +8223,26 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "bohatým", pl: "bohatými" },
       },
     },
-    examples: {
-      masc_anim: { cz: "Ten muž je bohatý.", uk: "Той чоловік багатий." },
-      masc_inan: { cz: "Ten stát je bohatý.", uk: "Та держава багата." },
-      fem: { cz: "Ta firma je bohatá.", uk: "Та фірма багата." },
-      neut: { cz: "To město je bohaté.", uk: "Те місто багате." },
-    },
-    senseLabel: "багатий (грошима)",
-    secondSense: {
-      label: "переносно: багатий на щось",
-      examples: {
-        masc_anim: { cz: "Ten text je bohatý.", uk: "Той текст багатий (насичений)." },
-        masc_inan: { cz: "Ten výběr je bohatý.", uk: "Той вибір багатий." },
-        fem: { cz: "Ta historie je bohatá.", uk: "Та історія багата." },
-        neut: { cz: "To menu je bohaté.", uk: "Те меню багате." },
+    senses: [
+      {
+        label: "багатий (грошима)",
+        examples: {
+          masc_anim: { cz: "Ten muž je bohatý.", uk: "Той чоловік багатий." },
+          masc_inan: { cz: "Ten stát je bohatý.", uk: "Та держава багата." },
+          fem: { cz: "Ta firma je bohatá.", uk: "Та фірма багата." },
+          neut: { cz: "To město je bohaté.", uk: "Те місто багате." },
+        },
       },
-    },
+      {
+        label: "переносно: багатий на щось",
+        examples: {
+          masc_anim: { cz: "Ten text je bohatý.", uk: "Той текст багатий (насичений)." },
+          masc_inan: { cz: "Ten výběr je bohatý.", uk: "Той вибір багатий." },
+          fem: { cz: "Ta historie je bohatá.", uk: "Та історія багата." },
+          neut: { cz: "To menu je bohaté.", uk: "Те меню багате." },
+        },
+      },
+    ],
     degrees: {
       comparative: {
         cz: "bohatší",
@@ -8357,22 +8378,26 @@ export const ADJECTIVES: AdjectiveEntry[] = [
         instrumental: { sg: "chudým", pl: "chudými" },
       },
     },
-    examples: {
-      masc_anim: { cz: "Ten muž je chudý.", uk: "Той чоловік бідний." },
-      masc_inan: { cz: "Ten stát je chudý.", uk: "Та держава бідна." },
-      fem: { cz: "Ta firma je chudá.", uk: "Та фірма бідна." },
-      neut: { cz: "To město je chudé.", uk: "Те місто бідне." },
-    },
-    senseLabel: "бідний (грошима)",
-    secondSense: {
-      label: "переносно: бідний на щось",
-      examples: {
-        masc_anim: { cz: "Ten text je chudý.", uk: "Той текст бідний (скупий)." },
-        masc_inan: { cz: "Ten výběr je chudý.", uk: "Той вибір бідний." },
-        fem: { cz: "Ta slovní zásoba je chudá.", uk: "Той словниковий запас бідний." },
-        neut: { cz: "To menu je chudé.", uk: "Те меню бідне." },
+    senses: [
+      {
+        label: "бідний (грошима)",
+        examples: {
+          masc_anim: { cz: "Ten muž je chudý.", uk: "Той чоловік бідний." },
+          masc_inan: { cz: "Ten stát je chudý.", uk: "Та держава бідна." },
+          fem: { cz: "Ta firma je chudá.", uk: "Та фірма бідна." },
+          neut: { cz: "To město je chudé.", uk: "Те місто бідне." },
+        },
       },
-    },
+      {
+        label: "переносно: бідний на щось",
+        examples: {
+          masc_anim: { cz: "Ten text je chudý.", uk: "Той текст бідний (скупий)." },
+          masc_inan: { cz: "Ten výběr je chudý.", uk: "Той вибір бідний." },
+          fem: { cz: "Ta slovní zásoba je chudá.", uk: "Той словниковий запас бідний." },
+          neut: { cz: "To menu je chudé.", uk: "Те меню бідне." },
+        },
+      },
+    ],
     degrees: {
       comparative: {
         cz: "chudší",
@@ -13043,7 +13068,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
   {
     id: "vedouci",
     semClass: "relational",
-    uk: "керівний; керівник",
+    uk: "керівний / керівник",
     cz: "vedoucí",
     pattern: "mekky",
     category: "soft",

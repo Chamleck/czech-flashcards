@@ -3,9 +3,16 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { NounEntry } from "../types";
 import { theme, GENDER_LABEL } from "../utils/theme";
 import { PosEmoji } from "./PosEmoji";
-import { TileEmoji } from "./TileEmoji";
+import { SenseExamples } from "./ExampleRow";
 import { DeclensionTable } from "./DeclensionTable";
 import { Speakable } from "./Speakable";
+
+// Приклади під таблицею: у однозначного слова — один (якщо є), у багатозначного — по одному на значення під його
+// підписом (NounSense, types/index.ts).
+function examplesOf(n: NounEntry): { label?: string; cz: string; uk: string }[] {
+  if (n.senses) return n.senses.map((s) => ({ label: s.label, ...s.example }));
+  return n.exampleSentenceCz ? [{ cz: n.exampleSentenceCz, uk: n.exampleSentenceUk ?? "" }] : [];
+}
 
 interface Props {
   entry: NounEntry;
@@ -58,19 +65,7 @@ export function FlashCard({ entry, revealed, onReveal }: Props) {
 
             <DeclensionTable table={entry.declension} speakId={entry.id} />
 
-            {entry.exampleSentenceCz && (
-              <View style={styles.example}>
-                <View style={styles.exampleRow}>
-                  <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
-                  <Speakable
-                    id={`${entry.id}:example`}
-                    text={entry.exampleSentenceCz}
-                    style={styles.exampleCz}
-                  />
-                </View>
-                <Text style={styles.exampleUk}>{entry.exampleSentenceUk}</Text>
-              </View>
-            )}
+            <SenseExamples id={entry.id} items={examplesOf(entry)} />
           </>
         </ScrollView>
       )}
@@ -107,13 +102,4 @@ const styles = StyleSheet.create({
   answerLabelRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   answerWord: { fontSize: 28, fontWeight: "800", marginVertical: 2 },
   genderTag: { fontSize: 13, fontWeight: "600" },
-  example: {
-    marginTop: theme.space(4),
-    backgroundColor: theme.colors.bgElevated,
-    borderRadius: theme.radius.md,
-    padding: theme.space(3.5),
-  },
-  exampleRow: { flexDirection: "row", alignItems: "baseline", gap: 5 },
-  exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600", flex: 1 },
-  exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
 });

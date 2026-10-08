@@ -34,6 +34,11 @@
 //  6. Порядкові «Числівників»: клітинка без природної фрази, яку прибирає ORDINAL_BARE_SKIPS (множина від 7), друкується як
 //     ВИНЯТОК із причиною; питання без речення для неї — ПОМИЛКА. Фрази без іменника (DeclFrame.standalone, гонки) мусять
 //     з'являтись у кожного порядкового 2–12 у називному множини чол. істот.
+//  7. Багатозначні іменники (поле senses): значення оракул будує сам із даних (senseViews), не через рушій. «Відмінки»:
+//     клітинка питається, якщо її не прибирає хоч одне значення; підказка — переклад того значення, з чиїх тегів фраза
+//     (у кожного слова, і однозначного: фраза — з фраз його тегів). «Прикметники та займенники»: фраза й тестоване слово
+//     (fits) підходять одному значенню. Межа: у «Прийменниках» і «Числівниках» значення фрази окремо не звіряється
+//     (там фразу й число обирає одна проєкція рушія; банки NO_PLURAL / NOUN_USAGE_RULES перевіряються для кожного значення).
 //
 // Природність речень оракул не оцінює: її перевіряє читання пар «фраза × слово» (правила в шапках data-файлів).
 
@@ -45,7 +50,7 @@ import { generatePrepositionSession } from "../src/utils/prepositionQuizEngine";
 import { generateVerbSession } from "../src/utils/verbFlashcardEngine";
 import { generateAdverbSession } from "../src/utils/adverbQuizEngine";
 import { generateDateTimeSession } from "../src/utils/datetimeEngine";
-import { acceptedForms, candidateNumbers, hasNumber, NO_PLURAL, NOUN_USAGE_RULES, vocalDecision } from "../src/utils/partnerSelection";
+import { acceptedForms, candidateNumbers, hasNumber, matchesFilter, matchesNeeds, NO_PLURAL, NOUN_USAGE_RULES, vocalDecision } from "../src/utils/partnerSelection";
 import { skipReason, SkipRule } from "../src/utils/quizCommon";
 import { NOUN_FRAMES, NOUN_SKIP_RULES } from "../src/data/nounFrames";
 import { ANTECEDENT_FRAME, DECL_CELL_SKIPS, DECL_FRAMES, DECL_WORD_SKIPS, OWNER_FRAME, QUIZ_CASES, QuizCase, ValueCell } from "../src/data/declensionFrames";
@@ -69,7 +74,21 @@ import { CARDINALS } from "../src/data/cardinals";
 import { DATE_ORDINALS } from "../src/data/dates";
 import { NOUN_CATS_EXCLUDED_FROM_QUIZ } from "../src/data/categories";
 import { adjQuizUsable } from "../src/data/adjectiveCategories";
-import { AdverbSense, CASE_ORDER, CzechCase, FullDeclension, Gender, GENDER_ORDER, GrammaticalNumber, NounEntry, NUMBER_ORDER, PERSON_ORDER, PronounEntry, PronounQuiz, VerbEntry } from "../src/types";
+import { AdverbSense, CASE_ORDER, CzechCase, FullDeclension, Gender, GENDER_ORDER, GrammaticalNumber, NounEntry, NounFilter, NUMBER_ORDER, PERSON_ORDER, PronounEntry, PronounQuiz, QuizNoun, VerbEntry } from "../src/types";
+
+// ─────────────── Значення багатозначних іменників (незалежно від рушія) ───────────────
+// Значення слова оракул будує сам із ДАНИХ (поле senses, types/index.ts), а не через nounSenses рушія: інакше помилка
+// в проєкції (напр. злиті теги двох значень) зіпсувала б і перевірку. Підказка значення в квізі — «переклад (підпис)».
+const SENSE_VIEWS = new Map<string, QuizNoun[]>();
+function senseViews(n: NounEntry): QuizNoun[] {
+  if (!n.senses) return [n];
+  let v = SENSE_VIEWS.get(n.id);
+  if (!v) {
+    v = n.senses.map((s) => ({ ...n, senses: undefined, sem: s.sem, uncountable: s.uncountable, uk: `${s.uk ?? n.uk} (${s.label})` }));
+    SENSE_VIEWS.set(n.id, v);
+  }
+  return v;
+}
 
 // ─────────────── Звіт ───────────────
 interface Report {
@@ -219,6 +238,41 @@ function checkAdjPron(r: Report, gen: Gen<DeclQuestion>): void {
   checkPersonal(r, gen);
   checkCore(r, gen);
   checkPossessive(r, gen);
+  checkDeclSenses(r, gen);
+}
+
+// Багатозначний іменник у фразі квізу (kuře — тварина / їжа): фраза й тестоване слово (його fits) підходять ОДНОМУ
+// значенню — не «Hraju si s teplým kuřetem» (фраза тварини, прикметник їжі). Фразу впізнаємо за шаблоном DECL_FRAMES
+// (останнє речення питання — перше може бути реченням-антецедентом «Znáš…?»); невпізнана фраза з таким словом — теж
+// помилка (перевірка не мовчить). Межа: слова-партнери (займенник перед прикметником) тут не перевіряються.
+const MULTI_SENSE = NOUNS.filter((n) => n.senses);
+const declFrameRe = (text: string) =>
+  new RegExp(`^${escapeRe(text).replace("___", "(?:\\S+ )?___(?: \\S+)*").replace("\\{N\\}", "\\S+(?: \\S+)*").replace(/\\\{[vksz]\\\}/g, "\\S+")}$`);
+function testedFits(comboId: string): NounFilter | null {
+  const id = comboId.split("::")[0].replace(/__(comp|super)$/, "");
+  const a = ADJECTIVES.find((x) => x.id === id);
+  if (a) return a.fits;
+  const p = ([...PRONOUNS, ...INTERROGATIVE_ADJ, ...INDEFINITE_ADJ] as PronounEntry[]).find((x) => x.id === id);
+  return p ? (p.quiz?.fits ?? {}) : null; // особові займенники (pp-…) іменника-партнера не мають
+}
+function checkDeclSenses(r: Report, gen: Gen<DeclQuestion>): void {
+  if (MULTI_SENSE.length === 0) return;
+  const frames = Object.values(DECL_FRAMES).flat();
+  for (let i = 0; i < 1500; i++)
+    for (const q of gen({})) {
+      if (!q.contextPhrase) continue;
+      const fits = testedFits(q.comboId);
+      if (!fits) continue;
+      const last = q.contextPhrase.split(/(?<=\?) /).pop()!;
+      const words = new Set(last.replace(/[.?!,]/g, "").split(" "));
+      for (const n of MULTI_SENSE) {
+        if (!CASE_ORDER.some((c) => NUMBER_ORDER.some((num) => acceptedForms(n, c, num).some((f) => words.has(f))))) continue;
+        const matched = frames.filter((f) => declFrameRe(f.text).test(last));
+        if (matched.length === 0) r.errors.push(`${ADJ_QUIZ}: ${q.comboId}: фразу «${q.contextPhrase}» зі словом ${n.cz} не впізнано серед DECL_FRAMES`);
+        else if (!senseViews(n).some((v) => matchesFilter(v, fits) && matched.some((f) => matchesFilter(v, f))))
+          r.errors.push(`${ADJ_QUIZ}: ${q.comboId}: «${q.contextPhrase}» — фраза й слово з різних значень ${n.cz}`);
+      }
+    }
 }
 
 // Особові: [без прийм., після прийм., наголошена] з даних PERSONAL_QUIZ_FORMS (3-тя особа) і з таблиць картки (1–2 особа,
@@ -328,14 +382,17 @@ function checkPossessive(r: Report, gen: Gen<DeclQuestion>): void {
 function checkNouns(r: Report, gen: Gen<NounQuestion>): void {
   const QUIZ = "Іменники";
   for (const n of NOUNS) {
+    const senses = senseViews(n);
     const pt = n.declension.nominativ.sg === "—";
     for (const c of CASE_ORDER)
       for (const num of NUMBER_ORDER) {
         if (split(n.declension[c][num]).length === 0) continue;
         if (NOUN_CATS_EXCLUDED_FROM_QUIZ.has(n.category)) { exclude(r, `${QUIZ}: категорія ${n.category} — тренує інший квіз`); continue; }
         if (c === "nominativ" && (num === "sg" || pt)) { exclude(r, `${QUIZ}: заголовок картки`); continue; }
-        const why = skipReason(NOUN_SKIP_RULES, { noun: n, c, n: num });
-        if (why) { exclude(r, `${QUIZ}: ${why}`); continue; }
+        // Клітинку не питає жодне значення слова — свідомий виняток; інакше її мусить питати квіз.
+        const whys = senses.map((v) => skipReason(NOUN_SKIP_RULES, { noun: v, c, n: num }));
+        if (whys.every(Boolean)) { exclude(r, `${QUIZ}: ${whys[0]}`); continue; }
+        const asking = senses.filter((_, i) => !whys[i]);
         const id = `${n.id}::${c}::${num}`;
         const qs = forced(gen, id);
         if (qs.length === 0) gap(r, QUIZ, `${id} не питається`);
@@ -345,15 +402,30 @@ function checkNouns(r: Report, gen: Gen<NounQuestion>): void {
           if (!acc.includes(q.correct)) r.errors.push(`${QUIZ}: ${id}: правильна «${q.correct}» не з клітинки`);
           const d = distractorOf(q);
           if (d && acc.includes(d)) r.errors.push(`${QUIZ}: ${id}: дистрактор «${d}» — прийнятна форма клітинки`);
+          nounSense(r, QUIZ, id, n, asking, c, q);
         }
       }
   }
 }
 
+// Фраза й підказка з ОДНОГО значення слова: підказка — переклад значення, для якого клітинку питаємо, і фраза — фраза
+// квізу, чиї теги підходять саме цьому значенню (у однозначного слова — тегам слова). Питання без речення показує
+// переклад-заголовок слова.
+function nounSense(r: Report, QUIZ: string, id: string, n: NounEntry, asking: readonly QuizNoun[], c: CzechCase, q: NounQuestion): void {
+  if (!q.contextPhrase) {
+    if (q.promptUk !== n.uk) r.errors.push(`${QUIZ}: ${id}: питання без речення з підказкою «${q.promptUk}», а не перекладом слова «${n.uk}»`);
+    return;
+  }
+  const sense = asking.find((v) => v.uk === q.promptUk);
+  if (!sense) return void r.errors.push(`${QUIZ}: ${id}: підказка «${q.promptUk}» — не переклад значення, у якому клітинку питаємо`);
+  if (!NOUN_FRAMES[c].some((f) => frameRe(f.text).test(q.contextPhrase!) && matchesNeeds(sense, f)))
+    r.errors.push(`${QUIZ}: ${id}: фраза «${q.contextPhrase}» не з фраз значення «${q.promptUk}» (теги ${sense.sem.join(", ")})`);
+}
+
 // ═════════════ Множина слів NO_PLURAL (rodina, metro) ═════════════
 // Самоперевірка підміняє вибір числа (NUMBERS_OF), щоб показати, що перевірка банків ловить множину без plOk.
 let NUMBERS_OF: typeof candidateNumbers = candidateNumbers;
-const noPluralTags = (n: NounEntry) => n.sem.filter((t) => NO_PLURAL.includes(t));
+const noPluralTags = (n: QuizNoun) => n.sem.filter((t) => NO_PLURAL.includes(t));
 const escapeRe = (s: string) => s.replace(/[.*+?^$()|[\]\\{}]/g, "\\$&");
 // Фраза квізу «Іменники» з {v}{k}{s}{z} → шаблон, що приймає і вокалізований прийменник.
 const frameRe = (text: string) => new RegExp(`^${escapeRe(text).replace(/\\\{[vksz]\\\}/g, "\\S+")}$`);
@@ -361,10 +433,12 @@ const frameRe = (text: string) => new RegExp(`^${escapeRe(text).replace(/\\\{[vk
 function checkNoPluralNouns(r: Report, gen: Gen<NounQuestion>): void {
   const QUIZ = "Іменники";
   for (const n of NOUNS) {
-    const tags = noPluralTags(n);
-    if (tags.length === 0 || !hasNumber(n, "sg") || NOUN_CATS_EXCLUDED_FROM_QUIZ.has(n.category)) continue;
+    // Значення без такого тегу законно дає множину — тоді її перевіряє nounSense (фраза з тегів цього значення).
+    const senses = senseViews(n);
+    if (senses.some((v) => noPluralTags(v).length === 0) || !hasNumber(n, "sg") || NOUN_CATS_EXCLUDED_FROM_QUIZ.has(n.category)) continue;
+    const tags = [...new Set(senses.flatMap(noPluralTags))];
     for (const c of CASE_ORDER) {
-      if (split(n.declension[c].pl).length === 0 || skipReason(NOUN_SKIP_RULES, { noun: n, c, n: "pl" })) continue;
+      if (split(n.declension[c].pl).length === 0 || senses.every((v) => skipReason(NOUN_SKIP_RULES, { noun: v, c, n: "pl" }))) continue;
       const ok = NOUN_FRAMES[c].filter((f) => f.plOk?.some((t) => tags.includes(t))).map((f) => frameRe(f.text));
       const id = `${n.id}::${c}::pl`;
       for (const q of forced(gen, id))
@@ -395,7 +469,7 @@ function carrierFrames(): CarrierFrame[] {
 
 function checkNoPluralBanks(r: Report): void {
   const banks = carrierFrames();
-  for (const n of NOUNS) {
+  for (const n of NOUNS.flatMap(senseViews)) {
     const tags = noPluralTags(n);
     if (tags.length === 0 || !hasNumber(n, "sg") || !hasNumber(n, "pl")) continue;
     for (const { quiz, c, f } of banks) {
@@ -411,7 +485,7 @@ function checkNoPluralBanks(r: Report): void {
 // перевірку: так нове слово чи тег не проскочить і в майбутній фразі).
 function checkUsageBanks(r: Report): void {
   const banks = carrierFrames();
-  for (const n of NOUNS)
+  for (const n of NOUNS.flatMap(senseViews))
     for (const { quiz, c, f } of banks)
       for (const x of [0, 0.99])
         for (const num of NUMBERS_OF(n, c, f.num ?? "sg", () => x, f.plOk)) {
@@ -425,7 +499,7 @@ function checkUsageNumerals(r: Report, gen: Gen<AnyQ & { blank?: string }>): voi
   for (let i = 0; i < 1500; i++)
     for (const q of gen({})) {
       if (q.blank !== "noun") continue;
-      const cells = NOUNS.filter((n) => n.cz === q.promptWord).flatMap((n) =>
+      const cells = NOUNS.filter((n) => n.cz === q.promptWord).flatMap(senseViews).flatMap((n) =>
         CASE_ORDER.flatMap((c) => NUMBER_ORDER.filter((num) => acceptedForms(n, c, num).includes(q.correct)).map((num) => ({ noun: n, c, n: num })))
       );
       const used = cells.filter((x) => !skipReason(NOUN_USAGE_RULES, x));

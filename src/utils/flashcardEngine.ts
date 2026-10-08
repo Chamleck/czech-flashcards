@@ -1,5 +1,6 @@
 import {
   NounEntry,
+  QuizNoun,
   CzechCase,
   CASE_ORDER,
   CASE_LABELS,
@@ -7,7 +8,7 @@ import {
 import { NOUNS } from "../data/nouns";
 import { nounQuizTestable } from "../data/categories";
 import { NOUN_FRAMES, NOUN_SKIP_RULES, NounFrame } from "../data/nounFrames";
-import { matchesNeeds, acceptedForms, freshWeightedOrder, hasNumber, NO_PLURAL, pluralOnly, vocalizeSlot } from "./partnerSelection";
+import { matchesNeeds, acceptedForms, freshWeightedOrder, hasNumber, NO_PLURAL, nounSenses, pluralOnly, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
 import { NUMBER_LABEL, formsOf, isUsableDistractor, once, shuffle, skipReason, splitForms, topUpRound } from "./quizCommon";
 
@@ -17,6 +18,9 @@ import { NUMBER_LABEL, formsOf, isUsableDistractor, once, shuffle, skipReason, s
 // жодна фраза — питання без речення (форма + підпис), щоб жодна форма парадигми не випадала з квізу.
 // Не питаємо: словникову форму (заголовок картки — називний однини, у слів лише з множиною — називний множини)
 // і кличний речей (звертаються лише до осіб і тварин).
+// Багатозначне слово (kuře — тварина / їжа) — одне слово з одними формами: клітинка питається, якщо її питає хоч одне
+// значення; фраза береться з того значення, для якого клітинку питаємо, а підказка — переклад саме цього значення
+// («курча (їжа)»). Питання без речення показує переклад-заголовок.
 // Відповідь завжди одна: на кнопці одна форма (з дублета «a / b» — перша, як на картці), дистрактор — справжня форма того самого
 // слова, що НЕ входить у прийнятні форми клітинки (усі дублети + variants).
 
@@ -40,24 +44,24 @@ function headlineNumber(n: NounEntry): GrammaticalNumber {
   return hasNumber(n, "sg") ? "sg" : "pl";
 }
 
-function asked(n: NounEntry, c: CzechCase, num: GrammaticalNumber): boolean {
+// Значення слова, у яких клітинку питаємо (свідомі винятки NOUN_SKIP_RULES — за тегами значення, data/nounFrames.ts).
+function askingSenses(n: NounEntry, c: CzechCase, num: GrammaticalNumber): readonly QuizNoun[] {
   const cell = n.declension[c][num];
-  if (!cell || cell === "—") return false; // форма не існує (однина peníze)
-  if (c === "nominativ" && num === headlineNumber(n)) return false; // відповідь стояла б у заголовку
-  if (skipReason(NOUN_SKIP_RULES, { noun: n, c, n: num })) return false; // свідомі винятки (data/nounFrames.ts)
-  return true;
+  if (!cell || cell === "—") return []; // форма не існує (однина peníze)
+  if (c === "nominativ" && num === headlineNumber(n)) return []; // відповідь стояла б у заголовку
+  return nounSenses(n).filter((v) => !skipReason(NOUN_SKIP_RULES, { noun: v, c, n: num }));
 }
 
 // ─────────────────── Фрази ───────────────────
 // Множина у фразі: не для незлічуваних (vody, masa), збірних (rodiny) і metro (NO_PLURAL), крім слів лише з множиною; її відкриває
 // сама фраза полем plOk — тег слова з plOk (правило 7 у шапці data/nounFrames.ts).
-function pluralFits(n: NounEntry, f: NounFrame): boolean {
+function pluralFits(n: QuizNoun, f: NounFrame): boolean {
   if (pluralOnly(n) || f.plOk?.some((t) => n.sem.includes(t))) return true;
   return !n.uncountable && !n.sem.some((t) => NO_PLURAL.includes(t));
 }
 
 // Чи годиться фраза для слова в цьому числі (правило 1 у шапці data/nounFrames.ts).
-function frameFits(f: NounFrame, n: NounEntry, num: GrammaticalNumber): boolean {
+function frameFits(f: NounFrame, n: QuizNoun, num: GrammaticalNumber): boolean {
   if (!matchesNeeds(n, f)) return false;
   const policy = f.num ?? "sg";
   if (num === "sg") return policy !== "pl";
@@ -119,17 +123,19 @@ function makeQuestion(
   // Правильною показуємо першу форму клітинки (як на картці); інші форми дублета — лише якщо з першою питання
   // не будується. Усі вони прийнятні й ніколи не стають дистрактором.
   const shown = splitForms(n.declension[c][num]);
+  // Фраза разом зі значенням, з якого вона взята (у однозначного слова значення одне — сам запис).
   const frames = freshWeightedOrder(
-    NOUN_FRAMES[c].filter((f) => frameFits(f, n, num)),
-    (f) => usedFrames.has(f.text),
-    () => 1
+    askingSenses(n, c, num).flatMap((sense) => NOUN_FRAMES[c].filter((f) => frameFits(f, sense, num)).map((f) => ({ f, sense }))),
+    (x) => usedFrames.has(x.f.text),
+    () => 1,
+    null
   );
-  const ask = (correct: string, distractor: string, contextPhrase?: string): Question => {
+  const ask = (correct: string, distractor: string, contextPhrase?: string, sense?: QuizNoun): Question => {
     const lbl = CASE_LABELS[c];
     return {
       comboId: comboId(n.id, c, num),
       promptWord: splitForms(n.declension.nominativ[headlineNumber(n)])[0],
-      promptUk: n.uk,
+      promptUk: (sense ?? n).uk,
       promptLabel: "іменник",
       taskText: `Оберіть форму: ${lbl.uk} (${lbl.cz}) — ${lbl.question}, ${NUMBER_LABEL[num]}`,
       ...(contextPhrase ? { contextPhrase } : {}),
@@ -143,12 +149,12 @@ function makeQuestion(
     const ds = distractorCandidates(n, c, num, correct, accepted, kind);
     if (ds.length === 0) continue;
     bare = bare ?? { q: ask(correct, ds[0]), frame: null };
-    for (const f of frames) {
+    for (const { f, sense } of frames) {
       for (const d of ds) {
         // null — прийменник перед пропуском вокалізується по-різному для двох кнопок або вокалізацію не
         // класифіковано (правило 4 у шапці data/nounFrames.ts).
         const text = vocalizeSlot(f.text, [correct, d]);
-        if (text) return { q: ask(correct, d, text), frame: f.text };
+        if (text) return { q: ask(correct, d, text, sense), frame: f.text };
       }
     }
   }
@@ -172,7 +178,7 @@ function enumerateCombos(pool: NounEntry[]): Combo[] {
   for (const entry of pool) {
     for (const c of CASE_ORDER) {
       for (const n of NUMBER_ORDER) {
-        if (!asked(entry, c, n)) continue;
+        if (askingSenses(entry, c, n).length === 0) continue;
         const accepted = acceptedForms(entry, c, n);
         if (splitForms(entry.declension[c][n]).some((correct) => hasDistractor(entry, correct, accepted))) {
           combos.push({ entry, targetCase: c, targetNumber: n, id: comboId(entry.id, c, n) });
@@ -195,19 +201,19 @@ function devCheckData(): void {
   const issues: string[] = [];
   for (const c of CASE_ORDER)
     for (const f of NOUN_FRAMES[c]) {
-      const k = DEFAULT_NOUN_POOL.filter((n) => matchesNeeds(n, f)).length;
+      const k = DEFAULT_NOUN_POOL.filter((n) => nounSenses(n).some((v) => matchesNeeds(v, f))).length;
       if (k < 3) issues.push(`фраза «${f.text}» (${c}): лише ${k} іменників (потрібно ≥ 3)`);
       if (/^\{[vksz]\}/.test(f.text)) issues.push(`фраза «${f.text}» (${c}): починається з прийменника — речення почнеться з малої літери`);
     }
   // Свідомий виняток (NOUN_SKIP_RULES) не може стосуватися клітинки, під яку є фраза (правило 2 біля таблиці).
-  for (const n of DEFAULT_NOUN_POOL)
+  for (const n of DEFAULT_NOUN_POOL.flatMap(nounSenses))
     for (const c of CASE_ORDER)
       for (const num of NUMBER_ORDER) {
         const cell = n.declension[c][num];
         if (!cell || cell === "—") continue;
         const why = skipReason(NOUN_SKIP_RULES, { noun: n, c, n: num });
         const f = why && NOUN_FRAMES[c].find((x) => frameFits(x, n, num));
-        if (f) issues.push(`${n.id} ${c} ${num}: виняток «${why}», але фраза «${f.text}» підходить`);
+        if (f) issues.push(`${n.id} «${n.uk}» ${c} ${num}: виняток «${why}», але фраза «${f.text}» підходить`);
       }
   // Без речення: жодна фраза не підійшла за тегами або всі відпали через вокалізацію (перебір у makeQuestion повний).
   const bare = defaultCombos()

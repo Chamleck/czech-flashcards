@@ -13,9 +13,9 @@
 /// <reference types="node" />
 import { NOUNS } from "../src/data/nouns";
 import { ORDINAL_FRAMES, NUMERAL_FRAMES } from "../src/data/numeralFrames";
-import { agreementGender, matchesNeeds } from "../src/utils/partnerSelection";
+import { agreementGender, matchesNeeds, nounSenses } from "../src/utils/partnerSelection";
 import type { Needs } from "../src/data/prepositionPartners";
-import type { NounEntry } from "../src/types";
+import type { QuizNoun } from "../src/types";
 
 interface BankFrame extends Needs {
   text: string;
@@ -36,11 +36,15 @@ if (!bank) {
   console.log(`невідомий банк «${bankName}» (є: ${Object.keys(BANKS).join(", ")})`);
   process.exit(2);
 }
-// ordinals: іменник мусить мати ordered (правило 1 шапки numeralFrames.ts), тож пул — лише такі слова
-const POOL: NounEntry[] = bankName === "ordinals" ? NOUNS.filter((n) => n.sem.includes("ordered")) : NOUNS;
+// ordinals: іменник мусить мати ordered (правило 1 шапки numeralFrames.ts), тож пул — лише такі слова. Багатозначне слово —
+// кожним значенням окремо (nounSenses): у звіті воно стоїть із перекладом значення.
+const VIEWS: QuizNoun[] = NOUNS.flatMap(nounSenses);
+const POOL: QuizNoun[] = bankName === "ordinals" ? VIEWS.filter((n) => n.sem.includes("ordered")) : VIEWS;
+const MULTI_SENSE = new Set(NOUNS.filter((n) => n.senses).map((n) => n.id));
+const name = (n: QuizNoun) => (MULTI_SENSE.has(n.id) ? `${n.cz} — ${n.uk}` : n.cz);
 
 // Тег, що відсіює півсловника, — тег класу (person, seat…): його сенс очевидний; малий список — місце, де шукати милицю.
-const show = (lost: NounEntry[]) => (lost.length > 6 ? `${lost.length} слів (тег класу)` : `${lost.map((n) => n.cz).join(", ")}  ← перевір: описує тег фразу, чи відсіює слово?`);
+const show = (lost: QuizNoun[]) => (lost.length > 6 ? `${lost.length} слів (тег класу)` : `${lost.map(name).join(", ")}  ← перевір: описує тег фразу, чи відсіює слово?`);
 
 let shown = 0;
 for (const [c, frames] of Object.entries(bank)) {
@@ -54,7 +58,7 @@ for (const [c, frames] of Object.entries(bank)) {
     const matched = POOL.filter((n) => matchesNeeds(n, f));
     const genders = [...new Set(matched.map((n) => agreementGender(n, f.num === "pl" ? "pl" : "sg")))];
     console.log(`${c.slice(0, 3)} | ${f.text}${f.num ? ` [${f.num}]` : ""}${f.max !== undefined ? ` max ${f.max}` : ""}`);
-    console.log(`    слова (${matched.length}): ${matched.map((n) => n.cz).join(", ") || "—"}   роди: ${genders.join(", ") || "—"}`);
+    console.log(`    слова (${matched.length}): ${matched.map(name).join(", ") || "—"}   роди: ${genders.join(", ") || "—"}`);
     // що виключає кожен тег обов'язкових вимог (all) і заборон (none): слова, що підійшли б без нього
     for (const t of f.all ?? []) {
       const without = { ...f, all: (f.all ?? []).filter((x) => x !== t) };

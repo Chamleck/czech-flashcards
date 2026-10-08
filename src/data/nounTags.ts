@@ -1,4 +1,4 @@
-import type { NounEntry } from "../types";
+import type { NounEntry, QuizNoun } from "../types";
 
 // ─────────────────────────── СМИСЛОВІ ТЕГИ ІМЕННИКІВ ───────────────────────────
 // Навіщо. Правильність фрази «Jsem v ___», «Jdu do ___», «Polož to na ___» залежить не лише від відмінка, а й
@@ -19,7 +19,8 @@ import type { NounEntry } from "../types";
 //     Тег може стояти й на одному слові, якщо описує ПОВЕДІНКУ, яку матиме будь-яке майбутнє слово того ж класу
 //     (strongPl, mineral, worksPl — множина живе лише з прикметником; oneSystem — множини немає в жодному квізі), а не
 //     виняток заради однієї фрази чи одного слова.
-//  2. Пояснення й приклади — у NOUN_TAG_DOC; тег ставиться всім словам nouns.ts, яких він стосується.
+//  2. Пояснення й приклади — у NOUN_TAG_DOC; тег ставиться всім словам nouns.ts, яких він стосується (багатозначному
+//     слову — у те значення, якого він стосується: поле senses, правило 15 шапки nouns.ts).
 //  3. Фрази всіх квізів, що беруть тег (data/prepositionPartners.ts, declensionFrames.ts, numeralFrames.ts,
 //     nounFrames.ts, поле fits у data/adjectives.ts), — перечитати; суперечливі набори ловить validateNounSem.
 //  4. Перед здачею — оракул scripts/check-quiz-coverage.ts (усі квізи): «Помилок: 0».
@@ -212,11 +213,11 @@ const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
   ranking: ["placeNa"],
 };
 
-// Перевірка набору тегів одного слова: список проблем (порожній — усе гаразд). Використовується у
-// dev-збірці (див. prepositionQuizEngine.ts), у релізі нічого не блокує.
-export function validateNounSem(n: Pick<NounEntry, "id" | "sem" | "month">): string[] {
+// Перевірка набору тегів одного слова (у багатозначного — кожного значення окремо, QuizNoun з nounSenses): список
+// проблем (порожній — усе гаразд). Використовується у dev-збірці (див. prepositionQuizEngine.ts), у релізі нічого не блокує.
+export function validateNounSem(n: Pick<QuizNoun, "id" | "sem" | "month">): string[] {
   const out: string[] = [];
-  const sem = n.sem ?? [];
+  const sem = n.sem;
   if (sem.length === 0) return [`${n.id}: порожній sem — слово не потрапить у фрази, що вимагають тегів`];
   for (const t of sem) if (!(t in NOUN_TAG_DOC)) out.push(`${n.id}: невідомий тег «${t}»`);
   for (const solo of SOLO) {
@@ -231,5 +232,21 @@ export function validateNounSem(n: Pick<NounEntry, "id" | "sem" | "month">): str
   for (const [tag, need] of Object.entries(REQUIRES) as [NounTag, NounTag[]][]) {
     if (sem.includes(tag) && !need.some((t) => sem.includes(t))) out.push(`${n.id}: тег «${tag}» потребує одного з: ${need.join(", ")}`);
   }
+  return out;
+}
+
+// Перевірка значень багатозначного слова (поле senses; правила — шапка data/nouns.ts): підписи різні й непорожні,
+// набори тегів різні (значення з тими самими тегами нічим не відрізняється для квізу), власний переклад значення є в
+// перекладі-заголовку (заголовок — єдине джерело перекладу). Теги кожного значення перевіряє validateNounSem.
+export function validateNounSenses(n: NounEntry): string[] {
+  if (!n.senses) return [];
+  const out: string[] = [];
+  const labels = n.senses.map((s) => s.label.trim());
+  if (labels.some((l) => l === "")) out.push(`${n.id}: порожній підпис значення`);
+  if (new Set(labels).size !== labels.length) out.push(`${n.id}: однакові підписи значень (${labels.join(", ")})`);
+  const tagSets = n.senses.map((s) => [...s.sem].sort().join(","));
+  if (new Set(tagSets).size !== tagSets.length) out.push(`${n.id}: два значення з однаковими тегами — для квізу це одне значення`);
+  const headline = n.uk.split(" / ").map((x) => x.trim());
+  for (const s of n.senses) if (s.uk && !headline.includes(s.uk)) out.push(`${n.id}: переклад значення «${s.uk}» відсутній у заголовку «${n.uk}»`);
   return out;
 }

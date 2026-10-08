@@ -9,11 +9,11 @@ import {
 } from "../types";
 import { theme } from "../utils/theme";
 import { PosEmoji } from "./PosEmoji";
-import { TileEmoji } from "./TileEmoji";
 import { DeclensionTable } from "./DeclensionTable";
 import { GenderIcon } from "./GenderIcon";
 import { SegmentTabs } from "./SegmentTabs";
 import { Speakable } from "./Speakable";
+import { SenseExamples } from "./ExampleRow";
 
 export type DeclEntry = AdjectiveEntry | PronounEntry;
 
@@ -53,34 +53,12 @@ function patternLabel(e: DeclEntry, degree: Degree): string {
   return "незмінний";
 }
 
-// Блок одного прикладу-речення (сз+ук), з необов'язковою міткою сенсу зверху.
-// Компонент рівня модуля (не всередині рендеру картки) — щоб ідентичність
-// компонента не мінялась при кожній зміні табу роду: Speakable тримає власний
-// useRef/useEffect (підсвітка/анімація), і локально-перевизначений компонент
-// на кожен рендер спричинив би його розмонтування-монтування щоразу.
-function ExampleBlock({
-  cz,
-  uk,
-  label,
-  speakId,
-  style,
-}: {
-  cz: string;
-  uk: string;
-  label?: string;
-  speakId: string;
-  style?: object;
-}) {
-  return (
-    <View style={[styles.example, style]}>
-      {label && <Text style={styles.senseLabel}>{label}</Text>}
-      <View style={styles.exampleRow}>
-        <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
-        <Speakable id={speakId} text={cz} style={styles.exampleCz} />
-      </View>
-      <Text style={styles.exampleUk}>{uk}</Text>
-    </View>
-  );
+// Приклади під таблицею (поле examples / senses, types/index.ts): незмінний займенник — один приклад; відмінюване
+// слово — приклад обраного роду, у багатозначного прикметника — по одному на значення під його підписом.
+function examplesOf(e: DeclEntry, g: Gender): { label?: string; cz: string; uk: string }[] {
+  if (!("declension" in e)) return e.exampleSentenceCz ? [{ cz: e.exampleSentenceCz, uk: e.exampleSentenceUk ?? "" }] : [];
+  if ("senses" in e && e.senses) return e.senses.map((s) => ({ label: s.label, ...s.examples[g] }));
+  return [e.examples[g]];
 }
 
 export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
@@ -181,47 +159,9 @@ export function AdjPronounCard({ entry, revealed, onReveal }: Props) {
 
             {/* Приклад показуємо лише для звичайного ступеня та незмінних.
                 Для вищого/найвищого прикладу немає — таблиця вже показує суть. */}
-            {indeclinable
-              ? (entry as any).exampleSentenceCz && (
-                  <View style={styles.example}>
-                    <View style={styles.exampleRow}>
-                      <TileEmoji name="speechBalloon" size={15} style={{ marginTop: 2 }} />
-                      <Speakable
-                        id={`${entry.id}:example`}
-                        text={(entry as any).exampleSentenceCz}
-                        style={styles.exampleCz}
-                      />
-                    </View>
-                    <Text style={styles.exampleUk}>{(entry as any).exampleSentenceUk}</Text>
-                  </View>
-                )
-              : degree === "positive" &&
-                (() => {
-                  const senseLabel = (entry as any).senseLabel as string | undefined;
-                  const secondSense = (entry as any).secondSense as
-                    | { label: string; examples: any }
-                    | undefined;
-                  const ex = (entry as any).examples[gender];
-                  return (
-                    <>
-                      <ExampleBlock
-                        cz={ex.cz}
-                        uk={ex.uk}
-                        label={senseLabel}
-                        speakId={`${entry.id}:${gender}:example`}
-                      />
-                      {secondSense && (
-                        <ExampleBlock
-                          cz={secondSense.examples[gender].cz}
-                          uk={secondSense.examples[gender].uk}
-                          label={secondSense.label}
-                          speakId={`${entry.id}:${gender}:example2`}
-                          style={styles.exampleSecond}
-                        />
-                      )}
-                    </>
-                  );
-                })()}
+            {(indeclinable || degree === "positive") && (
+              <SenseExamples id={indeclinable ? entry.id : `${entry.id}:${gender}`} items={examplesOf(entry, gender)} />
+            )}
           </>
         </ScrollView>
       )}
@@ -272,26 +212,4 @@ const styles = StyleSheet.create({
     marginTop: theme.space(2),
     lineHeight: 19,
   },
-  example: {
-    marginTop: theme.space(4),
-    backgroundColor: theme.colors.bgElevated,
-    borderRadius: theme.radius.md,
-    padding: theme.space(3.5),
-  },
-  // Другий приклад (secondSense) — той самий міжблоковий відступ, що вже
-  // перевірений на стеку прикладів SimpleWordCard (питальні слова).
-  exampleSecond: {
-    marginTop: theme.space(2),
-    marginBottom: theme.space(1),
-  },
-  senseLabel: {
-    color: theme.colors.textFaint,
-    fontSize: 11,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    marginBottom: theme.space(1),
-  },
-  exampleRow: { flexDirection: "row", alignItems: "baseline", gap: 5 },
-  exampleCz: { color: theme.colors.text, fontSize: 15, fontWeight: "600", flex: 1 },
-  exampleUk: { color: theme.colors.textDim, fontSize: 13, marginTop: 2 },
 });

@@ -5,7 +5,7 @@ import {
   PersonalDeclension,
   PronounQuiz,
   FullDeclension,
-  NounEntry,
+  QuizNoun,
   NounFilter,
   Gender,
   GENDER_ORDER,
@@ -37,7 +37,7 @@ import {
   ValueCell,
 } from "../data/declensionFrames";
 import type { VocalPrep } from "../data/prepositionPartners";
-import { PARTNER_NOUNS, agreementGender, candidateNumbers, fitCounts, freshWeightedOrder, matchesFilter, sharedVocalDecision, vocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
+import { PARTNER_NOUNS, agreementGender, distinctWords, candidateNumbers, fitCounts, freshWeightedOrder, matchesFilter, sharedVocalDecision, vocalDecision, VOCAL_PREP_TOKEN, vocalizeSlot } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos } from "./flashcardWeights";
 import { NUMBER_LABEL, SkipRule, capitalize, firstForm, formsOf, isRealOtherForm, once, randomOf, shuffle, skipReason, topUpRound } from "./quizCommon";
 
@@ -123,7 +123,7 @@ const pickForm = (forms: string[], idx: number) => forms[Math.min(idx, forms.len
 // ─────────────── Іменники-партнери ───────────────
 // Дні, місяці, сотні (unsuitableAsPartner) — не носії чужих фраз (єдиний пул — PARTNER_NOUNS, utils/partnerSelection.ts).
 
-function nounForm(noun: NounEntry, c: QuizCase, n: GrammaticalNumber): string | null {
+function nounForm(noun: QuizNoun, c: QuizCase, n: GrammaticalNumber): string | null {
   const cell = noun.declension[c][n];
   return !cell || cell === "—" ? null : firstForm(cell);
 }
@@ -133,7 +133,7 @@ function nounForm(noun: NounEntry, c: QuizCase, n: GrammaticalNumber): string | 
 // У називному дієслово узгоджується з групою («To je» / «To jsou»), тож число фрейму там суворе: brýle — лише в «To jsou».
 // plOk фрейму відкриває множину, якої загальне правило не дає (одиниці часу: «Strávil jsem tam celé dny»), — лише
 // у фразі, що дозволяє множину, і не для незлічуваних.
-function frameTakes(f: DeclFrame, noun: NounEntry, n: GrammaticalNumber, c: QuizCase): boolean {
+function frameTakes(f: DeclFrame, noun: QuizNoun, n: GrammaticalNumber, c: QuizCase): boolean {
   if (c === "nominativ" && f.num !== "any" && (f.num ?? "sg") !== n) return false;
   return candidateNumbers(noun, c, f.num ?? "sg", () => 0, f.plOk).includes(n);
 }
@@ -146,7 +146,7 @@ const ownerless = (f: DeclFrame, c: QuizCase) => c === "nominativ" || !!f.ownerl
 // DECL_FRAMES; інший квіз може скласти питання тим самим механізмом зі своїм банком (порядкові — ORDINAL_FRAMES).
 export interface FrameBank {
   frames: Record<QuizCase, DeclFrame[]>;
-  fit: (noun: NounEntry) => number;
+  fit: (noun: QuizNoun) => number;
 }
 export function frameBank(frames: Record<QuizCase, DeclFrame[]>): FrameBank {
   const fit = fitCounts(
@@ -218,14 +218,14 @@ const ADJECTIVE_PARTNERS: AdjectiveEntry[] = ADJECTIVES.filter((a) => adjQuizUsa
 
 // Чи стоїть слово в цій клітинці з цим іменником: клітинку квіз питає (DECL_CELL_SKIPS, data/declensionFrames.ts), svůj —
 // лише у фразі з власником, однина všechen — лише з незлічуваним іменником (сама клітинка є, але не з будь-яким).
-function quizAllows(q: PronounQuiz, noun: NounEntry, g: Gender, c: QuizCase, n: GrammaticalNumber, f?: DeclFrame): boolean {
+function quizAllows(q: PronounQuiz, noun: QuizNoun, g: Gender, c: QuizCase, n: GrammaticalNumber, f?: DeclFrame): boolean {
   if (skipReason(DECL_CELL_SKIPS, { quiz: q, g, c, n })) return false;
   if (q.needsOwner && f && ownerless(f, c)) return false;
   if (q.massSg && n === "sg" && !noun.uncountable) return false;
   return true;
 }
 
-function determinerForm(p: PronounEntry, noun: NounEntry, g: Gender, c: QuizCase, n: GrammaticalNumber, f?: DeclFrame): string | null {
+function determinerForm(p: PronounEntry, noun: QuizNoun, g: Gender, c: QuizCase, n: GrammaticalNumber, f?: DeclFrame): string | null {
   if (!matchesFilter(noun, p.quiz?.fits ?? {})) return null;
   if (!p.declinable) return p.invariantForm;
   if (!quizAllows(p.quiz ?? {}, noun, g, c, n, f)) return null;
@@ -233,7 +233,7 @@ function determinerForm(p: PronounEntry, noun: NounEntry, g: Gender, c: QuizCase
   return !cell || cell === "—" ? null : firstForm(cell);
 }
 
-function adjectiveForm(a: AdjectiveEntry, noun: NounEntry, g: Gender, c: QuizCase, n: GrammaticalNumber): string | null {
+function adjectiveForm(a: AdjectiveEntry, noun: QuizNoun, g: Gender, c: QuizCase, n: GrammaticalNumber): string | null {
   if (!matchesFilter(noun, a.fits)) return null;
   const cell = a.declension[g][c][n];
   return !cell || cell === "—" ? null : firstForm(cell);
@@ -306,14 +306,14 @@ function frameRenderable(f: DeclFrame, target: string[], dCells: () => string[])
 
 // ─────────────── Комбінації з повною парадигмою ───────────────
 interface Candidate {
-  noun: NounEntry;
+  noun: QuizNoun;
   // needsPartner: фраза годиться лише з займенником-партнером перед пропуском («k [té] tvrdé židli»), бо прийменник
   // перед самою відповіддю не вокалізується однозначно («k/ke tvrdé» — група tv- коливається).
   frames: { f: DeclFrame; needsPartner: boolean }[];
 }
 
 // Займенники-партнери, з якими прийменник перед групою вокалізується однозначно (для фраз needsPartner).
-function leadPartners(f: DeclFrame, noun: NounEntry, g: Gender, c: QuizCase, n: GrammaticalNumber): string[] {
+function leadPartners(f: DeclFrame, noun: QuizNoun, g: Gender, c: QuizCase, n: GrammaticalNumber): string[] {
   const prep = blankLeadPrep(f);
   return DETERMINER_PARTNERS.map((p) => determinerForm(p, noun, g, c, n, f)).filter(
     (x): x is string => !!x && (!prep || vocalDecision(prep, x) !== null)
@@ -428,7 +428,7 @@ function makeWithStyle(
   distractors: string[]
 ): Built | null {
   const fit = (t.bank ?? DECL_BANK).fit;
-  for (const { noun, frames } of freshWeightedOrder(cands, (x) => used.has(x.noun.id), (x) => fit(x.noun))) {
+  for (const { noun, frames } of freshWeightedOrder(cands, (x) => used.has(x.noun.id), (x) => fit(x.noun), (x) => x.noun.id)) {
     const nf = nounForm(noun, c, n)!;
     for (const { f, needsPartner } of shuffle(frames)) {
       // Партнер: займенник перед тестованим прикметником / прикметник перед іменником після тестованого займенника.
@@ -557,7 +557,7 @@ function fillPersonal(fr: PersonalFrame, ans: string, antecedent?: string): stri
 // тварина), прикметник — з його fits, партнери навпіл. Рід узгодження — з урахуванням plGender (děti → жін.).
 // Для «чий?» число власника мусить читатися з форми: «Znáš otce?» — і один батько, і кілька (otce = вин. одн. і мн.),
 // тож jeho чи jejich вгадати не можна. Такий іменник власником не береться (forms — з таблиці, без списків слів).
-const numberUnambiguous = (x: NounEntry, n: GrammaticalNumber) =>
+const numberUnambiguous = (x: QuizNoun, n: GrammaticalNumber) =>
   formsOf(x.declension.akuzativ[n === "sg" ? "pl" : "sg"]).every((f) => !formsOf(x.declension.akuzativ[n]).includes(f));
 // Антецедент: хто це (теги фрейму), які слова-партнери перед ним, чи мусить форма показувати число.
 interface AnteSpec {
@@ -565,7 +565,7 @@ interface AnteSpec {
   partners: PronounEntry[];
   numberMatters: boolean;
 }
-function antecedentPool(g: Gender, n: GrammaticalNumber, spec: AnteSpec): NounEntry[] {
+function antecedentPool(g: Gender, n: GrammaticalNumber, spec: AnteSpec): QuizNoun[] {
   const { frame, numberMatters } = spec;
   return PARTNER_NOUNS.filter(
     (x) =>
@@ -583,7 +583,7 @@ const ONI_GENDERS = GENDER_ORDER.filter((g) => antecedentPool(g, "pl", PERSONAL_
 function buildAntecedent(g: Gender, n: GrammaticalNumber, used: Set<string>, spec: AnteSpec = PERSONAL_ANTE): string {
   const { partners } = spec;
   const pool = antecedentPool(g, n, spec);
-  const noun = freshWeightedOrder(pool, (x) => used.has(x.id), DECL_BANK.fit)[0];
+  const noun = freshWeightedOrder(pool, (x) => used.has(x.id), DECL_BANK.fit, (x) => x.id)[0];
   if (!noun) return "";
   used.add(noun.id);
   const parts: string[] = [];
@@ -806,7 +806,7 @@ function possessiveUnits(pool: Tested[]): UnitCombo[] {
             const before = new Set(scratch);
             const antecedent = buildAntecedent(randomOf(anteGenders)!, subj.n, scratch, ante);
             const anteIds = [...scratch].filter((x) => !before.has(x));
-            for (const { noun, frames } of freshWeightedOrder(cands, (x) => scratch.has(x.noun.id), (x) => DECL_BANK.fit(x.noun))) {
+            for (const { noun, frames } of freshWeightedOrder(cands, (x) => scratch.has(x.noun.id), (x) => DECL_BANK.fit(x.noun), (x) => x.noun.id)) {
               if (anteIds.includes(noun.id)) continue; // не «Znáš toho kluka? Vidím jeho kluka»
               for (const { f, needsPartner } of shuffle(frames)) {
                 if (needsPartner) continue;
@@ -901,7 +901,7 @@ function devCheckData(): void {
   const issues: string[] = [];
   for (const c of QUIZ_CASES) {
     for (const f of DECL_FRAMES[c]) {
-      const k = PARTNER_NOUNS.filter((n) => matchesFilter(n, f)).length;
+      const k = distinctWords(PARTNER_NOUNS.filter((n) => matchesFilter(n, f)));
       if (k < 3) issues.push(`фрейм «${f.text}» (${c}): лише ${k} іменників (потрібно ≥ 3)`);
     }
   }

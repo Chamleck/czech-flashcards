@@ -67,25 +67,19 @@ export type WordCategory =
 // Повна парадигма відмінювання: 7 відмінків x 2 числа
 export type DeclensionTable = Record<CzechCase, { sg: string; pl: string }>;
 
-export interface NounEntry {
+// Поля, що однакові для всіх значень слова: форми, рід, категорія картки, заголовок.
+interface NounBase {
   id: string;
-  uk: string; // українською
+  // Переклад-заголовок картки й пошуку — ЄДИНЕ джерело перекладу слова. Варіанти перекладу — через « / »
+  // («папір / документ»), не через «;». Багатозначне слово, чиї значення українською — одне слово, має один
+  // переклад («курча»); квіз сам додає підпис значення: «курча (їжа)» (nounSenses, utils/partnerSelection.ts).
+  uk: string;
   cz: string; // чеською, називний однини (базова форма)
   gender: Gender;
   pattern: DeclensionPattern;
+  // Категорія словника. Багатозначне слово — ОДНА картка в ОДНІЙ категорії: категорія основного (першого) значення.
   category: WordCategory;
   declension: DeclensionTable;
-  exampleSentenceCz?: string;
-  exampleSentenceUk?: string;
-  // ОБОВ'ЯЗКОВЕ рішення: true → незлічуване (maso, voda, rýže, peníze…): у квізі «Числівники» не рахується
-  // («osm mas»), у множинних фразах квізів не стоїть («vody», «masa») — крім фраз, чиє поле plOk містить тег цього
-  // слова («minerální vody», «silné větry»); його множину, якої мова не вживає, не бере жоден квіз (NOUN_USAGE_RULES,
-  // utils/partnerSelection.ts). false → звичайний злічуваний іменник (káva — порції: «dvě kávy»).
-  uncountable: boolean;
-  // Смислові теги (data/nounTags.ts): за ними квіз «Прийменники» підбирає слово у фрази, де воно природне
-  // («Jsem v ___» — placeV, «Polož to na ___» — surface). ОБОВ'язкове поле: без нього новий іменник
-  // не збереться, а нічим не позначене слово не потрапляло б у змістовні фрази.
-  sem: NounTag[];
   // Прийнятні (розмовні чи рідкісні) форми клітинки, які НЕ показуємо на картці, але які квіз не має права
   // подавати як ПОМИЛКОВУ відповідь (напр. родовий kostel — kostela, але й kostelu вживають). Лише там, де
   // така форма збігається з формою іншого відмінка того ж слова.
@@ -104,6 +98,51 @@ export interface NounEntry {
   // Лише 12 місяців (leden … prosinec): номер і найбільший день. Квіз «Дата й час» бере місяці саме за цим полем.
   month?: CalendarMonth;
 }
+
+// Те, що залежить від ЗНАЧЕННЯ слова: за цим квізи підбирають фрази, прикметники, число.
+interface NounMeaning {
+  // ОБОВ'ЯЗКОВЕ рішення: true → незлічуване (maso, voda, rýže, peníze…): у квізі «Числівники» не рахується
+  // («osm mas»), у множинних фразах квізів не стоїть («vody», «masa») — крім фраз, чиє поле plOk містить тег цього
+  // слова («minerální vody», «silné větry»); його множину, якої мова не вживає, не бере жоден квіз (NOUN_USAGE_RULES,
+  // utils/partnerSelection.ts). false → звичайний злічуваний іменник (káva — порції: «dvě kávy»).
+  uncountable: boolean;
+  // Смислові теги (data/nounTags.ts): за ними квіз «Прийменники» підбирає слово у фрази, де воно природне
+  // («Jsem v ___» — placeV, «Polož to na ___» — surface). ОБОВ'язкове поле: без нього новий іменник
+  // не збереться, а нічим не позначене слово не потрапляло б у змістовні фрази.
+  sem: NounTag[];
+}
+
+// Одне значення багатозначного слова (kuře — тварина / їжа). Формами значення не відрізняються (одна стаття IJP,
+// одна парадигма); омоніми з різною парадигмою (los — losa / losu) — окремі записи. Правила — шапка data/nouns.ts.
+export interface NounSense extends NounMeaning {
+  label: string; // підпис значення на картці й у квізі: «тварина», «їжа»
+  uk?: string; // власний переклад значення, лише коли українською це інше слово (papír: «документ»); має бути в заголовку
+  example: { cz: string; uk: string }; // приклад саме цього значення (картка показує кожен під його підписом)
+}
+
+// Однозначне слово: значення записане прямо в записі (так записані всі слова, крім багатозначних).
+export interface SingleSenseNoun extends NounBase, NounMeaning {
+  exampleSentenceCz?: string;
+  exampleSentenceUk?: string;
+  senses?: undefined;
+}
+
+// Багатозначне слово: щонайменше два значення, кожне зі своїми тегами, злічуваністю й прикладом; на рівні запису
+// цих полів немає (компілятор не дасть записати їх двічі чи прочитати, оминувши значення).
+export interface MultiSenseNoun extends NounBase {
+  senses: [NounSense, NounSense, ...NounSense[]];
+  sem?: undefined;
+  uncountable?: undefined;
+  exampleSentenceCz?: undefined;
+  exampleSentenceUk?: undefined;
+}
+
+export type NounEntry = SingleSenseNoun | MultiSenseNoun;
+
+// Іменник у ОДНОМУ значенні — те, з чим працюють квізи (теги, злічуваність, переклад із підписом значення). Однозначне
+// слово — це сам запис; багатозначне розгортає nounSenses (utils/partnerSelection.ts) — по одній проєкції на значення,
+// з тим самим id і формами. Кожне питання будується з однієї проєкції, тож фраза, прикметник і число не змішують значень.
+export type QuizNoun = SingleSenseNoun;
 
 // Вимога до іменника-партнера (квіз «Прикметники та займенники»): ті самі смислові теги, що у фреймах квізу
 // «Прийменники» (any — хоча б один тег, all — усі, none — жодного), плюс countable: true — лише злічувані
@@ -166,14 +205,6 @@ interface AdjectiveBase {
   // Ступені порівняння беруть ту саму вимогу. Правила — у шапці data/adjectives.ts.
   fits: NounFilter;
   declension: FullDeclension;
-  // Приклади для кожного роду — показуються під відповідним табом.
-  examples: GenderExamples;
-  // Другий сенс багатозначного слова (наразі лише těžký/lehký: вага vs
-  // переносне значення складно/легко) — картка показує ОБИДВА приклади під
-  // активним табом роду, з короткою міткою сенсу над кожним. senseLabel —
-  // підпис над основним `examples`, задається лише разом із secondSense.
-  senseLabel?: string;
-  secondSense?: { label: string; examples: GenderExamples };
   // Лише порядкові (category "ordinal"): яке число слово називає (druhý — 2). Квіз «Дата й час» за ним читає
   // «půl druhé» (родовий жін. роду наступної години); квіз «Числівники» — фрази з max (data/numeralFrames.ts).
   value?: number;
@@ -184,6 +215,18 @@ export interface AdjectiveDegrees {
   comparative: { cz: string; uk: string; declension: FullDeclension };
   superlative: { cz: string; uk: string; declension: FullDeclension };
 }
+
+// Одне значення багатозначного прикметника (těžký — вага / переносно: складно): підпис і приклад на кожен рід.
+// Значення прикметника обирає іменник («těžká taška» / «těžká práce»), тож тегів у значенні немає — квіз бере fits слова.
+export interface AdjectiveSense {
+  label: string; // підпис над прикладом на картці: «вага», «переносно: складно»
+  examples: GenderExamples;
+}
+// Приклади для кожного роду (показуються під відповідним табом): однозначне слово — examples; багатозначне — senses,
+// щонайменше два значення, картка показує приклад кожного під його підписом (як у іменників, NounSense).
+type AdjectiveExamples =
+  | { examples: GenderExamples; senses?: undefined }
+  | { senses: [AdjectiveSense, AdjectiveSense, ...AdjectiveSense[]]; examples?: undefined };
 
 // Смисловий клас прикметника — ОБОВ'ЯЗКОВЕ рішення для кожного слова (без нього проєкт не збереться), бо від
 // нього залежить, у які фрази квізу слово може потрапити. З класу випливає решта, тож кожне рішення записане раз:
@@ -196,6 +239,7 @@ export interface AdjectiveDegrees {
 //  • "relational" — відносний, без ступенів (poslední, stejný, cizí, celý, hlavní, jarní, порядкові): не стає
 //                   словом-партнером («nějaké poslední divadlo») і не йде у фрази qualitative.
 export type AdjectiveEntry = AdjectiveBase &
+  AdjectiveExamples &
   (
     | { semClass: "quality"; degrees: AdjectiveDegrees; quizDegrees: boolean }
     | { semClass: "state"; degrees: AdjectiveDegrees; quizDegrees?: never }

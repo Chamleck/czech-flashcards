@@ -1,21 +1,43 @@
-import { CzechCase, Gender, GrammaticalNumber, NounEntry, NounFilter } from "../types";
+import { CzechCase, Gender, GrammaticalNumber, NounEntry, NounFilter, QuizNoun } from "../types";
 import type { NounTag } from "../data/nounTags";
 import { CLUSTER_RULES, MEST_RULE, Needs, NumberPolicy, VocalDecision, VocalPrep } from "../data/prepositionPartners";
 import { NOUNS } from "../data/nouns";
 import { nounUsableAsPartner } from "../data/categories";
 import { skipReason, SkipRule } from "./quizCommon";
 
+// ─────────────── Значення слова для квізів ───────────────
+// Квізи працюють з іменником в ОДНОМУ значенні (QuizNoun): однозначне слово — це сам запис, багатозначне (kuře —
+// тварина / їжа, поле senses) — по одній проєкції на значення: ті самі id, форми, рід, але теги, злічуваність і
+// переклад цього значення («курча (їжа)» — підпис значення стоїть у дужках). Кожне питання будується з однієї
+// проєкції, тож фраза, прикметник, число й правила пропуску не змішують значень («Hraju si s teplým kuřetem» — ні).
+// Проєкції одні й ті самі об'єкти за весь запуск (пули порівнюють слова за посиланням).
+const SENSE_VIEWS = new WeakMap<NounEntry, readonly QuizNoun[]>();
+export function nounSenses(n: NounEntry): readonly QuizNoun[] {
+  if (!n.senses) return [n];
+  let views = SENSE_VIEWS.get(n);
+  if (!views) {
+    const { senses, ...base } = n;
+    views = senses.map((s) => ({ ...base, uk: `${s.uk ?? n.uk} (${s.label})`, sem: s.sem, uncountable: s.uncountable }));
+    SENSE_VIEWS.set(n, views);
+  }
+  return views;
+}
+
+// Скільки різних СЛІВ у списку значень (два значення одного слова — одне слово): для dev-перевірок розміру пулів.
+export const distinctWords = (nouns: readonly QuizNoun[]) => new Set(nouns.map((n) => n.id)).size;
+
 // Іменники-партнери: слова, яких квізи ставлять у чужі фрази (не дні, місяці, сотні). Єдиний пул для «Прикметників та
 // займенників», «Числівників» і «Прийменників»; незлічувані тут є — «Числівники» відсіюють їх самі (countable).
-export const PARTNER_NOUNS: NounEntry[] = NOUNS.filter((n) => nounUsableAsPartner(n.category));
+// Багатозначне слово стоїть тут кожним своїм значенням (nounSenses).
+export const PARTNER_NOUNS: QuizNoun[] = NOUNS.filter((n) => nounUsableAsPartner(n.category)).flatMap(nounSenses);
 
 // ─────────────── Чисті допоміжні функції добору партнерів (без випадковості, крім candidateNumbers) ───────────────
 // Дані — data/prepositionPartners.ts, теги — data/nounTags.ts, квіз — prepositionQuizEngine.ts.
 
 // Чи підходить слово під вимогу фрейму (any — хоча б один тег, all — усі, none — жодного; порожня вимога —
 // будь-яке слово).
-export function matchesNeeds(n: NounEntry, needs: Needs): boolean {
-  const sem = n.sem ?? [];
+export function matchesNeeds(n: QuizNoun, needs: Needs): boolean {
+  const sem = n.sem;
   if (needs.none && needs.none.some((t) => sem.includes(t))) return false;
   if (needs.all && !needs.all.every((t) => sem.includes(t))) return false;
   if (needs.any && !needs.any.some((t) => sem.includes(t))) return false;
@@ -23,7 +45,7 @@ export function matchesNeeds(n: NounEntry, needs: Needs): boolean {
 }
 
 // Те саме для вимоги квізу «Прикметники та займенники» (NounFilter): теги + countable (лише злічувані іменники).
-export function matchesFilter(n: NounEntry, f: NounFilter): boolean {
+export function matchesFilter(n: QuizNoun, f: NounFilter): boolean {
   if (f.countable && n.uncountable) return false;
   return matchesNeeds(n, f);
 }
@@ -33,19 +55,47 @@ export function agreementGender(n: NounEntry, num: GrammaticalNumber): Gender {
   return num === "pl" && n.plGender ? n.plGender : n.gender;
 }
 
-// Скільки фраз (чи пулів) банку квізу підходить слову — fit для ваги 1 / fit у freshWeightedOrder; мінімум 1.
-export function fitCounts<F>(nouns: readonly NounEntry[], frames: readonly F[], fits: (n: NounEntry, f: F) => boolean): Map<string, number> {
-  return new Map(nouns.map((n) => [n.id, Math.max(1, frames.filter((f) => fits(n, f)).length)]));
+// Скільки фраз (чи пулів) банку квізу підходить слову — fit для ваги 1 / fit у freshWeightedOrder; мінімум 1. Ключ —
+// id слова: фраза рахується, якщо їй підходить хоч одне значення слова (і рахується один раз).
+export function fitCounts<F>(nouns: readonly QuizNoun[], frames: readonly F[], fits: (n: QuizNoun, f: F) => boolean): Map<string, number> {
+  const byId = new Map<string, QuizNoun[]>();
+  for (const n of nouns) byId.set(n.id, [...(byId.get(n.id) ?? []), n]);
+  return new Map([...byId].map(([id, views]) => [id, Math.max(1, frames.filter((f) => views.some((v) => fits(v, f))).length)]));
 }
 
 // Порядок перебору кандидатів (спільний для квізів): спершу ті, кого ще не було в раунді, всередині — зважена
 // випадкова вибірка без повернень (ключ u^fit, Efraimidis–Spirakis), тож імовірність бути першим ∝ 1 / fit. Перебір
 // повний: якщо придатні лише вже використані, береться один із них — питання не губиться.
-export function freshWeightedOrder<T>(items: T[], isUsed: (t: T) => boolean, fitOf: (t: T) => number): T[] {
-  return items
-    .map((t) => ({ t, fresh: isUsed(t) ? 0 : 1, key: Math.random() ** fitOf(t) }))
+// groupOf — id слова, коли кандидати — іменники (null — інші кандидати, напр. фрази): значення одного слова отримують
+// ОДИН ключ (слово не стає вдвічі ймовірнішим через два значення) і стоять поруч у випадковому порядку; перебір
+// лишається повним — якщо одне значення не дає питання, пробується інше.
+export function freshWeightedOrder<T>(items: T[], isUsed: (t: T) => boolean, fitOf: (t: T) => number, groupOf: ((t: T) => string) | null): T[] {
+  const groupKey = new Map<string, number>();
+  const keyOf = (t: T): number => {
+    const g = groupOf?.(t);
+    if (g === undefined) return Math.random() ** fitOf(t);
+    const known = groupKey.get(g);
+    if (known !== undefined) return known;
+    const k = Math.random() ** fitOf(t);
+    groupKey.set(g, k);
+    return k;
+  };
+  const sorted = items
+    .map((t) => ({ t, fresh: isUsed(t) ? 0 : 1, key: keyOf(t) }))
     .sort((a, b) => b.fresh - a.fresh || b.key - a.key)
     .map((x) => x.t);
+  if (!groupOf || groupKey.size === items.length) return sorted;
+  // Значення одного слова (той самий ключ — сусіди після сортування): випадковий порядок усередині групи.
+  for (let i = 0; i < sorted.length; ) {
+    let j = i + 1;
+    while (j < sorted.length && groupOf(sorted[j]) === groupOf(sorted[i])) j++;
+    for (let k = j - 1; k > i; k--) {
+      const r = i + Math.floor(Math.random() * (k - i + 1));
+      [sorted[k], sorted[r]] = [sorted[r], sorted[k]];
+    }
+    i = j;
+  }
+  return sorted;
 }
 
 // Множина природна не завжди: «po obědech», «do týdnů», «od rodin» звучать дивно — тому теги часу, погоди, їжі-події,
@@ -55,15 +105,15 @@ export function freshWeightedOrder<T>(items: T[], isUsed: (t: T) => boolean, fit
 export const NO_PLURAL: NounTag[] = ["collective", "oneSystem"];
 // Слова, яких не буває кілька (oneSystem — metro): ні множини, ні лічби; квіз «Числівники» їх не бере («dvě metra» — ні).
 // Збірні (rodina) рахуються: «dvě rodiny».
-export const onlyOne = (n: NounEntry) => (n.sem ?? []).includes("oneSystem");
+export const onlyOne = (n: QuizNoun) => n.sem.includes("oneSystem");
 const SINGULAR_ONLY: NounTag[] = ["meal", "weather", "activity", "time", ...NO_PLURAL];
 // Частина тіла, якої в людини одна (hlava, nos, krk, srdce: тег body без bodyMany). Її множина — це кілька людей,
 // тож поруч з одним власником («tvé krky», «Znáš dítě? Mluvíme o jeho krcích») вона безглузда: у фразах інших квізів
 // слово за замовчуванням лише в однині (відкрити множину може plOk фрази). Квіз «Відмінки» число вирішує своїми
 // фразами без власника («To jsou krky»), там цієї умови немає; давальний і орудний множини прибирає NOUN_USAGE_RULES.
 const SINGLE_BODY: Needs = { any: ["body"], none: ["bodyMany"] };
-export function pluralNatural(n: NounEntry): boolean {
-  return !n.uncountable && !(n.sem ?? []).some((t) => SINGULAR_ONLY.includes(t)) && !matchesNeeds(n, SINGLE_BODY);
+export function pluralNatural(n: QuizNoun): boolean {
+  return !n.uncountable && !n.sem.some((t) => SINGULAR_ONLY.includes(t)) && !matchesNeeds(n, SINGLE_BODY);
 }
 
 // Чи має слово це число (клітинка називного не «—»); лише множина — peníze, brýle, kalhoty.
@@ -77,6 +127,7 @@ export const pluralOnly = (n: NounEntry) => !hasNumber(n, "sg") && hasNumber(n, 
 // це правила нижче + рішення самого квізу), а квізи, де іменник — слово-партнер у фразі («Прийменники»,
 // «Прикметники та займенники», порядкові й лічба «Числівників»), ніколи не ставлять його в таку клітинку
 // (candidateNumbers нижче — з відмінком; «Числівники» — formInUse на клітинці, яку вимагає числівник).
+// Правило читає теги й злічуваність ЗНАЧЕННЯ (QuizNoun): у багатозначного слова — кожного значення окремо.
 // Оракул (scripts/check-quiz-coverage.ts) перевіряє кожну фразу кожного банку проти цих правил.
 // ПРАВИЛА ДОДАВАННЯ
 //  1. Сюди — лише те, що мова не вживає в будь-якій фразі (факт про слово), за рішенням Ніка, з причиною.
@@ -85,7 +136,7 @@ export const pluralOnly = (n: NounEntry) => !hasNumber(n, "sg") && hasNumber(n, 
 //     заборонить правильні фрази в інших квізах («Mluvíme o večeru», «Před jedním dnem»).
 //  3. Порожні cases / numbers — усі відмінки / обидва числа.
 export interface NounCell {
-  noun: NounEntry;
+  noun: QuizNoun;
   c: CzechCase;
   n: GrammaticalNumber;
 }
@@ -123,7 +174,7 @@ export const NOUN_USAGE_RULES: SkipRule<NounCell>[] = [
   tagSkip({ any: ["oneSystem"], numbers: ["pl"], reason: "metro: множина (Нік: у місті одне; множину тренують інші слова)" }),
 ];
 // Чи вживає мова цю форму слова (жодне правило NOUN_USAGE_RULES її не прибирає).
-export const formInUse = (noun: NounEntry, c: CzechCase, n: GrammaticalNumber) => !skipReason(NOUN_USAGE_RULES, { noun, c, n });
+export const formInUse = (noun: QuizNoun, c: CzechCase, n: GrammaticalNumber) => !skipReason(NOUN_USAGE_RULES, { noun, c, n });
 
 // Які числа можна взяти для слова за політикою фрейму, у ВИПАДКОВОМУ порядку (перебирає той, хто викликає:
 // якщо перше число не дає контрасту форм, пробуємо друге — слово не карається за невдалий жереб).
@@ -133,15 +184,15 @@ export const formInUse = (noun: NounEntry, c: CzechCase, n: GrammaticalNumber) =
 // Тег із plOk — явне рішення, тож відкриває множину й незлічуваному («silné větry», «minerální vody»); так само в
 // усіх квізах (рушій «Відмінки» — pluralFits). c — відмінок, у якому слово стане у фразі: число, форму якого мова в
 // цьому відмінку не вживає (NOUN_USAGE_RULES — «k patru»), не повертається ніколи, навіть із plOk.
-export function candidateNumbers(n: NounEntry, c: CzechCase, policy: NumberPolicy, rnd: () => number = Math.random, plOk?: readonly NounTag[]): GrammaticalNumber[] {
+export function candidateNumbers(n: QuizNoun, c: CzechCase, policy: NumberPolicy, rnd: () => number = Math.random, plOk?: readonly NounTag[]): GrammaticalNumber[] {
   return numbersByPolicy(n, policy, rnd, plOk).filter((num) => formInUse(n, c, num));
 }
-function numbersByPolicy(n: NounEntry, policy: NumberPolicy, rnd: () => number, plOk?: readonly NounTag[]): GrammaticalNumber[] {
+function numbersByPolicy(n: QuizNoun, policy: NumberPolicy, rnd: () => number, plOk?: readonly NounTag[]): GrammaticalNumber[] {
   const sg = hasNumber(n, "sg");
   const pl = hasNumber(n, "pl");
-  const natural = pluralNatural(n) || (!!plOk && (n.sem ?? []).some((t) => plOk.includes(t))); // тег із plOk — явне рішення, навіть для незлічуваного
+  const natural = pluralNatural(n) || (!!plOk && n.sem.some((t) => plOk.includes(t))); // тег із plOk — явне рішення, навіть для незлічуваного
   if (policy === "pl") return pl && (natural || !sg) ? ["pl"] : []; // не «mezi rodinami», не «mezi oblečeními»
-  if (!sg || (pl && (n.sem ?? []).includes("paired"))) return pl ? ["pl"] : [];
+  if (!sg || (pl && n.sem.includes("paired"))) return pl ? ["pl"] : [];
   if (policy === "sg" || !pl || !natural) return ["sg"];
   return rnd() < 0.5 ? ["sg", "pl"] : ["pl", "sg"];
 }

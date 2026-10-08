@@ -1,10 +1,10 @@
-import { CzechCase, NounEntry, PrepositionEntry, CASE_LABELS, GrammaticalNumber, Gender, PersonalDeclension, PersonalPronounEntry } from "../types";
+import { CzechCase, QuizNoun, PrepositionEntry, CASE_LABELS, GrammaticalNumber, Gender, PersonalDeclension, PersonalPronounEntry } from "../types";
 import { PREPOSITIONS } from "../data/prepositions";
 import { NOUNS } from "../data/nouns";
 import { COLS_NP, PERSONAL_PRONOUNS } from "../data/personalPronouns";
-import { validateNounSem } from "../data/nounTags";
+import { validateNounSem, validateNounSenses } from "../data/nounTags";
 import { CONFUSABLE_PREP_PAIRS, DUAL_FRAMES, EXCHANGE_FRAMES, FIXED_FRAMES, Frame, Needs, PRONOUN_FRAMES } from "../data/prepositionPartners";
-import { PARTNER_NOUNS, acceptedForms, candidateNumbers, disjoint, fitCounts, formOf, freshWeightedOrder, matchesNeeds, vocalizedPrep } from "./partnerSelection";
+import { PARTNER_NOUNS, acceptedForms, distinctWords, nounSenses, candidateNumbers, disjoint, fitCounts, formOf, freshWeightedOrder, matchesNeeds, vocalizedPrep } from "./partnerSelection";
 import { MistakeStore, comboId, selectRoundCombos, KindQuota } from "./flashcardWeights";
 import { NUMBER_LABEL, formsOf, isUsableDistractor, once, shuffle, topUpRound } from "./quizCommon";
 
@@ -60,8 +60,8 @@ function caseTail(c: CzechCase, n: GrammaticalNumber): string {
 // Партнер-пул: ті самі фільтри, що в numeral (не декоративні категорії: дні, місяці, числівники).
 // Незлічувані лишаємо — «bez másla» цілком нормально (на відміну від «osm mas» у числівниках).
 
-const needsPools = new Map<string, NounEntry[]>();
-function poolForNeeds(key: string, needs: Needs): NounEntry[] {
+const needsPools = new Map<string, QuizNoun[]>();
+function poolForNeeds(key: string, needs: Needs): QuizNoun[] {
   let p = needsPools.get(key);
   if (!p) {
     p = PARTNER_NOUNS.filter((n) => matchesNeeds(n, needs));
@@ -70,15 +70,15 @@ function poolForNeeds(key: string, needs: Needs): NounEntry[] {
   return p;
 }
 
-function framePool(prepId: string, kind: string, f: Frame): NounEntry[] {
+function framePool(prepId: string, kind: string, f: Frame): QuizNoun[] {
   // ключ — текст І вимоги: два фрейми з однаковим текстом, але різними тегами не ділять кеш
   return poolForNeeds(`frame:${prepId}:${kind}:${f.text}:${JSON.stringify([f.any, f.all, f.none])}`, f);
 }
 
 // Слова, придатні хоча б до одного фрейму пулу (прийменник × сенс). Добір іде від СЛОВА, а не від фрейму: слово,
 // що підходить до двадцяти фреймів, інакше з'являлося б у двадцять разів частіше за слово з одним.
-const unionPools = new Map<string, NounEntry[]>();
-function unionPool(prepId: string, kind: string, frames: Frame[]): NounEntry[] {
+const unionPools = new Map<string, QuizNoun[]>();
+function unionPool(prepId: string, kind: string, frames: Frame[]): QuizNoun[] {
   const key = `${prepId}:${kind}`;
   let u = unionPools.get(key);
   if (!u) {
@@ -94,8 +94,8 @@ type DualSense = "motion" | "location";
 const SENSES: DualSense[] = ["motion", "location"];
 
 // Усі пули квізу (ключ — як в unionPool): один на фіксований прийменник, по одному на сенс двоїстого, обмін «za».
-function allPools(): NounEntry[][] {
-  const out: NounEntry[][] = [];
+function allPools(): QuizNoun[][] {
+  const out: QuizNoun[][] = [];
   for (const p of PREPOSITIONS) {
     if (p.type === "fixed") {
       const fr = FIXED_FRAMES[p.id];
@@ -120,12 +120,12 @@ const fitCount = (nounId: string) => FIT().get(nounId) ?? 1;
 // Порядок перебору кандидатів: спершу слова, яких ще не було в раунді, всередині вага 1 / fit (freshWeightedOrder).
 // Перебір повний: якщо в комбо придатні лише вже використані слова, береться одне з них — питання (зокрема
 // зарезервоване під помилку) не губиться.
-function partnerOrder(cands: NounEntry[], used: ReadonlySet<string>): NounEntry[] {
-  return freshWeightedOrder(cands, (n) => used.has(n.id), (n) => fitCount(n.id));
+function partnerOrder(cands: QuizNoun[], used: ReadonlySet<string>): QuizNoun[] {
+  return freshWeightedOrder(cands, (n) => used.has(n.id), (n) => fitCount(n.id), (n) => n.id);
 }
 
 interface PartnerPick<T> {
-  noun: NounEntry;
+  noun: QuizNoun;
   frame: Frame;
   num: GrammaticalNumber;
   data: T;
@@ -139,7 +139,7 @@ function pickPartner<T>(
   c: CzechCase, // відмінок форми слова у фразі: candidateNumbers не дасть форми, якої мова не вживає («k patru»)
   frames: Frame[],
   used: ReadonlySet<string>,
-  tryForm: (noun: NounEntry, num: GrammaticalNumber) => T | null
+  tryForm: (noun: QuizNoun, num: GrammaticalNumber) => T | null
 ): PartnerPick<T> | null {
   for (const noun of partnerOrder(unionPool(prepId, kind, frames), used)) {
     for (const frame of shuffle(frames.filter((f) => matchesNeeds(noun, f)))) {
@@ -161,7 +161,7 @@ interface Built {
 // Дистрактор до фіксованого прийменника / обміну: той самий партнер в іншому відмінку, у ТОМУ Ж числі.
 // Виключаємо nominativ і vokativ (жоден прийменник ними не керує — надто очевидно) та будь-який відмінок,
 // форма якого збігається з прийнятою формою правильної клітинки (дублет чи variants).
-function nounDistractor(noun: NounEntry, correctCase: CzechCase, n: GrammaticalNumber, correct: string): string | null {
+function nounDistractor(noun: QuizNoun, correctCase: CzechCase, n: GrammaticalNumber, correct: string): string | null {
   const target = acceptedForms(noun, correctCase, n);
   for (const cc of shuffle(CASES.filter((c) => c !== correctCase && c !== "nominativ"))) {
     const f = formOf(noun, cc, n);
@@ -175,7 +175,7 @@ function nounDistractor(noun: NounEntry, correctCase: CzechCase, n: GrammaticalN
 // Дистрактор для dual: форма ІНШОГО з двох відмінків (рух ↔ спокій). Якщо вона збігається з правильною або
 // відрізняється лише довжиною голосного (restauraci / restaurací — саме те, що учень має розрізняти, але вибір
 // «лише за довжиною» не годиться для питання), беремо будь-який інший відмінок, як і раніше.
-function dualDistractor(noun: NounEntry, c: CzechCase, otherCase: CzechCase, num: GrammaticalNumber, correct: string): string | null {
+function dualDistractor(noun: QuizNoun, c: CzechCase, otherCase: CzechCase, num: GrammaticalNumber, correct: string): string | null {
   const other = formOf(noun, otherCase, num);
   if (isUsableDistractor(correct, other) && disjoint(acceptedForms(noun, c, num), acceptedForms(noun, otherCase, num))) return other;
   return nounDistractor(noun, c, num, correct);
@@ -430,18 +430,18 @@ function buildPronoun(grp: PronounGroup, c: CzechCase, used: ReadonlySet<string>
 // фіксований прийменник без фреймів (він тоді не потрапляє у квіз).
 function devCheckData(): void {
   const issues: string[] = [];
-  for (const n of NOUNS) issues.push(...validateNounSem(n));
+  for (const n of NOUNS) issues.push(...validateNounSenses(n), ...nounSenses(n).flatMap(validateNounSem));
   const small = (label: string, n: number, min: number) => {
     if (n < min) issues.push(`пул «${label}» має лише ${n} слів (потрібно ≥ ${min})`);
   };
   for (const [pid, f] of Object.entries(DUAL_FRAMES)) {
-    for (const sense of SENSES) for (const fr of f[sense]) small(`${pid}.${sense} «${fr.text}»`, framePool(pid, sense, fr).length, 3);
+    for (const sense of SENSES) for (const fr of f[sense]) small(`${pid}.${sense} «${fr.text}»`, distinctWords(framePool(pid, sense, fr)), 3);
   }
   for (const p of PREPOSITIONS) {
     if (p.type !== "fixed") continue;
     const frames = FIXED_FRAMES[p.id];
     if (!frames) issues.push(`${p.id}: немає FIXED_FRAMES — прийменник не потрапляє у квіз`);
-    else for (const fr of frames) small(`${p.id} «${fr.text}»`, framePool(p.id, "fixed", fr).length, 3);
+    else for (const fr of frames) small(`${p.id} «${fr.text}»`, distinctWords(framePool(p.id, "fixed", fr)), 3);
   }
   for (const fr of Object.values(PRONOUN_FRAMES).flat()) if (fr && !PREP_BY_ID.has(fr.prepId)) issues.push(`PRONOUN_FRAMES: невідомий прийменник ${fr.prepId}`);
   if (issues.length > 0) console.warn(`prepositionQuiz: ${issues.length} зауваж.:\n  ` + issues.slice(0, 25).join("\n  "));
