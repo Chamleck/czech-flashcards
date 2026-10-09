@@ -255,7 +255,9 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
 export const ANTECEDENT_FRAME: DeclFrame = { text: "Znáš ___?", num: "any", any: ["person", "animal"] };
 // Власник у питанні «чий?» (jeho / její / jejich) — лише людина: «Znáš tu ženu? Bydlím v jejím domě», не «Znáš krávu?
 // Vidím její silnice».
-export const OWNER_FRAME: DeclFrame = { text: "Znáš ___?", num: "any", any: ["person"] };
+// Антецедент-людина: власник у «чий?» і фрази, природні лише про людей («Věřím mu», «Dostal jsem dárek od něj» —
+// не про кошеня, Нік 2026-10-09).
+export const PERSON_ANTECEDENT_FRAME: DeclFrame = { text: "Znáš ___?", num: "any", any: ["person"] };
 // Антецедент фраз страху («Znáš ___? Bojím se ho»): без дитинчат (young) — як і у фразах страху банку (Нік 2026-10-08).
 export const FEAR_ANTECEDENT_FRAME: DeclFrame = { ...ANTECEDENT_FRAME, none: ["young"] };
 
@@ -264,17 +266,18 @@ export const FEAR_ANTECEDENT_FRAME: DeclFrame = { ...ANTECEDENT_FRAME, none: ["y
 // проти ho / mu; фраза з протиставленням «…, ne tebe», де ненаголошена форма неможлива). s1 — підмет «я» (ціль 2/3 особи),
 // s2 — підмет «ти» (ціль 1 особи): «Vidím mě» неможливе (кореференція). Займенник-приклонка ніколи не перший у реченні.
 // Прийменник (prep) вокалізується за формою (ke mně, se mnou, ode mě).
-// ante — іменник-антецедент 3-ї особи, коли фраза звужує ANTECEDENT_FRAME (фрази страху — FEAR_ANTECEDENT_FRAME).
+// ante — іменник-антецедент 3-ї особи, коли фраза звужує ANTECEDENT_FRAME (фрази страху — FEAR_ANTECEDENT_FRAME, фрази лише
+// про людей — PERSON_ANTECEDENT_FRAME).
 export interface PersonalFrame { pre: string; post: string; prep?: string; ante?: DeclFrame }
 export interface PersonalCaseFrame { s1: PersonalFrame; s2: PersonalFrame }
 export const PERSONAL_FRAMES: Partial<Record<QuizCase, Partial<Record<0 | 1 | 2, PersonalCaseFrame>>>> = {
   genitiv: {
     0: { s1: { pre: "Bojím se ", post: ".", ante: FEAR_ANTECEDENT_FRAME }, s2: { pre: "Bojíš se ", post: "?" } },
-    1: { s1: { pre: "Dostal jsem dárek ", post: ".", prep: "od" }, s2: { pre: "Dostal jsi dárek ", post: "?", prep: "od" } },
+    1: { s1: { pre: "Dostal jsem dárek ", post: ".", prep: "od", ante: PERSON_ANTECEDENT_FRAME }, s2: { pre: "Dostal jsi dárek ", post: "?", prep: "od" } },
     2: { s1: { pre: "Bojím se ", post: ", ne tebe.", ante: FEAR_ANTECEDENT_FRAME }, s2: { pre: "Bojíš se ", post: ", ne mě?" } },
   },
   dativ: {
-    0: { s1: { pre: "Věřím ", post: "." }, s2: { pre: "Věříš ", post: "?" } },
+    0: { s1: { pre: "Věřím ", post: ".", ante: PERSON_ANTECEDENT_FRAME }, s2: { pre: "Věříš ", post: "?" } },
     1: { s1: { pre: "Jdu ", post: ".", prep: "k" }, s2: { pre: "Jdeš ", post: "?", prep: "k" } },
     2: { s1: { pre: "Dej to ", post: ", ne mně." }, s2: { pre: "Dáš to ", post: ", ne mně?" } },
   },

@@ -23,7 +23,7 @@ import { INDEFINITE_ADJ, INDEFINITE_CORE } from "../data/indefinitePronouns";
 import { adjQuizUsable } from "../data/adjectiveCategories";
 import {
   ANTECEDENT_FRAME,
-  OWNER_FRAME,
+  PERSON_ANTECEDENT_FRAME,
   DECL_CELL_SKIPS,
   DECL_FRAMES,
   DECL_WORD_SKIPS,
@@ -788,9 +788,9 @@ const ownerForm = (p: PronounEntry, g: Gender, c: QuizCase, n: GrammaticalNumber
 
 function possessiveUnits(pool: Tested[]): UnitCombo[] {
   const owners = PRONOUNS.filter((p) => p.quiz?.owner);
-  // Власник — людина (OWNER_FRAME), форма показує число, в антецеденті жодного jeho / její / jejich: «Znáš jeho ženu?
+  // Власник — людина (PERSON_ANTECEDENT_FRAME), форма показує число, в антецеденті жодного jeho / její / jejich: «Znáš jeho ženu?
   // … jejím» плутало б, чий це власник.
-  const ante: AnteSpec = { frame: OWNER_FRAME, partners: DETERMINER_PARTNERS.filter((p) => !owners.includes(p)), numberMatters: true };
+  const ante: AnteSpec = { frame: PERSON_ANTECEDENT_FRAME, partners: DETERMINER_PARTNERS.filter((p) => !owners.includes(p)), numberMatters: true };
   const frameWord = pool.find((t) => owners.some((o) => o.id === t.id)); // відмінюваний присвійний (její)
   if (!frameWord) return [];
   const label = {

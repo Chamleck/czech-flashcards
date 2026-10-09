@@ -53,7 +53,7 @@ import { generateDateTimeSession } from "../src/utils/datetimeEngine";
 import { acceptedForms, candidateNumbers, hasNumber, matchesFilter, matchesNeeds, NO_PLURAL, NOUN_USAGE_RULES, vocalDecision } from "../src/utils/partnerSelection";
 import { skipReason, SkipRule } from "../src/utils/quizCommon";
 import { NOUN_FRAMES, NOUN_SKIP_RULES } from "../src/data/nounFrames";
-import { ANTECEDENT_FRAME, FEAR_ANTECEDENT_FRAME, DECL_CELL_SKIPS, DECL_FRAMES, DECL_WORD_SKIPS, OWNER_FRAME, QUIZ_CASES, QuizCase, ValueCell } from "../src/data/declensionFrames";
+import { ANTECEDENT_FRAME, FEAR_ANTECEDENT_FRAME, DECL_CELL_SKIPS, DECL_FRAMES, DECL_WORD_SKIPS, PERSON_ANTECEDENT_FRAME, QUIZ_CASES, QuizCase, ValueCell } from "../src/data/declensionFrames";
 import { DUAL_FRAMES, EXCHANGE_FRAMES, FIXED_FRAMES } from "../src/data/prepositionPartners";
 import { ORDINAL_BARE_SKIPS, ORDINAL_FRAMES } from "../src/data/numeralFrames";
 import { PAST_SUBJECT_ORDER, IMPERATIVE_ORDER, presentForm, futureForm, pastForm, imperativeForm } from "../src/utils/verbForms";
@@ -461,7 +461,7 @@ function carrierFrames(): CarrierFrame[] {
     }
   }
   for (const [c, fs] of Object.entries(DECL_FRAMES)) for (const f of fs) out.push({ quiz: ADJ_QUIZ, c: c as CzechCase, f });
-  for (const f of [ANTECEDENT_FRAME, FEAR_ANTECEDENT_FRAME, OWNER_FRAME]) out.push({ quiz: ADJ_QUIZ, c: "akuzativ", f });
+  for (const f of [ANTECEDENT_FRAME, FEAR_ANTECEDENT_FRAME, PERSON_ANTECEDENT_FRAME]) out.push({ quiz: ADJ_QUIZ, c: "akuzativ", f });
   // фраза без іменника (standalone) іменника-партнера не має — перевіряти її проти слів нічого
   for (const [c, fs] of Object.entries(ORDINAL_FRAMES)) for (const f of fs) if (!f.standalone) out.push({ quiz: "Числівники (порядкові)", c: c as CzechCase, f });
   return out;

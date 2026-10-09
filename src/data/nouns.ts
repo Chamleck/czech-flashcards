@@ -23,7 +23,7 @@ import { NounEntry } from "../types";
 //       • місце ЗАВЖДИ має рівно один із placeV (в школі) чи placeNa (на пошті) — це лексична властивість
 //         слова; перевір за словником, а не за відчуттям;
 //       • особа, тварина, їжа, час, погода, гроші, документ, тіло, повітря — «самотні» теги (без інших; винятки:
-//         тіло + bodyLevel / singleLevel / bodyMany / noLooks, тварина + young (дитинча: kotě, štěně), час + timeUnit / dayPart / month / season / weekday / daySpan / dayPoint / timeV / yearsPlural, їжа + served / homemade / drink / mineral, погода + strongPl / weatherCause / sky, документ + carried — pas, doklad, гроші + currency — koruna, euro, особа + collective — rodina);
+//         тіло + bodyLevel / singleLevel / bodyMany / noLooks, тварина + young / farm (дитинча kotě, ферма kráva), час + timeUnit / dayPart / month / season / weekday / daySpan / dayPoint / timeV / yearsPlural, їжа + served / homemade / drink / mineral, погода + strongPl / weatherCause / sky, документ + carried — pas, doklad, гроші + currency — koruna, euro, особа + collective — rodina);
 //       • їжа: served — страва чи напій, який подають теплим або холодним (káva, polévka, maso: «teplá polévka»);
 //         homemade — буває домашнім (chléb, pivo, ovoce: «domácí chléb»); жодного — як cukr. Без них teplý / studený /
 //         domácí з цим словом не з'являться (і «studený cukr» теж) — це безпечно; зайвий тег дасть безглузду пару;
@@ -1943,7 +1943,7 @@ export const NOUNS: NounEntry[] = [
     gender: "fem",
     pattern: "zena",
     category: "animals",
-    sem: ["animal"],
+    sem: ["animal", "farm"],
     declension: {
       // krátí se á→a v Gpl: krav
       nominativ: { sg: "kráva", pl: "krávy" },
@@ -1965,7 +1965,7 @@ export const NOUNS: NounEntry[] = [
     gender: "masc_anim",
     pattern: "muz",
     category: "animals",
-    sem: ["animal"],
+    sem: ["animal", "farm"],
     declension: {
       // ů→o в основі; множина частково за старим зразком (koní, koňmi)
       nominativ: { sg: "kůň", pl: "koně" },
@@ -2036,7 +2036,7 @@ export const NOUNS: NounEntry[] = [
     senses: [
       {
         label: "тварина",
-        sem: ["animal", "young"],
+        sem: ["animal", "young", "farm"],
         uncountable: false,
         example: { cz: "Na dvoře běhají kuřata.", uk: "Подвір'ям бігають курчата." },
       },

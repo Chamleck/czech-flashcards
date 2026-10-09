@@ -89,12 +89,13 @@ export const NUMERAL_FRAMES: Record<QuizCase, NumeralFrame[]> = {
   ],
   instrumental: [
     { text: "Šel jsem tam {s} ___.", any: ["person", "animal"], max: EVERYDAY_MAX },
-    // před / mezi не вокалізуються — люди й тварини в орудному і для dva / čtyři (s + dv-, čt- не класифіковано)
-    { text: "Stál jsem před ___.", any: ["person", "animal"], max: PEOPLE_ANIMALS_MAX },
+    // před / mezi не вокалізуються — люди в орудному і для dva / čtyři (s + dv-, čt- не класифіковано). «Stál jsem před» —
+    // лише люди (виступ перед залом: «před tisícem lidí»; «před tisícem kuřat» — ні, Нік 2026-10-09).
+    { text: "Stál jsem před ___.", any: ["person"], max: PEOPLE_ANIMALS_MAX },
     { text: "Seděl jsem mezi ___.", any: ["person"], many: true, max: PEOPLE_ANIMALS_MAX },
     { text: "Mezi ___ je park.", any: ["building"], many: true, max: EVERYDAY_MAX },
     { text: "Je to město {s} ___.", any: ["building"] },
-    { text: "Je to farma {s} ___.", any: ["animal"], max: PEOPLE_ANIMALS_MAX },
+    { text: "Je to farma {s} ___.", any: ["farm"], max: PEOPLE_ANIMALS_MAX }, // не «farma s koťaty» (Нік 2026-10-09)
     { text: "Za ___ je les.", any: ["building"], max: EVERYDAY_MAX },
     { text: "Před ___ jsem tam byl.", any: ["timeUnit"], max: EVERYDAY_MAX },
     { text: "Přišel {s} ___.", any: ["carried"], none: ["document"], max: EVERYDAY_MAX },
