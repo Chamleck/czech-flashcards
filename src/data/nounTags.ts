@@ -33,6 +33,7 @@ import type { NounEntry, QuizNoun } from "../types";
 export type NounTag =
   | "person"
   | "animal"
+  | "young"
   | "placeV"
   | "placeNa"
   | "building"
@@ -107,6 +108,7 @@ export type NounTag =
 export const NOUN_TAG_DOC: Record<NounTag, string> = {
   person: "людина, професія, родич: kamarád, učitel, matka, rodina",
   animal: "тварина: pes, kočka, kůň",
+  young: "дитинча тварини (разом з animal): kotě, štěně, kuře — НЕ «staré / mladé / silné / nebezpečné / štíhlé kotě» і не у фразах страху «Bojím se ___» (Нік 2026-10-08)",
   placeV: "місце, де «є» з прийменником v/ve і «іду» з do: v škole, ve městě, do lesa (НЕ pošta — вона na)",
   placeNa: "місце з прийменником na: na poště, na úřadě, na nádraží, na hoře, na moři",
   building: "будівля чи споруда як орієнтир для před/za/vedle: kostel, škola, nádraží, most",
@@ -180,7 +182,7 @@ export const NOUN_TAG_DOC: Record<NounTag, string> = {
 
 // Теги-«самоцілі»: слово з таким тегом не має жодних інших (особа не буває будівлею, їжа — місцем тощо).
 // Винятки: body разом з bodyLevel / singleLevel / bodyMany / noLooks, time разом зі своїми підтегами (timeUnit, dayPart, month…), document разом з carried (pas, doklad),
-// person разом з collective (rodina), food разом з served / homemade, money разом з currency (koruna, euro); наскрізні теги (CROSS) — з будь-яким.
+// person разом з collective (rodina), animal разом з young (kotě, štěně), food разом з served / homemade, money разом з currency (koruna, euro); наскрізні теги (CROSS) — з будь-яким.
 const CROSS: NounTag[] = ["ordered", "recurring"];
 const SOLO: NounTag[] = ["person", "animal", "money", "food", "meal", "time", "weather", "abstract", "document", "body", "air"];
 // Теги, що ВИМАГАЮТЬ супутнього: (тег → хоча б один з переліку).
@@ -211,6 +213,7 @@ const REQUIRES: Partial<Record<NounTag, NounTag[]>> = {
   served: ["food"],
   homemade: ["food"],
   ranking: ["placeNa"],
+  young: ["animal"],
 };
 
 // Перевірка набору тегів одного слова (у багатозначного — кожного значення окремо, QuizNoun з nounSenses): список
@@ -223,7 +226,7 @@ export function validateNounSem(n: Pick<QuizNoun, "id" | "sem" | "month">): stri
   for (const solo of SOLO) {
     if (!sem.includes(solo)) continue;
     const allowed: NounTag[] =
-      solo === "body" ? ["body", "bodyLevel", "singleLevel", "bodyMany", "noLooks"] : solo === "time" ? ["time", "timeUnit", "dayPart", "month", "season", "weekday", "daySpan", "dayPoint", "timeV", "yearsPlural"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade", "drink", "mineral"] : solo === "weather" ? ["weather", "strongPl", "weatherCause", "sky"] : solo === "money" ? ["money", "currency"] : [solo];
+      solo === "body" ? ["body", "bodyLevel", "singleLevel", "bodyMany", "noLooks"] : solo === "time" ? ["time", "timeUnit", "dayPart", "month", "season", "weekday", "daySpan", "dayPoint", "timeV", "yearsPlural"] : solo === "document" ? ["document", "carried"] : solo === "person" ? ["person", "collective"] : solo === "food" ? ["food", "served", "homemade", "drink", "mineral"] : solo === "weather" ? ["weather", "strongPl", "weatherCause", "sky"] : solo === "money" ? ["money", "currency"] : solo === "animal" ? ["animal", "young"] : [solo];
     const extra = sem.filter((t) => !allowed.includes(t) && !CROSS.includes(t));
     if (extra.length > 0) out.push(`${n.id}: тег «${solo}» не сполучається з ${extra.join(", ")}`);
   }

@@ -114,22 +114,23 @@ interface NounMeaning {
 
 // Одне значення багатозначного слова (kuře — тварина / їжа). Формами значення не відрізняються (одна стаття IJP,
 // одна парадигма); омоніми з різною парадигмою (los — losa / losu) — окремі записи. Правила — шапка data/nouns.ts.
-export interface NounSense extends NounMeaning {
+interface NounSense extends NounMeaning {
   label: string; // підпис значення на картці й у квізі: «тварина», «їжа»
   uk?: string; // власний переклад значення, лише коли українською це інше слово (papír: «документ»); має бути в заголовку
   example: { cz: string; uk: string }; // приклад саме цього значення (картка показує кожен під його підписом)
 }
 
+// Приклад-речення слова: чеське речення й переклад — лише разом (без пари картка показала б порожній рядок).
+type ExampleSentence =
+  | { exampleSentenceCz: string; exampleSentenceUk: string }
+  | { exampleSentenceCz?: undefined; exampleSentenceUk?: undefined };
+
 // Однозначне слово: значення записане прямо в записі (так записані всі слова, крім багатозначних).
-export interface SingleSenseNoun extends NounBase, NounMeaning {
-  exampleSentenceCz?: string;
-  exampleSentenceUk?: string;
-  senses?: undefined;
-}
+type SingleSenseNoun = NounBase & NounMeaning & ExampleSentence & { senses?: undefined };
 
 // Багатозначне слово: щонайменше два значення, кожне зі своїми тегами, злічуваністю й прикладом; на рівні запису
 // цих полів немає (компілятор не дасть записати їх двічі чи прочитати, оминувши значення).
-export interface MultiSenseNoun extends NounBase {
+interface MultiSenseNoun extends NounBase {
   senses: [NounSense, NounSense, ...NounSense[]];
   sem?: undefined;
   uncountable?: undefined;
@@ -218,7 +219,7 @@ export interface AdjectiveDegrees {
 
 // Одне значення багатозначного прикметника (těžký — вага / переносно: складно): підпис і приклад на кожен рід.
 // Значення прикметника обирає іменник («těžká taška» / «těžká práce»), тож тегів у значенні немає — квіз бере fits слова.
-export interface AdjectiveSense {
+interface AdjectiveSense {
   label: string; // підпис над прикладом на картці: «вага», «переносно: складно»
   examples: GenderExamples;
 }
@@ -291,13 +292,12 @@ export interface PronounQuiz {
 
 // Незмінний займенник: jeho, jejich — одна форма на всі відмінки,
 // тому й приклад один (табів роду немає).
-export interface IndeclinablePronoun extends PronounBase {
-  declinable: false;
-  invariantForm: string;
-  quiz?: PronounQuiz; // лише fits: з якими іменниками природний як слово-партнер (jeho / jejich — не з погодою й часом)
-  exampleSentenceCz?: string;
-  exampleSentenceUk?: string;
-}
+export type IndeclinablePronoun = PronounBase &
+  ExampleSentence & {
+    declinable: false;
+    invariantForm: string;
+    quiz?: PronounQuiz; // лише fits: з якими іменниками природний як слово-партнер (jeho / jejich — не з погодою й часом)
+  };
 
 export type PronounEntry = DeclinablePronoun | IndeclinablePronoun;
 

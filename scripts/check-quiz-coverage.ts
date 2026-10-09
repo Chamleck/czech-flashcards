@@ -53,7 +53,7 @@ import { generateDateTimeSession } from "../src/utils/datetimeEngine";
 import { acceptedForms, candidateNumbers, hasNumber, matchesFilter, matchesNeeds, NO_PLURAL, NOUN_USAGE_RULES, vocalDecision } from "../src/utils/partnerSelection";
 import { skipReason, SkipRule } from "../src/utils/quizCommon";
 import { NOUN_FRAMES, NOUN_SKIP_RULES } from "../src/data/nounFrames";
-import { ANTECEDENT_FRAME, DECL_CELL_SKIPS, DECL_FRAMES, DECL_WORD_SKIPS, OWNER_FRAME, QUIZ_CASES, QuizCase, ValueCell } from "../src/data/declensionFrames";
+import { ANTECEDENT_FRAME, FEAR_ANTECEDENT_FRAME, DECL_CELL_SKIPS, DECL_FRAMES, DECL_WORD_SKIPS, OWNER_FRAME, QUIZ_CASES, QuizCase, ValueCell } from "../src/data/declensionFrames";
 import { DUAL_FRAMES, EXCHANGE_FRAMES, FIXED_FRAMES } from "../src/data/prepositionPartners";
 import { ORDINAL_BARE_SKIPS, ORDINAL_FRAMES } from "../src/data/numeralFrames";
 import { PAST_SUBJECT_ORDER, IMPERATIVE_ORDER, presentForm, futureForm, pastForm, imperativeForm } from "../src/utils/verbForms";
@@ -461,7 +461,7 @@ function carrierFrames(): CarrierFrame[] {
     }
   }
   for (const [c, fs] of Object.entries(DECL_FRAMES)) for (const f of fs) out.push({ quiz: ADJ_QUIZ, c: c as CzechCase, f });
-  for (const f of [ANTECEDENT_FRAME, OWNER_FRAME]) out.push({ quiz: ADJ_QUIZ, c: "akuzativ", f });
+  for (const f of [ANTECEDENT_FRAME, FEAR_ANTECEDENT_FRAME, OWNER_FRAME]) out.push({ quiz: ADJ_QUIZ, c: "akuzativ", f });
   // фраза без іменника (standalone) іменника-партнера не має — перевіряти її проти слів нічого
   for (const [c, fs] of Object.entries(ORDINAL_FRAMES)) for (const f of fs) if (!f.standalone) out.push({ quiz: "Числівники (порядкові)", c: c as CzechCase, f });
   return out;
@@ -994,13 +994,17 @@ function selfTest(): boolean {
     { name: "NOUN_USAGE_RULES: «k patru» (вибір числа без тегу floor)", only: ["preps"], focus: ["patro"], gens: {}, numbersOf: withoutTag("floor") },
     { name: "NOUN_USAGE_RULES: лічба з формою, якої мова не вживає (hlavami)", only: ["numerals"], focus: ["hlava"], gens: { numerals: mutate(REAL.numerals, (q) => (q.blank === "noun" ? { ...q, promptWord: "hlava", correct: "hlavami", options: ["hlavami", "hlavy"] } : q)) } },
     { name: "NO_PLURAL: rodina в множині у фразі без plOk", only: ["nouns"], focus: ["rodina::"], gens: { nouns: mutate(REAL.nouns, (q) => (q.comboId === "rodina::lokal::pl" ? { ...q, contextPhrase: "Čtu o ___." } : q)) } },
+    { name: "значення: фраза тварини з прикметником їжі («Hraju si s teplým kuřetem»)", only: ["decl"], focus: ["teply::"], gens: { decl: (s) => REAL.decl(s).map((q, i) => (i === 0 ? { ...q, comboId: "teply::neut_instrumental::sg", contextPhrase: "Hraju si s ___ kuřetem.", correct: "teplým", options: ["teplým", "teplou"] } : q)) } },
+    { name: "значення: підказка не того значення (kuře, «курча (тварина)» ↔ «курча (їжа)»)", only: ["nouns"], focus: ["kure::"], gens: { nouns: mutate(REAL.nouns, (q) => (q.comboId.startsWith("kure::") && q.contextPhrase ? { ...q, promptUk: q.promptUk === "курча (тварина)" ? "курча (їжа)" : "курча (тварина)" } : q)) } },
     { name: "зникла клітинка (velký чол. істот. орудний мн.)", only: ["decl"], focus: ["velky::"], gens: { decl: mutate(REAL.decl, (q) => (q.comboId === "velky::masc_anim_instrumental::pl" ? null : q)) } },
     { name: "хибна правильна відповідь у прикметника", only: ["decl"], focus: ["stary::"], gens: { decl: mutate(REAL.decl, (q) => (q.comboId.startsWith("stary::") ? swap(q) : q)) } },
     { name: "дійсна форма як дистрактор (pán: páni / pánové)", only: ["nouns"], focus: ["muz-pan::"], gens: { nouns: mutate(REAL.nouns, (q) => (q.comboId === "muz-pan::nominativ::pl" ? { ...q, options: [q.correct, q.correct === "páni" ? "pánové" : "páni"] } : q)) } },
     { name: "залишок «{s}» у фразі", only: ["nouns"], focus: ["stul::"], gens: { nouns: mutate(REAL.nouns, (q) => (q.comboId.startsWith("stul::") && q.contextPhrase ? { ...q, contextPhrase: `{s} ${q.contextPhrase}` } : q)) } },
     { name: "чужий власник у «чий?»", only: ["decl"], focus: ["jeho::", "jeji::owner", "jejich::"], gens: { decl: mutate(REAL.decl, (q) => (q.comboId.includes("::owner_") ? swap(q) : q)) } },
     { name: "особовий: форма іншого регістру", only: ["decl"], focus: ["pp-ja::"], gens: { decl: mutate(REAL.decl, (q) => (q.comboId === "pp-ja::x_genitiv::0" ? { ...q, correct: "mne", options: ["mne", distractorOf(q) ?? "mi"] } : q)) } },
-    { name: "хибна вокалізація (ve → v)", only: ["decl"], focus: ["velky::", "vysoky::", "vsechen"], gens: { decl: mutate(REAL.decl, (q) => (q.contextPhrase && / ve ___/.test(q.contextPhrase) ? { ...q, contextPhrase: q.contextPhrase.replace(" ve ___", " v ___") } : q)) } },
+    // Мутація не залежить від того, чи жереб дав фразу з «ve ___»: питання velký із реченням отримує «v ___» перед формою
+    // на v- (velkém, velkého…) — потрібне «ve», оракул мусить це спіймати (раніше випадок падав, коли такої фрази не було).
+    { name: "хибна вокалізація (ve → v)", only: ["decl"], focus: ["velky::"], gens: { decl: mutate(REAL.decl, (q) => (q.comboId.startsWith("velky::") && q.contextPhrase ? { ...q, contextPhrase: "Bydlím v ___ domě." } : q)) } },
     { name: "хибна правильна відповідь в іменника", only: ["nouns"], focus: ["stul::"], gens: { nouns: mutate(REAL.nouns, (q) => (q.comboId.startsWith("stul::") ? swap(q) : q)) } },
     { name: "прийменник: зникла множина (v + місцевий)", only: ["preps"], focus: ["prep-v::"], gens: { preps: mutate(REAL.preps, (q) => (q.comboId === "prep-v::dual-location::lokal" && /множина/.test(q.taskText) ? null : q)) } },
     { name: "прийменник: зникла однина (po + знахідний, až po krk)", only: ["preps"], focus: ["prep-po::"], gens: { preps: mutate(REAL.preps, (q) => (q.comboId === "prep-po::dual-motion::akuzativ" && /однина/.test(q.taskText) ? null : q)) } },

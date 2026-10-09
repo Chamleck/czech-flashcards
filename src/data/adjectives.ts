@@ -52,6 +52,9 @@ const LENGTH: NounFilter = { any: ["timeUnit", "clothes", "path"], none: ["outdo
 const WIDTH: NounFilter = { any: ["furniture", "clothes", "path"], none: ["outdoor"] }; // široká postel, úzké kalhoty, široká cesta
 const DEPTH: NounFilter = { any: ["container"], none: ["vehicle", "clothes"] }; // hluboký talíř, hrnek, hluboká skříň
 const AGE: NounFilter = { none: ["time", "weather", "air", "meal", "activity", "abstract", "body", "food", "nature", "landform"] }; // не «staré moře»
+// Дитинча (тег young) молоде за визначенням: «staré kotě» — суперечність, «mladé štěně» — тавтологія (Нік 2026-10-08).
+const AGE_OLD: NounFilter = { none: [...(AGE.none ?? []), "young"] };
+const ANIMATE_ADULT: NounFilter = { ...ANIMATE, none: ["young"] };
 const LOOKS: NounFilter = { none: ["abstract", "document", "money", "activity", "meal", "food", "air", "noLooks"] }; // не «hezká kost / hlava»
 // Оцінка «добрий / поганий» з частиною тіла — лише сталі звороти («dobré srdce», «špatné oči»), не для всіх («dobrý krk»,
 // «dobrá kost»): частин тіла не беремо зовсім (Нік 2026-10-07).
@@ -632,7 +635,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "starý",
     pattern: "tvrdy",
     category: "quality",
-    fits: AGE,
+    fits: AGE_OLD,
     hasConsonantAlternation: true,
     declension: {
       masc_anim: {
@@ -914,7 +917,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "mladý",
     pattern: "tvrdy",
     category: "quality",
-    fits: ANIMATE,
+    fits: ANIMATE_ADULT,
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -5321,7 +5324,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "silný",
     pattern: "tvrdy",
     category: "quality",
-    fits: { any: ["person", "animal", "weather"] },
+    fits: { any: ["person", "animal", "weather"], none: ["young"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -10885,7 +10888,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "nebezpečný",
     pattern: "tvrdy",
     category: "quality",
-    fits: { any: ["vehicle", "outdoor", "path", "animal", "person"], none: ["collective"] },
+    fits: { any: ["vehicle", "outdoor", "path", "animal", "person"], none: ["collective", "young"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {
@@ -11870,7 +11873,7 @@ export const ADJECTIVES: AdjectiveEntry[] = [
     cz: "štíhlý",
     pattern: "tvrdy",
     category: "size",
-    fits: { any: ["person", "animal"], none: ["collective"] },
+    fits: { any: ["person", "animal"], none: ["collective", "young"] },
     hasConsonantAlternation: false,
     declension: {
       masc_anim: {

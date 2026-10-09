@@ -110,7 +110,7 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { text: "___ je pryč.", num: "sg", role: "every", any: ["food", "weather"] }, // všechen sníh / všechna voda je pryč
   ],
   genitiv: [
-    { text: "Bojím se ___.", num: "any", any: ["person", "animal"] },
+    { text: "Bojím se ___.", num: "any", any: ["person", "animal"], none: ["young"] }, // не «Bojím se kotěte» (дитинча, NOUN_TAG_DOC)
     { some: true, text: "Jdu do ___.", degrees: true, any: ["placeV"] },
     { text: "Vracím se {z} ___.", any: ["placeV"] }, // ze školy, z města
     { text: "Vracím se {z} ___.", all: ["placeNa", "workplace"] }, // z pošty, z nádraží (не «ze silnice»)
@@ -125,9 +125,9 @@ export const DECL_FRAMES: Record<QuizCase, DeclFrame[]> = {
     { text: "Nejdu do ___.", role: "neg", any: ["placeV"] },
     { text: "Do ___ {N} jdeš?", role: "question", any: ["placeV"] },
     { text: "Od ___ {N} je ten dárek?", num: "any", role: "question", any: ["person"] },
-    { text: "___ {N} se bojíš?", num: "any", role: "question", any: ["person", "animal"] },
+    { text: "___ {N} se bojíš?", num: "any", role: "question", any: ["person", "animal"], none: ["young"] },
     { text: "Od ___ {N} tu jsi?", role: "question", any: ["timeUnit"] }, // od kterého dne, od kolikátého týdne
-    { text: "Bojím se ___.", num: "any", role: "every", any: ["person", "animal"] }, // každého psa, všech psů
+    { text: "Bojím se ___.", num: "any", role: "every", any: ["person", "animal"], none: ["young"] }, // každého psa, všech psů
     { text: "Ptám se ___.", num: "any", role: "every", any: ["person"] }, // ptát se koho — родовий
     { text: "Během ___ se toho hodně stalo.", num: "any", ownerless: true, any: ["timeUnit", "dayPart"], plOk: ["timeUnit"] }, // během posledního týdne, během dlouhých nocí
     { text: "Nevejdu se do ___.", num: "any", any: ["clothes"] }, // do toho úzkého kabátu, do těch bot
@@ -256,19 +256,22 @@ export const ANTECEDENT_FRAME: DeclFrame = { text: "Znáš ___?", num: "any", an
 // Власник у питанні «чий?» (jeho / její / jejich) — лише людина: «Znáš tu ženu? Bydlím v jejím domě», не «Znáš krávu?
 // Vidím její silnice».
 export const OWNER_FRAME: DeclFrame = { text: "Znáš ___?", num: "any", any: ["person"] };
+// Антецедент фраз страху («Znáš ___? Bojím se ho»): без дитинчат (young) — як і у фразах страху банку (Нік 2026-10-08).
+export const FEAR_ANTECEDENT_FRAME: DeclFrame = { ...ANTECEDENT_FRAME, none: ["young"] };
 
 // ── Особові займенники ──
 // Регістр 0 = без прийменника / короткий, 1 = після прийменника / довгий, 2 = наголошений (лише 3-тя особа: jeho / jemu
 // проти ho / mu; фраза з протиставленням «…, ne tebe», де ненаголошена форма неможлива). s1 — підмет «я» (ціль 2/3 особи),
 // s2 — підмет «ти» (ціль 1 особи): «Vidím mě» неможливе (кореференція). Займенник-приклонка ніколи не перший у реченні.
 // Прийменник (prep) вокалізується за формою (ke mně, se mnou, ode mě).
-export interface PersonalFrame { pre: string; post: string; prep?: string }
+// ante — іменник-антецедент 3-ї особи, коли фраза звужує ANTECEDENT_FRAME (фрази страху — FEAR_ANTECEDENT_FRAME).
+export interface PersonalFrame { pre: string; post: string; prep?: string; ante?: DeclFrame }
 export interface PersonalCaseFrame { s1: PersonalFrame; s2: PersonalFrame }
 export const PERSONAL_FRAMES: Partial<Record<QuizCase, Partial<Record<0 | 1 | 2, PersonalCaseFrame>>>> = {
   genitiv: {
-    0: { s1: { pre: "Bojím se ", post: "." }, s2: { pre: "Bojíš se ", post: "?" } },
+    0: { s1: { pre: "Bojím se ", post: ".", ante: FEAR_ANTECEDENT_FRAME }, s2: { pre: "Bojíš se ", post: "?" } },
     1: { s1: { pre: "Dostal jsem dárek ", post: ".", prep: "od" }, s2: { pre: "Dostal jsi dárek ", post: "?", prep: "od" } },
-    2: { s1: { pre: "Bojím se ", post: ", ne tebe." }, s2: { pre: "Bojíš se ", post: ", ne mě?" } },
+    2: { s1: { pre: "Bojím se ", post: ", ne tebe.", ante: FEAR_ANTECEDENT_FRAME }, s2: { pre: "Bojíš se ", post: ", ne mě?" } },
   },
   dativ: {
     0: { s1: { pre: "Věřím ", post: "." }, s2: { pre: "Věříš ", post: "?" } },

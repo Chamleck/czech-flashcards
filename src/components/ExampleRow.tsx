@@ -20,9 +20,16 @@ export function ExampleRow({ id, cz, uk, label, lead }: { id: string; cz: string
   );
 }
 
+// Приклад під таблицею форм: речення, переклад і (у багатозначного слова) підпис значення.
+export interface ExampleItem {
+  label?: string;
+  cz: string;
+  uk: string;
+}
+
 // Приклади слова під таблицею форм: у однозначного — один, у багатозначного — по одному на значення, кожен під своїм
-// підписом (data: NounSense, AdjectiveSense). Перший — під таблицею, решта — стосом.
-export function SenseExamples({ id, items }: { id: string; items: { label?: string; cz: string; uk: string }[] }) {
+// підписом (поле senses, types/index.ts). Перший — під таблицею, решта — стосом.
+export function SenseExamples({ id, items }: { id: string; items: ExampleItem[] }) {
   return (
     <>
       {items.map((ex, i) => (

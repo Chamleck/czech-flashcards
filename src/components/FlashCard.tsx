@@ -3,15 +3,15 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { NounEntry } from "../types";
 import { theme, GENDER_LABEL } from "../utils/theme";
 import { PosEmoji } from "./PosEmoji";
-import { SenseExamples } from "./ExampleRow";
+import { ExampleItem, SenseExamples } from "./ExampleRow";
 import { DeclensionTable } from "./DeclensionTable";
 import { Speakable } from "./Speakable";
 
 // Приклади під таблицею: у однозначного слова — один (якщо є), у багатозначного — по одному на значення під його
 // підписом (NounSense, types/index.ts).
-function examplesOf(n: NounEntry): { label?: string; cz: string; uk: string }[] {
+function examplesOf(n: NounEntry): ExampleItem[] {
   if (n.senses) return n.senses.map((s) => ({ label: s.label, ...s.example }));
-  return n.exampleSentenceCz ? [{ cz: n.exampleSentenceCz, uk: n.exampleSentenceUk ?? "" }] : [];
+  return n.exampleSentenceCz !== undefined ? [{ cz: n.exampleSentenceCz, uk: n.exampleSentenceUk }] : [];
 }
 
 interface Props {

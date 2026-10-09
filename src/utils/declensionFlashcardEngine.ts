@@ -577,8 +577,21 @@ function antecedentPool(g: Gender, n: GrammaticalNumber, spec: AnteSpec): QuizNo
   );
 }
 const PERSONAL_ANTE: AnteSpec = { frame: ANTECEDENT_FRAME, partners: DETERMINER_PARTNERS, numberMatters: false };
-// oni: рід антецедента довільний (непрямі форми множини спільні), але лише з тих, де є особа чи тварина.
-const ONI_GENDERS = GENDER_ORDER.filter((g) => antecedentPool(g, "pl", PERSONAL_ANTE).length > 0);
+// Фраза особового займенника може звузити антецедент (PersonalFrame.ante — фрази страху без дитинчат).
+const ANTE_SPECS = new Map<DeclFrame, AnteSpec>();
+function anteSpecOf(fr: PersonalFrame): AnteSpec {
+  if (!fr.ante) return PERSONAL_ANTE;
+  let spec = ANTE_SPECS.get(fr.ante);
+  if (!spec) ANTE_SPECS.set(fr.ante, (spec = { ...PERSONAL_ANTE, frame: fr.ante }));
+  return spec;
+}
+// oni: рід антецедента довільний (непрямі форми множини спільні), але лише з тих, де є такий іменник.
+const ONI_GENDERS = new Map<AnteSpec, Gender[]>();
+function oniGenders(spec: AnteSpec): Gender[] {
+  let gs = ONI_GENDERS.get(spec);
+  if (!gs) ONI_GENDERS.set(spec, (gs = GENDER_ORDER.filter((g) => antecedentPool(g, "pl", spec).length > 0)));
+  return gs;
+}
 
 function buildAntecedent(g: Gender, n: GrammaticalNumber, used: Set<string>, spec: AnteSpec = PERSONAL_ANTE): string {
   const { partners } = spec;
@@ -741,8 +754,10 @@ function personalUnits(): UnitCombo[] {
             avoid: stressed ? [] : [getForm(c, 0), getForm(c, 1), getForm(c, 2)],
             taskText: ppTaskText(isOni ? null : g, c, r, true),
             // oni: рід лише декорує антецедент (непрямі форми множини спільні для всіх родів)
-            context: (used) =>
-              fillPersonal(cf.s1, form, isOni ? buildAntecedent(randomOf(ONI_GENDERS)!, "pl", used) : buildAntecedent(g, "sg", used)),
+            context: (used) => {
+              const spec = anteSpecOf(cf.s1);
+              return fillPersonal(cf.s1, form, isOni ? buildAntecedent(randomOf(oniGenders(spec))!, "pl", used, spec) : buildAntecedent(g, "sg", used, spec));
+            },
             promptWord: entry.cz,
             promptUk: entry.uk,
             gender: isOni ? "masc_anim" : g,

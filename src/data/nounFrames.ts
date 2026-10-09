@@ -65,7 +65,7 @@ export const NOUN_FRAMES: Record<CzechCase, NounFrame[]> = {
     { text: "Minerální ___ jsou zdravé.", num: "pl", any: ["mineral"], plOk: ["mineral"] }, // minerální vody
   ],
   genitiv: [
-    { text: "Bojím se ___.", num: "any", any: ["person", "animal"] },
+    { text: "Bojím se ___.", num: "any", any: ["person", "animal"], none: ["young"] }, // не «Bojím se štěněte» (дитинча)
     { text: "Mám dárek od ___.", num: "any", any: ["person"] },
     { text: "Mám fotku ___.", num: "any", none: [...NOT_PICTURED, "document"] },
     { text: "Bojím se ___.", any: ["weather"] }, // deště, sněhu, větru

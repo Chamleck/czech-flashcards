@@ -23,7 +23,7 @@ import { NounEntry } from "../types";
 //       • місце ЗАВЖДИ має рівно один із placeV (в школі) чи placeNa (на пошті) — це лексична властивість
 //         слова; перевір за словником, а не за відчуттям;
 //       • особа, тварина, їжа, час, погода, гроші, документ, тіло, повітря — «самотні» теги (без інших; винятки:
-//         тіло + bodyLevel / singleLevel / bodyMany / noLooks, час + timeUnit / dayPart / month / season / weekday / daySpan / dayPoint / timeV / yearsPlural, їжа + served / homemade / drink / mineral, погода + strongPl / weatherCause / sky, документ + carried — pas, doklad, гроші + currency — koruna, euro, особа + collective — rodina);
+//         тіло + bodyLevel / singleLevel / bodyMany / noLooks, тварина + young (дитинча: kotě, štěně), час + timeUnit / dayPart / month / season / weekday / daySpan / dayPoint / timeV / yearsPlural, їжа + served / homemade / drink / mineral, погода + strongPl / weatherCause / sky, документ + carried — pas, doklad, гроші + currency — koruna, euro, особа + collective — rodina);
 //       • їжа: served — страва чи напій, який подають теплим або холодним (káva, polévka, maso: «teplá polévka»);
 //         homemade — буває домашнім (chléb, pivo, ovoce: «domácí chléb»); жодного — як cukr. Без них teplý / studený /
 //         domácí з цим словом не з'являться (і «studený cukr» теж) — це безпечно; зайвий тег дасть безглузду пару;
@@ -465,29 +465,6 @@ export const NOUNS: NounEntry[] = [
     },
     exampleSentenceCz: "Jedeme k moři.",
     exampleSentenceUk: "Ми їдемо до моря.",
-  },
-
-  // ─────────────── kuře (сер., -ete) ───────────────
-  {
-    id: "kure",
-    uncountable: false,
-    uk: "курча",
-    cz: "kuře",
-    gender: "neut",
-    pattern: "kure",
-    category: "food",
-    sem: ["food", "served", "homemade"],
-    declension: {
-      nominativ: { sg: "kuře", pl: "kuřata" },
-      genitiv: { sg: "kuřete", pl: "kuřat" },
-      dativ: { sg: "kuřeti", pl: "kuřatům" },
-      akuzativ: { sg: "kuře", pl: "kuřata" },
-      vokativ: { sg: "kuře", pl: "kuřata" },
-      lokal: { sg: "kuřeti", pl: "kuřatech" },
-      instrumental: { sg: "kuřetem", pl: "kuřaty" },
-    },
-    exampleSentenceCz: "To kuře je malé.",
-    exampleSentenceUk: "Те курча маленьке.",
   },
 
   // ─────────────── stavení (сер., -í незмінний) ───────────────
@@ -2001,6 +1978,84 @@ export const NOUNS: NounEntry[] = [
     },
     exampleSentenceCz: "Kůň běží po louce.",
     exampleSentenceUk: "Кінь біжить по лузі.",
+  },
+
+  // ─────────────── Дитинчата тварин (сер., -ete, зразок kuře; IJP: kotě, štěně, kuře — таблиці звірено 2026-10-08) ───────────────
+  // young — дитинча: без «starý / mladý / silný / nebezpečný / štíhlý» і без фраз страху (NOUN_TAG_DOC, data/nounTags.ts).
+  {
+    id: "kote",
+    uncountable: false,
+    uk: "кошеня",
+    cz: "kotě",
+    gender: "neut",
+    pattern: "kure",
+    category: "animals",
+    sem: ["animal", "young"],
+    declension: {
+      nominativ: { sg: "kotě", pl: "koťata" },
+      genitiv: { sg: "kotěte", pl: "koťat" },
+      dativ: { sg: "kotěti", pl: "koťatům" },
+      akuzativ: { sg: "kotě", pl: "koťata" },
+      vokativ: { sg: "kotě", pl: "koťata" },
+      lokal: { sg: "kotěti", pl: "koťatech" },
+      instrumental: { sg: "kotětem", pl: "koťaty" },
+    },
+    exampleSentenceCz: "Máme doma hravé kotě.",
+    exampleSentenceUk: "У нас удома грайливе кошеня.",
+  },
+  {
+    id: "stene",
+    uncountable: false,
+    uk: "цуценя",
+    cz: "štěně",
+    gender: "neut",
+    pattern: "kure",
+    category: "animals",
+    sem: ["animal", "young"],
+    declension: {
+      nominativ: { sg: "štěně", pl: "štěňata" },
+      genitiv: { sg: "štěněte", pl: "štěňat" },
+      dativ: { sg: "štěněti", pl: "štěňatům" },
+      akuzativ: { sg: "štěně", pl: "štěňata" },
+      vokativ: { sg: "štěně", pl: "štěňata" },
+      lokal: { sg: "štěněti", pl: "štěňatech" },
+      instrumental: { sg: "štěnětem", pl: "štěňaty" },
+    },
+    exampleSentenceCz: "Štěně spí v košíku.",
+    exampleSentenceUk: "Цуценя спить у кошику.",
+  },
+  // kuře — одне слово з двома значеннями (SSČ: «mládě kura: pečené kuře»): одна картка в «Тварини», значення — senses
+  // (правило 15 шапки). Зразок відмінювання kuře (pattern "kure") — саме це слово.
+  {
+    id: "kure",
+    uk: "курча",
+    cz: "kuře",
+    gender: "neut",
+    pattern: "kure",
+    category: "animals",
+    senses: [
+      {
+        label: "тварина",
+        sem: ["animal", "young"],
+        uncountable: false,
+        example: { cz: "Na dvoře běhají kuřata.", uk: "Подвір'ям бігають курчата." },
+      },
+      {
+        label: "їжа",
+        sem: ["food", "served", "homemade"],
+        uncountable: false,
+        example: { cz: "Dnes je k obědu pečené kuře.", uk: "Сьогодні на обід запечене курча." },
+      },
+    ],
+    declension: {
+      nominativ: { sg: "kuře", pl: "kuřata" },
+      genitiv: { sg: "kuřete", pl: "kuřat" },
+      dativ: { sg: "kuřeti", pl: "kuřatům" },
+      akuzativ: { sg: "kuře", pl: "kuřata" },
+      vokativ: { sg: "kuře", pl: "kuřata" },
+      lokal: { sg: "kuřeti", pl: "kuřatech" },
+      instrumental: { sg: "kuřetem", pl: "kuřaty" },
+    },
   },
 
   // ═══════════════════ ДНІ ТИЖНЯ ═══════════════════

@@ -13,7 +13,7 @@ import { DeclensionTable } from "./DeclensionTable";
 import { GenderIcon } from "./GenderIcon";
 import { SegmentTabs } from "./SegmentTabs";
 import { Speakable } from "./Speakable";
-import { SenseExamples } from "./ExampleRow";
+import { ExampleItem, SenseExamples } from "./ExampleRow";
 
 export type DeclEntry = AdjectiveEntry | PronounEntry;
 
@@ -55,8 +55,8 @@ function patternLabel(e: DeclEntry, degree: Degree): string {
 
 // Приклади під таблицею (поле examples / senses, types/index.ts): незмінний займенник — один приклад; відмінюване
 // слово — приклад обраного роду, у багатозначного прикметника — по одному на значення під його підписом.
-function examplesOf(e: DeclEntry, g: Gender): { label?: string; cz: string; uk: string }[] {
-  if (!("declension" in e)) return e.exampleSentenceCz ? [{ cz: e.exampleSentenceCz, uk: e.exampleSentenceUk ?? "" }] : [];
+function examplesOf(e: DeclEntry, g: Gender): ExampleItem[] {
+  if (!("declension" in e)) return e.exampleSentenceCz !== undefined ? [{ cz: e.exampleSentenceCz, uk: e.exampleSentenceUk }] : [];
   if ("senses" in e && e.senses) return e.senses.map((s) => ({ label: s.label, ...s.examples[g] }));
   return [e.examples[g]];
 }
